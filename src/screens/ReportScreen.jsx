@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Badge, Btn, GlobalNav, VoicePlayer, Footer, Skeleton } from "../components/shared.jsx";
+import { Badge, Btn, GlobalNav, VoicePlayer, Footer, Skeleton, useToast } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function ReportScreen({ go, user, logout, interviewId }) {
   const isMobile = useIsMobile();
+  const { showToast } = useToast();
   const [interview, setInterview] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -66,7 +67,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
       if (!res.ok) throw new Error(data.error || "리포트 생성 실패");
       setReport({ status: "completed", content: data.content });
     } catch (e) {
-      alert(e.message);
+      showToast(e.message, "error");
     } finally {
       clearInterval(genTimerRef.current);
       setGenerating(false);
@@ -206,7 +207,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 ];
                 const currentStep = steps.findIndex(s => genElapsed >= s.from && genElapsed < s.to);
                 const stepIdx = currentStep === -1 ? steps.length - 1 : currentStep;
-                const progress = Math.min((genElapsed / 20) * 100, 95);
+                const progress = Math.min((genElapsed / 25) * 100, 98);
                 return (
                   <div style={{ maxWidth: 300, margin: "0 auto" }}>
                     <style>{`@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse-step{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
@@ -236,6 +237,23 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
           {report?.status === "completed" && report.content && (
             <div>
+              {/* Stats */}
+              {report.content.stats && (
+                <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24, boxShadow: S.ambient }}>
+                  <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 14 }}>응답 통계</div>
+                  <div style={{ display: "flex", gap: 32 }}>
+                    <div>
+                      <div style={{ fontSize: 11, color: C.body, marginBottom: 4 }}>총 응답수</div>
+                      <div style={{ fontSize: 20, fontWeight: 600, color: C.navy }}>{report.content.stats.total_responses}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, color: C.body, marginBottom: 4 }}>평균 완료 시간</div>
+                      <div style={{ fontSize: 20, fontWeight: 600, color: C.navy }}>{report.content.stats.avg_completion_time}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Summary */}
               <div style={{ background: `linear-gradient(135deg,rgba(83,58,253,0.05),rgba(232,113,10,0.04))`, border: `1px solid rgba(83,58,253,0.1)`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
                 <div style={{ fontSize: 12, fontWeight: 400, color: C.purple, marginBottom: 10 }}>✦ AI 종합 요약</div>
