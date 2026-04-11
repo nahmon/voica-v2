@@ -43,6 +43,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [saving, setSaving] = useState(false);
   const [shareCode, setShareCode] = useState(null);
+  const [showShareOverlay, setShowShareOverlay] = useState(false);
   const [editingId, setEditingId] = useState(interviewId ?? null);
   const [loadingExisting, setLoadingExisting] = useState(!!interviewId);
   const [copied, setCopied] = useState(false);
@@ -147,6 +148,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "저장 실패");
       setShareCode(data.share_code);
+      setShowShareOverlay(true);
       if (!editingId && data.interview?.id) setEditingId(data.interview.id);
       localStorage.removeItem(DRAFT_KEY);
     } catch (e) {
@@ -176,7 +178,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   // ─── Overlays (share success + incomplete warning) ───
   const shareUrl = shareCode ? `${window.location.origin}/i/${shareCode}` : null;
 
-  const ShareOverlay = shareCode && (
+  const ShareOverlay = showShareOverlay && shareCode && (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ background: C.white, borderRadius: 20, padding: "40px 36px", maxWidth: 440, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px", animation: "fadeInUp 0.2s ease" }}>
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(21,190,83,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
@@ -191,7 +193,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           <Btn size="sm" onClick={handleCopy}>{copied ? "복사됨 ✓" : "복사"}</Btn>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn full variant="ghost" onClick={() => setShareCode(null)}>계속 편집</Btn>
+          <Btn full variant="ghost" onClick={() => setShowShareOverlay(false)}>계속 편집</Btn>
           <Btn full onClick={() => go("dashboard")}>대시보드로 이동</Btn>
         </div>
       </div>
