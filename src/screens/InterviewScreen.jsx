@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { Btn, WaveAnimation } from "../components/shared.jsx";
+import { Btn, WaveAnimation, useToast } from "../components/shared.jsx";
 
 const MIN_RECORD_SECS = 5;
 
@@ -37,6 +37,9 @@ export default function InterviewScreen({ go, shareCode }) {
   // Exit confirm
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [ttsBlocked, setTtsBlocked] = useState(false);
+  const [recordingWarning, setRecordingWarning] = useState(null);
+  const [resumeData, setResumeData] = useState(null); // { sessionId, qIndex }
+  const { showToast } = useToast();
   const audioRef = useRef(null);
   const ttsCacheRef = useRef({}); // { [question_id]: url }
 
@@ -131,6 +134,50 @@ export default function InterviewScreen({ go, shareCode }) {
     return () => clearInterval(timerRef.current);
   }, [phase]);
 
+  // Page Visibility — stop recording if screen locks / tab switches
+  useEffect(() => {
+    if (phase !== "recording") return;
+    const handleVisibility = () => {
+      if (document.hidden) {
+        const mr = mediaRecorderRef.current;
+        if (mr && mr.state === "recording") {
+          mr.stop();
+          streamRef.current?.getTracks().forEach(t => t.stop());
+        }
+        setPhase("ready");
+        setRecordTime(0);
+        chunksRef.current = [];
+        setRecordingWarning("화면이 잠겨서 녹음이 중단됐어요. 다시 녹음해 주세요.");
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [phase]);
+
+  // Session resume — check localStorage for existing session
+  useEffect(() => {
+    if (!shareCode || !interview) return;
+    const key = `voica_session_${shareCode}`;
+    const stored = localStorage.getItem(key);
+    if (!stored) return;
+    try {
+      const parsed = JSON.parse(stored);
+      const twoHours = 2 * 60 * 60 * 1000;
+      if (parsed.sessionId && Date.now() - parsed.startedAt < twoHours) {
+        setResumeData(parsed);
+      } else {
+        localStorage.removeItem(key);
+      }
+    } catch { localStorage.removeItem(key); }
+  }, [shareCode, interview]);
+
+  // Persist qIndex to localStorage as interview progresses
+  useEffect(() => {
+    if (!shareCode || !sessionId) return;
+    const key = `voica_session_${shareCode}`;
+    localStorage.setItem(key, JSON.stringify({ sessionId, qIndex, startedAt: Date.now() }));
+  }, [qIndex, sessionId, shareCode]);
+
   const startSession = async () => {
     // Prefetch first two questions' TTS immediately on session start
     const qs = interview?.questions ?? [];
@@ -168,6 +215,7 @@ export default function InterviewScreen({ go, shareCode }) {
     } else {
       // Complete session
       if (sessionId) fetch("/api/session", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, status: "completed" }) });
+      if (shareCode) localStorage.removeItem(`voica_session_${shareCode}`);
       setCompleted(true);
     }
   };
@@ -205,7 +253,7 @@ export default function InterviewScreen({ go, shareCode }) {
       try {
         const path = `${sessionId}/${q.id}.${ext}`;
         const { data: uploaded, error: uploadError } = await supabase.storage.from("audio-responses").upload(path, blob, { contentType: mimeType, upsert: true });
-        if (uploadError) console.error("[audio upload]", uploadError);
+        if (uploadError) { console.error("[audio upload]", uploadError); showToast("녹음 저장에 실패했어요. 응답은 계속 진행됩니다.", "error"); }
         else if (uploaded) {
           const { data: signedData } = await supabase.storage.from("audio-responses").createSignedUrl(path, 31536000);
           if (signedData) audioUrl = signedData.signedUrl;
@@ -218,7 +266,7 @@ export default function InterviewScreen({ go, shareCode }) {
         fd.append("session_id", sessionId);
         const sttRes = await fetch("/api/stt", { method: "POST", body: fd });
         if (sttRes.ok) { const d = await sttRes.json(); transcript = d.transcript; }
-        else console.error("[stt]", sttRes.status, await sttRes.text().catch(() => ""));
+        else { console.error("[stt]", sttRes.status); showToast("음성 인식에 실패했어요. 텍스트 없이 저장됩니다.", "error"); }
       } catch (e) { console.error("[stt exception]", e); }
       await saveResponse({ audio_url: audioUrl, transcript });
       setPhase("review_pass");
@@ -250,6 +298,33 @@ export default function InterviewScreen({ go, shareCode }) {
       <div style={{ fontSize: 32, marginBottom: 16 }}>🔗</div>
       <div style={{ fontSize: 18, color: C.white, marginBottom: 8 }}>링크를 확인해 주세요</div>
       <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>{loadError}</div>
+    </div>
+  );
+
+  // ─── Resume prompt ───
+  if (introStep === "info" && resumeData) return (
+    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
+      <div style={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
+        <div style={{ fontSize: 40, marginBottom: 20 }}>💬</div>
+        <div style={{ fontSize: 20, fontWeight: 600, color: "#fff", marginBottom: 10 }}>이전 인터뷰가 있어요</div>
+        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 32, lineHeight: 1.6 }}>
+          {resumeData.qIndex + 1}번 질문까지 진행했어요.<br />이어서 계속할까요?
+        </div>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+          <button onClick={() => {
+            setSessionId(resumeData.sessionId);
+            setQIndex(resumeData.qIndex);
+            setIntroStep("started");
+            setResumeData(null);
+          }} style={{ padding: "12px 24px", borderRadius: 10, border: "none", background: `linear-gradient(135deg,${C.purple},${C.purpleDeep})`, color: "#fff", fontSize: 14, fontWeight: 500, fontFamily: F, cursor: "pointer" }}>
+            이어서 하기 →
+          </button>
+          <button onClick={() => { localStorage.removeItem(`voica_session_${shareCode}`); setResumeData(null); }}
+            style={{ padding: "12px 24px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.6)", fontSize: 14, fontFamily: F, cursor: "pointer" }}>
+            처음부터
+          </button>
+        </div>
+      </div>
     </div>
   );
 
@@ -376,6 +451,13 @@ export default function InterviewScreen({ go, shareCode }) {
             {/* Voice question */}
             {q.type === "voice" && (
               <>
+                {recordingWarning && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 8, background: "rgba(255,200,50,0.1)", border: "1px solid rgba(255,200,50,0.25)", marginBottom: 4 }}>
+                    <span style={{ fontSize: 16 }}>⚠️</span>
+                    <span style={{ fontSize: 12, color: "rgba(255,200,50,0.9)" }}>{recordingWarning}</span>
+                    <button onClick={() => setRecordingWarning(null)} style={{ marginLeft: "auto", background: "none", border: "none", color: "rgba(255,255,255,0.3)", fontSize: 14, cursor: "pointer", padding: 0 }}>✕</button>
+                  </div>
+                )}
                 {phase === "ai_speaking" && !ttsBlocked && <div style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>AI가 질문을 읽고 있어요...</div>}
                 {phase === "ai_speaking" && ttsBlocked && (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>

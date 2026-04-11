@@ -1,9 +1,51 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, createContext, useContext, useCallback } from "react";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
 
 const _interviewCountCache = {};
+
+// ─── Toast ──────────────────────────────────────────────────────────────────
+const ToastCtx = createContext(null);
+
+export function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
+  const showToast = useCallback((message, variant = "info") => {
+    const id = Date.now() + Math.random();
+    setToasts(t => [...t, { id, message, variant }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3200);
+  }, []);
+  const bg = { success: "#1e8e3e", error: "#d93025", info: C.purple };
+  return (
+    <ToastCtx.Provider value={{ showToast }}>
+      {children}
+      <div style={{ position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)", zIndex: 9999, display: "flex", flexDirection: "column", gap: 8, alignItems: "center", pointerEvents: "none" }}>
+        <style>{`@keyframes toast-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        {toasts.map(t => (
+          <div key={t.id} style={{ background: bg[t.variant] ?? C.purple, color: "#fff", padding: "10px 18px", borderRadius: 10, fontSize: 13, fontFamily: F, fontWeight: 500, boxShadow: "0 4px 16px rgba(0,0,0,0.22)", whiteSpace: "nowrap", animation: "toast-in 0.22s ease", letterSpacing: "0.16px" }}>
+            {t.message}
+          </div>
+        ))}
+      </div>
+    </ToastCtx.Provider>
+  );
+}
+
+export function useToast() {
+  const ctx = useContext(ToastCtx);
+  if (!ctx) return { showToast: () => {} };
+  return ctx;
+}
+
+// ─── Skeleton ────────────────────────────────────────────────────────────────
+export function Skeleton({ width = "100%", height = 16, borderRadius = 6, style: sx = {} }) {
+  return (
+    <>
+      <style>{`@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}`}</style>
+      <div style={{ width, height, borderRadius, background: "linear-gradient(90deg,#eee 25%,#f5f5f5 50%,#eee 75%)", backgroundSize: "800px 100%", animation: "shimmer 1.4s infinite linear", ...sx }} />
+    </>
+  );
+}
 
 export function Badge({ children, variant = "neutral", style: sx = {} }) {
   const v = {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Btn, GlobalNav, VoicePlayer } from "../components/shared.jsx";
+import { Btn, GlobalNav, VoicePlayer, Skeleton } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function ResponsesScreen({ go, user, logout, interviewId }) {
@@ -52,8 +52,20 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
     : [];
 
   if (loading) return (
-    <div style={{ fontFamily: F, display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", color: C.body, fontSize: 14 }}>
-      불러오는 중…
+    <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
+        <Skeleton width={200} height={28} borderRadius={8} style={{ marginBottom: 8 }} />
+        <Skeleton width={140} height={16} borderRadius={6} style={{ marginBottom: 32 }} />
+        {[1,2,3].map(i => (
+          <div key={i} style={{ background: "#fff", borderRadius: 12, padding: "18px 20px", marginBottom: 10, display: "flex", gap: 12, alignItems: "center" }}>
+            <Skeleton width={36} height={36} borderRadius="50%" />
+            <div style={{ flex: 1 }}>
+              <Skeleton width="40%" height={14} borderRadius={5} style={{ marginBottom: 6 }} />
+              <Skeleton width="25%" height={12} borderRadius={5} />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 
@@ -106,7 +118,17 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
             응답자 목록 ({sessions.length})
           </div>
           {sessions.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "48px 0", color: C.body, fontSize: 14 }}>아직 응답이 없어요</div>
+            <div style={{ textAlign: "center", padding: "56px 20px" }}>
+              <div style={{ fontSize: 40, marginBottom: 14 }}>🎙️</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 6 }}>아직 응답이 없어요</div>
+              <div style={{ fontSize: 13, color: C.body, marginBottom: interview?.share_code ? 20 : 0 }}>인터뷰 링크를 공유하면 패널이 참여해요</div>
+              {interview?.share_code && (
+                <button onClick={() => { navigator.clipboard.writeText(`${location.origin}/i/${interview.share_code}`); }}
+                  style={{ padding: "8px 18px", borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, fontSize: 13, color: C.purple, fontFamily: F, cursor: "pointer", fontWeight: 500 }}>
+                  🔗 링크 복사
+                </button>
+              )}
+            </div>
           ) : sessions.map((s, i) => {
             const isCompleted = s.status === "completed";
             const dt = s.completed_at
@@ -163,8 +185,16 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           </div>
           <div style={{ flex: 1, overflowY: "auto" }}>
             {sessions.length === 0 ? (
-              <div style={{ padding: "40px 20px", textAlign: "center", color: C.body, fontSize: 13 }}>
-                아직 응답이 없어요
+              <div style={{ textAlign: "center", padding: "48px 16px" }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>🎙️</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 6 }}>아직 응답이 없어요</div>
+                <div style={{ fontSize: 12, color: C.body, marginBottom: interview?.share_code ? 16 : 0 }}>인터뷰 링크를 공유하면 패널이 참여해요</div>
+                {interview?.share_code && (
+                  <button onClick={() => navigator.clipboard.writeText(`${location.origin}/i/${interview.share_code}`)}
+                    style={{ padding: "7px 16px", borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, fontSize: 12, color: C.purple, fontFamily: F, cursor: "pointer" }}>
+                    🔗 링크 복사
+                  </button>
+                )}
               </div>
             ) : sessions.map((s, i) => {
               const isSelected = selectedSession?.id === s.id;

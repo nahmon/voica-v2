@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Badge, Btn, GlobalNav, VoicePlayer, Footer } from "../components/shared.jsx";
+import { Badge, Btn, GlobalNav, VoicePlayer, Footer, Skeleton } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function ReportScreen({ go, user, logout, interviewId }) {
@@ -78,8 +78,16 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   const completedSessions = sessions.filter(s => s.status === "completed");
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F }}>
-      <div style={{ color: C.body }}>불러오는 중...</div>
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
+        <Skeleton width={220} height={28} borderRadius={8} style={{ marginBottom: 8 }} />
+        <Skeleton width={160} height={16} borderRadius={6} style={{ marginBottom: 32 }} />
+        <div style={{ background: "#fff", borderRadius: 16, padding: "28px 24px" }}>
+          <Skeleton width="100%" height={20} borderRadius={6} style={{ marginBottom: 12 }} />
+          <Skeleton width="80%" height={16} borderRadius={6} style={{ marginBottom: 8 }} />
+          <Skeleton width="60%" height={16} borderRadius={6} />
+        </div>
+      </div>
     </div>
   );
 
@@ -189,24 +197,33 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 완료된 응답 {completedSessions.length}건을 GPT-4o가 분석하여<br />
                 테마, 감성, 인사이트를 자동으로 정리해요.
               </div>
-              {generating ? (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 16 }}>
-                    <div style={{ width: 20, height: 20, border: `2px solid ${C.purple}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                    <span style={{ fontSize: 14, color: C.navy }}>AI 분석 중...</span>
+              {generating ? (() => {
+                const steps = [
+                  { label: "응답 데이터 수집 중", from: 0, to: 3 },
+                  { label: "AI 분석 중", from: 3, to: 8 },
+                  { label: "테마 분류 중", from: 8, to: 15 },
+                  { label: "인사이트 리포트 작성 중", from: 15, to: Infinity },
+                ];
+                const currentStep = steps.findIndex(s => genElapsed >= s.from && genElapsed < s.to);
+                const stepIdx = currentStep === -1 ? steps.length - 1 : currentStep;
+                const progress = Math.min((genElapsed / 20) * 100, 95);
+                return (
+                  <div style={{ maxWidth: 300, margin: "0 auto" }}>
+                    <style>{`@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse-step{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, justifyContent: "center" }}>
+                      <div style={{ width: 16, height: 16, border: `2px solid ${C.purple}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+                      <span style={{ fontSize: 14, fontWeight: 500, color: C.navy, animation: "pulse-step 1.6s ease-in-out infinite" }}>{steps[stepIdx].label}</span>
+                    </div>
+                    <div style={{ height: 4, background: C.border, borderRadius: 2, overflow: "hidden", marginBottom: 10 }}>
+                      <div style={{ height: "100%", background: `linear-gradient(90deg,${C.purple},${C.purpleLight})`, borderRadius: 2, width: `${progress}%`, transition: "width 1s ease" }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.body }}>
+                      <span>{steps.map((s, i) => i <= stepIdx ? "●" : "○").join(" ")}</span>
+                      <span>{genElapsed}초 경과</span>
+                    </div>
                   </div>
-                  <div style={{ fontSize: 12, color: C.body, marginBottom: 8 }}>
-                    {genElapsed}초 경과 · 보통 30초~1분 걸려요
-                  </div>
-                  <div style={{ height: 3, background: C.border, borderRadius: 2, maxWidth: 240, margin: "0 auto", overflow: "hidden" }}>
-                    <div style={{ height: "100%", background: C.purple, borderRadius: 2, width: "60%", animation: "slide-progress 2s ease-in-out infinite alternate" }} />
-                  </div>
-                  <style>{`
-                    @keyframes spin { to { transform: rotate(360deg); } }
-                    @keyframes slide-progress { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
-                  `}</style>
-                </div>
-              ) : (
+                );
+              })() : (
                 <Btn onClick={handleGenerateReport} disabled={completedSessions.length === 0}>
                   리포트 생성하기 →
                 </Btn>

@@ -21,6 +21,7 @@ import FAQScreen from "./screens/FAQScreen.jsx";
 import TermsScreen from "./screens/TermsScreen.jsx";
 import PrivacyScreen from "./screens/PrivacyScreen.jsx";
 import AboutScreen from "./screens/AboutScreen.jsx";
+import { ToastProvider } from "./components/shared.jsx";
 
 export default function Voica() {
   const [screen, setScreen] = useState("landing");
@@ -65,6 +66,7 @@ export default function Voica() {
   };
 
   return (
+    <ToastProvider>
     <div style={{ fontFamily: F, fontFeatureSettings: '"ss01"', color: C.navy }}>
       <style>{`@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}.cursor-blink{display:inline-block;width:10px;height:2px;background:${C.purple};margin-left:4px;vertical-align:0.1em;border-radius:0;animation:blink 0.8s step-end infinite;}`}</style>
       <style>{`
@@ -93,5 +95,6 @@ export default function Voica() {
       {screen === "privacy"          && <PrivacyScreen go={go} user={user} logout={logout} />}
       {screen === "about"            && <AboutScreen go={go} user={user} logout={logout} />}
     </div>
+    </ToastProvider>
   );
 }
