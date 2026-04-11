@@ -80,7 +80,7 @@ export default function Voica() {
       {screen === "interview"        && <InterviewScreen go={go} shareCode={shareCode} />}
       {screen === "report"           && <ReportScreen go={go} user={user} interviewId={interviewId} />}
       {screen === "recruiter_admin"  && <RecruiterAdminScreen go={go} />}
-      {screen === "panel_board"      && <PanelBoardScreen go={go} user={user} />}
+      {screen === "panel_board"      && <PanelBoardScreen go={go} user={user} logout={logout} />}
       {screen === "pricing"          && <PricingScreen go={go} user={user} logout={logout} />}
       {screen === "support"          && <SupportScreen go={go} user={user} logout={logout} />}
       {screen === "faq"              && <FAQScreen go={go} user={user} logout={logout} />}

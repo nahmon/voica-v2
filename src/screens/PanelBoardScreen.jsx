@@ -6,7 +6,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const APPLY_STEPS = ["none", "applied", "ai_screening", "confirmed"];
 
-export default function PanelBoardScreen({ go, user }) {
+export default function PanelBoardScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const [search, setSearch]       = useState("");
   const [catFilter, setCatFilter] = useState("전체");
@@ -32,7 +32,7 @@ export default function PanelBoardScreen({ go, user }) {
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
-      <GlobalNav go={go} activeTab="panel_board" variant="panel" user={user} />
+      <GlobalNav go={go} activeTab="panel_board" variant="panel" user={user} logout={logout} />
 
       {/* Hero */}
       <div style={{ background: C.navy, padding: isMobile ? "32px 20px 28px" : "40px 24px 32px", textAlign: "center" }}>

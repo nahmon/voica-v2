@@ -93,13 +93,22 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
   const isMobile = isMobileProp !== undefined ? isMobileProp : isMobileHook;
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const navLinks = [["서비스 소개", "landing"], ["패널 모집 보드", "panel_board"], ["요금제", "pricing"], ["FAQ", "faq"], ["고객센터", "support"]];
+  const navLinks =
+    variant === "app"
+      ? [["대시보드", "dashboard"], ["요금제", "pricing"], ["FAQ", "faq"], ["고객센터", "support"]]
+      : variant === "panel"
+      ? [["인터뷰 모집", "panel_board"], ["내 인터뷰", "panel_mypage"], ["FAQ", "faq"], ["고객센터", "support"]]
+      : [["서비스 소개", "landing"], ["패널 모집 보드", "panel_board"], ["요금제", "pricing"], ["FAQ", "faq"], ["고객센터", "support"]];
+
+  const homeTarget =
+    variant === "app" ? "dashboard" :
+    variant === "panel" ? "panel_board" : "landing";
 
   return (
     <>
       <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "stretch", justifyContent: "space-between", height: 56, position: "relative" }}>
-          <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go("landing")}>
+          <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go(homeTarget)}>
             <span style={{ fontSize: 17, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}><span style={{ color: C.purple }}>Vo</span>ica</span>
           </div>
           {!isMobile && (
@@ -155,44 +164,91 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
               <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: C.body, lineHeight: 1, padding: 4 }}>✕</button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "12px 0" }}>
-              <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>서비스</div>
-              {[
-                { label: "서비스 소개", target: "landing", desc: "Voica가 하는 일" },
-                { label: "요금제", target: "pricing", desc: "플랜별 기능 비교" },
-                { label: "FAQ", target: "faq", desc: "자주 묻는 질문" },
-                { label: "고객센터", target: "support", desc: "문의 및 도움말" },
-              ].map(item => (
-                <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
-                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
-                  onMouseEnter={e => e.currentTarget.style.background = C.bg}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                  <div>
-                    <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
-                    <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
-                  </div>
-                  <span style={{ fontSize: 12, color: C.border }}>›</span>
-                </div>
-              ))}
-              <div style={{ height: 1, background: C.border, margin: "8px 20px" }} />
-              <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>패널 참여</div>
-              {[
-                { label: "참여 가능한 인터뷰", target: "panel_board", desc: "모집 중인 공고 보기" },
-                { label: "패널 등록하기", target: "panel_entry", desc: "리워드 받고 인터뷰 참여" },
-              ].map(item => (
-                <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
-                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
-                  onMouseEnter={e => e.currentTarget.style.background = C.bg}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                  <div>
-                    <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
-                    <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
-                  </div>
-                  <span style={{ fontSize: 12, color: C.border }}>›</span>
-                </div>
-              ))}
+              {variant === "app" ? (
+                <>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>리서처</div>
+                  {[
+                    { label: "대시보드", target: "dashboard", desc: "진행 중인 인터뷰 관리" },
+                    { label: "인터뷰 만들기", target: "editor", desc: "새 인터뷰 설계" },
+                    { label: "요금제", target: "pricing", desc: "플랜별 기능 비교" },
+                    { label: "FAQ", target: "faq", desc: "자주 묻는 질문" },
+                    { label: "고객센터", target: "support", desc: "문의 및 도움말" },
+                  ].map(item => (
+                    <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = C.bg}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <div>
+                        <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
+                        <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
+                      </div>
+                      <span style={{ fontSize: 12, color: C.border }}>›</span>
+                    </div>
+                  ))}
+                </>
+              ) : variant === "panel" ? (
+                <>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>패널</div>
+                  {[
+                    { label: "인터뷰 모집", target: "panel_board", desc: "모집 중인 공고 보기" },
+                    { label: "내 인터뷰", target: "panel_mypage", desc: "신청·진행 현황" },
+                    { label: "FAQ", target: "faq", desc: "자주 묻는 질문" },
+                    { label: "고객센터", target: "support", desc: "문의 및 도움말" },
+                  ].map(item => (
+                    <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = C.bg}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <div>
+                        <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
+                        <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
+                      </div>
+                      <span style={{ fontSize: 12, color: C.border }}>›</span>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>서비스</div>
+                  {[
+                    { label: "서비스 소개", target: "landing", desc: "Voica가 하는 일" },
+                    { label: "요금제", target: "pricing", desc: "플랜별 기능 비교" },
+                    { label: "FAQ", target: "faq", desc: "자주 묻는 질문" },
+                    { label: "고객센터", target: "support", desc: "문의 및 도움말" },
+                  ].map(item => (
+                    <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = C.bg}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <div>
+                        <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
+                        <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
+                      </div>
+                      <span style={{ fontSize: 12, color: C.border }}>›</span>
+                    </div>
+                  ))}
+                  <div style={{ height: 1, background: C.border, margin: "8px 20px" }} />
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>패널 참여</div>
+                  {[
+                    { label: "참여 가능한 인터뷰", target: "panel_board", desc: "모집 중인 공고 보기" },
+                    { label: "패널 등록하기", target: "panel_entry", desc: "리워드 받고 인터뷰 참여" },
+                  ].map(item => (
+                    <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = C.bg}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <div>
+                        <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
+                        <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
+                      </div>
+                      <span style={{ fontSize: 12, color: C.border }}>›</span>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
             <div style={{ padding: "16px 20px", borderTop: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
-              {variant === "app" && logout ? (
+              {(variant === "app" || variant === "panel") && logout ? (
                 <Btn full size="md" variant="ghost" onClick={() => { logout(); setMenuOpen(false); }}>로그아웃</Btn>
               ) : (
                 <>
