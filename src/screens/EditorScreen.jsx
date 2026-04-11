@@ -58,16 +58,21 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   useEffect(() => {
     if (!interviewId) return;
     (async () => {
-      const [{ data: iv }, { data: qs }] = await Promise.all([
-        supabase.from("interviews").select("id, title, share_code").eq("id", interviewId).single(),
-        supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
-      ]);
-      if (iv) { setTitle(iv.title ?? ""); if (iv.share_code) setShareCode(iv.share_code); }
-      if (qs && qs.length > 0) {
-        setQuestions(qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options })));
-        setSelectedIdx(0);
+      try {
+        const [{ data: iv }, { data: qs }] = await Promise.all([
+          supabase.from("interviews").select("id, title, share_code").eq("id", interviewId).single(),
+          supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
+        ]);
+        if (iv) { setTitle(iv.title ?? ""); if (iv.share_code) setShareCode(iv.share_code); }
+        if (qs && qs.length > 0) {
+          setQuestions(qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options })));
+          setSelectedIdx(0);
+        }
+      } catch (e) {
+        console.error("[EditorScreen load]", e);
+      } finally {
+        setLoadingExisting(false);
       }
-      setLoadingExisting(false);
     })();
   }, [interviewId]);
 

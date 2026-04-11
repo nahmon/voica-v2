@@ -15,10 +15,14 @@ export default async function handler(req, res) {
     .from("interviews")
     .select("id, title, description, share_code, status, questions(id, order_num, type, content, options, tts_url)")
     .eq("share_code", code)
-    .in("status", ["active", "draft"])
+    .eq("status", "active")
     .single();
 
   if (error || !interview) return res.status(404).json({ error: "Interview not found" });
+
+  if (!interview.questions || interview.questions.length === 0) {
+    return res.status(422).json({ error: "This interview has no questions" });
+  }
 
   interview.questions.sort((a, b) => a.order_num - b.order_num);
 

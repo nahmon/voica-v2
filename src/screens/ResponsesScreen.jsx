@@ -16,30 +16,34 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   useEffect(() => {
     if (!interviewId) return;
     (async () => {
-      const [{ data: qs }, { data: iv }, { data: ss }] = await Promise.all([
-        supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
-        supabase.from("interviews").select("*").eq("id", interviewId).single(),
-        supabase.from("sessions").select("*").eq("interview_id", interviewId).order("started_at", { ascending: false }),
-      ]);
-      setQuestions(qs ?? []);
-      setInterview(iv ?? null);
+      try {
+        const [{ data: qs }, { data: iv }, { data: ss }] = await Promise.all([
+          supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
+          supabase.from("interviews").select("*").eq("id", interviewId).single(),
+          supabase.from("sessions").select("*").eq("interview_id", interviewId).order("started_at", { ascending: false }),
+        ]);
+        setQuestions(qs ?? []);
+        setInterview(iv ?? null);
 
-      const sorted = (ss ?? []).sort((a, b) => {
-        if (a.status === "completed" && b.status !== "completed") return -1;
-        if (a.status !== "completed" && b.status === "completed") return 1;
-        return new Date(b.started_at) - new Date(a.started_at);
-      });
-      setSessions(sorted);
+        const sorted = (ss ?? []).sort((a, b) => {
+          if (a.status === "completed" && b.status !== "completed") return -1;
+          if (a.status !== "completed" && b.status === "completed") return 1;
+          return new Date(b.started_at) - new Date(a.started_at);
+        });
+        setSessions(sorted);
 
-      if (sorted.length > 0) {
-        const sessionIds = sorted.map(s => s.id);
-        const { data: resp } = await supabase
-          .from("responses").select("*").in("session_id", sessionIds);
-        setAllResponses(resp ?? []);
-        // On desktop auto-select first; on mobile start at list view
-        if (window.innerWidth >= 768) setSelectedSession(sorted[0]);
+        if (sorted.length > 0) {
+          const sessionIds = sorted.map(s => s.id);
+          const { data: resp } = await supabase
+            .from("responses").select("*").in("session_id", sessionIds);
+          setAllResponses(resp ?? []);
+          if (window.innerWidth >= 768) setSelectedSession(sorted[0]);
+        }
+      } catch (e) {
+        console.error("[ResponsesScreen load]", e);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, [interviewId]);
 

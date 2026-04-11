@@ -20,29 +20,34 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   useEffect(() => {
     if (!interviewId) { setLoading(false); return; }
     (async () => {
-      const [ivRes, sessRes, qsRes, repRes] = await Promise.all([
-        supabase.from("interviews").select("id, title, status").eq("id", interviewId).single(),
-        supabase.from("sessions")
-          .select("id, respondent, status, started_at, completed_at")
-          .eq("interview_id", interviewId)
-          .order("started_at", { ascending: false }),
-        supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
-        supabase.from("reports").select("*").eq("interview_id", interviewId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-      ]);
-      if (ivRes.data) setInterview(ivRes.data);
-      if (qsRes.data) setQuestions(qsRes.data);
-      if (repRes.data) setReport(repRes.data);
+      try {
+        const [ivRes, sessRes, qsRes, repRes] = await Promise.all([
+          supabase.from("interviews").select("id, title, status").eq("id", interviewId).single(),
+          supabase.from("sessions")
+            .select("id, respondent, status, started_at, completed_at")
+            .eq("interview_id", interviewId)
+            .order("started_at", { ascending: false }),
+          supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
+          supabase.from("reports").select("*").eq("interview_id", interviewId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+        ]);
+        if (ivRes.data) setInterview(ivRes.data);
+        if (qsRes.data) setQuestions(qsRes.data);
+        if (repRes.data) setReport(repRes.data);
 
-      const ss = sessRes.data ?? [];
-      setSessions(ss);
+        const ss = sessRes.data ?? [];
+        setSessions(ss);
 
-      if (ss.length > 0) {
-        const sessionIds = ss.map(s => s.id);
-        const { data: resp } = await supabase
-          .from("responses").select("*").in("session_id", sessionIds);
-        setAllResponses(resp ?? []);
+        if (ss.length > 0) {
+          const sessionIds = ss.map(s => s.id);
+          const { data: resp } = await supabase
+            .from("responses").select("*").in("session_id", sessionIds);
+          setAllResponses(resp ?? []);
+        }
+      } catch (e) {
+        console.error("[ReportScreen load]", e);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, [interviewId]);
 

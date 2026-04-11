@@ -16,11 +16,22 @@ export default async function handler(req, res) {
   // Verify session is valid and in progress before accepting responses
   const { data: session } = await supabase
     .from("sessions")
-    .select("id, status")
+    .select("id, status, interview_id")
     .eq("id", session_id)
     .single();
   if (!session || session.status !== "in_progress") {
     return res.status(403).json({ error: "Invalid or already completed session" });
+  }
+
+  // Verify question belongs to the session's interview
+  const { data: question } = await supabase
+    .from("questions")
+    .select("id")
+    .eq("id", question_id)
+    .eq("interview_id", session.interview_id)
+    .single();
+  if (!question) {
+    return res.status(400).json({ error: "Invalid question for this session" });
   }
 
   const { error } = await supabase.from("responses").insert({

@@ -3,7 +3,7 @@ import { C, F } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, GlobalNav, VoCCarousel, HowItWorksCarousel, Footer } from "../components/shared.jsx";
 
-function CounterStat({ end, suffix, label, delay, isMobile }) {
+function CounterStat({ end, suffix, label, delay, color, labelColor }) {
   const [val, setVal] = useState(0);
   const [visible, setVisible] = useState(false);
   const ref = useRef(null);
@@ -11,7 +11,7 @@ function CounterStat({ end, suffix, label, delay, isMobile }) {
   useEffect(() => {
     const io = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) { setVisible(true); io.disconnect(); } },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     );
     if (ref.current) io.observe(ref.current);
     return () => io.disconnect();
@@ -36,30 +36,11 @@ function CounterStat({ end, suffix, label, delay, isMobile }) {
   const display = val >= 1000 ? val.toLocaleString("ko-KR") : String(val);
 
   return (
-    <div ref={ref} style={{ textAlign: "center", padding: isMobile ? "32px 12px" : "0 40px" }}>
-      <div style={{
-        fontSize: isMobile ? 38 : 54,
-        fontWeight: 700,
-        color: "#f5f5f7",
-        lineHeight: 1,
-        letterSpacing: "-1.5px",
-        fontFamily: F,
-        fontFeatureSettings: '"tnum"',
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(14px)",
-        transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
-      }}>
+    <div ref={ref} style={{ textAlign: "center" }}>
+      <div style={{ fontSize: "inherit", fontWeight: 700, color, lineHeight: 1.1, fontFamily: F, letterSpacing: "-0.5px", fontFeatureSettings: '"tnum"' }}>
         {display}{suffix}
       </div>
-      <div style={{
-        fontSize: 13,
-        color: "rgba(255,255,255,0.38)",
-        marginTop: 10,
-        letterSpacing: "0.16px",
-        lineHeight: 1.4,
-        opacity: visible ? 1 : 0,
-        transition: `opacity 0.7s ease ${delay + 180}ms`,
-      }}>
+      <div style={{ fontSize: 13, color: labelColor, marginTop: 6, letterSpacing: "0.16px", lineHeight: 1.4 }}>
         {label}
       </div>
     </div>
@@ -131,20 +112,23 @@ export default function LandingScreen({ go, user, logout }) {
         </div>
       </section>
 
-      {/* Stats — Apple dark */}
-      <section style={{ background: "#1d1d1f", padding: isMobile ? "56px 0" : "72px 24px" }}>
-        <div style={{ maxWidth: 880, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)" }}>
+      {/* Stats */}
+      <section style={{ background: C.white, padding: isMobile ? "40px 20px" : "52px 24px" }}>
+        <div style={{ maxWidth: 800, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)" }}>
           {[
-            { end: 12400, suffix: "+", label: "등록된 패널", delay: 0 },
-            { end: 4200, suffix: "건", label: "이번 달 완료 인터뷰", delay: 100 },
-            { end: 94, suffix: "%", label: "AI 분석 정확도", delay: 200 },
-            { end: 8, suffix: "분", label: "평균 인터뷰 시간", delay: 300 },
-          ].map((stat, i) => (
-            <div key={stat.label} style={{
-              borderRight: (isMobile ? i % 2 === 0 : i < 3) ? "1px solid rgba(255,255,255,0.08)" : "none",
-              borderBottom: (isMobile && i < 2) ? "1px solid rgba(255,255,255,0.08)" : "none",
+            { end: 12400, suffix: "+", label: "등록된 패널", color: C.purple, delay: 0 },
+            { end: 4200, suffix: "건", label: "이번 달 완료 인터뷰", color: C.navy, delay: 100 },
+            { end: 94, suffix: "%", label: "AI 분석 정확도", color: C.successText, delay: 200 },
+            { end: 8, suffix: "분", label: "평균 인터뷰 시간", color: "#b91c4a", delay: 300 },
+          ].map(({ label, ...stat }, i) => (
+            <div key={label} style={{
+              textAlign: "center",
+              padding: isMobile ? "20px 12px" : "24px 20px",
+              fontSize: isMobile ? 26 : 34,
+              borderRight: (isMobile ? i % 2 === 0 : i < 3) ? `1px solid ${C.border}` : "none",
+              borderBottom: (isMobile && i < 2) ? `1px solid ${C.border}` : "none",
             }}>
-              <CounterStat {...stat} isMobile={isMobile} />
+              <CounterStat {...stat} label={label} labelColor="rgba(10,11,13,0.56)" />
             </div>
           ))}
         </div>
@@ -153,28 +137,7 @@ export default function LandingScreen({ go, user, logout }) {
       <VoCCarousel />
       <HowItWorksCarousel />
 
-      {/* Footer */}
-      <footer style={{ background: C.brandDark, padding: isMobile ? "40px 20px" : "48px 24px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "flex-start", gap: 28, marginBottom: 28 }}>
-            <div>
-              <span style={{ fontSize: 17, fontWeight: 600, color: C.white, letterSpacing: "0.16px" }}><span style={{ color: C.purpleLight }}>Vo</span>ica</span>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI가 인터뷰하고, AI가 분석합니다</div>
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
-              {[["서비스 소개", "landing"], ["요금제", "pricing"], ["패널 참여", "panel_board"], ["고객센터", "support"]].map(([l, target]) => (
-                <a key={l} href="#" onClick={e => { e.preventDefault(); if (target) go(target); }}
-                  style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", textDecoration: "none", letterSpacing: "0.16px" }}
-                  onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.88)"}
-                  onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.48)"}>{l}</a>
-              ))}
-            </div>
-          </div>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 20 }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.16px" }}>Copyright © 2026 Voica Inc. All rights reserved.</div>
-          </div>
-        </div>
-      </footer>
+      <Footer go={go} />
     </div>
   );
 }

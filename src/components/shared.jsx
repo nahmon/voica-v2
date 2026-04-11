@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { supabase } from "../supabase.js";
+
+const _interviewCountCache = {};
 
 export function Badge({ children, variant = "neutral", style: sx = {} }) {
   const v = {
@@ -92,6 +95,26 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
   const isMobileHook = useIsMobile();
   const isMobile = isMobileProp !== undefined ? isMobileProp : isMobileHook;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hasInterviews, setHasInterviews] = useState(
+    user?.id != null ? (_interviewCountCache[user.id] ?? null) : null
+  );
+
+  useEffect(() => {
+    if (variant !== "app" || !user?.id) return;
+    if (_interviewCountCache[user.id] !== undefined) {
+      setHasInterviews(_interviewCountCache[user.id]);
+      return;
+    }
+    supabase
+      .from("interviews")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => {
+        const result = (count ?? 0) > 0;
+        _interviewCountCache[user.id] = result;
+        setHasInterviews(result);
+      });
+  }, [variant, user?.id]);
 
   const navLinks =
     variant === "app"
@@ -119,17 +142,18 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {variant === "app" && !isMobile && (
               <>
-                <Btn size="sm" onClick={() => go("editor")}>+ 인터뷰 시작하기</Btn>
+                {hasInterviews !== null && (
+                  <Btn size="sm" onClick={() => go(hasInterviews ? "dashboard" : "editor")}>{hasInterviews ? "대시보드" : "+ 인터뷰 시작하기"}</Btn>
+                )}
                 {logout && <Btn variant="ghost" size="sm" onClick={logout}>로그아웃</Btn>}
                 <div style={{ width: 1, height: 16, background: C.border }} />
                 {(() => {
                   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
                   const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "U";
+                  const initials = <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.purple }}>{displayName[0].toUpperCase()}</div>;
                   return avatarUrl
-                    ? <img src={avatarUrl} alt="profile" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover", border: `1px solid ${C.border}` }} />
-                    : <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.purple }}>
-                        {displayName[0].toUpperCase()}
-                      </div>;
+                    ? <img src={avatarUrl} alt="profile" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover", border: `1px solid ${C.border}` }} onError={e => { e.currentTarget.style.display = "none"; }} />
+                    : initials;
                 })()}
                 <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>
                   {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || ""}
@@ -300,20 +324,20 @@ export function VoCCarousel() {
           <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
             {VOC_LIST.map((v, i) => (
               <div key={i} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box" }}>
-                <div style={{ background: C.white, borderRadius: 16, padding: "32px 40px", boxShadow: "0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05)" }}>
+                <div style={{ background: C.white, borderRadius: 16, padding: "36px 40px" }}>
                   <div style={{ fontSize: 24, color: C.purple, marginBottom: 16, lineHeight: 1 }}>❝</div>
                   <p style={{ margin: "0 0 24px", fontSize: 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px" }}>{v.quote}</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                     {v.photo ? (
-                      <img src={v.photo} alt={v.name} style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                      <img src={v.photo} alt={v.name} style={{ width: 60, height: 60, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
                     ) : (
-                      <div style={{ width: 40, height: 40, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: C.white, fontWeight: 600, flexShrink: 0 }}>
+                      <div style={{ width: 60, height: 60, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: C.white, fontWeight: 600, flexShrink: 0 }}>
                         {v.name[0]}
                       </div>
                     )}
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}>{v.name} {v.title}</div>
-                      <div style={{ fontSize: 12, color: "rgba(10,11,13,0.56)", marginTop: 2, letterSpacing: "0.16px" }}>{v.company}</div>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}>{v.name} {v.title}</div>
+                      <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", marginTop: 3, letterSpacing: "0.16px" }}>{v.company}</div>
                     </div>
                   </div>
                 </div>
@@ -348,40 +372,63 @@ export function HowItWorksCarousel() {
 
   function Row({ steps, title, sub, scrollRef }) {
     const ref = scrollRef || useRef(null);
-    const cardW = isMobile ? Math.min(window.innerWidth - 56, 280) : 240;
+    const cardW = Math.min(window.innerWidth - 56, 280);
     const scroll = (dir) => { ref.current.scrollBy({ left: dir * (cardW + 14), behavior: "smooth" }); };
-    return (
-      <div style={{ marginBottom: isMobile ? 32 : 40 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-          <div>
-            <div style={{ fontSize: isMobile ? 15 : 17, fontWeight: 400, color: C.navy, letterSpacing: "0.16px", marginBottom: 3, lineHeight: 1.47 }}>{title}</div>
-            <div style={{ fontSize: 14, color: "rgba(10,11,13,0.56)", letterSpacing: "0.16px" }}>{sub}</div>
+
+    const iconMap = { pencil: Ic.Pencil, users: Ic.Users, sparkle: Ic.Sparkle, barchart: Ic.BarChart, search: Ic.Search, check: Ic.Check, mic: Ic.Mic, gift: Ic.Gift };
+
+    const Card = ({ s, i }) => (
+      <div key={i} style={{
+        background: C.white, borderRadius: 14, padding: "24px 20px",
+        flex: isMobile ? `0 0 ${cardW}px` : "1 1 0",
+        transition: "box-shadow 0.2s",
+      }}
+        onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)"; }}
+        onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {iconMap[s.icon]?.({ s: 18, c: C.purple })}
           </div>
-          <div style={{ display: "flex", gap: 6, flexShrink: 0, marginLeft: 12 }}>
-            {["←", "→"].map((arrow, i) => (
-              <button key={arrow} onClick={() => scroll(i === 0 ? -1 : 1)}
-                style={{ width: 32, height: 32, borderRadius: "50%", border: `1px solid ${C.border}`, background: C.bg, cursor: "pointer", fontSize: 13, color: C.body, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}
-                onMouseEnter={e => { e.currentTarget.style.background = C.purple; e.currentTarget.style.color = C.white; e.currentTarget.style.borderColor = C.purple; }}
-                onMouseLeave={e => { e.currentTarget.style.background = C.bg; e.currentTarget.style.color = C.body; e.currentTarget.style.borderColor = C.border; }}>
-                {arrow}
-              </button>
+          <span style={{ fontSize: 12, fontWeight: 700, color: C.purple, letterSpacing: "0.5px" }}>{s.step}</span>
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 8, letterSpacing: "0.16px", lineHeight: 1.47 }}>{s.title}</div>
+        <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.65, letterSpacing: "0.16px" }}>{s.desc}</div>
+      </div>
+    );
+
+    return (
+      <div style={{ marginBottom: isMobile ? 32 : 48 }}>
+        <div style={{ marginBottom: isMobile ? 16 : 20 }}>
+          <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 4, lineHeight: 1.47 }}>{title}</div>
+          <div style={{ fontSize: 13, color: "rgba(10,11,13,0.48)", letterSpacing: "0.16px" }}>{sub}</div>
+        </div>
+
+        {isMobile ? (
+          <div style={{ position: "relative" }}>
+            <div ref={ref} style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
+              {steps.map((s, i) => <Card key={i} s={s} i={i} />)}
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 12 }}>
+              {["←", "→"].map((arrow, i) => (
+                <button key={arrow} onClick={() => scroll(i === 0 ? -1 : 1)}
+                  style={{ width: 30, height: 30, borderRadius: "50%", border: `1px solid ${C.border}`, background: C.bg, cursor: "pointer", fontSize: 13, color: C.body, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {arrow}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
+            {steps.map((s, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "stretch", flex: "1 1 0", minWidth: 0 }}>
+                <Card s={s} i={i} />
+                {i < steps.length - 1 && (
+                  <div style={{ display: "flex", alignItems: "center", padding: "0 4px", flexShrink: 0, color: "rgba(10,11,13,0.2)", fontSize: 16 }}>›</div>
+                )}
+              </div>
             ))}
           </div>
-        </div>
-        <div ref={ref} style={{ display: "flex", gap: 14, overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
-          {steps.map((s, i) => (
-            <div key={i} style={{ flex: `0 0 ${cardW}px`, background: C.bg, borderRadius: 12, padding: "24px 18px", transition: "box-shadow 0.2s, background 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)"; e.currentTarget.style.background = C.white; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.background = C.bg; }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                <span style={{ display:"flex",alignItems:"center" }}>{({pencil:Ic.Pencil,users:Ic.Users,sparkle:Ic.Sparkle,barchart:Ic.BarChart,search:Ic.Search,check:Ic.Check,mic:Ic.Mic,gift:Ic.Gift})[s.icon]?.({s:22,c:C.purple})}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: C.purple, letterSpacing: "0.16px" }}>{s.step}</span>
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 8, letterSpacing: "0.16px", lineHeight: 1.47 }}>{s.title}</div>
-              <div style={{ fontSize: 14, color: "rgba(10,11,13,0.56)", lineHeight: 1.6, letterSpacing: "0.16px" }}>{s.desc}</div>
-            </div>
-          ))}
-        </div>
+        )}
       </div>
     );
   }
@@ -390,7 +437,7 @@ export function HowItWorksCarousel() {
   const pRef = useRef(null);
 
   return (
-    <section style={{ background: C.white, padding: isMobile ? "60px 20px" : "80px 24px" }}>
+    <section style={{ background: C.bg, padding: isMobile ? "60px 20px" : "80px 24px" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: isMobile ? 40 : 56 }}>
           <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", margin: "0 0 14px", lineHeight: 1.10, fontFamily: F }}>
@@ -549,38 +596,28 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
 // ─── Footer — 모든 페이지 하단 공통 ───
 export function Footer({ go }) {
   const isMobile = useIsMobile();
-  const links = [
-    { label: "서비스 소개", screen: "about" },
-    { label: "요금제", screen: "pricing" },
-    { label: "FAQ", screen: "faq" },
-    { label: "고객지원", screen: "support" },
-    { label: "이용약관", screen: "terms" },
-    { label: "개인정보처리방침", screen: "privacy" },
-  ];
   return (
-    <footer style={{ background: C.white, borderTop: `1px solid ${C.border}`, padding: isMobile ? "28px 20px" : "32px 40px", fontFamily: F }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: 20 }}>
-        <div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 4 }}>Voica</div>
-          <div style={{ fontSize: 11, color: C.body, lineHeight: 1.7 }}>
-            AI 보이스 인터뷰 플랫폼<br />
-            사업자등록번호: [000-00-00000] · 대표: [대표자명]<br />
-            이메일: voica.support@gmail.com
+    <footer style={{ background: C.brandDark, padding: isMobile ? "40px 20px" : "48px 24px", borderTop: "1px solid rgba(255,255,255,0.08)", fontFamily: F }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: "flex-start", gap: 28, marginBottom: 28 }}>
+          <div>
+            <span style={{ fontSize: 17, fontWeight: 600, color: C.white, letterSpacing: "0.16px" }}>
+              <span style={{ color: C.purpleLight }}>Vo</span>ica
+            </span>
+            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI가 인터뷰하고, AI가 분석합니다</div>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
+            {[["서비스 소개", "about"], ["요금제", "pricing"], ["패널 참여", "panel_board"], ["고객센터", "support"]].map(([l, target]) => (
+              <a key={l} href="#" onClick={e => { e.preventDefault(); if (target) go(target); }}
+                style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", textDecoration: "none", letterSpacing: "0.16px" }}
+                onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.88)"}
+                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.48)"}>{l}</a>
+            ))}
           </div>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "8px 16px" : "8px 24px" }}>
-          {links.map(l => (
-            <button key={l.screen} onClick={() => go(l.screen)}
-              style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: C.body, fontFamily: F, padding: 0 }}
-              onMouseEnter={e => e.currentTarget.style.color = C.navy}
-              onMouseLeave={e => e.currentTarget.style.color = C.body}>
-              {l.label}
-            </button>
-          ))}
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 20 }}>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.16px" }}>Copyright © {new Date().getFullYear()} Voica Inc. All rights reserved.</div>
         </div>
-      </div>
-      <div style={{ maxWidth: 1100, margin: "12px auto 0", fontSize: 11, color: C.body }}>
-        © {new Date().getFullYear()} Voica Inc. All rights reserved.
       </div>
     </footer>
   );

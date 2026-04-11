@@ -90,7 +90,9 @@ export default async function handler(req, res) {
         temperature: 0.3,
       });
 
-      const content = JSON.parse(completion.choices[0].message.content);
+      const raw = completion.choices[0]?.message?.content;
+      if (!raw) throw new Error("Empty response from GPT");
+      const content = JSON.parse(raw);
       await supabase.from("reports").update({ status: "completed", content }).eq("id", report.id);
       return res.status(200).json({ report_id: report.id, status: "completed", content });
     } catch (e) {
