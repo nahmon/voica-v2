@@ -28,12 +28,13 @@ export default function AdvertiserLoginScreen({ go }) {
   const handleLogin = async () => {
     setAuthError("");
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
     setLoading(false);
     if (error) {
       setAuthError(error.message === "Invalid login credentials" ? "이메일 또는 비밀번호가 맞지 않아요" : error.message);
     } else {
-      go(role === "panel" ? "panel_board" : "dashboard");
+      const userRole = data.user?.user_metadata?.role;
+      go(userRole === "panel" ? "panel_board" : "dashboard");
     }
   };
 
@@ -119,7 +120,7 @@ export default function AdvertiserLoginScreen({ go }) {
           <div style={{ background: C.white, borderRadius: 12, padding: "28px 28px", boxShadow: S.card }}>
             <div style={{ display: "flex", background: C.bg, borderRadius: 6, padding: 3, marginBottom: 24 }}>
               {["login", "signup"].map(t => (
-                <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "6px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: 400, transition: "all 0.15s", background: tab === t ? C.white : "transparent", color: tab === t ? C.navy : C.body, boxShadow: tab === t ? S.ambient : "none" }}>
+                <button key={t} onClick={() => { setTab(t); setResetMode(false); setAuthError(""); }} style={{ flex: 1, padding: "6px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: 400, transition: "all 0.15s", background: tab === t ? C.white : "transparent", color: tab === t ? C.navy : C.body, boxShadow: tab === t ? S.ambient : "none" }}>
                   {t === "login" ? "로그인" : "회원가입"}
                 </button>
               ))}

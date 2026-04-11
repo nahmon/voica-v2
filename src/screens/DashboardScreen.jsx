@@ -66,8 +66,8 @@ export default function DashboardScreen({ go, user, logout }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12, marginBottom: 28 }}>
           {[
-            { icon: "users", title: "패널 리쿠르팅", desc: "지원자 검토 및 승인", screen: "recruiter_admin", badge: "신청 3건", badgeColor: "#f59e0b" },
-            { icon: "search", title: "패널 모집 보드", desc: "공개 모집 공고 관리", screen: "panel_board", badge: "6개 공고", badgeColor: C.purple },
+            { icon: "users", title: "패널 리쿠르팅", desc: "지원자 검토 및 승인", screen: "recruiter_admin" },
+            { icon: "search", title: "패널 모집 보드", desc: "공개 모집 공고 관리", screen: "panel_board" },
           ].map(item => (
             <div key={item.title} onClick={() => go(item.screen)} style={{ background: C.white, borderRadius: 16, padding: "16px 18px", boxShadow: S.ambient, border: `1px solid ${C.border}`, cursor: "pointer", display: "flex", alignItems: "center", gap: 14, transition: "box-shadow 0.2s" }}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = S.card; }}
@@ -77,7 +77,6 @@ export default function DashboardScreen({ go, user, logout }) {
                 <div style={{ fontSize: 14, fontWeight: 400, color: C.navy, marginBottom: 2 }}>{item.title}</div>
                 <div style={{ fontSize: 12, color: C.body }}>{item.desc}</div>
               </div>
-              <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, background: `${item.badgeColor}18`, color: item.badgeColor, border: `1px solid ${item.badgeColor}40`, whiteSpace: "nowrap" }}>{item.badge}</span>
             </div>
           ))}
         </div>

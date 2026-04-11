@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { Badge, Btn } from "../components/shared.jsx";
+import { Badge, Btn, useToast } from "../components/shared.jsx";
 
 function newQ(type = "voice") {
   const id = Math.random().toString(36).slice(2, 10);
@@ -36,6 +36,7 @@ const VOICA_SURVEY_TEMPLATE = {
 const DRAFT_KEY = "voica_editor_draft";
 
 export default function EditorScreen({ go, user, logout, interviewId }) {
+  const { showToast } = useToast();
   // Restore draft from localStorage only when creating new (no interviewId)
   const savedDraft = !interviewId ? (() => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; } })() : null;
   const [title, setTitle] = useState(savedDraft?.title ?? "");
@@ -89,6 +90,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   }, [title, questions, editingId]);
 
   const loadTemplate = () => {
+    const hasContent = title.trim() || questions.some(q => q.content.trim());
+    if (hasContent && !window.confirm("현재 작성 중인 내용이 모두 사라집니다. 템플릿으로 교체할까요?")) return;
     setTitle(VOICA_SURVEY_TEMPLATE.title);
     setQuestions(VOICA_SURVEY_TEMPLATE.questions.map(q => ({ ...q, id: mkId() })));
     setSelectedIdx(0);
@@ -152,7 +155,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       if (!editingId && data.interview?.id) setEditingId(data.interview.id);
       localStorage.removeItem(DRAFT_KEY);
     } catch (e) {
-      alert(e.message);
+      showToast(e.message || "저장에 실패했습니다. 다시 시도해 주세요.", "error");
     } finally {
       setSaving(false);
     }
@@ -165,9 +168,18 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     doSave();
   };
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     const url = `${window.location.origin}/i/${shareCode}`;
-    navigator.clipboard.writeText(url);
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = url;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -225,8 +237,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {logout && <Btn variant="ghost" size="sm" onClick={logout} style={{ fontSize: 12, color: C.body }}>로그아웃</Btn>}
-        {draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시저장됨 ✓</span>}
-        {!draftSaved && <span style={{ fontSize: 11, color: C.body, opacity: 0.5 }}>자동저장 중…</span>}
+        {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시저장됨 ✓</span>}
         <div style={{ position: "relative" }}>
           <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>템플릿</Btn>
           {templateOpen && (
@@ -272,10 +283,22 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             Q{i + 1}
           </button>
         ))}
-        <button onClick={() => addQuestion("voice")}
-          style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: `1px dashed ${C.border}`, background: "transparent", color: C.body, whiteSpace: "nowrap" }}>
-          +
-        </button>
+        <div style={{ position: "relative" }}>
+          <button onClick={() => setAddTypeOpen(v => !v)}
+            style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: `1px dashed ${C.border}`, background: "transparent", color: C.body, whiteSpace: "nowrap" }}>
+            +
+          </button>
+          {addTypeOpen && (
+            <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 100 }}>
+              {[["voice", "🎙 음성"], ["multiple_choice", "☑ 객관식"], ["likert", "📊 평점"]].map(([type, label]) => (
+                <div key={type} onClick={() => addQuestion(type)}
+                  style={{ padding: "10px 16px", fontSize: 13, color: C.navy, cursor: "pointer", whiteSpace: "nowrap", borderBottom: `1px solid ${C.border}` }}>
+                  {label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <div style={{ padding: 16 }}>
         <PreviewCard q={q} idx={selectedIdx} total={questions.length} updateQ={updateQ} />

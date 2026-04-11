@@ -33,11 +33,17 @@ export default async function handler(req, res) {
   if (!audioFile) return res.status(400).json({ error: "audio file required" });
 
   const fileStream = fs.createReadStream(audioFile.filepath);
-  const transcription = await openai.audio.transcriptions.create({
-    model: "whisper-1",
-    file: await toFile(fileStream, audioFile.originalFilename || "audio.webm", { type: audioFile.mimetype }),
-    language: "ko",
-  });
+  let transcription;
+  try {
+    transcription = await openai.audio.transcriptions.create({
+      model: "whisper-1",
+      file: await toFile(fileStream, audioFile.originalFilename || "audio.webm", { type: audioFile.mimetype }),
+      language: "ko",
+    });
+  } catch (e) {
+    console.error("[STT] OpenAI error:", e.message);
+    return res.status(500).json({ error: "음성 인식에 실패했습니다. 다시 시도해 주세요." });
+  }
 
   return res.status(200).json({ transcript: transcription.text });
 }

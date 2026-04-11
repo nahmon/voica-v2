@@ -178,32 +178,48 @@ export default function InterviewScreen({ go, shareCode }) {
     localStorage.setItem(key, JSON.stringify({ sessionId, qIndex, startedAt: Date.now() }));
   }, [qIndex, sessionId, shareCode]);
 
-  const startSession = async () => {
-    // Prefetch first two questions' TTS immediately on session start
-    const qs = interview?.questions ?? [];
-    prefetchTts(qs[0]);
-    prefetchTts(qs[1]);
+  const [starting, setStarting] = useState(false);
 
-    const res = await fetch("/api/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ interview_id: interview.id, respondent }),
-    });
-    if (res.ok) {
-      const d = await res.json();
-      setSessionId(d.session_id);
-      setIntroStep("started");
+  const startSession = async () => {
+    if (starting) return;
+    setStarting(true);
+    try {
+      const qs = interview?.questions ?? [];
+      prefetchTts(qs[0]);
+      prefetchTts(qs[1]);
+      const res = await fetch("/api/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interview_id: interview.id, respondent }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setSessionId(d.session_id);
+        setIntroStep("started");
+      } else {
+        const d = await res.json().catch(() => ({}));
+        showToast(d.error || "인터뷰를 시작할 수 없어요. 다시 시도해 주세요.", "error");
+      }
+    } catch {
+      showToast("네트워크 오류가 발생했어요. 다시 시도해 주세요.", "error");
+    } finally {
+      setStarting(false);
     }
   };
 
   const saveResponse = async (patch) => {
     if (!sessionId) return;
     const q = interview.questions[qIndex];
-    await fetch("/api/response", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId, question_id: q.id, type: q.type, ...patch }),
-    });
+    try {
+      const res = await fetch("/api/response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, question_id: q.id, type: q.type, ...patch }),
+      });
+      if (!res.ok) showToast("답변 저장에 실패했어요. 연결을 확인해 주세요.", "error");
+    } catch {
+      showToast("답변 저장에 실패했어요. 연결을 확인해 주세요.", "error");
+    }
   };
 
   const advanceOrComplete = () => {
@@ -233,7 +249,7 @@ export default function InterviewScreen({ go, shareCode }) {
       mediaRecorderRef.current = mr;
       setPhase("recording");
     } catch {
-      alert("마이크 권한이 필요해요. 브라우저 설정에서 허용해요.");
+      setRecordingWarning("마이크 권한이 필요해요. 브라우저 설정에서 마이크를 허용한 후 다시 시도해 주세요.");
     }
   };
 
@@ -342,12 +358,12 @@ export default function InterviewScreen({ go, shareCode }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
           {[
             { key: "name", label: "이름 (선택)", placeholder: "홍길동" },
-            { key: "age", label: "나이 (선택)", placeholder: "예: 29" },
+            { key: "age", label: "나이 (선택)", placeholder: "예: 29", inputMode: "numeric" },
           ].map(f => (
             <div key={f.key}>
               <label style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>{f.label}</label>
-              <input value={respondent[f.key]} onChange={e => setRespondent(r => ({ ...r, [f.key]: e.target.value }))} placeholder={f.placeholder}
-                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)", fontSize: 14, fontFamily: F, color: C.white, outline: "none", boxSizing: "border-box" }} />
+              <input value={respondent[f.key]} onChange={e => setRespondent(r => ({ ...r, [f.key]: e.target.value }))} placeholder={f.placeholder} inputMode={f.inputMode}
+                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)", fontSize: 16, fontFamily: F, color: C.white, outline: "none", boxSizing: "border-box" }} />
             </div>
           ))}
           <div>

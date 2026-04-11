@@ -19,7 +19,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastCtx.Provider value={{ showToast }}>
       {children}
-      <div style={{ position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)", zIndex: 9999, display: "flex", flexDirection: "column", gap: 8, alignItems: "center", pointerEvents: "none" }}>
+      <div style={{ position: "fixed", bottom: "calc(28px + env(safe-area-inset-bottom, 0px))", left: "50%", transform: "translateX(-50%)", zIndex: 9999, display: "flex", flexDirection: "column", gap: 8, alignItems: "center", pointerEvents: "none" }}>
         <style>{`@keyframes toast-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
         {toasts.map(t => (
           <div key={t.id} style={{ background: bg[t.variant] ?? C.purple, color: "#fff", padding: "10px 18px", borderRadius: 10, fontSize: 13, fontFamily: F, fontWeight: 500, boxShadow: "0 4px 16px rgba(0,0,0,0.22)", whiteSpace: "nowrap", animation: "toast-in 0.22s ease", letterSpacing: "0.16px" }}>
@@ -343,13 +343,15 @@ const VOC_LIST = [
 
 export function VoCCarousel() {
   const [idx, setIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
   const total = VOC_LIST.length;
   const trackRef = useRef(null);
 
   useEffect(() => {
+    if (paused) return;
     const t = setInterval(() => setIdx(i => (i + 1) % total), 4200);
     return () => clearInterval(t);
-  }, [total]);
+  }, [total, paused]);
 
   useEffect(() => {
     if (trackRef.current) {
@@ -362,7 +364,7 @@ export function VoCCarousel() {
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 24px" }}>
         <div style={{ fontSize: 12, fontWeight: 400, color: C.body, letterSpacing: "0.16px", textAlign: "center", marginBottom: 8, textTransform: "uppercase" }}>REVIEWS</div>
         <h2 style={{ fontSize: 28, fontWeight: 400, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0 0 40px", fontFamily: F }}>직접 써본 분들의 이야기</h2>
-        <div style={{ overflow: "hidden" }}>
+        <div style={{ overflow: "hidden" }} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
           <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
             {VOC_LIST.map((v, i) => (
               <div key={i} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box" }}>
@@ -389,7 +391,7 @@ export function VoCCarousel() {
         </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 24 }}>
           {VOC_LIST.map((_, i) => (
-            <button key={i} onClick={() => setIdx(i)} style={{ width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: "none", cursor: "pointer", background: i === idx ? "#533afd" : "rgba(23,23,23,0.3)", transition: "all 0.3s", padding: 0 }} />
+            <button key={i} onClick={() => setIdx(i)} aria-label={`후기 ${i + 1}번으로 이동`} style={{ width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: "none", cursor: "pointer", background: i === idx ? "#533afd" : "rgba(23,23,23,0.3)", transition: "all 0.3s", padding: 0 }} />
           ))}
         </div>
       </div>
