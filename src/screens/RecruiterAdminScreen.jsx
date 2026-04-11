@@ -3,6 +3,22 @@ import { C, S, F } from "../lib/constants.jsx";
 import { PANEL_APPLICANTS } from "../lib/mockData.js";
 import { Btn, GlobalNav } from "../components/shared.jsx";
 
+function InfoTooltip({ text }) {
+  const [show, setShow] = useState(false);
+  return (
+    <span style={{ position: "relative", display: "inline-flex", verticalAlign: "middle", marginLeft: 4 }}
+      onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      <span style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(83,58,253,0.12)", color: C.purple, fontSize: 9, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", cursor: "default", lineHeight: 1 }}>i</span>
+      {show && (
+        <div style={{ position: "absolute", bottom: "calc(100% + 6px)", left: "50%", transform: "translateX(-50%)", background: C.navy, color: C.white, fontSize: 11, lineHeight: 1.6, padding: "8px 12px", borderRadius: 6, whiteSpace: "nowrap", zIndex: 100, boxShadow: "0 4px 12px rgba(0,0,0,0.2)", pointerEvents: "none" }}>
+          {text.split("\n").map((line, i) => <div key={i}>{line}</div>)}
+          <div style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: `5px solid ${C.navy}` }} />
+        </div>
+      )}
+    </span>
+  );
+}
+
 export default function RecruiterAdminScreen({ go, user, logout }) {
   const [filter, setFilter] = useState("전체");
   const [selected, setSelected] = useState(new Set());
@@ -62,9 +78,16 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
 
         <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, overflow: "auto", boxShadow: S.ambient }}>
           {/* Table header */}
-          <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 72px 72px 168px 124px 116px 180px", columnGap: 16, alignItems: "center", padding: "0 24px", height: 40, borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 980 }}>
-            {["", "패널", "연령", "성별", "지원일시", "AI 적합도", "상태", "액션"].map((h, i) => (
+          <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 72px 72px 168px 130px 116px 180px", columnGap: 16, alignItems: "center", padding: "0 24px", height: 40, borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 980 }}>
+            {["", "패널", "연령", "성별", "지원일시"].map((h, i) => (
               <div key={i} style={{ fontSize: 11, fontWeight: 600, color: C.body, letterSpacing: "0.3px", textTransform: "uppercase" }}>{h}</div>
+            ))}
+            <div style={{ fontSize: 11, fontWeight: 600, color: C.body, letterSpacing: "0.3px", textTransform: "uppercase", display: "flex", alignItems: "center" }}>
+              AI 적합도
+              <InfoTooltip text={"프로필 매칭도 + 인터뷰 이력 + 응답 품질을\n종합한 0~100점 AI 적합도 점수입니다.\n85점↑ 적합 · 70~84점 검토 · 70점↓ 부적합"} />
+            </div>
+            {["상태", "액션"].map((h, i) => (
+              <div key={i} style={{ fontSize: 11, fontWeight: 600, color: C.body, letterSpacing: "0.3px", textTransform: "uppercase", paddingLeft: i === 1 ? 16 : 0 }}>{h}</div>
             ))}
           </div>
 
@@ -74,7 +97,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
             const isSelected = selected.has(p.id);
             const scoreColor = p.score >= 85 ? C.success : p.score >= 70 ? "#f59e0b" : C.ruby;
             return (
-              <div key={p.id} style={{ display: "grid", gridTemplateColumns: "40px 1fr 72px 72px 168px 124px 116px 180px", columnGap: 16, alignItems: "center", padding: "0 24px", minHeight: 60, minWidth: 980, borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : "none", background: isSelected ? C.purpleBg : "transparent", transition: "background 0.15s" }}>
+              <div key={p.id} style={{ display: "grid", gridTemplateColumns: "40px 1fr 72px 72px 168px 130px 116px 180px", columnGap: 16, alignItems: "center", padding: "0 24px", minHeight: 60, minWidth: 980, borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : "none", background: isSelected ? C.purpleBg : "transparent", transition: "background 0.15s" }}>
                 {/* Checkbox */}
                 <div onClick={() => setSelected(prev => { const n = new Set(prev); n.has(p.id) ? n.delete(p.id) : n.add(p.id); return n; })}
                   style={{ width: 16, height: 16, borderRadius: 3, border: `1.5px solid ${isSelected ? C.purple : C.border}`, background: isSelected ? C.purple : C.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
@@ -103,7 +126,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
                   <span style={{ display: "inline-flex", alignItems: "center", padding: "3px 9px", borderRadius: 4, fontSize: 11, fontWeight: 500, background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, whiteSpace: "nowrap" }}>{p.status}</span>
                 </div>
                 {/* Actions */}
-                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <div style={{ display: "flex", gap: 6, alignItems: "center", paddingLeft: 16 }}>
                   {p.status === "신청" && (
                     <>
                       <button style={{ padding: "4px 12px", fontSize: 12, borderRadius: 6, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>승인</button>

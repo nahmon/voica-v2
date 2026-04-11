@@ -100,9 +100,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
       ? [["인터뷰 모집", "panel_board"], ["내 인터뷰", "panel_mypage"], ["FAQ", "faq"], ["고객센터", "support"]]
       : [["서비스 소개", "landing"], ["패널 모집 보드", "panel_board"], ["요금제", "pricing"], ["FAQ", "faq"], ["고객센터", "support"]];
 
-  const homeTarget =
-    variant === "app" ? "dashboard" :
-    variant === "panel" ? "panel_board" : "landing";
+  const homeTarget = "landing";
 
   return (
     <>
