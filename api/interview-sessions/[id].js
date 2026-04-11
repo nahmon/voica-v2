@@ -29,9 +29,9 @@ export default async function handler(req, res) {
   // Fetch all sessions (service role bypasses RLS)
   const { data: sessions, error: sessError } = await supabase
     .from("sessions")
-    .select("id, respondent, status, completed_at, created_at")
+    .select("id, respondent, status, completed_at, started_at")
     .eq("interview_id", interviewId)
-    .order("created_at", { ascending: false });
+    .order("started_at", { ascending: false });
   if (sessError) return res.status(500).json({ error: sessError.message });
 
   // Fetch all responses for all sessions in one query

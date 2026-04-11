@@ -14,21 +14,28 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   useEffect(() => {
     if (!interviewId) return;
     (async () => {
-      const { data: qs } = await supabase
-        .from("questions").select("*").eq("interview_id", interviewId).order("order_num");
+      const [{ data: qs }, { data: iv }, { data: ss }] = await Promise.all([
+        supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
+        supabase.from("interviews").select("*").eq("id", interviewId).single(),
+        supabase.from("sessions").select("*").eq("interview_id", interviewId).order("started_at", { ascending: false }),
+      ]);
       setQuestions(qs ?? []);
+      setInterview(iv ?? null);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      const res = await fetch(`/api/interview-sessions/${interviewId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      // Show completed sessions first, then in-progress
+      const sorted = (ss ?? []).sort((a, b) => {
+        if (a.status === "completed" && b.status !== "completed") return -1;
+        if (a.status !== "completed" && b.status === "completed") return 1;
+        return new Date(b.started_at) - new Date(a.started_at);
       });
-      if (res.ok) {
-        const { interview: iv, sessions: ss, responses: resp } = await res.json();
-        setInterview(iv);
-        setSessions(ss ?? []);
+      setSessions(sorted);
+
+      if (sorted.length > 0) {
+        const sessionIds = sorted.map(s => s.id);
+        const { data: resp } = await supabase
+          .from("responses").select("*").in("session_id", sessionIds);
         setAllResponses(resp ?? []);
-        if (ss?.length > 0) setSelectedSession(ss[0]);
+        setSelectedSession(sorted[0]);
       }
       setLoading(false);
     })();
