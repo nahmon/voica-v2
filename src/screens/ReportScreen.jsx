@@ -106,7 +106,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {sessions.length === 0 && (
               <div style={{ background: C.white, border: `1px dashed ${C.border}`, borderRadius: 8, padding: "24px", textAlign: "center" }}>
-                <div style={{ fontSize: 13, color: C.body }}>아직 응답이 없습니다</div>
+                <div style={{ fontSize: 13, color: C.body }}>아직 응답이 없어요</div>
               </div>
             )}
             {sessions.map((s, i) => {
@@ -182,7 +182,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
               <div style={{ fontSize: 18, fontWeight: 400, color: C.navy, marginBottom: 8 }}>AI 리포트 생성</div>
               <div style={{ fontSize: 13, color: C.body, marginBottom: 24, lineHeight: 1.6 }}>
                 완료된 응답 {completedSessions.length}건을 GPT-4o가 분석하여<br />
-                테마, 감성, 인사이트를 자동으로 정리합니다.
+                테마, 감성, 인사이트를 자동으로 정리해요.
               </div>
               {generating ? (
                 <div>
@@ -191,7 +191,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                     <span style={{ fontSize: 14, color: C.navy }}>AI 분석 중...</span>
                   </div>
                   <div style={{ fontSize: 12, color: C.body, marginBottom: 8 }}>
-                    {genElapsed}초 경과 · 보통 30초~1분 소요됩니다
+                    {genElapsed}초 경과 · 보통 30초~1분 걸려요
                   </div>
                   <div style={{ height: 3, background: C.border, borderRadius: 2, maxWidth: 240, margin: "0 auto", overflow: "hidden" }}>
                     <div style={{ height: "100%", background: C.purple, borderRadius: 2, width: "60%", animation: "slide-progress 2s ease-in-out infinite alternate" }} />
@@ -207,7 +207,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 </Btn>
               )}
               {completedSessions.length === 0 && !generating && (
-                <div style={{ fontSize: 12, color: C.body, marginTop: 12 }}>완료된 응답이 있어야 리포트를 생성할 수 있습니다</div>
+                <div style={{ fontSize: 12, color: C.body, marginTop: 12 }}>완료된 응답이 있으면 리포트를 생성할 수 있어요</div>
               )}
             </div>
           )}

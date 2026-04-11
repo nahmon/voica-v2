@@ -31,7 +31,7 @@ export default function AdvertiserLoginScreen({ go }) {
     const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
     setLoading(false);
     if (error) {
-      setAuthError(error.message === "Invalid login credentials" ? "이메일 또는 비밀번호가 올바르지 않습니다" : error.message);
+      setAuthError(error.message === "Invalid login credentials" ? "이메일 또는 비밀번호가 맞지 않아요" : error.message);
     } else {
       go(role === "panel" ? "panel_board" : "dashboard");
     }
@@ -39,7 +39,7 @@ export default function AdvertiserLoginScreen({ go }) {
 
   const handleSignup = async () => {
     setAuthError("");
-    if (pw.length < 8) { setAuthError("비밀번호는 8자 이상이어야 합니다"); return; }
+    if (pw.length < 8) { setAuthError("비밀번호는 8자 이상이에요"); return; }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email, password: pw,
@@ -101,7 +101,7 @@ export default function AdvertiserLoginScreen({ go }) {
             <div style={{ fontSize: 28, fontWeight: 600, color: C.navy, letterSpacing: "0.196px", lineHeight: 1.14, marginBottom: 6, fontFamily: F }}>
               {tab === "login" ? "로그인" : "회원가입"}
             </div>
-            <div style={{ fontSize: 14, color: C.body }}>{tab === "login" ? "계정에 로그인하세요" : "Voica에 가입하세요"}</div>
+            <div style={{ fontSize: 14, color: C.body }}>{tab === "login" ? "이메일로 로그인해요" : "Voica에 가입해요"}</div>
           </div>
 
           {tab === "signup" && (
@@ -145,17 +145,17 @@ export default function AdvertiserLoginScreen({ go }) {
 
             {tab === "login" && resetMode && (
               <>
-                <div style={{ fontSize: 14, color: C.navy, marginBottom: 14 }}>비밀번호 재설정 링크를 이메일로 발송합니다.</div>
+                <div style={{ fontSize: 14, color: C.navy, marginBottom: 14 }}>비밀번호 재설정 링크를 이메일로 보내드려요.</div>
                 <Input label="이메일" type="email" placeholder="가입한 이메일 주소" value={email} onChange={e => setEmail(e.target.value)} />
                 {resetSent ? (
                   <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 8, background: "rgba(30,142,62,0.08)", color: C.successText, fontSize: 13 }}>
-                    재설정 링크를 발송했습니다. 받은 메일함을 확인해 주세요.
+                    재설정 링크를 보냈어요. 받은편지함을 확인해요.
                   </div>
                 ) : (
                   <>
                     {authError && <div style={{ marginTop: 10, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
                     <Btn full size="lg" style={{ marginTop: 14 }} disabled={loading || !email} onClick={handleResetPassword}>
-                      {loading ? "발송 중..." : "재설정 링크 발송"}
+                      {loading ? "보내는 중..." : "재설정 링크 보내기"}
                     </Btn>
                   </>
                 )}
@@ -189,9 +189,9 @@ export default function AdvertiserLoginScreen({ go }) {
 
           <div style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: C.body }}>
             {tab === "login" ? (
-              <>계정이 없으신가요? <span onClick={() => setTab("signup")} style={{ color: C.purple, cursor: "pointer" }}>회원가입</span></>
+              <>처음이에요? <span onClick={() => setTab("signup")} style={{ color: C.purple, cursor: "pointer" }}>회원가입</span></>
             ) : (
-              <>이미 계정이 있으신가요? <span onClick={() => setTab("login")} style={{ color: C.purple, cursor: "pointer" }}>로그인</span></>
+              <>이미 계정이 있어요? <span onClick={() => setTab("login")} style={{ color: C.purple, cursor: "pointer" }}>로그인</span></>
             )}
           </div>
         </div>

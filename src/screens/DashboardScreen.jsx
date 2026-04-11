@@ -89,10 +89,10 @@ export default function DashboardScreen({ go, user, logout }) {
           {!loading && interviews.length === 0 && (
             <div style={{ background: C.white, border: `2px dashed ${C.border}`, borderRadius: 8, padding: "48px 24px", textAlign: "center" }}>
               <div style={{ fontSize: 32, marginBottom: 12 }}>📋</div>
-              <div style={{ fontSize: 16, fontWeight: 500, color: C.navy, marginBottom: 8 }}>아직 프로젝트가 없습니다</div>
+              <div style={{ fontSize: 16, fontWeight: 500, color: C.navy, marginBottom: 8 }}>아직 프로젝트가 없어요</div>
               <div style={{ fontSize: 13, color: C.body, marginBottom: 24, lineHeight: 1.6 }}>
-                첫 번째 인터뷰 프로젝트를 만들어 보세요.<br />
-                질문을 설계하면 AI가 패널과 인터뷰를 자동 진행합니다.
+                첫 인터뷰를 만들어봐요.<br />
+                질문을 설계하면 AI가 패널과 인터뷰를 자동으로 진행해요.
               </div>
               <Btn onClick={() => go("editor")}>+ 첫 프로젝트 만들기</Btn>
             </div>

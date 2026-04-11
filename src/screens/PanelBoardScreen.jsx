@@ -192,14 +192,14 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
             </div>
             <button onClick={() => go("consent")}
               style={{ padding: "9px 18px", background: C.purple, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: F }}>
-              인터뷰 시작 →
+              인터뷰 시작할게요
             </button>
           </div>
         ) : isApplied ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", background: "rgba(108,63,219,0.07)", borderRadius: 8 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.purple, flexShrink: 0 }} />
             <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>
-              {status === "applied" ? "AI 적합성 검토 중" : "리서처 최종 검토 대기"}
+              {status === "applied" ? "AI 적합성 검토 중이에요" : "리서처 최종 검토를 기다리고 있어요"}
             </span>
             <button onClick={onCycleDemo} style={{ marginLeft: "auto", fontSize: 10, color: "rgba(0,0,0,0.1)", background: "none", border: "none", cursor: "pointer", fontFamily: F }}>[dev]</button>
           </div>
@@ -212,7 +212,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
               background: C.purple, color: "#fff",
               fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F,
             }}>
-            지원하기
+            지원할게요
           </button>
         )}
 

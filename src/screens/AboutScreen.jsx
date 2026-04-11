@@ -40,7 +40,7 @@ export default function AboutScreen({ go, user, logout }) {
         <section style={{ background: C.white, borderRadius: 16, border: `1px solid ${C.border}`, padding: isMobile ? "28px 20px" : "40px 48px", textAlign: "center" }}>
           <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 10 }}>함께 만들어 가요</div>
           <div style={{ fontSize: 14, color: C.body, marginBottom: 28, lineHeight: 1.7 }}>
-            리서처라면 첫 인터뷰를 무료로 시작해보세요.<br />패널이라면 지금 모집 보드를 확인하세요.
+            첫 인터뷰를 무료로 시작할 수 있어요.<br />패널이라면 지금 모집 보드를 둘러보세요.
           </div>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
             <Btn onClick={() => go("advertiser_login")}>리서처로 시작하기</Btn>

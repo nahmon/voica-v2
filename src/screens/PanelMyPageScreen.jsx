@@ -29,7 +29,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div>
               <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 4 }}>내 활동</div>
-              <div style={{ fontSize: 13, color: C.body }}>참여 내역과 리워드를 확인하세요</div>
+              <div style={{ fontSize: 13, color: C.body }}>참여 내역과 리워드를 확인해요</div>
             </div>
             <Btn variant="ghost" size="sm" onClick={() => go("panel_entry")}>프로필 수정</Btn>
           </div>
@@ -54,7 +54,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
           <div style={{ background: "rgba(234,34,97,0.05)", border: `1px solid rgba(234,34,97,0.2)`, borderRadius: 8, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "flex-start", gap: 10 }}>
             {Ic.Warning({s:16, c:C.ruby})}
             <div style={{ fontSize: 12, color: C.ruby, lineHeight: 1.6 }}>
-              <strong>경고 {warnings}회</strong> — 3회 이상 시 패널 자격이 정지됩니다.
+              <strong>경고 {warnings}회</strong> — 3회 이상이 되면 패널 자격이 정지돼요.
               <span style={{ color: C.body }}> 이의신청은 <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 12, padding: 0, textDecoration: "underline" }}>고객센터</button>로 문의해 주세요.</span>
             </div>
           </div>
@@ -79,11 +79,11 @@ export default function PanelMyPageScreen({ go, user, logout }) {
                   {intv.status === "in_progress" && (
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 11, color: "#d97706" }}>{intv.progress}</span>
-                      <Btn size="sm" onClick={() => alert("리서처가 보낸 인터뷰 링크로 접속해 주세요")}>이어하기 →</Btn>
+                      <Btn size="sm" onClick={() => alert("리서처가 보낸 인터뷰 링크로 접속해 주세요")}>이어서 하기</Btn>
                     </div>
                   )}
                   {intv.status === "confirmed" && (
-                    <Btn size="sm" onClick={() => go("consent")}>인터뷰 시작</Btn>
+                    <Btn size="sm" onClick={() => go("consent")}>인터뷰 시작할게요</Btn>
                   )}
                   {intv.status === "completed" && intv.rewardStatus && (
                     <span style={{ fontSize: 11, color: C.successText, background: C.successBg, padding: "3px 8px", borderRadius: 12 }}>{intv.rewardStatus}</span>
@@ -96,7 +96,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
 
         {/* CTA */}
         <div style={{ marginTop: 24, textAlign: "center" }}>
-          <Btn variant="ghost" onClick={() => go("panel_board")}>더 많은 인터뷰 찾아보기</Btn>
+          <Btn variant="ghost" onClick={() => go("panel_board")}>인터뷰 더 찾아보기</Btn>
         </div>
       </div>
       <Footer go={go} />

@@ -58,10 +58,10 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // Load interview
   useEffect(() => {
-    if (!shareCode) { setLoadError("인터뷰 링크가 올바르지 않습니다"); setLoading(false); return; }
+    if (!shareCode) { setLoadError("인터뷰 링크가 맞지 않아요"); setLoading(false); return; }
     (async () => {
       const res = await fetch(`/api/interview/${shareCode}`);
-      if (!res.ok) { setLoadError("인터뷰를 찾을 수 없습니다. 링크를 확인해 주세요."); setLoading(false); return; }
+      if (!res.ok) { setLoadError("인터뷰를 찾지 못했어요. 링크를 다시 확인해요."); setLoading(false); return; }
       const data = await res.json();
       setInterview(data);
       setLoading(false);
@@ -185,7 +185,7 @@ export default function InterviewScreen({ go, shareCode }) {
       mediaRecorderRef.current = mr;
       setPhase("recording");
     } catch {
-      alert("마이크 권한이 필요합니다. 브라우저 설정에서 허용해 주세요.");
+      alert("마이크 권한이 필요해요. 브라우저 설정에서 허용해요.");
     }
   };
 
@@ -310,7 +310,7 @@ export default function InterviewScreen({ go, shareCode }) {
       <div style={{ textAlign: "center", position: "relative" }}>
         <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(30,142,62,0.2)", border: "1px solid rgba(30,142,62,0.4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>✓</div>
         <div style={{ fontSize: 30, fontWeight: 700, color: C.white, marginBottom: 10 }}>인터뷰 완료!</div>
-        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>소중한 의견 감사합니다.<br />답변이 성공적으로 저장됐습니다.</div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>소중한 의견 감사해요.<br />답변을 저장했어요.</div>
       </div>
     </div>
   );
@@ -361,7 +361,7 @@ export default function InterviewScreen({ go, shareCode }) {
             <div style={{ width: 42, height: 42, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0, boxShadow: phase === "ai_speaking" ? "0 0 20px rgba(26,115,232,0.5)" : "none", transition: "box-shadow 0.5s" }}>✦</div>
             <div>
               <div style={{ fontSize: 11, color: C.purpleLight, marginBottom: 2 }}>AI 인터뷰어 · Voica</div>
-              {phase === "ai_speaking" ? <WaveAnimation active /> : <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>질문을 완료했습니다</span>}
+              {phase === "ai_speaking" ? <WaveAnimation active /> : <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>질문이 끝났어요</span>}
             </div>
           </div>
 
@@ -376,7 +376,7 @@ export default function InterviewScreen({ go, shareCode }) {
             {/* Voice question */}
             {q.type === "voice" && (
               <>
-                {phase === "ai_speaking" && !ttsBlocked && <div style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>AI가 질문을 읽고 있습니다...</div>}
+                {phase === "ai_speaking" && !ttsBlocked && <div style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>AI가 질문을 읽고 있어요...</div>}
                 {phase === "ai_speaking" && ttsBlocked && (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 8, background: "rgba(255,200,50,0.1)", border: "1px solid rgba(255,200,50,0.25)" }}>
@@ -409,13 +409,13 @@ export default function InterviewScreen({ go, shareCode }) {
                     <div style={{ display: "flex", gap: 4 }}>
                       {[0,1,2,3,4].map(i => <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: C.purple, opacity: 0.4, animation: `wave-${i%3} 0.6s ease-in-out ${i*0.12}s infinite alternate` }} />)}
                     </div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>답변을 처리하고 있습니다...</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>답변을 저장하고 있어요...</div>
                   </div>
                 )}
 
                 {phase === "review_pass" && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(30,142,62,0.8)" }}>
-                    <span>✓</span><span>답변이 저장됐습니다. 다음 질문으로 이동합니다...</span>
+                    <span>✓</span><span>답변을 저장했어요. 다음 질문으로 넘어가요...</span>
                   </div>
                 )}
 
@@ -447,7 +447,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
                 {phase === "ready" && (
                   <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", marginBottom: 4 }}>버튼을 눌러 답변을 시작하세요</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", marginBottom: 4 }}>버튼을 눌러 답변을 시작해요</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,0.22)" }}>최소 {MIN_RECORD_SECS}초 이상 답변 후 다시 눌러 완료</div>
                   </div>
                 )}
@@ -496,7 +496,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
             {phase === "review_pass" && q.type !== "voice" && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(30,142,62,0.8)" }}>
-                <span>✓</span><span>답변이 저장됐습니다. 다음 질문으로 이동합니다...</span>
+                <span>✓</span><span>답변을 저장했어요. 다음 질문으로 넘어가요...</span>
               </div>
             )}
           </div>

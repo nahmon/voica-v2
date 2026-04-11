@@ -102,7 +102,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
             응답자 목록 ({sessions.length})
           </div>
           {sessions.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "48px 0", color: C.body, fontSize: 14 }}>아직 응답이 없습니다</div>
+            <div style={{ textAlign: "center", padding: "48px 0", color: C.body, fontSize: 14 }}>아직 응답이 없어요</div>
           ) : sessions.map((s, i) => {
             const isCompleted = s.status === "completed";
             const dt = s.completed_at
@@ -160,7 +160,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           <div style={{ flex: 1, overflowY: "auto" }}>
             {sessions.length === 0 ? (
               <div style={{ padding: "40px 20px", textAlign: "center", color: C.body, fontSize: 13 }}>
-                아직 응답이 없습니다
+                아직 응답이 없어요
               </div>
             ) : sessions.map((s, i) => {
               const isSelected = selectedSession?.id === s.id;
@@ -191,7 +191,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
         <div style={{ flex: 1, overflowY: "auto", padding: "24px 32px" }}>
           {!selectedSession ? (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: C.body, fontSize: 14 }}>
-              왼쪽에서 응답자를 선택하세요
+              왼쪽에서 응답자를 선택해요
             </div>
           ) : (
             <div style={{ maxWidth: 720 }}>

@@ -23,9 +23,9 @@ export default function RoleSelectScreen({ go, user }) {
           <span style={{ color: C.purple }}>Vo</span>ica
         </div>
         <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 6 }}>
-          {name ? `${name}님, 어떤 목적으로 오셨나요?` : "어떤 목적으로 오셨나요?"}
+          {name ? `${name}님, 어떻게 이용하실 건가요?` : "어떻게 이용하실 건가요?"}
         </div>
-        <div style={{ fontSize: 14, color: C.body }}>역할에 맞는 화면으로 안내해드립니다</div>
+        <div style={{ fontSize: 14, color: C.body }}>역할에 맞는 화면으로 이동해요</div>
       </div>
 
       <div style={{ display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center", width: "100%", maxWidth: 560 }}>
@@ -42,7 +42,7 @@ export default function RoleSelectScreen({ go, user }) {
           </div>
           <div style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 8 }}>리서처 / 기업</div>
           <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 20 }}>
-            인터뷰를 설계하고 AI가 패널과 진행한 결과를 리포트로 받아보세요.
+            인터뷰를 설계하고 AI가 진행한 결과를 리포트로 받아요.
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {["인터뷰 질문 설계", "공유 링크 생성", "AI 리포트 자동 생성"].map(f => (
@@ -53,7 +53,7 @@ export default function RoleSelectScreen({ go, user }) {
             ))}
           </div>
           <div style={{ marginTop: 24, fontSize: 14, fontWeight: 600, color: C.purple }}>
-            {loading ? "이동 중..." : "리서처로 시작하기 →"}
+            {loading ? "이동 중..." : "리서처로 시작할게요 →"}
           </div>
         </button>
 
@@ -70,7 +70,7 @@ export default function RoleSelectScreen({ go, user }) {
           </div>
           <div style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Voica 패널</div>
           <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 20 }}>
-            보이스 인터뷰에 참여하고 리워드를 받으세요. 8분 소일거리로 수입을 만들어 보세요.
+            보이스 인터뷰에 참여하고 리워드를 받아요. 8분 참여로 수입을 만들 수 있어요.
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {["인터뷰 참여 · 리워드 수령", "시간 · 장소 자유", "투잡 · 부업 가능"].map(f => (
@@ -81,13 +81,13 @@ export default function RoleSelectScreen({ go, user }) {
             ))}
           </div>
           <div style={{ marginTop: 24, fontSize: 14, fontWeight: 600, color: C.success }}>
-            {loading ? "이동 중..." : "패널로 참여하기 →"}
+            {loading ? "이동 중..." : "패널로 참여할게요 →"}
           </div>
         </button>
       </div>
 
       <div style={{ marginTop: 32, fontSize: 12, color: C.body }}>
-        나중에 역할을 변경하려면 고객센터로 문의해 주세요
+        역할은 나중에 고객센터에서 변경할 수 있어요
       </div>
     </div>
   );

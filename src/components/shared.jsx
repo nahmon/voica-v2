@@ -300,7 +300,7 @@ export function VoCCarousel() {
           <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
             {VOC_LIST.map((v, i) => (
               <div key={i} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box" }}>
-                <div style={{ background: C.white, border: `1px solid rgba(23,23,23,0.15)`, borderRadius: 16, padding: "32px 40px" }}>
+                <div style={{ background: C.white, borderRadius: 16, padding: "32px 40px", boxShadow: "0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05)" }}>
                   <div style={{ fontSize: 24, color: C.purple, marginBottom: 16, lineHeight: 1 }}>❝</div>
                   <p style={{ margin: "0 0 24px", fontSize: 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px" }}>{v.quote}</p>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -370,9 +370,9 @@ export function HowItWorksCarousel() {
         </div>
         <div ref={ref} style={{ display: "flex", gap: 14, overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
           {steps.map((s, i) => (
-            <div key={i} style={{ flex: `0 0 ${cardW}px`, background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "24px 18px", transition: "box-shadow 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = S.standard; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}>
+            <div key={i} style={{ flex: `0 0 ${cardW}px`, background: C.bg, borderRadius: 12, padding: "24px 18px", transition: "box-shadow 0.2s, background 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)"; e.currentTarget.style.background = C.white; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.background = C.bg; }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                 <span style={{ display:"flex",alignItems:"center" }}>{({pencil:Ic.Pencil,users:Ic.Users,sparkle:Ic.Sparkle,barchart:Ic.BarChart,search:Ic.Search,check:Ic.Check,mic:Ic.Mic,gift:Ic.Gift})[s.icon]?.({s:22,c:C.purple})}</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color: C.purple, letterSpacing: "0.16px" }}>{s.step}</span>

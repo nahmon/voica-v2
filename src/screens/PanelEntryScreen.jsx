@@ -76,8 +76,8 @@ export default function PanelEntryScreen({ go }) {
         <div style={{ width: "100%", maxWidth: 520 }}>
           <StepBar />
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>기본 정보를 입력해 주세요</div>
-            <div style={{ fontSize: 13, color: C.body }}>리워드 지급 및 인터뷰 매칭에 사용됩니다</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>기본 정보를 알려주세요</div>
+            <div style={{ fontSize: 13, color: C.body }}>리워드 지급과 인터뷰 매칭에 써요</div>
           </div>
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "28px", boxShadow: S.standard, display: "flex", flexDirection: "column", gap: 22 }}>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
@@ -96,7 +96,7 @@ export default function PanelEntryScreen({ go }) {
               <FieldLabel>연령대</FieldLabel>
               <ChipGroup options={AGES} value={form.age} onSelect={v => upd("age", v)} />
             </div>
-            <Btn full size="lg" disabled={!step0Valid} onClick={() => setStep(1)}>다음 →</Btn>
+            <Btn full size="lg" disabled={!step0Valid} onClick={() => setStep(1)}>다음으로</Btn>
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function PanelEntryScreen({ go }) {
           <StepBar />
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>매칭 프로필을 설정해 주세요</div>
-            <div style={{ fontSize: 13, color: C.body }}>리서처가 적합한 패널을 선택할 때 활용됩니다</div>
+            <div style={{ fontSize: 13, color: C.body }}>리서처가 알맞은 패널을 찾을 때 봐요</div>
           </div>
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "28px", boxShadow: S.standard, display: "flex", flexDirection: "column", gap: 24 }}>
             <div>
@@ -130,8 +130,8 @@ export default function PanelEntryScreen({ go }) {
               )}
             </div>
             <div style={{ display: "flex", gap: 10 }}>
-              <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => setStep(0)}>← 이전</Btn>
-              <Btn size="lg" style={{ flex: 2 }} disabled={!step1Valid} onClick={() => setStep(2)}>다음 →</Btn>
+              <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => setStep(0)}>이전으로</Btn>
+              <Btn size="lg" style={{ flex: 2 }} disabled={!step1Valid} onClick={() => setStep(2)}>다음으로</Btn>
             </div>
           </div>
         </div>
@@ -145,11 +145,11 @@ export default function PanelEntryScreen({ go }) {
       <div style={{ display: "flex", justifyContent: "center", padding: "60px 24px" }}>
         <div style={{ width: "100%", maxWidth: 520, textAlign: "center" }}>
           <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(30,142,62,0.12)", border: "1px solid rgba(30,142,62,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>✓</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 10 }}>패널 등록 완료!</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 10 }}>패널 등록 완료</div>
           <div style={{ fontSize: 14, color: C.body, lineHeight: 1.75, marginBottom: 32 }}>
-            {form.name}님, 환영합니다.<br />
-            이제 인터뷰 모집 보드에서 참여 가능한 인터뷰를 찾아보세요.<br />
-            리워드는 인터뷰 완료 후 AI 검토를 거쳐 자동 지급됩니다.
+            {form.name}님, 환영해요.<br />
+            인터뷰 모집 보드에서 참여할 인터뷰를 찾아보세요.<br />
+            리워드는 인터뷰 완료 후 AI 검토를 거쳐 자동으로 지급돼요.
           </div>
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "18px 20px", marginBottom: 24, textAlign: "left", boxShadow: S.ambient }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, marginBottom: 10 }}>다음 단계 안내</div>
@@ -168,7 +168,7 @@ export default function PanelEntryScreen({ go }) {
           <div style={{ display: "flex", gap: 10 }}>
             <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => go("landing")}>홈으로</Btn>
             <Btn size="lg" style={{ flex: 2 }} onClick={() => go("panel_board")}>
-              인터뷰 찾아보기 →
+              인터뷰 찾아보기
             </Btn>
           </div>
         </div>
@@ -209,7 +209,7 @@ export default function PanelEntryScreen({ go }) {
               ["수집 항목", "성함, 연락처, 거주지역, 성별, 연령, 직업, 소득, 관심분야, 음성 답변"],
               ["이용 목적", "인터뷰 패널 매칭, 리서치 분석 및 리포트 작성"],
               ["보유 기간", "서비스 탈퇴 시 또는 마지막 인터뷰 완료 후 2년"],
-              ["제3자 제공", "의뢰 기업에게 익명화된 분석 데이터 제공 (개인 식별 불가)"],
+              ["제3자 제공", "의뢰 기업에 익명화된 분석 데이터 제공 (개인 식별 불가)"],
             ].map(([k, v]) => (
               <div key={k} style={{ display: "flex", gap: 12, padding: "9px 0", borderBottom: `1px solid ${C.border}` }}>
                 <span style={{ fontSize: 11, color: C.body, minWidth: 72, flexShrink: 0 }}>{k}</span>
@@ -218,9 +218,9 @@ export default function PanelEntryScreen({ go }) {
             ))}
             <div style={{ marginTop: 16, padding: "12px 14px", borderRadius: 6, background: C.bg, border: `1px solid ${C.border}` }}>
               <div style={{ fontSize: 12, color: C.body, lineHeight: 1.75 }}>
-                ✦ 음성은 AI 전사 후 즉시 삭제됩니다<br />
-                ✦ 개인 식별 정보는 광고주에게 공유되지 않습니다<br />
-                ✦ 동의 철회 시 언제든 탈퇴 가능합니다
+                ✦ 음성은 AI 전사 후 즉시 삭제돼요<br />
+                ✦ 개인 식별 정보는 광고주에게 공유되지 않아요<br />
+                ✦ 동의를 철회하면 언제든 탈퇴할 수 있어요
               </div>
             </div>
 
@@ -228,13 +228,13 @@ export default function PanelEntryScreen({ go }) {
               <div style={{ width: 20, height: 20, borderRadius: 4, border: `1.5px solid ${agreed ? C.purple : C.border}`, background: agreed ? C.purple : C.white, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s", flexShrink: 0 }}>
                 {agreed && <span style={{ color: C.white, fontSize: 12, lineHeight: 1 }}>✓</span>}
               </div>
-              <span style={{ fontSize: 13, color: C.navy }}>위 내용을 모두 읽었으며 동의합니다</span>
+              <span style={{ fontSize: 13, color: C.navy }}>위 내용을 모두 읽었고 동의해요</span>
             </div>
 
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => setStep(1)}>← 이전</Btn>
+              <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => setStep(1)}>이전으로</Btn>
               <Btn size="lg" style={{ flex: 2 }} disabled={!agreed} onClick={() => setStep(3)}>
-                패널 등록 완료 →
+                패널 등록할게요
               </Btn>
             </div>
           </div>
