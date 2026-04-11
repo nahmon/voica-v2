@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
@@ -47,6 +47,8 @@ export default function EditorScreen({ go, user }) {
   const [addTypeOpen, setAddTypeOpen] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
+  const [dragOver, setDragOver] = useState(null);
+  const dragIdx = useRef(null);
   const isMobile = useIsMobile();
 
   // Auto-save draft to localStorage
@@ -249,14 +251,36 @@ export default function EditorScreen({ go, user }) {
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: 10 }}>
             {questions.map((qq, i) => (
-              <div key={qq.id} onClick={() => setSelectedIdx(i)}
-                style={{ padding: "10px 12px", borderRadius: 6, marginBottom: 4, cursor: "pointer", border: `1px solid ${selectedIdx === i ? C.purpleLight : "transparent"}`, background: selectedIdx === i ? C.purpleBg : "transparent" }}>
+              <div key={qq.id}
+                draggable
+                onDragStart={() => { dragIdx.current = i; }}
+                onDragOver={e => { e.preventDefault(); setDragOver(i); }}
+                onDragLeave={() => setDragOver(null)}
+                onDrop={() => {
+                  const from = dragIdx.current;
+                  if (from === null || from === i) { setDragOver(null); return; }
+                  const next = [...questions];
+                  const [moved] = next.splice(from, 1);
+                  next.splice(i, 0, moved);
+                  setQuestions(next);
+                  setSelectedIdx(i);
+                  dragIdx.current = null;
+                  setDragOver(null);
+                }}
+                onDragEnd={() => { dragIdx.current = null; setDragOver(null); }}
+                onClick={() => setSelectedIdx(i)}
+                style={{
+                  padding: "10px 12px", borderRadius: 6, marginBottom: 4, cursor: "grab",
+                  border: `1px solid ${dragOver === i ? C.purple : selectedIdx === i ? C.purpleLight : "transparent"}`,
+                  background: dragOver === i ? "rgba(83,58,253,0.08)" : selectedIdx === i ? C.purpleBg : "transparent",
+                  opacity: dragIdx.current === i ? 0.4 : 1,
+                  transition: "background 0.1s, border-color 0.1s",
+                }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                  <span style={{ fontSize: 10, color: C.body, cursor: "grab", opacity: 0.4, marginRight: 2 }}>⠿</span>
                   <span style={{ fontSize: 11, color: selectedIdx === i ? C.purple : C.body }}>Q{i + 1}</span>
                   <Badge variant={selectedIdx === i ? typeVariant[qq.type] : "neutral"} style={{ fontSize: 10 }}>{typeLabel[qq.type]}</Badge>
                   <div style={{ marginLeft: "auto", display: "flex", gap: 2 }}>
-                    <button onClick={e => { e.stopPropagation(); moveQ(i, -1); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px" }}>↑</button>
-                    <button onClick={e => { e.stopPropagation(); moveQ(i, 1); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px" }}>↓</button>
                     <button onClick={e => { e.stopPropagation(); removeQ(i); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px" }}>✕</button>
                   </div>
                 </div>
