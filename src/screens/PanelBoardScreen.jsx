@@ -163,18 +163,56 @@ function JobRow({ job, status, isRecommended, isMobile, onApply, onCycleDemo, go
           </span>
         </div>
 
-        {/* Conditions — collapsed on mobile */}
-        {(!isMobile || expanded) && (
-          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 10 }}>
-            {job.conditions.map(c => (
-              <span key={c} style={{ fontSize: 11, padding: "3px 8px", borderRadius: 4, background: C.bg, color: C.label, border: `1px solid ${C.border}` }}>{c}</span>
-            ))}
+        {/* Toggle button */}
+        <button onClick={() => setExpanded(v => !v)} style={{ marginTop: 8, fontSize: 11, color: C.purple, background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: F, display: "flex", alignItems: "center", gap: 3 }}>
+          {expanded ? "접기 ↑" : "상세 보기 ↓"}
+        </button>
+
+        {/* Expanded detail panel */}
+        {expanded && (
+          <div style={{ marginTop: 12, borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 14 }}>
+            {/* Description */}
+            {job.description && (
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 5, letterSpacing: 0.4 }}>인터뷰 소개</div>
+                <div style={{ fontSize: 13, color: C.navy, lineHeight: 1.65 }}>{job.description}</div>
+              </div>
+            )}
+            {/* Target profile */}
+            {job.targetProfile && (
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 8, letterSpacing: 0.4 }}>찾는 패널</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8 }}>
+                  {[
+                    { icon: "🎂", label: "연령", value: job.targetProfile.age },
+                    { icon: "👤", label: "성별", value: job.targetProfile.gender },
+                    { icon: "📍", label: "지역", value: job.targetProfile.region },
+                  ].map(item => (
+                    <div key={item.label} style={{ background: C.bg, borderRadius: 8, padding: "8px 10px", border: `1px solid ${C.border}` }}>
+                      <div style={{ fontSize: 10, color: C.body, marginBottom: 2 }}>{item.icon} {item.label}</div>
+                      <div style={{ fontSize: 12, fontWeight: 500, color: C.navy }}>{item.value}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop: 8, background: "rgba(83,58,253,0.04)", borderRadius: 8, padding: "8px 10px", border: `1px solid rgba(83,58,253,0.12)` }}>
+                  <div style={{ fontSize: 10, color: C.purple, marginBottom: 3, fontWeight: 600 }}>✦ 이런 분을 찾아요</div>
+                  <div style={{ fontSize: 12, color: C.navy, lineHeight: 1.6 }}>{job.targetProfile.lifestyle}</div>
+                </div>
+                {job.targetProfile.exclude && (
+                  <div style={{ marginTop: 6, fontSize: 11, color: C.body }}>⛔ {job.targetProfile.exclude}</div>
+                )}
+              </div>
+            )}
+            {/* Conditions tags */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 6, letterSpacing: 0.4 }}>참여 조건</div>
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                {job.conditions.map(c => (
+                  <span key={c} style={{ fontSize: 11, padding: "3px 8px", borderRadius: 4, background: C.bg, color: C.label, border: `1px solid ${C.border}` }}>{c}</span>
+                ))}
+              </div>
+            </div>
           </div>
-        )}
-        {isMobile && (
-          <button onClick={() => setExpanded(v => !v)} style={{ marginTop: 6, fontSize: 11, color: C.body, background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: F }}>
-            {expanded ? "접기 ↑" : "참여조건 보기 ↓"}
-          </button>
         )}
 
         {/* CTA row */}

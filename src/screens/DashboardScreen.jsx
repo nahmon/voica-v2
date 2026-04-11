@@ -105,27 +105,30 @@ export default function DashboardScreen({ go, user, logout }) {
             const st = statusStyle[label] ?? { variant: "neutral", dot: C.body };
             const date = new Date(p.created_at).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\. /g, ".").replace(/\.$/, "");
             return (
-              <div key={p.id} onClick={() => go(p.status === "closed" ? "report" : "editor", p.id)} style={{ background: C.white, borderRadius: 16, padding: "18px 20px", boxShadow: S.ambient, border: `1px solid ${C.border}`, cursor: "pointer", transition: "box-shadow 0.2s", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}
+              <div key={p.id} onClick={() => go(p.status === "closed" ? "report" : "editor", p.id)} style={{ background: C.white, borderRadius: 16, padding: "20px 24px", boxShadow: S.ambient, border: `1px solid ${C.border}`, cursor: "pointer", transition: "box-shadow 0.2s", display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap" }}
                 onMouseEnter={e => { e.currentTarget.style.boxShadow = S.card; }}
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = S.ambient; }}>
-                <div style={{ flex: 1, minWidth: 180 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                {/* Title + status */}
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
                     <span style={{ fontSize: 15, fontWeight: 400, color: C.navy, fontFeatureSettings: '"ss01"' }}>{p.title}</span>
                     <Badge variant={st.variant}>{label}</Badge>
                   </div>
                   <div style={{ fontSize: 12, color: C.body }}>질문 {questionCount}개 · {date}</div>
                 </div>
+                {/* Response count */}
                 <div style={{ minWidth: 160 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
                     <span style={{ fontSize: 11, color: C.body }}>응답 수</span>
-                    <span style={{ fontSize: 11, fontWeight: 400, color: C.navy, fontFeatureSettings: '"tnum"' }}>{sessionCount}명</span>
+                    <span style={{ fontSize: 11, fontWeight: 500, color: C.navy, fontFeatureSettings: '"tnum"' }}>{sessionCount}명</span>
                   </div>
                   <div style={{ height: 4, background: C.border, borderRadius: 2 }}>
                     <div style={{ height: "100%", width: sessionCount > 0 ? "100%" : "0%", background: C.purple, borderRadius: 2, transition: "width 0.5s" }} />
                   </div>
                 </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  {p.status !== "closed" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("editor"); }}>편집</Btn>}
+                {/* Actions — visually separated */}
+                <div style={{ display: "flex", gap: 8, paddingLeft: 8, borderLeft: `1px solid ${C.border}` }}>
+                  {p.status !== "closed" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("editor", p.id); }}>편집</Btn>}
                   {p.status === "closed" && <Btn size="sm" onClick={e => { e.stopPropagation(); go("report", p.id); }}>리포트</Btn>}
                 </div>
               </div>
