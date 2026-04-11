@@ -35,14 +35,16 @@ const VOICA_SURVEY_TEMPLATE = {
 
 const DRAFT_KEY = "voica_editor_draft";
 
-export default function EditorScreen({ go, user, logout }) {
-  // Restore draft from localStorage
-  const savedDraft = (() => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; } })();
+export default function EditorScreen({ go, user, logout, interviewId }) {
+  // Restore draft from localStorage only when creating new (no interviewId)
+  const savedDraft = !interviewId ? (() => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; } })() : null;
   const [title, setTitle] = useState(savedDraft?.title ?? "");
   const [questions, setQuestions] = useState(savedDraft?.questions ?? [newQ("voice")]);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [saving, setSaving] = useState(false);
   const [shareCode, setShareCode] = useState(null);
+  const [editingId, setEditingId] = useState(interviewId ?? null);
+  const [loadingExisting, setLoadingExisting] = useState(!!interviewId);
   const [copied, setCopied] = useState(false);
   const [addTypeOpen, setAddTypeOpen] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
@@ -52,15 +54,33 @@ export default function EditorScreen({ go, user, logout }) {
   const dragIdx = useRef(null);
   const isMobile = useIsMobile();
 
-  // Auto-save draft to localStorage
+  // Load existing interview from DB when editing
   useEffect(() => {
+    if (!interviewId) return;
+    (async () => {
+      const [{ data: iv }, { data: qs }] = await Promise.all([
+        supabase.from("interviews").select("id, title, share_code").eq("id", interviewId).single(),
+        supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
+      ]);
+      if (iv) { setTitle(iv.title ?? ""); if (iv.share_code) setShareCode(iv.share_code); }
+      if (qs && qs.length > 0) {
+        setQuestions(qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options })));
+        setSelectedIdx(0);
+      }
+      setLoadingExisting(false);
+    })();
+  }, [interviewId]);
+
+  // Auto-save draft to localStorage only for new interviews
+  useEffect(() => {
+    if (editingId) return;
     const timer = setTimeout(() => {
       localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, questions }));
       setDraftSaved(true);
       setTimeout(() => setDraftSaved(false), 1500);
     }, 800);
     return () => clearTimeout(timer);
-  }, [title, questions]);
+  }, [title, questions, editingId]);
 
   const loadTemplate = () => {
     setTitle(VOICA_SURVEY_TEMPLATE.title);
@@ -103,22 +123,26 @@ export default function EditorScreen({ go, user, logout }) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
+      const payload = {
+        title: title.trim(),
+        questions: questions.map((q, i) => ({
+          id: q.id,
+          order_num: i + 1,
+          type: q.type,
+          content: q.content,
+          options: q.options ?? null,
+        })),
+      };
+      if (editingId) payload.id = editingId;
       const res = await fetch("/api/interview", {
-        method: "POST",
+        method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          title: title.trim(),
-          questions: questions.map((q, i) => ({
-            order_num: i + 1,
-            type: q.type,
-            content: q.content,
-            options: q.options ?? null,
-          })),
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "저장 실패");
       setShareCode(data.share_code);
+      if (!editingId && data.interview?.id) setEditingId(data.interview.id);
       localStorage.removeItem(DRAFT_KEY);
     } catch (e) {
       alert(e.message);

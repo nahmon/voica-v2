@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { C, S, F } from "../lib/constants.jsx";
-import { Btn, Input, GlobalNav } from "../components/shared.jsx";
+import { Btn, Input, GlobalNav, Footer } from "../components/shared.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function PanelEntryScreen({ go }) {
+  const isMobile = useIsMobile();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "", phone: "", region: "", gender: "", age: "",
@@ -78,7 +80,7 @@ export default function PanelEntryScreen({ go }) {
             <div style={{ fontSize: 13, color: C.body }}>리워드 지급 및 인터뷰 매칭에 사용됩니다</div>
           </div>
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "28px", boxShadow: S.standard, display: "flex", flexDirection: "column", gap: 22 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
               <Input label="이름 (실명)" placeholder="홍길동" value={form.name} onChange={e => upd("name", e.target.value)} />
               <Input label="연락처" type="tel" placeholder="010-0000-0000" value={form.phone} onChange={e => upd("phone", e.target.value)} />
             </div>

@@ -13,6 +13,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  // Verify session is valid and in progress before accepting responses
+  const { data: session } = await supabase
+    .from("sessions")
+    .select("id, status")
+    .eq("id", session_id)
+    .single();
+  if (!session || session.status !== "in_progress") {
+    return res.status(403).json({ error: "Invalid or already completed session" });
+  }
+
   const { error } = await supabase.from("responses").insert({
     session_id,
     question_id,

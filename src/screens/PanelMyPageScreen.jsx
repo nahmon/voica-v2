@@ -1,5 +1,5 @@
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Btn, GlobalNav } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function PanelMyPageScreen({ go, user, logout }) {
@@ -99,6 +99,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
           <Btn variant="ghost" onClick={() => go("panel_board")}>더 많은 인터뷰 찾아보기</Btn>
         </div>
       </div>
+      <Footer go={go} />
     </div>
   );
 }

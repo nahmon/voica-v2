@@ -1,36 +1,55 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Badge, Btn, GlobalNav } from "../components/shared.jsx";
+import { Badge, Btn, GlobalNav, VoicePlayer, Footer } from "../components/shared.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function ReportScreen({ go, user, logout, interviewId }) {
+  const isMobile = useIsMobile();
   const [interview, setInterview] = useState(null);
   const [sessions, setSessions] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [allResponses, setAllResponses] = useState([]);
   const [report, setReport] = useState(null);
   const [generating, setGenerating] = useState(false);
+  const [genElapsed, setGenElapsed] = useState(0);
+  const genTimerRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState(null);
 
   useEffect(() => {
     if (!interviewId) { setLoading(false); return; }
     (async () => {
-      const [ivRes, sessRes, repRes] = await Promise.all([
+      const [ivRes, sessRes, qsRes, repRes] = await Promise.all([
         supabase.from("interviews").select("id, title, status").eq("id", interviewId).single(),
         supabase.from("sessions")
-          .select("id, respondent, status, started_at, completed_at, responses(id, type, transcript, value, audio_url, question_id, questions(content, order_num, type))")
+          .select("id, respondent, status, started_at, completed_at")
           .eq("interview_id", interviewId)
           .order("started_at", { ascending: false }),
+        supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
         supabase.from("reports").select("*").eq("interview_id", interviewId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
       ]);
       if (ivRes.data) setInterview(ivRes.data);
-      if (sessRes.data) setSessions(sessRes.data);
+      if (qsRes.data) setQuestions(qsRes.data);
       if (repRes.data) setReport(repRes.data);
+
+      const ss = sessRes.data ?? [];
+      setSessions(ss);
+
+      if (ss.length > 0) {
+        const sessionIds = ss.map(s => s.id);
+        const { data: resp } = await supabase
+          .from("responses").select("*").in("session_id", sessionIds);
+        setAllResponses(resp ?? []);
+      }
       setLoading(false);
     })();
   }, [interviewId]);
 
   const handleGenerateReport = async () => {
     setGenerating(true);
+    setGenElapsed(0);
+    genTimerRef.current = setInterval(() => setGenElapsed(s => s + 1), 1000);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -44,9 +63,12 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
     } catch (e) {
       alert(e.message);
     } finally {
+      clearInterval(genTimerRef.current);
       setGenerating(false);
     }
   };
+
+  const handlePrint = () => window.print();
 
   const completedSessions = sessions.filter(s => s.status === "completed");
 
@@ -70,18 +92,16 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
       <GlobalNav go={go} variant="app" user={user} logout={logout} />
 
       {/* Sub nav */}
-      <div style={{ padding: "10px 24px", background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
-        <div style={{ fontSize: 14, fontWeight: 400, color: C.navy }}>{interview?.title}</div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Badge variant="neutral">{completedSessions.length}명 완료</Badge>
-        </div>
+      <div style={{ padding: isMobile ? "8px 16px" : "10px 24px", background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← {isMobile ? "" : "대시보드"}</Btn>
+        <div style={{ fontSize: 13, fontWeight: 400, color: C.navy, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>{interview?.title}</div>
+        <Badge variant="neutral">{completedSessions.length}명 완료</Badge>
       </div>
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px", display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
+      <main style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "16px" : "28px 24px", display: "flex", flexDirection: isMobile ? "column" : "row", gap: 24, alignItems: "flex-start" }}>
 
         {/* Left: Sessions list */}
-        <div style={{ width: 280, flexShrink: 0 }}>
+        <div style={{ width: isMobile ? "100%" : 280, flexShrink: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 12 }}>응답 목록 ({sessions.length}명)</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {sessions.length === 0 && (
@@ -101,7 +121,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                     <span style={{ fontSize: 13, fontWeight: 400, color: C.navy }}>{name}</span>
                     <Badge variant={s.status === "completed" ? "success" : "warning"}>{s.status === "completed" ? "완료" : "진행 중"}</Badge>
                   </div>
-                  <div style={{ fontSize: 11, color: C.body }}>{duration} · {(s.responses?.length ?? 0)}개 답변</div>
+                  <div style={{ fontSize: 11, color: C.body }}>{duration} · {allResponses.filter(r => r.session_id === s.id).length}개 답변</div>
                 </div>
               );
             })}
@@ -121,29 +141,36 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 <button onClick={() => setSelectedSession(null)} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 18 }}>✕</button>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {(selectedSession.responses ?? [])
-                  .sort((a, b) => (a.questions?.order_num ?? 0) - (b.questions?.order_num ?? 0))
-                  .map((r, i) => (
-                    <div key={r.id} style={{ borderBottom: `1px solid ${C.border}`, paddingBottom: 12 }}>
-                      <div style={{ fontSize: 12, color: C.body, marginBottom: 4 }}>Q{i + 1} · {r.questions?.content}</div>
-                      {r.type === "voice" && (
-                        <div>
-                          {r.audio_url && (
-                            <audio controls src={r.audio_url} style={{ width: "100%", height: 32, marginBottom: 8, borderRadius: 6 }} />
-                          )}
-                          <div style={{ fontSize: 13, color: C.navy, lineHeight: 1.6 }}>
-                            {r.transcript ? <span>"{r.transcript}"</span> : <span style={{ color: C.body, fontStyle: "italic" }}>트랜스크립트 없음</span>}
-                          </div>
+                {questions.map((q, i) => {
+                  const r = allResponses.find(r => r.session_id === selectedSession.id && r.question_id === q.id);
+                  return (
+                    <div key={q.id} style={{ borderBottom: `1px solid ${C.border}`, paddingBottom: 12 }}>
+                      <div style={{ fontSize: 12, color: C.body, marginBottom: 6 }}>Q{i + 1} · {q.content}</div>
+                      {!r ? (
+                        <span style={{ fontSize: 12, color: C.body, fontStyle: "italic" }}>응답 없음</span>
+                      ) : q.type === "voice" ? (
+                        <VoicePlayer audioUrl={r.audio_url} transcript={r.transcript} />
+                      ) : q.type === "multiple_choice" ? (
+                        <div style={{ padding: "6px 12px", borderRadius: 6, background: C.purpleBg, border: `1px solid ${C.purple}20`, display: "inline-block" }}>
+                          <span style={{ fontSize: 13, color: C.purple, fontWeight: 500 }}>
+                            {Array.isArray(r.value) ? r.value.join(", ") : String(r.value ?? "")}
+                          </span>
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex", gap: 6 }}>
+                          {Array.from({ length: (q.options?.max ?? 5) - (q.options?.min ?? 1) + 1 }, (_, k) => k + (q.options?.min ?? 1)).map(n => {
+                            const sel = n === Number(r.value);
+                            return (
+                              <div key={n} style={{ width: 32, height: 32, borderRadius: 6, border: `2px solid ${sel ? C.purple : C.border}`, background: sel ? C.purple : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: sel ? C.white : C.body }}>
+                                {n}
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
-                      {r.type === "multiple_choice" && (
-                        <Badge variant="purple">{Array.isArray(r.value) ? r.value.join(", ") : String(r.value ?? "")}</Badge>
-                      )}
-                      {r.type === "likert" && (
-                        <Badge variant="neutral">{r.value}점</Badge>
-                      )}
                     </div>
-                  ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -157,10 +184,29 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 완료된 응답 {completedSessions.length}건을 GPT-4o가 분석하여<br />
                 테마, 감성, 인사이트를 자동으로 정리합니다.
               </div>
-              <Btn onClick={handleGenerateReport} disabled={generating || completedSessions.length === 0}>
-                {generating ? "분석 중... (30초~1분 소요)" : "리포트 생성하기 →"}
-              </Btn>
-              {completedSessions.length === 0 && (
+              {generating ? (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 16 }}>
+                    <div style={{ width: 20, height: 20, border: `2px solid ${C.purple}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                    <span style={{ fontSize: 14, color: C.navy }}>AI 분석 중...</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: C.body, marginBottom: 8 }}>
+                    {genElapsed}초 경과 · 보통 30초~1분 소요됩니다
+                  </div>
+                  <div style={{ height: 3, background: C.border, borderRadius: 2, maxWidth: 240, margin: "0 auto", overflow: "hidden" }}>
+                    <div style={{ height: "100%", background: C.purple, borderRadius: 2, width: "60%", animation: "slide-progress 2s ease-in-out infinite alternate" }} />
+                  </div>
+                  <style>{`
+                    @keyframes spin { to { transform: rotate(360deg); } }
+                    @keyframes slide-progress { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
+                  `}</style>
+                </div>
+              ) : (
+                <Btn onClick={handleGenerateReport} disabled={completedSessions.length === 0}>
+                  리포트 생성하기 →
+                </Btn>
+              )}
+              {completedSessions.length === 0 && !generating && (
                 <div style={{ fontSize: 12, color: C.body, marginTop: 12 }}>완료된 응답이 있어야 리포트를 생성할 수 있습니다</div>
               )}
             </div>
@@ -218,6 +264,9 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 <Btn variant="ghost" size="sm" onClick={handleGenerateReport} disabled={generating}>
                   {generating ? "재생성 중..." : "리포트 재생성"}
                 </Btn>
+                <Btn variant="ghost" size="sm" onClick={handlePrint}>
+                  PDF 저장
+                </Btn>
               </div>
             </div>
           )}
@@ -230,6 +279,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
           )}
         </div>
       </main>
+      <Footer go={go} />
     </div>
   );
 }

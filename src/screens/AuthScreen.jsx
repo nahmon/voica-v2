@@ -10,14 +10,9 @@ export default function AdvertiserLoginScreen({ go }) {
   const [pw, setPw] = useState("");
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
-  const [coType, setCoType] = useState("");
-  const [coSize, setCoSize] = useState("");
-  const [purposes, setPurposes] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [position, setPosition] = useState("");
-  const [dept, setDept] = useState("");
   const [authError, setAuthError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
   const handleResetPassword = async (e) => {
@@ -48,7 +43,7 @@ export default function AdvertiserLoginScreen({ go }) {
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email, password: pw,
-      options: { data: { name, company, coType, coSize, position, dept, purposes, categories, role } }
+      options: { data: { name, company, role } }
     });
     setLoading(false);
     if (error) {
@@ -109,15 +104,17 @@ export default function AdvertiserLoginScreen({ go }) {
             <div style={{ fontSize: 14, color: C.body }}>{tab === "login" ? "계정에 로그인하세요" : "Voica에 가입하세요"}</div>
           </div>
 
-          <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-            {[["researcher", "리서처 / 기업", "인터뷰 설계 · 리포트"], ["panel", "패널 참여자", "인터뷰 참여 · 리워드"]].map(([v, label, desc]) => (
-              <div key={v} onClick={() => setRole(v)}
-                style={{ flex: 1, padding: "14px 16px", borderRadius: 10, border: `2px solid ${role === v ? C.purple : C.border}`, background: role === v ? C.purpleBg : C.white, cursor: "pointer", transition: "all 0.15s" }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: role === v ? C.purple : C.navy, marginBottom: 3 }}>{label}</div>
-                <div style={{ fontSize: 11, color: role === v ? C.purple : C.body, opacity: role === v ? 0.8 : 1 }}>{desc}</div>
-              </div>
-            ))}
-          </div>
+          {tab === "signup" && (
+            <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+              {[["researcher", "리서처 / 기업", "인터뷰 설계 · 리포트"], ["panel", "패널 참여자", "인터뷰 참여 · 리워드"]].map(([v, label, desc]) => (
+                <div key={v} onClick={() => setRole(v)}
+                  style={{ flex: 1, padding: "14px 16px", borderRadius: 10, border: `2px solid ${role === v ? C.purple : C.border}`, background: role === v ? C.purpleBg : C.white, cursor: "pointer", transition: "all 0.15s" }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: role === v ? C.purple : C.navy, marginBottom: 3 }}>{label}</div>
+                  <div style={{ fontSize: 11, color: role === v ? C.purple : C.body, opacity: role === v ? 0.8 : 1 }}>{desc}</div>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div style={{ background: C.white, borderRadius: 12, padding: "28px 28px", boxShadow: S.card }}>
             <div style={{ display: "flex", background: C.bg, borderRadius: 6, padding: 3, marginBottom: 24 }}>
@@ -128,22 +125,17 @@ export default function AdvertiserLoginScreen({ go }) {
               ))}
             </div>
 
-            {tab === "login" && (
+            {tab === "login" && !resetMode && (
               <>
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                   <Input label="이메일" type="email" placeholder="hello@brand.com" value={email} onChange={e => setEmail(e.target.value)} />
                   <Input label="비밀번호" type="password" placeholder="8자 이상" value={pw} onChange={e => setPw(e.target.value)} />
                 </div>
                 <div style={{ textAlign: "right", marginTop: 8 }}>
-                  <a href="#" onClick={handleResetPassword} style={{ fontSize: 12, color: C.purple, textDecoration: "none" }}>
-                    {loading ? "발송 중..." : "비밀번호 찾기"}
+                  <a href="#" onClick={e => { e.preventDefault(); setResetMode(true); setAuthError(""); setResetSent(false); }} style={{ fontSize: 12, color: C.purple, textDecoration: "none" }}>
+                    비밀번호 찾기
                   </a>
                 </div>
-                {resetSent && (
-                  <div style={{ marginTop: 8, padding: "8px 12px", borderRadius: 6, background: "rgba(30,142,62,0.08)", color: C.successText, fontSize: 13 }}>
-                    재설정 링크를 이메일로 발송했습니다. 받은 메일함을 확인해 주세요.
-                  </div>
-                )}
                 {authError && <div style={{ marginTop: 12, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
                 <Btn full size="lg" style={{ marginTop: 20 }} disabled={loading || !email || !pw} onClick={handleLogin}>{loading ? "로그인 중..." : "로그인"}</Btn>
                 <Divider label="간편 로그인" />
@@ -151,35 +143,38 @@ export default function AdvertiserLoginScreen({ go }) {
               </>
             )}
 
+            {tab === "login" && resetMode && (
+              <>
+                <div style={{ fontSize: 14, color: C.navy, marginBottom: 14 }}>비밀번호 재설정 링크를 이메일로 발송합니다.</div>
+                <Input label="이메일" type="email" placeholder="가입한 이메일 주소" value={email} onChange={e => setEmail(e.target.value)} />
+                {resetSent ? (
+                  <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 8, background: "rgba(30,142,62,0.08)", color: C.successText, fontSize: 13 }}>
+                    재설정 링크를 발송했습니다. 받은 메일함을 확인해 주세요.
+                  </div>
+                ) : (
+                  <>
+                    {authError && <div style={{ marginTop: 10, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
+                    <Btn full size="lg" style={{ marginTop: 14 }} disabled={loading || !email} onClick={handleResetPassword}>
+                      {loading ? "발송 중..." : "재설정 링크 발송"}
+                    </Btn>
+                  </>
+                )}
+                <div style={{ textAlign: "center", marginTop: 12 }}>
+                  <a href="#" onClick={e => { e.preventDefault(); setResetMode(false); setAuthError(""); }} style={{ fontSize: 12, color: C.body, textDecoration: "none" }}>
+                    ← 로그인으로 돌아가기
+                  </a>
+                </div>
+              </>
+            )}
+
             {tab === "signup" && (
               <>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>기본 정보</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 24 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
                   <Input label="이름" placeholder="홍길동" value={name} onChange={e => setName(e.target.value)} />
                   {role === "researcher" && <Input label="회사 / 브랜드명" placeholder="(주)브랜드랩" value={company} onChange={e => setCompany(e.target.value)} />}
                   <Input label="이메일" type="email" placeholder="hello@brand.com" value={email} onChange={e => setEmail(e.target.value)} />
                   <Input label="비밀번호" type="password" placeholder="8자 이상" value={pw} onChange={e => setPw(e.target.value)} helper="영문, 숫자, 특수문자 포함 8자 이상" />
                 </div>
-
-                {role === "researcher" && <>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>회사 정보</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 18, marginBottom: 24 }}>
-                    <PillGroup label="회사 유형" options={["스타트업", "중소기업", "중견기업", "대기업", "컨설팅/에이전시", "개인사업자/프리랜서"]} value={coType} onChange={setCoType} />
-                    <PillGroup label="회사 규모" options={["1~10명", "11~50명", "51~200명", "201명 이상"]} value={coSize} onChange={setCoSize} />
-                  </div>
-
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>담당자 정보</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 18, marginBottom: 24 }}>
-                    <PillGroup label="직급" options={["사원/주임", "대리/매니저", "과장/시니어", "차장/리드", "부장/헤드", "임원/C-level", "대표/창업자"]} value={position} onChange={setPosition} />
-                    <PillGroup label="담당 부서" options={["리서치/UX", "마케팅", "제품/기획", "전략/경영", "영업/파트너십", "기타"]} value={dept} onChange={setDept} />
-                  </div>
-
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>리서치 목적 <span style={{ fontSize: 11, fontWeight: 400, color: C.body }}>(복수 선택 가능)</span></div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 18, marginBottom: 28 }}>
-                    <PillGroup label="가입 목적" options={["서비스/UX 개선", "신제품 개발", "시장/경쟁사 조사", "브랜드 인식 조사", "고객 경험 분석", "기타"]} value={purposes} onChange={setPurposes} multi />
-                    <PillGroup label="조사 희망 카테고리" options={["테크/IT", "뷰티/패션", "식품/음료", "금융/핀테크", "헬스케어", "교육", "미디어/엔터", "부동산/인테리어"]} value={categories} onChange={setCategories} multi />
-                  </div>
-                </>}
 
                 {authError && <div style={{ marginBottom: 12, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
                 <Btn full size="lg" disabled={loading || !email || !pw || !name} onClick={handleSignup}>{loading ? "가입 중..." : role === "panel" ? "패널로 가입하기" : "가입하고 시작하기"}</Btn>

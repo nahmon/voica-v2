@@ -10,11 +10,17 @@ export const C = {
   interviewBg: "#07081a",
 };
 export const S = {
-  elevated: "rgba(50,50,93,0.25) 0px 30px 45px -30px,rgba(0,0,0,0.1) 0px 18px 36px -18px",
-  standard: "rgba(23,23,23,0.08) 0px 15px 35px 0px",
-  ambient: "rgba(23,23,23,0.06) 0px 3px 6px",
-  deep: "rgba(3,3,39,0.25) 0px 14px 21px -14px,rgba(0,0,0,0.1) 0px 8px 17px -8px",
-  card: "rgba(23,23,23,0.08) 0px 15px 35px 0px",
+  // Static cards — border only, no shadow (set to none)
+  elevated: "none",
+  standard: "none",
+  ambient:  "none",
+  deep:     "none",
+  // Hover / lift state — apply on mouseEnter
+  card:     "0 4px 16px rgba(6,27,49,0.1)",
+  // Floating UI (modals, tooltips, dropdowns)
+  float:    "0 8px 24px rgba(6,27,49,0.12), 0 2px 8px rgba(6,27,49,0.05)",
+  // Semantic aliases
+  lift:     "0 4px 16px rgba(6,27,49,0.1)",
 };
 export const F = `'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif`;
 

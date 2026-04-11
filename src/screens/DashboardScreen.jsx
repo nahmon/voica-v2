@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { Badge, Btn, GlobalNav } from "../components/shared.jsx";
+import { Badge, Btn, GlobalNav, Footer } from "../components/shared.jsx";
 
 export default function DashboardScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
@@ -49,7 +49,7 @@ export default function DashboardScreen({ go, user, logout }) {
           <Btn onClick={() => go("editor")}>+ 새 프로젝트</Btn>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 32 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fit,minmax(180px,1fr))", gap: isMobile ? 10 : 14, marginBottom: 32 }}>
           {[
             { label: "전체 프로젝트", value: loading ? "—" : String(interviews.length), sub: "생성된 인터뷰", color: C.purple },
             { label: "누적 응답", value: loading ? "—" : String(totalSessions), sub: "패널 응답 완료", color: C.success },
@@ -82,9 +82,8 @@ export default function DashboardScreen({ go, user, logout }) {
           ))}
         </div>
 
-        <div style={{ marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 14, fontWeight: 400, color: C.label }}>프로젝트</div>
-          <Btn variant="ghost" size="sm">전체 보기</Btn>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {!loading && interviews.length === 0 && (
@@ -105,29 +104,27 @@ export default function DashboardScreen({ go, user, logout }) {
             const st = statusStyle[label] ?? { variant: "neutral", dot: C.body };
             const date = new Date(p.created_at).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\. /g, ".").replace(/\.$/, "");
             return (
-              <div key={p.id} onClick={() => go(p.status === "closed" ? "report" : "editor", p.id)} style={{ background: C.white, borderRadius: 16, padding: "20px 24px", boxShadow: S.ambient, border: `1px solid ${C.border}`, cursor: "pointer", transition: "box-shadow 0.2s", display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap" }}
+              <div key={p.id} onClick={() => go(p.status === "closed" ? "report" : "editor", p.id)} style={{ background: C.white, borderRadius: 16, padding: isMobile ? "16px" : "20px 24px", boxShadow: S.ambient, border: `1px solid ${C.border}`, cursor: "pointer", transition: "box-shadow 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.boxShadow = S.card; }}
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = S.ambient; }}>
                 {/* Title + status */}
-                <div style={{ flex: 1, minWidth: 200 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 15, fontWeight: 400, color: C.navy, fontFeatureSettings: '"ss01"' }}>{p.title}</span>
-                    <Badge variant={st.variant}>{label}</Badge>
-                  </div>
-                  <div style={{ fontSize: 12, color: C.body }}>질문 {questionCount}개 · {date}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 15, fontWeight: 400, color: C.navy, fontFeatureSettings: '"ss01"', flex: 1, minWidth: 0 }}>{p.title}</span>
+                  <Badge variant={st.variant}>{label}</Badge>
                 </div>
+                <div style={{ fontSize: 12, color: C.body, marginBottom: 12 }}>질문 {questionCount}개 · {date}</div>
                 {/* Response count */}
-                <div style={{ minWidth: 160 }}>
+                <div style={{ marginBottom: 12 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ fontSize: 11, color: C.body }}>응답 수</span>
+                    <span style={{ fontSize: 11, color: C.body }}>응답</span>
                     <span style={{ fontSize: 11, fontWeight: 500, color: C.navy, fontFeatureSettings: '"tnum"' }}>{sessionCount}명</span>
                   </div>
                   <div style={{ height: 4, background: C.border, borderRadius: 2 }}>
-                    <div style={{ height: "100%", width: sessionCount > 0 ? "100%" : "0%", background: C.purple, borderRadius: 2, transition: "width 0.5s" }} />
+                    <div style={{ height: "100%", width: `${Math.min((sessionCount / Math.max(sessionCount, 20)) * 100, 100)}%`, background: C.purple, borderRadius: 2, transition: "width 0.5s" }} />
                   </div>
                 </div>
-                {/* Actions — visually separated */}
-                <div style={{ display: "flex", gap: 8, paddingLeft: 8, borderLeft: `1px solid ${C.border}` }}>
+                {/* Actions */}
+                <div style={{ display: "flex", gap: 8, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
                   {p.status !== "closed" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("editor", p.id); }}>편집</Btn>}
                   {sessionCount > 0 && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("responses", p.id); }}>응답 보기</Btn>}
                   {p.status === "closed" && <Btn size="sm" onClick={e => { e.stopPropagation(); go("report", p.id); }}>리포트</Btn>}
@@ -137,6 +134,7 @@ export default function DashboardScreen({ go, user, logout }) {
           })}
         </div>
       </main>
+      <Footer go={go} />
     </div>
   );
 }

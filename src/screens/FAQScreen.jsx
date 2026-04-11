@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
-import { Btn, GlobalNav } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { FAQ_DATA } from "../lib/mockData.js";
 
 export default function FAQScreen({ go, user, logout }) {
@@ -60,6 +60,7 @@ export default function FAQScreen({ go, user, logout }) {
           </div>
         </div>
       </div>
+      <Footer go={go} />
     </div>
   );
 }

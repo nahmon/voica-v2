@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { C, F } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { Badge, GlobalNav, VoCCarousel, HowItWorksCarousel } from "../components/shared.jsx";
+import { Badge, GlobalNav, VoCCarousel, HowItWorksCarousel, Footer } from "../components/shared.jsx";
 
 export default function LandingScreen({ go, user, logout }) {
   const isMobile = useIsMobile();

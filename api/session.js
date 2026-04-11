@@ -10,6 +10,16 @@ export default async function handler(req, res) {
     const { interview_id, respondent } = req.body;
     if (!interview_id) return res.status(400).json({ error: "interview_id required" });
 
+    // Verify interview exists and is active before creating a session
+    const { data: interview } = await supabase
+      .from("interviews")
+      .select("id, status")
+      .eq("id", interview_id)
+      .single();
+    if (!interview || interview.status !== "active") {
+      return res.status(403).json({ error: "Interview not found or not accepting responses" });
+    }
+
     const { data, error } = await supabase
       .from("sessions")
       .insert({ interview_id, respondent: respondent ?? {}, status: "in_progress" })
@@ -26,6 +36,14 @@ export default async function handler(req, res) {
     if (!["completed", "abandoned"].includes(status)) {
       return res.status(400).json({ error: "status must be 'completed' or 'abandoned'" });
     }
+
+    // Verify session exists before updating
+    const { data: session } = await supabase
+      .from("sessions")
+      .select("id")
+      .eq("id", session_id)
+      .single();
+    if (!session) return res.status(404).json({ error: "Session not found" });
 
     const patch = { status };
     if (status === "completed") patch.completed_at = new Date().toISOString();

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
-import { Btn, GlobalNav } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 
 export default function ConsentScreen({ go, user, logout }) {
   const [agreed1, setAgreed1] = useState(false); // 필수 동의
@@ -20,7 +20,7 @@ export default function ConsentScreen({ go, user, logout }) {
       checked: agreed1,
       setChecked: setAgreed1,
       detail: (
-        <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse", lineHeight: 1.7 }}>
+        <div style={{ overflowX: "auto" }}><table style={{ width: "100%", minWidth: 420, fontSize: 12, borderCollapse: "collapse", lineHeight: 1.7 }}>
           <thead>
             <tr style={{ background: "rgba(26,115,232,0.05)" }}>
               {["수집 항목", "수집·이용 목적", "보유·이용 기간"].map(h => (
@@ -35,7 +35,7 @@ export default function ConsentScreen({ go, user, logout }) {
               <td style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, color: C.body, verticalAlign: "top" }}>인터뷰 완료일로부터 1년, 이후 파기</td>
             </tr>
           </tbody>
-        </table>
+        </table></div>
       ),
     },
     {
@@ -49,9 +49,9 @@ export default function ConsentScreen({ go, user, logout }) {
           <p style={{ margin: "0 0 8px" }}>본 인터뷰는 <strong>음성으로 녹음</strong>됩니다. 수집된 음성은 다음과 같이 처리됩니다.</p>
           <ul style={{ margin: 0, paddingLeft: 18 }}>
             <li>음성 데이터는 텍스트(STT)로 변환되어 AI 분석에 활용됩니다.</li>
-            <li>음성-텍스트 변환은 외부 위탁 업체(클로바 STT, 네이버)를 통해 처리됩니다. 위탁 목적 외 사용하지 않습니다.</li>
-            <li>원본 음성 파일은 보유 기간 종료 후 즉시 파기됩니다.</li>
-            <li>해외 서버 이전은 없으며 모든 데이터는 국내 서버에 저장됩니다.</li>
+            <li>음성-텍스트 변환은 OpenAI Whisper (OpenAI, LLC, 미국)를 통해 처리됩니다. API 이용약관에 따라 AI 학습에 사용되지 않습니다.</li>
+            <li>전사(STT) 처리를 위해 음성 데이터가 미국 OpenAI 서버로 전송됩니다 (국외 이전).</li>
+            <li>원본 음성 파일은 인터뷰 완료일로부터 1년 보관 후 파기됩니다.</li>
           </ul>
         </div>
       ),
@@ -146,6 +146,7 @@ export default function ConsentScreen({ go, user, logout }) {
           </div>
         </div>
       </div>
+      <Footer go={go} />
     </div>
   );
 }

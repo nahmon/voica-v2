@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Btn, Input, GlobalNav } from "../components/shared.jsx";
+import { Btn, Input, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function SupportScreen({ go, user, logout }) {
@@ -112,6 +112,7 @@ export default function SupportScreen({ go, user, logout }) {
           </div>
         </div>
       </div>
+      <Footer go={go} />
     </div>
   );
 }

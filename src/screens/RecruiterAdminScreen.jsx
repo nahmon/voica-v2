@@ -1,16 +1,28 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { C, S, F } from "../lib/constants.jsx";
 import { PANEL_APPLICANTS } from "../lib/mockData.js";
-import { Btn, GlobalNav } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 function InfoTooltip({ text }) {
   const [show, setShow] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPos({ top: rect.top - 8, left: rect.left + rect.width / 2 });
+    }
+    setShow(true);
+  };
+
   return (
-    <span style={{ position: "relative", display: "inline-flex", verticalAlign: "middle", marginLeft: 4 }}
-      onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+    <span ref={triggerRef} style={{ display: "inline-flex", verticalAlign: "middle", marginLeft: 4 }}
+      onMouseEnter={handleMouseEnter} onMouseLeave={() => setShow(false)}>
       <span style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(83,58,253,0.12)", color: C.purple, fontSize: 9, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", cursor: "default", lineHeight: 1 }}>i</span>
       {show && (
-        <div style={{ position: "absolute", bottom: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)", background: C.navy, color: C.white, fontSize: 11, lineHeight: 1.65, padding: "10px 14px", borderRadius: 8, whiteSpace: "normal", width: 240, zIndex: 200, boxShadow: "0 6px 20px rgba(0,0,0,0.25)", pointerEvents: "none" }}>
+        <div style={{ position: "fixed", top: pos.top, left: pos.left, transform: "translateX(-50%) translateY(-100%)", background: C.navy, color: C.white, fontSize: 11, lineHeight: 1.65, padding: "10px 14px", borderRadius: 8, whiteSpace: "normal", width: 240, zIndex: 9999, boxShadow: "0 6px 20px rgba(0,0,0,0.25)", pointerEvents: "none" }}>
           {text.split("\n").map((line, i) => <div key={i}>{line}</div>)}
           <div style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: `5px solid ${C.navy}` }} />
         </div>
@@ -22,6 +34,7 @@ function InfoTooltip({ text }) {
 export default function RecruiterAdminScreen({ go, user, logout }) {
   const [filter, setFilter] = useState("전체");
   const [selected, setSelected] = useState(new Set());
+  const isMobile = useIsMobile();
   const filters = ["전체", "신청", "적합", "부적합", "완료"];
   const statusStyle = {
     신청:  { color: "#92650a", bg: "rgba(251,191,36,0.12)", border: "rgba(251,191,36,0.3)" },
@@ -76,6 +89,47 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
           )}
         </div>
 
+        {/* Mobile: card list */}
+        {isMobile ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {filtered.map((p) => {
+              const ss = statusStyle[p.status];
+              const scoreColor = p.score >= 85 ? C.success : p.score >= 70 ? "#f59e0b" : C.ruby;
+              return (
+                <div key={p.id} style={{ background: C.white, borderRadius: 12, border: `1px solid ${C.border}`, padding: "14px 16px", boxShadow: S.ambient }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 500, color: C.navy }}>{p.name}</div>
+                      <div style={{ fontSize: 12, color: C.body, marginTop: 2 }}>{p.age} · {p.gender} · 인터뷰 {p.intv}회</div>
+                    </div>
+                    <span style={{ display: "inline-flex", alignItems: "center", padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 500, background: ss.bg, color: ss.color, border: `1px solid ${ss.border}` }}>{p.status}</span>
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                      <span style={{ fontSize: 11, color: C.body }}>AI 적합도</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: scoreColor }}>{p.score}점</span>
+                    </div>
+                    <div style={{ height: 4, background: C.border, borderRadius: 2 }}>
+                      <div style={{ height: "100%", width: `${p.score}%`, background: scoreColor, borderRadius: 2 }} />
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 11, color: C.body, marginBottom: 12 }}>{p.applied}</div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {p.status === "신청" && (
+                      <>
+                        <button style={{ flex: 1, padding: "8px", fontSize: 13, borderRadius: 8, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>승인</button>
+                        <button style={{ flex: 1, padding: "8px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(217,48,37,0.25)", background: "rgba(217,48,37,0.06)", color: C.ruby, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>거절</button>
+                      </>
+                    )}
+                    {p.status === "적합" && <Btn size="sm" onClick={() => go("interview")}>인터뷰 시작</Btn>}
+                    {p.status === "완료" && <Btn variant="ghost" size="sm" onClick={() => go("report")}>리포트</Btn>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+        /* Desktop: table */
         <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, overflowX: "auto", overflowY: "visible", boxShadow: S.ambient }}>
           {/* Table header */}
           <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 72px 72px 168px 130px 116px 180px", columnGap: 16, alignItems: "center", padding: "0 24px", height: 40, borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 980 }}>
@@ -98,34 +152,26 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
             const scoreColor = p.score >= 85 ? C.success : p.score >= 70 ? "#f59e0b" : C.ruby;
             return (
               <div key={p.id} style={{ display: "grid", gridTemplateColumns: "40px 1fr 72px 72px 168px 130px 116px 180px", columnGap: 16, alignItems: "center", padding: "0 24px", minHeight: 60, minWidth: 980, borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : "none", background: isSelected ? C.purpleBg : "transparent", transition: "background 0.15s" }}>
-                {/* Checkbox */}
                 <div onClick={() => setSelected(prev => { const n = new Set(prev); n.has(p.id) ? n.delete(p.id) : n.add(p.id); return n; })}
                   style={{ width: 16, height: 16, borderRadius: 3, border: `1.5px solid ${isSelected ? C.purple : C.border}`, background: isSelected ? C.purple : C.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
                   {isSelected && <span style={{ color: C.white, fontSize: 10 }}>✓</span>}
                 </div>
-                {/* Name */}
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 400, color: C.navy, lineHeight: 1.3 }}>{p.name}</div>
                   <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>인터뷰 {p.intv}회 참여</div>
                 </div>
-                {/* Age */}
                 <div style={{ fontSize: 13, color: C.navy }}>{p.age}</div>
-                {/* Gender */}
                 <div style={{ fontSize: 13, color: C.navy }}>{p.gender}</div>
-                {/* Applied at */}
                 <div style={{ fontSize: 12, color: C.body, fontFeatureSettings: '"tnum"', lineHeight: 1.4 }}>{p.applied}</div>
-                {/* AI Score */}
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: scoreColor, marginBottom: 5, fontFeatureSettings: '"tnum"' }}>{p.score}점</div>
                   <div style={{ height: 3, background: C.border, borderRadius: 2, width: "80%" }}>
                     <div style={{ height: "100%", width: `${p.score}%`, background: scoreColor, borderRadius: 2 }} />
                   </div>
                 </div>
-                {/* Status badge */}
                 <div>
                   <span style={{ display: "inline-flex", alignItems: "center", padding: "3px 9px", borderRadius: 4, fontSize: 11, fontWeight: 500, background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, whiteSpace: "nowrap" }}>{p.status}</span>
                 </div>
-                {/* Actions */}
                 <div style={{ display: "flex", gap: 6, alignItems: "center", paddingLeft: 16 }}>
                   {p.status === "신청" && (
                     <>
@@ -141,7 +187,9 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
             );
           })}
         </div>
+        )}
       </main>
+      <Footer go={go} />
     </div>
   );
 }

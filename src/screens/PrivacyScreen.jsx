@@ -1,7 +1,9 @@
 import { C, F } from "../lib/constants.jsx";
-import { Btn, GlobalNav } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function PrivacyScreen({ go, user, logout }) {
+  const isMobile = useIsMobile();
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
       <GlobalNav go={go} variant={user ? "app" : "sub"} user={user} logout={logout} />
@@ -10,7 +12,7 @@ export default function PrivacyScreen({ go, user, logout }) {
           <Btn variant="ghost" size="sm" onClick={() => go("advertiser_login")}>← 돌아가기</Btn>
         </div>
 
-        <div style={{ background: C.white, borderRadius: 16, padding: "40px 48px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+        <div style={{ background: C.white, borderRadius: 16, padding: isMobile ? "24px 20px" : "40px 48px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: C.navy, marginBottom: 6 }}>개인정보처리방침</h1>
           <p style={{ fontSize: 13, color: C.body, marginBottom: 40 }}>시행일: 2026년 4월 11일 · 최종 개정일: 2026년 4월 11일</p>
 
@@ -158,6 +160,7 @@ export default function PrivacyScreen({ go, user, logout }) {
           </div>
         </div>
       </main>
+      <Footer go={go} />
     </div>
   );
 }

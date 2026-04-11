@@ -20,6 +20,7 @@ import SupportScreen from "./screens/SupportScreen.jsx";
 import FAQScreen from "./screens/FAQScreen.jsx";
 import TermsScreen from "./screens/TermsScreen.jsx";
 import PrivacyScreen from "./screens/PrivacyScreen.jsx";
+import AboutScreen from "./screens/AboutScreen.jsx";
 
 export default function Voica() {
   const [screen, setScreen] = useState("landing");
@@ -76,7 +77,7 @@ export default function Voica() {
       {screen === "role_select"      && <RoleSelectScreen go={go} user={user} />}
       {screen === "advertiser_login" && <AuthScreen go={go} />}
       {screen === "dashboard"        && <DashboardScreen go={go} user={user} logout={logout} />}
-      {screen === "editor"           && <EditorScreen go={go} user={user} logout={logout} />}
+      {screen === "editor"           && <EditorScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
       {screen === "panel_entry"      && <PanelEntryScreen go={go} />}
       {screen === "panel_mypage"     && <PanelMyPageScreen go={go} user={user} logout={logout} />}
       {screen === "consent"          && <ConsentScreen go={go} user={user} logout={logout} />}
@@ -90,6 +91,7 @@ export default function Voica() {
       {screen === "faq"              && <FAQScreen go={go} user={user} logout={logout} />}
       {screen === "terms"            && <TermsScreen go={go} user={user} logout={logout} />}
       {screen === "privacy"          && <PrivacyScreen go={go} user={user} logout={logout} />}
+      {screen === "about"            && <AboutScreen go={go} user={user} logout={logout} />}
     </div>
   );
 }

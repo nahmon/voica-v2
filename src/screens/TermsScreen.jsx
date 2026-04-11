@@ -1,7 +1,9 @@
 import { C, F } from "../lib/constants.jsx";
-import { Btn, GlobalNav } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function TermsScreen({ go, user, logout }) {
+  const isMobile = useIsMobile();
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
       <GlobalNav go={go} variant={user ? "app" : "sub"} user={user} logout={logout} />
@@ -10,7 +12,7 @@ export default function TermsScreen({ go, user, logout }) {
           <Btn variant="ghost" size="sm" onClick={() => go("advertiser_login")}>← 돌아가기</Btn>
         </div>
 
-        <div style={{ background: C.white, borderRadius: 16, padding: "40px 48px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+        <div style={{ background: C.white, borderRadius: 16, padding: isMobile ? "24px 20px" : "40px 48px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: C.navy, marginBottom: 6 }}>서비스 이용약관</h1>
           <p style={{ fontSize: 13, color: C.body, marginBottom: 40 }}>시행일: 2026년 4월 11일 · 최종 개정일: 2026년 4월 11일</p>
 
@@ -163,13 +165,18 @@ export default function TermsScreen({ go, user, logout }) {
 
           <div style={{ marginTop: 40, paddingTop: 24, borderTop: `1px solid ${C.border}`, fontSize: 12, color: C.body, lineHeight: 1.8 }}>
             <strong style={{ color: C.navy }}>Voica Inc.</strong><br />
-            대표: Voica 운영팀<br />
+            대표자: [대표자 실명 기재 필요]<br />
+            사업자등록번호: [000-00-00000]<br />
+            통신판매업 신고번호: [제 0000-서울00-0000호]<br />
+            사업장 소재지: [주소 기재 필요]<br />
+            대표전화: [전화번호 기재 필요]<br />
             이메일: voica.support@gmail.com<br />
             <br />
             본 약관은 2026년 4월 11일부터 시행됩니다.
           </div>
         </div>
       </main>
+      <Footer go={go} />
     </div>
   );
 }

@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { PANEL_JOBS, MOCK_PANEL_PROFILE, getMatchScore } from "../lib/mockData.js";
-import { Btn, GlobalNav } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const APPLY_STEPS = ["none", "applied", "ai_screening", "confirmed"];
 
 function rewardTier(rewardStr) {
   const n = parseInt(rewardStr.replace(/[^0-9]/g, ""), 10) || 0;
-  if (n >= 80000) return { color: "#92400e", bg: "#fef3c7", accent: "#f59e0b", label: "전문가" };
-  if (n >= 20000) return { color: "#92400e", bg: "#fef9e7", accent: "#f59e0b", label: "프리미엄" };
-  if (n >= 5000)  return { color: C.successText, bg: "#d1fae5", accent: C.success, label: null };
-  return { color: C.purple, bg: C.purpleBg, accent: C.purple, label: null };
+  if (n >= 20000) return { color: "#92400e", bg: "#fef3c7", label: "프리미엄" };
+  return { color: C.purple, bg: C.purpleBg, label: null };
 }
 
 export default function PanelBoardScreen({ go, user, logout }) {
@@ -111,6 +109,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
           ))}
         </div>
       </div>
+      <Footer go={go} />
     </div>
   );
 }
@@ -184,16 +183,17 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
           </span>
         </div>
 
+        {/* Interview intro — always visible */}
+        {job.description && (
+          <div style={{ marginTop: 16, background: "#f4f4f9", borderRadius: 10, padding: "12px 14px" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 6, letterSpacing: 0.5, textTransform: "uppercase" }}>인터뷰 소개</div>
+            <div style={{ fontSize: 13, color: "#1a1a2e", lineHeight: 1.7 }}>{job.description}</div>
+          </div>
+        )}
+
         {/* Expanded detail */}
         {expanded && (
-          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 14 }}>
-            {job.description && (
-              <div style={{ background: "#f4f4f9", borderRadius: 10, padding: "12px 14px" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 6, letterSpacing: 0.5, textTransform: "uppercase" }}>인터뷰 소개</div>
-                <div style={{ fontSize: 13, color: "#1a1a2e", lineHeight: 1.7 }}>{job.description}</div>
-              </div>
-            )}
-
+          <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 14 }}>
             {job.targetProfile && (
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 8, letterSpacing: 0.5, textTransform: "uppercase" }}>찾는 패널</div>
@@ -203,13 +203,13 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
                     { icon: "👤", label: "성별", value: job.targetProfile.gender },
                     { icon: "📍", label: "지역", value: job.targetProfile.region },
                   ].map(item => (
-                    <div key={item.label} style={{ background: "#eef0fb", borderRadius: 10, padding: "10px 12px" }}>
+                    <div key={item.label} style={{ background: C.bg, borderRadius: 10, padding: "10px 12px" }}>
                       <div style={{ fontSize: 10, color: "#777", marginBottom: 3 }}>{item.icon} {item.label}</div>
                       <div style={{ fontSize: 13, fontWeight: 600, color: "#0d0f1a" }}>{item.value}</div>
                     </div>
                   ))}
                 </div>
-                <div style={{ marginTop: 8, background: "#ede9ff", borderRadius: 10, padding: "10px 12px" }}>
+                <div style={{ marginTop: 8, background: C.purpleBg, borderRadius: 10, padding: "10px 12px" }}>
                   <div style={{ fontSize: 10, color: C.purple, marginBottom: 4, fontWeight: 700 }}>✦ 이런 분을 찾아요</div>
                   <div style={{ fontSize: 12, color: "#1a1a2e", lineHeight: 1.65 }}>{job.targetProfile.lifestyle}</div>
                 </div>
@@ -243,7 +243,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
         <div style={{ marginTop: 14 }}>
           {isConfirmed ? (
             <div style={{ display: "flex", gap: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", background: "#d1fae5", borderRadius: 10, flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", background: C.successBg, borderRadius: 10, flex: 1 }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.success, display: "inline-block" }} />
                 <span style={{ fontSize: 13, fontWeight: 700, color: C.successText }}>참여 확정</span>
               </div>
@@ -253,7 +253,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
               </button>
             </div>
           ) : isApplied ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", background: "#ede9ff", borderRadius: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", background: C.purpleBg, borderRadius: 10 }}>
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.purple, display: "inline-block" }} />
               <span style={{ fontSize: 12, color: C.purple, fontWeight: 600 }}>
                 {status === "applied" ? "AI 적합성 검토 중" : "리서처 최종 검토 대기"}
@@ -265,7 +265,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
               style={{ width: "100%", padding: "9px 14px", borderRadius: 10, border: "1px solid #d4d4e0", background: "transparent", color: "#666", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, transition: "border-color 0.12s, color 0.12s" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.color = C.purple; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "#d4d4e0"; e.currentTarget.style.color = "#666"; }}>
-              {expanded ? "접기 ∧" : "상세 보기 ∨"}
+              {expanded ? "접기 ∧" : "더 보기 ∨"}
             </button>
           )}
         </div>

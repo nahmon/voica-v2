@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Btn, GlobalNav } from "../components/shared.jsx";
+import { Btn, GlobalNav, VoicePlayer } from "../components/shared.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function ResponsesScreen({ go, user, logout, interviewId }) {
   const [interview, setInterview] = useState(null);
@@ -10,6 +11,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   const [selectedSession, setSelectedSession] = useState(null);
   const [allResponses, setAllResponses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!interviewId) return;
@@ -22,7 +24,6 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
       setQuestions(qs ?? []);
       setInterview(iv ?? null);
 
-      // Show completed sessions first, then in-progress
       const sorted = (ss ?? []).sort((a, b) => {
         if (a.status === "completed" && b.status !== "completed") return -1;
         if (a.status !== "completed" && b.status === "completed") return 1;
@@ -35,7 +36,8 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
         const { data: resp } = await supabase
           .from("responses").select("*").in("session_id", sessionIds);
         setAllResponses(resp ?? []);
-        setSelectedSession(sorted[0]);
+        // On desktop auto-select first; on mobile start at list view
+        if (window.innerWidth >= 768) setSelectedSession(sorted[0]);
       }
       setLoading(false);
     })();
@@ -53,6 +55,83 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
 
   const completedCount = sessions.filter(s => s.status === "completed").length;
 
+  /* ── Mobile: detail view ── */
+  if (isMobile && selectedSession) {
+    const sessionIdx = sessions.indexOf(selectedSession) + 1;
+    const dt = selectedSession.completed_at
+      ? new Date(selectedSession.completed_at).toLocaleString("ko-KR")
+      : "인터뷰 진행 중";
+    return (
+      <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg }}>
+        <GlobalNav go={go} variant="app" user={user} logout={logout} />
+        <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 16px", height: 48, display: "flex", alignItems: "center", gap: 10 }}>
+          <button onClick={() => setSelectedSession(null)}
+            style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: C.navy, padding: "0 4px", lineHeight: 1 }}>←</button>
+          <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            응답자 {sessionIdx}
+          </div>
+          <Btn size="sm" onClick={() => go("report", interviewId)}>리포트</Btn>
+        </div>
+        <div style={{ padding: "16px" }}>
+          <div style={{ marginBottom: 16, fontSize: 12, color: C.body }}>{dt} · {responses.length}개 응답</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {questions.map((q, qi) => {
+              const r = responses.find(r => r.question_id === q.id);
+              return <QuestionAnswer key={q.id} question={q} response={r} index={qi} />;
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Mobile: list view ── */
+  if (isMobile) {
+    return (
+      <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg }}>
+        <GlobalNav go={go} variant="app" user={user} logout={logout} />
+        <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 16px", height: 48, display: "flex", alignItems: "center", gap: 10 }}>
+          <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
+          <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {interview?.title ?? "인터뷰"}
+          </div>
+          <div style={{ fontSize: 12, color: C.body, whiteSpace: "nowrap" }}>완료 {completedCount}명</div>
+        </div>
+        <div style={{ padding: "12px 16px" }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 10, letterSpacing: 0.5 }}>
+            응답자 목록 ({sessions.length})
+          </div>
+          {sessions.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "48px 0", color: C.body, fontSize: 14 }}>아직 응답이 없습니다</div>
+          ) : sessions.map((s, i) => {
+            const isCompleted = s.status === "completed";
+            const dt = s.completed_at
+              ? new Date(s.completed_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+              : "진행 중";
+            const respCount = allResponses.filter(r => r.session_id === s.id).length;
+            return (
+              <div key={s.id} onClick={() => setSelectedSession(s)}
+                style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px", marginBottom: 8, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, boxShadow: S.ambient }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: isCompleted ? "rgba(21,190,83,0.12)" : "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: isCompleted ? C.successText : "#92650a", flexShrink: 0 }}>
+                  {i + 1}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>응답자 {i + 1}</div>
+                  <div style={{ fontSize: 12, color: C.body }}>{dt} · {respCount}개 응답</div>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: isCompleted ? C.successText : "#b45309", whiteSpace: "nowrap" }}>
+                  {isCompleted ? "완료" : "진행 중"}
+                </div>
+                <span style={{ color: C.body, fontSize: 16 }}>›</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Desktop: 2-panel layout ── */
   return (
     <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
       <GlobalNav go={go} variant="app" user={user} logout={logout} />
@@ -179,82 +258,7 @@ function QuestionAnswer({ question, response, index }) {
 }
 
 function VoiceAnswer({ response }) {
-  const audioRef = useRef(null);
-  const [playing, setPlaying] = useState(false);
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-
-  const fmt = s => {
-    if (!isFinite(s) || s < 0) return "0:00";
-    const m = Math.floor(s / 60);
-    const sec = Math.floor(s % 60);
-    return `${m}:${String(sec).padStart(2, "0")}`;
-  };
-
-  const toggle = () => {
-    const a = audioRef.current;
-    if (!a) return;
-    if (playing) { a.pause(); setPlaying(false); }
-    else { a.play(); setPlaying(true); }
-  };
-
-  const seek = (e) => {
-    const a = audioRef.current;
-    if (!a || !duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    a.currentTime = ((e.clientX - rect.left) / rect.width) * duration;
-  };
-
-  const pct = duration ? Math.min((current / duration) * 100, 100) : 0;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      {response.audio_url ? (
-        <>
-          <audio
-            ref={audioRef}
-            src={response.audio_url}
-            onTimeUpdate={e => setCurrent(e.target.currentTime)}
-            onLoadedMetadata={e => setDuration(e.target.duration)}
-            onEnded={() => { setPlaying(false); setCurrent(0); }}
-          />
-          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}` }}>
-            <button
-              onClick={toggle}
-              style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.12s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#4434d4"}
-              onMouseLeave={e => e.currentTarget.style.background = C.purple}
-            >
-              {playing
-                ? <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><rect x="1.5" y="1" width="3.5" height="11" rx="1"/><rect x="8" y="1" width="3.5" height="11" rx="1"/></svg>
-                : <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><path d="M2.5 1.5l9 5-9 5z"/></svg>
-              }
-            </button>
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
-              <div
-                onClick={seek}
-                style={{ height: 4, background: C.border, borderRadius: 2, cursor: "pointer", position: "relative" }}
-              >
-                <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${pct}%`, background: C.purple, borderRadius: 2 }} />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(current)}</span>
-                <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(duration)}</span>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : (
-        <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>녹음 없음</div>
-      )}
-      {response.transcript && (
-        <div style={{ padding: "10px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${C.border}` }}>
-          <div style={{ fontSize: 10, color: C.body, fontWeight: 600, marginBottom: 6, letterSpacing: 0.4 }}>전사 텍스트</div>
-          <div style={{ fontSize: 13, color: C.navy, lineHeight: 1.75 }}>{response.transcript}</div>
-        </div>
-      )}
-    </div>
-  );
+  return <VoicePlayer audioUrl={response.audio_url} transcript={response.transcript} />;
 }
 
 function MCAnswer({ response, question }) {

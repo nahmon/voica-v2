@@ -98,7 +98,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
       ? [["대시보드", "dashboard"], ["요금제", "pricing"], ["FAQ", "faq"], ["고객센터", "support"]]
       : variant === "panel"
       ? [["인터뷰 모집", "panel_board"], ["내 인터뷰", "panel_mypage"], ["FAQ", "faq"], ["고객센터", "support"]]
-      : [["서비스 소개", "landing"], ["패널 모집 보드", "panel_board"], ["요금제", "pricing"], ["FAQ", "faq"], ["고객센터", "support"]];
+      : [["서비스 소개", "about"], ["패널 모집 보드", "panel_board"], ["요금제", "pricing"], ["FAQ", "faq"], ["고객센터", "support"]];
 
   const homeTarget = "landing";
 
@@ -211,7 +211,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                 <>
                   <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>서비스</div>
                   {[
-                    { label: "서비스 소개", target: "landing", desc: "Voica가 하는 일" },
+                    { label: "서비스 소개", target: "about", desc: "Voica가 하는 일" },
                     { label: "요금제", target: "pricing", desc: "플랜별 기능 비교" },
                     { label: "FAQ", target: "faq", desc: "자주 묻는 질문" },
                     { label: "고객센터", target: "support", desc: "문의 및 도움말" },
@@ -266,13 +266,13 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
 
 // ─── VoC Carousel ───
 const VOC_LIST = [
-  { quote: "평소 사용자 인터뷰 하나 진행하려면 섭외부터 일정 조율까지 최소 일주일이 걸렸는데, Voica로 하루 만에 100명 인터뷰 결과를 받았습니다. 리포트 퀄리티도 기대 이상이었어요.", name: "이강인", title: "과장", company: "삼성전자 MX사업부 마케팅팀" },
-  { quote: "기존엔 FGI 한 번 진행하면 진행비만 수백만 원이었어요. Voica는 비용도 10분의 1 수준이고, 결과물은 훨씬 빠르게 나오더라고요. 이제 정성 리서치 방식이 완전히 바뀔 것 같습니다.", name: "김지수", title: "브랜드 매니저", company: "LG생활건강 브랜드전략팀" },
-  { quote: "신제품 론칭 전 2주 안에 소비자 반응을 확인해야 했는데, Voica 덕분에 3일 만에 200명 인터뷰 분석 결과를 받을 수 있었습니다. 의사결정 속도가 완전히 달라졌어요.", name: "박성현", title: "PM", company: "카카오 서비스기획팀" },
-  { quote: "AI가 인터뷰를 직접 진행한다는 게 처음엔 반신반의했는데, 실제 녹취록을 보니 사용자가 자연스럽게 속마음을 털어놓더라고요. 면접관 눈치 없이 솔직한 답변이 많이 나왔습니다.", name: "최예린", title: "UX 리서처", company: "네이버 UX리서치실" },
-  { quote: "글로벌 시장 진출 전 국내 타깃 유저 인터뷰가 필요했어요. 지역·연령·직군 조건 설정하니까 딱 맞는 패널이 빠르게 모였고, 리포트까지 영업일 3일 안에 나왔습니다.", name: "정우진", title: "사업개발 팀장", company: "토스 신사업팀" },
-  { quote: "분기마다 진행하던 사용성 테스트를 이제 매달 할 수 있게 됐어요. 비용과 시간 장벽이 낮아지니 리서치를 훨씬 자주 의사결정에 활용하게 됐습니다.", name: "한소희", title: "서비스 기획자", company: "현대자동차 Connected Car팀" },
-  { quote: "외부 리서치 에이전시 대비 비용은 80% 절감되고, 결과물은 2배 빠르게 나왔습니다. 특히 테마 분류와 감성 분석이 자동으로 되니 별도 분석 시간이 거의 필요 없었어요.", name: "오민준", title: "마케팅 이사", company: "쿠팡 그로스마케팅본부" },
+  { quote: "평소 사용자 인터뷰 하나 진행하려면 섭외부터 일정 조율까지 최소 일주일이 걸렸는데, Voica로 하루 만에 100명 인터뷰 결과를 받았습니다. 리포트 퀄리티도 기대 이상이었어요.", name: "이강인", title: "과장", company: "**전자 MX사업부 마케팅팀", photo: "/profiles/male-1.png" },
+  { quote: "기존엔 FGI 한 번 진행하면 진행비만 수백만 원이었어요. Voica는 비용도 10분의 1 수준이고, 결과물은 훨씬 빠르게 나오더라고요. 이제 정성 리서치 방식이 완전히 바뀔 것 같습니다.", name: "김지수", title: "브랜드 매니저", company: "LG**건강 브랜드전략팀", photo: "/profiles/female-1.png" },
+  { quote: "신제품 론칭 전 2주 안에 소비자 반응을 확인해야 했는데, Voica 덕분에 3일 만에 200명 인터뷰 분석 결과를 받을 수 있었습니다. 의사결정 속도가 완전히 달라졌어요.", name: "박성현", title: "PM", company: "**카오 서비스기획팀" },
+  { quote: "AI가 인터뷰를 직접 진행한다는 게 처음엔 반신반의했는데, 실제 녹취록을 보니 사용자가 자연스럽게 속마음을 털어놓더라고요. 면접관 눈치 없이 솔직한 답변이 많이 나왔습니다.", name: "최예린", title: "UX 리서처", company: "**이버 UX리서치실", photo: "/profiles/female-2.png" },
+  { quote: "글로벌 시장 진출 전 국내 타깃 유저 인터뷰가 필요했어요. 지역·연령·직군 조건 설정하니까 딱 맞는 패널이 빠르게 모였고, 리포트까지 영업일 3일 안에 나왔습니다.", name: "정우진", title: "사업개발 팀장", company: "**스 신사업팀" },
+  { quote: "분기마다 진행하던 사용성 테스트를 이제 매달 할 수 있게 됐어요. 비용과 시간 장벽이 낮아지니 리서치를 훨씬 자주 의사결정에 활용하게 됐습니다.", name: "한소희", title: "서비스 기획자", company: "**자동차 Connected Car팀" },
+  { quote: "외부 리서치 에이전시 대비 비용은 80% 절감되고, 결과물은 2배 빠르게 나왔습니다. 특히 테마 분류와 감성 분석이 자동으로 되니 별도 분석 시간이 거의 필요 없었어요.", name: "오민준", title: "마케팅 이사", company: "**팡 그로스마케팅본부" },
 ];
 
 export function VoCCarousel() {
@@ -304,9 +304,13 @@ export function VoCCarousel() {
                   <div style={{ fontSize: 24, color: C.purple, marginBottom: 16, lineHeight: 1 }}>❝</div>
                   <p style={{ margin: "0 0 24px", fontSize: 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px" }}>{v.quote}</p>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: C.white, fontWeight: 600, flexShrink: 0 }}>
-                      {v.name[0]}
-                    </div>
+                    {v.photo ? (
+                      <img src={v.photo} alt={v.name} style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                    ) : (
+                      <div style={{ width: 40, height: 40, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: C.white, fontWeight: 600, flexShrink: 0 }}>
+                        {v.name[0]}
+                      </div>
+                    )}
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}>{v.name} {v.title}</div>
                       <div style={{ fontSize: 12, color: "rgba(10,11,13,0.56)", marginTop: 2, letterSpacing: "0.16px" }}>{v.company}</div>
@@ -538,6 +542,122 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+// ─── Footer — 모든 페이지 하단 공통 ───
+export function Footer({ go }) {
+  const isMobile = useIsMobile();
+  const links = [
+    { label: "서비스 소개", screen: "about" },
+    { label: "요금제", screen: "pricing" },
+    { label: "FAQ", screen: "faq" },
+    { label: "고객지원", screen: "support" },
+    { label: "이용약관", screen: "terms" },
+    { label: "개인정보처리방침", screen: "privacy" },
+  ];
+  return (
+    <footer style={{ background: C.white, borderTop: `1px solid ${C.border}`, padding: isMobile ? "28px 20px" : "32px 40px", fontFamily: F }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: 20 }}>
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 4 }}>Voica</div>
+          <div style={{ fontSize: 11, color: C.body, lineHeight: 1.7 }}>
+            AI 보이스 인터뷰 플랫폼<br />
+            사업자등록번호: [000-00-00000] · 대표: [대표자명]<br />
+            이메일: voica.support@gmail.com
+          </div>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "8px 16px" : "8px 24px" }}>
+          {links.map(l => (
+            <button key={l.screen} onClick={() => go(l.screen)}
+              style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: C.body, fontFamily: F, padding: 0 }}
+              onMouseEnter={e => e.currentTarget.style.color = C.navy}
+              onMouseLeave={e => e.currentTarget.style.color = C.body}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div style={{ maxWidth: 1100, margin: "12px auto 0", fontSize: 11, color: C.body }}>
+        © {new Date().getFullYear()} Voica Inc. All rights reserved.
+      </div>
+    </footer>
+  );
+}
+
+// ─── VoicePlayer — 공유 오디오 플레이어 (ResponsesScreen, ReportScreen 공용) ───
+export function VoicePlayer({ audioUrl, transcript }) {
+  const audioRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const fmt = s => {
+    if (!isFinite(s) || s < 0) return "0:00";
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${String(sec).padStart(2, "0")}`;
+  };
+
+  const toggle = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (playing) { a.pause(); setPlaying(false); }
+    else { a.play().catch(() => {}); setPlaying(true); }
+  };
+
+  const seek = (e) => {
+    const a = audioRef.current;
+    if (!a || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    a.currentTime = ((e.clientX - rect.left) / rect.width) * duration;
+  };
+
+  const pct = duration ? Math.min((current / duration) * 100, 100) : 0;
+
+  if (!audioUrl) return <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>녹음 없음</div>;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <audio
+        ref={audioRef}
+        src={audioUrl}
+        onTimeUpdate={e => setCurrent(e.target.currentTime)}
+        onLoadedMetadata={e => setDuration(e.target.duration)}
+        onEnded={() => { setPlaying(false); setCurrent(0); }}
+      />
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}` }}>
+        <button
+          onClick={toggle}
+          style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.12s" }}
+          onMouseEnter={e => e.currentTarget.style.background = "#4434d4"}
+          onMouseLeave={e => e.currentTarget.style.background = C.purple}
+        >
+          {playing
+            ? <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><rect x="1.5" y="1" width="3.5" height="11" rx="1"/><rect x="8" y="1" width="3.5" height="11" rx="1"/></svg>
+            : <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><path d="M2.5 1.5l9 5-9 5z"/></svg>
+          }
+        </button>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
+          <div
+            onClick={seek}
+            style={{ height: 4, background: C.border, borderRadius: 2, cursor: "pointer", position: "relative" }}
+          >
+            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${pct}%`, background: C.purple, borderRadius: 2, transition: "width 0.1s linear" }} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(current)}</span>
+            <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(duration)}</span>
+          </div>
+        </div>
+      </div>
+      {transcript && (
+        <div style={{ padding: "10px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${C.border}` }}>
+          <div style={{ fontSize: 10, color: C.body, fontWeight: 600, marginBottom: 6, letterSpacing: 0.4 }}>전사 텍스트</div>
+          <div style={{ fontSize: 13, color: C.navy, lineHeight: 1.75 }}>{transcript}</div>
+        </div>
+      )}
     </div>
   );
 }

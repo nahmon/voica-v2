@@ -201,20 +201,25 @@ export default function InterviewScreen({ go, shareCode }) {
       const q = interview.questions[qIndex];
       let audioUrl = null;
       let transcript = null;
+      // Upload audio — independent of STT
       try {
-        // Upload to Supabase Storage
         const path = `${sessionId}/${q.id}.${ext}`;
-        const { data: uploaded } = await supabase.storage.from("audio-responses").upload(path, blob, { contentType: mimeType, upsert: true });
-        if (uploaded) {
-          const { data: { publicUrl } } = supabase.storage.from("audio-responses").getPublicUrl(path);
-          audioUrl = publicUrl;
+        const { data: uploaded, error: uploadError } = await supabase.storage.from("audio-responses").upload(path, blob, { contentType: mimeType, upsert: true });
+        if (uploadError) console.error("[audio upload]", uploadError);
+        else if (uploaded) {
+          const { data: signedData } = await supabase.storage.from("audio-responses").createSignedUrl(path, 31536000);
+          if (signedData) audioUrl = signedData.signedUrl;
         }
-        // STT
+      } catch (e) { console.error("[audio upload exception]", e); }
+      // STT — independent of audio upload
+      try {
         const fd = new FormData();
         fd.append("audio", blob, `audio.${ext}`);
+        fd.append("session_id", sessionId);
         const sttRes = await fetch("/api/stt", { method: "POST", body: fd });
         if (sttRes.ok) { const d = await sttRes.json(); transcript = d.transcript; }
-      } catch {}
+        else console.error("[stt]", sttRes.status, await sttRes.text().catch(() => ""));
+      } catch (e) { console.error("[stt exception]", e); }
       await saveResponse({ audio_url: audioUrl, transcript });
       setPhase("review_pass");
       setTimeout(advanceOrComplete, 1200);
