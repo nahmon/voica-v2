@@ -32,7 +32,7 @@ export default function LandingScreen({ go, user, logout }) {
               시간과 비용이 많이 들었던 인터뷰
             </span>
             <span style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "block" }}>
-              AI로 수 백명의 인터뷰를 동시에<span className="cursor-blink" style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)` }} />
+              AI로 수백 명의 인터뷰를 동시에<span className="cursor-blink" style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)` }} />
             </span>
           </h1>
 
@@ -51,7 +51,7 @@ export default function LandingScreen({ go, user, logout }) {
               onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(23,23,23,0.2)"}>
               <div style={{ fontSize: 20, marginBottom: 10 }}>🎯</div>
               <div style={{ fontSize: 16, fontWeight: 600, color: C.navy, marginBottom: 6, letterSpacing: "0.16px" }}>리서처 / 기업</div>
-              <div style={{ fontSize: 14, color: "rgba(10,11,13,0.56)", lineHeight: 1.5, letterSpacing: "0.16px" }}>인터뷰 설계부터 리포트 수령까지</div>
+              <div style={{ fontSize: 14, color: "rgba(10,11,13,0.56)", lineHeight: 1.5, letterSpacing: "0.16px" }}>인터뷰 설계부터 리포트 받기까지</div>
               <div style={{ marginTop: 14, fontSize: 14, fontWeight: 600, color: C.purple }}>시작하기 →</div>
             </div>
             <div onClick={() => go("panel_entry")} style={{ cursor: "pointer", padding: "24px", borderRadius: 16, background: C.white, border: `1px solid rgba(23,23,23,0.2)`, width: isMobile ? "100%" : "auto", minWidth: isMobile ? 0 : 220, transition: "border-color 0.18s", textAlign: "left" }}
@@ -95,7 +95,7 @@ export default function LandingScreen({ go, user, logout }) {
               <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI가 인터뷰하고, AI가 분석합니다</div>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
-              {[["서비스 소개", "landing"], ["요금제", "pricing"], ["패널 참여", "panel_board"], ["고객 지원", "support"]].map(([l, target]) => (
+              {[["서비스 소개", "landing"], ["요금제", "pricing"], ["패널 참여", "panel_board"], ["고객센터", "support"]].map(([l, target]) => (
                 <a key={l} href="#" onClick={e => { e.preventDefault(); if (target) go(target); }}
                   style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", textDecoration: "none", letterSpacing: "0.16px" }}
                   onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.88)"}

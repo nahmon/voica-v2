@@ -10,7 +10,7 @@ function InfoTooltip({ text }) {
       onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
       <span style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(83,58,253,0.12)", color: C.purple, fontSize: 9, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", cursor: "default", lineHeight: 1 }}>i</span>
       {show && (
-        <div style={{ position: "absolute", bottom: "calc(100% + 6px)", left: "50%", transform: "translateX(-50%)", background: C.navy, color: C.white, fontSize: 11, lineHeight: 1.6, padding: "8px 12px", borderRadius: 6, whiteSpace: "nowrap", zIndex: 100, boxShadow: "0 4px 12px rgba(0,0,0,0.2)", pointerEvents: "none" }}>
+        <div style={{ position: "absolute", bottom: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)", background: C.navy, color: C.white, fontSize: 11, lineHeight: 1.65, padding: "10px 14px", borderRadius: 8, whiteSpace: "normal", width: 240, zIndex: 200, boxShadow: "0 6px 20px rgba(0,0,0,0.25)", pointerEvents: "none" }}>
           {text.split("\n").map((line, i) => <div key={i}>{line}</div>)}
           <div style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: `5px solid ${C.navy}` }} />
         </div>
@@ -76,7 +76,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
           )}
         </div>
 
-        <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, overflow: "auto", boxShadow: S.ambient }}>
+        <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, overflowX: "auto", overflowY: "visible", boxShadow: S.ambient }}>
           {/* Table header */}
           <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 72px 72px 168px 130px 116px 180px", columnGap: 16, alignItems: "center", padding: "0 24px", height: 40, borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 980 }}>
             {["", "패널", "연령", "성별", "지원일시"].map((h, i) => (

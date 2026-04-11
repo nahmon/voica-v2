@@ -294,8 +294,8 @@ export function VoCCarousel() {
   return (
     <section style={{ background: C.bg, padding: "72px 0", overflow: "hidden" }}>
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ fontSize: 12, fontWeight: 400, color: C.body, letterSpacing: "0.16px", textAlign: "center", marginBottom: 8, textTransform: "uppercase" }}>고객 후기</div>
-        <h2 style={{ fontSize: 28, fontWeight: 400, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0 0 40px", fontFamily: F }}>실제 사용자의 목소리</h2>
+        <div style={{ fontSize: 12, fontWeight: 400, color: C.body, letterSpacing: "0.16px", textAlign: "center", marginBottom: 8, textTransform: "uppercase" }}>REVIEWS</div>
+        <h2 style={{ fontSize: 28, fontWeight: 400, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0 0 40px", fontFamily: F }}>직접 써본 분들의 이야기</h2>
         <div style={{ overflow: "hidden" }}>
           <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
             {VOC_LIST.map((v, i) => (
@@ -390,12 +390,12 @@ export function HowItWorksCarousel() {
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: isMobile ? 40 : 56 }}>
           <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", margin: "0 0 14px", lineHeight: 1.10, fontFamily: F }}>
-            {isMobile ? "소비자의 목소리를 정확하고 빠르게" : <>Voica를 통해 소비자의 목소리를<br />정확하고 빠르게 들어보세요</>}
+            {isMobile ? "소비자의 목소리를 정확하고 빠르게" : <>소비자의 목소리를<br />정확하고 빠르게 들어보세요</>}
           </h2>
-          <p style={{ fontSize: 16, color: "rgba(10,11,13,0.56)", margin: 0, letterSpacing: "0.16px", lineHeight: 1.47 }}>리서처와 패널 모두를 위한 완전 자동화 인터뷰 플랫폼</p>
+          <p style={{ fontSize: 16, color: "rgba(10,11,13,0.56)", margin: 0, letterSpacing: "0.16px", lineHeight: 1.47 }}>처음부터 끝까지 알아서 되는 인터뷰 플랫폼</p>
         </div>
         <Row steps={researcherSteps} title="인터뷰를 설계하고 싶다면" sub="질문만 만들면 AI가 수천 명과 대화하고 리포트를 드립니다" scrollRef={rRef} />
-        <Row steps={panelSteps} title="내 의견을 나누고 리워드를 받고 싶다면" sub="짧은 보이스 인터뷰로 참여하고 즉시 포인트를 받으세요" scrollRef={pRef} />
+        <Row steps={panelSteps} title="인터뷰 참여하고 리워드 받고 싶다면" sub="짧은 보이스 인터뷰로 참여하고 즉시 포인트를 받으세요" scrollRef={pRef} />
       </div>
     </section>
   );
