@@ -8,9 +8,9 @@ export default function PricingScreen({ go, user, logout }) {
   const [billing, setBilling] = useState("monthly");
 
   const credits = [
-    { id: "c10",  label: "스타터 팩",   count: 10,  price: 59000,  unit: 5900, badge: null,      highlight: false },
-    { id: "c30",  label: "스탠다드 팩", count: 30,  price: 149000, unit: 4967, badge: "인기",     highlight: true  },
-    { id: "c100", label: "볼륨 팩",     count: 100, price: 390000, unit: 3900, badge: "34% 절약", highlight: false },
+    { id: "c50",  label: "스타터 팩",   count: 50,  price: 79000,  unit: 1580, badge: null,      highlight: false },
+    { id: "c150", label: "스탠다드 팩", count: 150, price: 179000, unit: 1193, badge: "인기",     highlight: true  },
+    { id: "c500", label: "볼륨 팩",     count: 500, price: 490000, unit: 980,  badge: "38% 절약", highlight: false },
   ];
 
   const proMonthly = 99000;
@@ -40,7 +40,7 @@ export default function PricingScreen({ go, user, logout }) {
         <div style={{ marginBottom: 64 }}>
           <div style={{ marginBottom: 24 }}>
             <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 6 }}>건별 충전</div>
-            <div style={{ fontSize: 14, color: C.body }}>구독 없이 인터뷰 횟수를 크레딧으로 구매하세요. 유효기간 1년, 미사용 시 환불 가능.</div>
+            <div style={{ fontSize: 14, color: C.body }}>구독 없이 응답 수를 크레딧으로 구매하세요. 1응답 = 참여자 1명 완료 기준. 유효기간 1년.</div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16 }}>
             {credits.map(c => (
@@ -53,9 +53,9 @@ export default function PricingScreen({ go, user, logout }) {
                 )}
                 <div style={{ fontSize: 12, fontWeight: 600, color: c.highlight ? "rgba(255,255,255,0.6)" : C.body, marginBottom: 8, letterSpacing: 0.5 }}>{c.label.toUpperCase()}</div>
                 <div style={{ fontSize: 36, fontWeight: 800, color: c.highlight ? C.white : C.navy, lineHeight: 1, marginBottom: 4 }}>
-                  {c.count}<span style={{ fontSize: 16, fontWeight: 500, marginLeft: 4 }}>건</span>
+                  {c.count}<span style={{ fontSize: 16, fontWeight: 500, marginLeft: 4 }}>응답</span>
                 </div>
-                <div style={{ fontSize: 13, color: c.highlight ? "rgba(255,255,255,0.5)" : C.body, marginBottom: 20 }}>건당 {c.unit.toLocaleString()}원</div>
+                <div style={{ fontSize: 13, color: c.highlight ? "rgba(255,255,255,0.5)" : C.body, marginBottom: 20 }}>응답당 {c.unit.toLocaleString()}원</div>
                 <div style={{ fontSize: 26, fontWeight: 700, color: c.highlight ? C.white : C.navy, marginBottom: 4 }}>{c.price.toLocaleString()}원</div>
                 <div style={{ fontSize: 11, color: c.highlight ? "rgba(255,255,255,0.45)" : C.body, marginBottom: 24 }}>부가세 별도 · 유효기간 1년</div>
                 <Btn full variant={c.highlight ? "white" : "primary"} style={c.highlight ? { color: C.purple, fontWeight: 700 } : {}} onClick={() => go("advertiser_login")}>
@@ -70,7 +70,7 @@ export default function PricingScreen({ go, user, logout }) {
         <div style={{ marginBottom: 64 }}>
           <div style={{ marginBottom: 24 }}>
             <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 6 }}>PRO 구독</div>
-            <div style={{ fontSize: 14, color: C.body }}>월 30건 + AI 심층 분석 + 팀 기능. 정기 리서치 팀에 최적.</div>
+            <div style={{ fontSize: 14, color: C.body }}>월 100응답 + AI 심층 분석 + 팀 기능. 정기 리서치 팀에 최적.</div>
           </div>
 
           {/* Billing toggle */}
@@ -96,7 +96,7 @@ export default function PricingScreen({ go, user, logout }) {
             <div style={{ fontSize: 12, color: C.body, marginBottom: 24 }}>{proDisplaySub}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {[
-                "월 30건 인터뷰 (초과 시 건당 3,900원)",
+                "월 100응답 포함 (초과 시 응답당 980원)",
                 "AI 심층 분석 + 테마 드릴다운",
                 "대표 발화 인용문 자동 추출",
                 "크로스탭 분석 · 세그먼트 비교",

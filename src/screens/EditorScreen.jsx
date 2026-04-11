@@ -4,8 +4,6 @@ import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, Btn } from "../components/shared.jsx";
 
-const DEFAULT_QUESTION = { type: "voice", content: "", options: null };
-
 function newQ(type = "voice") {
   const id = Math.random().toString(36).slice(2, 10);
   if (type === "multiple_choice") return { id, type, content: "", options: ["", "", ""] };
@@ -25,9 +23,8 @@ export default function EditorScreen({ go, user }) {
 
   const q = questions[selectedIdx] ?? questions[0];
 
-  const updateQ = (idx, patch) => {
+  const updateQ = (idx, patch) =>
     setQuestions(qs => qs.map((item, i) => i === idx ? { ...item, ...patch } : item));
-  };
 
   const addQuestion = (type) => {
     const next = [...questions, newQ(type)];
@@ -115,21 +112,18 @@ export default function EditorScreen({ go, user }) {
     );
   }
 
-  // ─── Nav bar ───
+  // ─── Top nav bar (back + save only) ───
   const NavBar = (
-    <div style={{ padding: "10px 20px", background: C.white, boxShadow: "0 1px 0 rgba(0,0,0,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
-        <input
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          placeholder="인터뷰 제목을 입력하세요"
-          style={{ border: "none", outline: "none", fontSize: 14, fontFamily: F, color: C.navy, background: "transparent", minWidth: 200, fontWeight: 400 }}
-        />
+    <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
+      <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontSize: 12, color: title ? C.body : C.border }}>
+          {title || "제목 없음"}
+        </span>
+        <Btn size="sm" onClick={handleSave} disabled={saving}>
+          {saving ? "저장 중…" : "링크 생성 →"}
+        </Btn>
       </div>
-      <Btn size="sm" onClick={handleSave} disabled={saving}>
-        {saving ? "저장 중…" : "링크 생성 →"}
-      </Btn>
     </div>
   );
 
@@ -137,11 +131,27 @@ export default function EditorScreen({ go, user }) {
   if (isMobile) return (
     <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>
       {NavBar}
-      <div style={{ display: "flex", gap: 6, padding: "12px 16px", overflowX: "auto", background: C.white, boxShadow: "0 1px 0 rgba(0,0,0,0.08)" }}>
+      {/* Title area */}
+      <div style={{ background: C.white, padding: "16px 16px 12px", borderBottom: `1px solid ${C.border}` }}>
+        <input
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          placeholder="인터뷰 제목을 입력하세요"
+          style={{ width: "100%", border: "none", outline: "none", fontSize: 18, fontFamily: F, fontWeight: 600, color: C.navy, background: "transparent", boxSizing: "border-box" }}
+        />
+      </div>
+      {/* Question tabs */}
+      <div style={{ display: "flex", gap: 6, padding: "10px 16px", overflowX: "auto", background: C.white, borderBottom: `1px solid ${C.border}` }}>
         {questions.map((qq, i) => (
-          <button key={qq.id} onClick={() => setSelectedIdx(i)} style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: "none", background: selectedIdx === i ? C.purple : "#f5f5f7", color: selectedIdx === i ? C.white : C.body, whiteSpace: "nowrap", fontWeight: selectedIdx === i ? 500 : 400 }}>Q{i + 1}</button>
+          <button key={qq.id} onClick={() => setSelectedIdx(i)}
+            style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: "none", background: selectedIdx === i ? C.purple : C.bg, color: selectedIdx === i ? C.white : C.body, whiteSpace: "nowrap", fontWeight: selectedIdx === i ? 500 : 400 }}>
+            Q{i + 1}
+          </button>
         ))}
-        <button onClick={() => addQuestion("voice")} style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: `1px dashed ${C.border}`, background: "transparent", color: C.body, whiteSpace: "nowrap" }}>+</button>
+        <button onClick={() => addQuestion("voice")}
+          style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: `1px dashed ${C.border}`, background: "transparent", color: C.body, whiteSpace: "nowrap" }}>
+          +
+        </button>
       </div>
       <div style={{ padding: 16 }}>
         <PreviewCard q={q} idx={selectedIdx} total={questions.length} />
@@ -154,19 +164,21 @@ export default function EditorScreen({ go, user }) {
 
   // ─── Desktop layout ───
   return (
-    <div style={{ fontFamily: F }}>
+    <div style={{ fontFamily: F, height: "100vh", display: "flex", flexDirection: "column" }}>
       {NavBar}
-      <div style={{ display: "flex", height: "calc(100vh - 49px)" }}>
+
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
         {/* Left: question list */}
-        <div style={{ width: 270, borderRight: `1px solid ${C.border}`, background: C.white, display: "flex", flexDirection: "column" }}>
-          <div style={{ padding: "14px 14px 10px", borderBottom: `1px solid ${C.border}`, position: "relative" }}>
-            <div style={{ fontSize: 12, fontWeight: 400, color: C.label, marginBottom: 8 }}>질문 목록 ({questions.length}개)</div>
+        <div style={{ width: 260, borderRight: `1px solid ${C.border}`, background: C.white, display: "flex", flexDirection: "column", flexShrink: 0 }}>
+          <div style={{ padding: "12px 14px", borderBottom: `1px solid ${C.border}`, position: "relative" }}>
+            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>질문 목록 ({questions.length}개)</div>
             <Btn size="sm" full onClick={() => setAddTypeOpen(v => !v)}>+ 질문 추가</Btn>
             {addTypeOpen && (
               <div style={{ position: "absolute", top: "100%", left: 14, right: 14, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 10 }}>
                 {[["voice", "🎙 음성 질문"], ["multiple_choice", "☑ 객관식"], ["likert", "📊 리커트 척도"]].map(([type, label]) => (
-                  <div key={type} onClick={() => addQuestion(type)} style={{ padding: "10px 14px", fontSize: 13, color: C.navy, cursor: "pointer", borderBottom: `1px solid ${C.border}` }}
+                  <div key={type} onClick={() => addQuestion(type)}
+                    style={{ padding: "10px 14px", fontSize: 13, color: C.navy, cursor: "pointer", borderBottom: `1px solid ${C.border}` }}
                     onMouseEnter={e => e.currentTarget.style.background = C.bg}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     {label}
@@ -177,7 +189,8 @@ export default function EditorScreen({ go, user }) {
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: 10 }}>
             {questions.map((qq, i) => (
-              <div key={qq.id} onClick={() => setSelectedIdx(i)} style={{ padding: "10px 12px", borderRadius: 6, marginBottom: 6, cursor: "pointer", border: `1px solid ${selectedIdx === i ? C.purpleLight : "transparent"}`, background: selectedIdx === i ? C.purpleBg : "transparent" }}>
+              <div key={qq.id} onClick={() => setSelectedIdx(i)}
+                style={{ padding: "10px 12px", borderRadius: 6, marginBottom: 4, cursor: "pointer", border: `1px solid ${selectedIdx === i ? C.purpleLight : "transparent"}`, background: selectedIdx === i ? C.purpleBg : "transparent" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                   <span style={{ fontSize: 11, color: selectedIdx === i ? C.purple : C.body }}>Q{i + 1}</span>
                   <Badge variant={selectedIdx === i ? typeVariant[qq.type] : "neutral"} style={{ fontSize: 10 }}>{typeLabel[qq.type]}</Badge>
@@ -187,22 +200,55 @@ export default function EditorScreen({ go, user }) {
                     <button onClick={e => { e.stopPropagation(); removeQ(i); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px" }}>✕</button>
                   </div>
                 </div>
-                <div style={{ fontSize: 12, color: selectedIdx === i ? C.navy : C.body, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{qq.content || <span style={{ color: C.border }}>질문 텍스트 없음</span>}</div>
+                <div style={{ fontSize: 12, color: selectedIdx === i ? C.navy : C.body, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                  {qq.content || <span style={{ color: C.border }}>질문 텍스트 없음</span>}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Center: preview */}
-        <div style={{ flex: 1, background: C.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, gap: 16 }}>
-          <div style={{ fontSize: 12, color: C.body }}>참여자에게 보이는 화면 미리보기</div>
-          <PreviewCard q={q} idx={selectedIdx} total={questions.length} />
+        {/* Center: title + preview canvas */}
+        <div style={{ flex: 1, background: C.bg, display: "flex", flexDirection: "column", overflow: "auto" }}>
+
+          {/* Title input — prominent, top of canvas */}
+          <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "20px 40px 16px" }}>
+            <div style={{ fontSize: 11, color: C.body, marginBottom: 6, letterSpacing: 0.5 }}>인터뷰 제목</div>
+            <input
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="예: 신제품 사용성 인터뷰 — 2026 Q2"
+              style={{
+                width: "100%",
+                border: "none",
+                borderBottom: `2px solid ${title ? C.purple : C.border}`,
+                outline: "none",
+                fontSize: 22,
+                fontFamily: F,
+                fontWeight: 600,
+                color: C.navy,
+                background: "transparent",
+                paddingBottom: 6,
+                boxSizing: "border-box",
+                transition: "border-color 0.15s",
+              }}
+              onFocus={e => e.target.style.borderBottomColor = C.purple}
+              onBlur={e => e.target.style.borderBottomColor = title ? C.purple : C.border}
+            />
+          </div>
+
+          {/* Preview card */}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 40px", gap: 12 }}>
+            <div style={{ fontSize: 11, color: C.body, letterSpacing: 0.3 }}>참여자에게 보이는 화면</div>
+            <PreviewCard q={q} idx={selectedIdx} total={questions.length} />
+          </div>
         </div>
 
         {/* Right: settings */}
-        <div style={{ width: 260, borderLeft: `1px solid ${C.border}`, background: C.white, padding: 18, overflowY: "auto" }}>
+        <div style={{ width: 260, borderLeft: `1px solid ${C.border}`, background: C.white, padding: 18, overflowY: "auto", flexShrink: 0 }}>
           <QuestionSettings q={q} idx={selectedIdx} updateQ={updateQ} typeLabel={typeLabel} />
         </div>
+
       </div>
     </div>
   );
@@ -218,10 +264,14 @@ function PreviewCard({ q, idx, total }) {
           <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>AI 인터뷰어 · Voica</span>
           <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,0.25)" }}>Q{idx + 1}/{total}</span>
         </div>
-        <p style={{ fontSize: 15, fontWeight: 400, color: "white", lineHeight: 1.65, letterSpacing: -0.3, margin: "0 0 20px" }}>{q?.content || <span style={{ opacity: 0.3 }}>질문 텍스트를 입력하세요</span>}</p>
+        <p style={{ fontSize: 15, fontWeight: 400, color: "white", lineHeight: 1.65, letterSpacing: -0.3, margin: "0 0 20px" }}>
+          {q?.content || <span style={{ opacity: 0.3 }}>질문 텍스트를 입력하세요</span>}
+        </p>
         {q?.type === "voice" && (
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(26,115,232,0.25)", border: "1px solid rgba(26,115,232,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Ic.Mic({ s: 18, c: "#b9b9f9" })}</div>
+            <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(26,115,232,0.25)", border: "1px solid rgba(26,115,232,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {Ic.Mic({ s: 18, c: "#b9b9f9" })}
+            </div>
             <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>버튼을 눌러 답변해 주세요</span>
           </div>
         )}
@@ -248,9 +298,9 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
   if (!q) return null;
   return (
     <div>
-      <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 14 }}>질문 설정 — {typeLabel[q.type]}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>질문 설정 — {typeLabel[q.type]}</div>
       <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 12, color: C.body, display: "block", marginBottom: 6 }}>질문 텍스트</label>
+        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>질문 텍스트</label>
         <textarea
           value={q.content}
           onChange={e => updateQ(idx, { content: e.target.value })}
@@ -259,19 +309,14 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
           style={{ width: "100%", padding: "8px 10px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.5 }}
         />
       </div>
-
       {q.type === "multiple_choice" && Array.isArray(q.options) && (
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 12, color: C.body, display: "block", marginBottom: 6 }}>보기 목록</label>
+          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>보기 목록</label>
           {q.options.map((opt, i) => (
             <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6 }}>
               <input
                 value={opt}
-                onChange={e => {
-                  const next = [...q.options];
-                  next[i] = e.target.value;
-                  updateQ(idx, { options: next });
-                }}
+                onChange={e => { const next = [...q.options]; next[i] = e.target.value; updateQ(idx, { options: next }); }}
                 placeholder={`보기 ${i + 1}`}
                 style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }}
               />
@@ -285,10 +330,9 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
           )}
         </div>
       )}
-
       {q.type === "likert" && (
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 12, color: C.body, display: "block", marginBottom: 6 }}>척도 범위</label>
+          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>척도 범위</label>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input type="number" value={q.options?.min ?? 1} min={1} max={4}
               onChange={e => updateQ(idx, { options: { ...q.options, min: Number(e.target.value) } })}
