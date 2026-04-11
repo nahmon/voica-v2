@@ -529,8 +529,18 @@ export default function InterviewScreen({ go, shareCode }) {
 
                 {phase === "ready" && (
                   <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", marginBottom: 4 }}>버튼을 눌러 답변을 시작해요</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.22)" }}>최소 {MIN_RECORD_SECS}초 이상 답변 후 다시 눌러 완료</div>
+                    {recordingWarning ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 8, background: "rgba(217,48,37,0.1)", border: "1px solid rgba(217,48,37,0.25)", marginBottom: 10 }}
+                        onClick={() => setRecordingWarning(null)}>
+                        <span style={{ fontSize: 16 }}>⚠️</span>
+                        <div style={{ fontSize: 12, color: "rgba(255,180,180,0.9)", lineHeight: 1.5, textAlign: "left" }}>{recordingWarning}</div>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", marginBottom: 4 }}>버튼을 눌러 답변을 시작해요</div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.22)" }}>최소 {MIN_RECORD_SECS}초 이상 답변 후 다시 눌러 완료</div>
+                      </>
+                    )}
                   </div>
                 )}
               </>
