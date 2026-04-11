@@ -25,7 +25,7 @@ export default function SupportScreen({ go, user, logout }) {
             <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 10 }}>문의가 접수되었습니다</div>
             <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 28 }}>
               입력하신 이메일로 영업일 1~2일 내에 답변 드리겠습니다.<br />
-              빠른 답변이 필요하시면 <span style={{ color: C.purple }}>support@voica.ai</span>로 직접 연락해 주세요.
+              빠른 답변이 필요하시면 <span style={{ color: C.purple }}>voica.support@gmail.com</span>로 직접 연락해 주세요.
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
               <Btn onClick={() => go(user ? "dashboard" : "landing")}>{user ? "대시보드로 돌아가기" : "홈으로 돌아가기"}</Btn>
@@ -107,7 +107,7 @@ export default function SupportScreen({ go, user, logout }) {
             </Btn>
 
             <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 12, lineHeight: 1.6 }}>
-              또는 직접 이메일: <a href="mailto:support@voica.ai" style={{ color: C.purple }}>support@voica.ai</a>
+              또는 직접 이메일: <a href="mailto:voica.support@gmail.com" style={{ color: C.purple }}>voica.support@gmail.com</a>
             </div>
           </div>
         </div>
