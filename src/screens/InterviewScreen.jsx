@@ -36,6 +36,8 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // Exit confirm
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [ttsBlocked, setTtsBlocked] = useState(false);
+  const audioRef = useRef(null);
 
   // Load interview
   useEffect(() => {
@@ -68,14 +70,20 @@ export default function InterviewScreen({ go, shareCode }) {
         }
         if (url && !cancelled) {
           const audio = new Audio(url);
-          audio.onended = () => { if (!cancelled) setPhase(q.type === "voice" ? "ready" : q.type); };
-          audio.play().catch(() => { if (!cancelled) setPhase(q.type === "voice" ? "ready" : q.type); });
+          audioRef.current = audio;
+          audio.onended = () => { if (!cancelled) { setTtsBlocked(false); setPhase(q.type === "voice" ? "ready" : q.type); } };
+          try {
+            await audio.play();
+            setTtsBlocked(false);
+          } catch {
+            // Autoplay blocked or device muted
+            if (!cancelled) setTtsBlocked(true);
+          }
           return;
         }
       } catch {}
-      // Fallback: simulate TTS delay
-      const t = setTimeout(() => { if (!cancelled) setPhase(q.type === "voice" ? "ready" : q.type); }, 2800);
-      return () => clearTimeout(t);
+      // Fallback: show blocked state
+      if (!cancelled) setTtsBlocked(true);
     })();
     return () => { cancelled = true; };
   }, [qIndex, phase, introStep, interview]);
@@ -236,6 +244,14 @@ export default function InterviewScreen({ go, shareCode }) {
             </div>
           </div>
         </div>
+        {/* Sound notice */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 8, background: "rgba(255,200,50,0.08)", border: "1px solid rgba(255,200,50,0.2)", marginBottom: 20 }}>
+          <span style={{ fontSize: 16 }}>🔊</span>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,200,50,0.9)" }}>소리를 켜주세요</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>AI 인터뷰어가 질문을 음성으로 읽어드립니다. 이어폰 착용을 권장합니다.</div>
+          </div>
+        </div>
         <button onClick={startSession} style={{ width: "100%", padding: "14px", borderRadius: 10, border: "none", background: `linear-gradient(135deg,${C.purple},${C.purpleDeep})`, color: C.white, fontSize: 15, fontWeight: 500, fontFamily: F, cursor: "pointer" }}>
           인터뷰 시작하기 →
         </button>
@@ -317,7 +333,33 @@ export default function InterviewScreen({ go, shareCode }) {
             {/* Voice question */}
             {q.type === "voice" && (
               <>
-                {phase === "ai_speaking" && <div style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>AI가 질문을 읽고 있습니다...</div>}
+                {phase === "ai_speaking" && !ttsBlocked && <div style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>AI가 질문을 읽고 있습니다...</div>}
+                {phase === "ai_speaking" && ttsBlocked && (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 8, background: "rgba(255,200,50,0.1)", border: "1px solid rgba(255,200,50,0.25)" }}>
+                      <span style={{ fontSize: 18 }}>🔇</span>
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,200,50,0.9)" }}>오디오가 차단됐습니다</div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>기기 소리를 켠 후 아래 버튼을 눌러주세요</div>
+                      </div>
+                    </div>
+                    <button onClick={async () => {
+                      setTtsBlocked(false);
+                      if (audioRef.current) {
+                        try { await audioRef.current.play(); }
+                        catch { setPhase(q.type === "voice" ? "ready" : q.type); }
+                      } else {
+                        setPhase(q.type === "voice" ? "ready" : q.type);
+                      }
+                    }} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
+                      🔊 소리 켜고 다시 듣기
+                    </button>
+                    <button onClick={() => setPhase(q.type === "voice" ? "ready" : q.type)}
+                      style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", background: "none", border: "none", cursor: "pointer", fontFamily: F }}>
+                      소리 없이 텍스트로 진행
+                    </button>
+                  </div>
+                )}
 
                 {phase === "submitting" && (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
