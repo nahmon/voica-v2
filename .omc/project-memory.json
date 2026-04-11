@@ -1,0 +1,214 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1775876732636,
+  "projectRoot": "/Users/mh/voica-v2",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "react",
+        "version": "18.3.1",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "18.3.1",
+        "category": "frontend"
+      },
+      {
+        "name": "vite",
+        "version": "6.3.1",
+        "category": "build"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "vite",
+      "build": "vite build",
+      "preview": "vite preview"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": "type-based"
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "public",
+      "src"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "api": {
+      "path": "api",
+      "purpose": "API routes",
+      "fileCount": 4,
+      "lastAccessed": 1775876732615,
+      "keyFiles": [
+        "response.js",
+        "session.js",
+        "stt.js",
+        "tts.js"
+      ]
+    },
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 3,
+      "lastAccessed": 1775876732616,
+      "keyFiles": [
+        "index.html",
+        "voica-app.jsx",
+        "voica.html"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1775876732619,
+      "keyFiles": []
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 2,
+      "lastAccessed": 1775876732620,
+      "keyFiles": [
+        "voica-app.jsx",
+        "voica.html"
+      ]
+    },
+    "reports": {
+      "path": "reports",
+      "purpose": null,
+      "fileCount": 6,
+      "lastAccessed": 1775876732621,
+      "keyFiles": [
+        "01-product-flow-review.md",
+        "02-design-review.md",
+        "03-pricing-roi-review.md",
+        "04-gtm-strategy.md",
+        "05-north-america-competitors.md"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 4,
+      "lastAccessed": 1775876732621,
+      "keyFiles": [
+        "App.jsx",
+        "App.jsx.bak",
+        "main.jsx",
+        "supabase.js"
+      ]
+    },
+    "supabase": {
+      "path": "supabase",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1775876732622,
+      "keyFiles": []
+    },
+    "dist/assets": {
+      "path": "dist/assets",
+      "purpose": "Static assets",
+      "fileCount": 1,
+      "lastAccessed": 1775876732622,
+      "keyFiles": [
+        "index-C_Pc7MHr.js"
+      ]
+    },
+    "src/components": {
+      "path": "src/components",
+      "purpose": "UI components",
+      "fileCount": 1,
+      "lastAccessed": 1775876732624,
+      "keyFiles": [
+        "shared.jsx"
+      ]
+    },
+    "src/lib": {
+      "path": "src/lib",
+      "purpose": "Library code",
+      "fileCount": 2,
+      "lastAccessed": 1775876732624,
+      "keyFiles": [
+        "constants.jsx",
+        "mockData.js"
+      ]
+    },
+    "supabase/migrations": {
+      "path": "supabase/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 1,
+      "lastAccessed": 1775876732625,
+      "keyFiles": [
+        "001_init.sql"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "supabase/migrations/001_init.sql",
+      "accessCount": 1,
+      "lastAccessed": 1775876773472,
+      "type": "file"
+    },
+    {
+      "path": "src/screens/EditorScreen.jsx",
+      "accessCount": 1,
+      "lastAccessed": 1775876778623,
+      "type": "file"
+    },
+    {
+      "path": "src/screens/InterviewScreen.jsx",
+      "accessCount": 1,
+      "lastAccessed": 1775876779018,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/constants.jsx",
+      "accessCount": 1,
+      "lastAccessed": 1775876787142,
+      "type": "file"
+    },
+    {
+      "path": "src/components/shared.jsx",
+      "accessCount": 1,
+      "lastAccessed": 1775876793865,
+      "type": "directory"
+    },
+    {
+      "path": "api/session.js",
+      "accessCount": 1,
+      "lastAccessed": 1775876808735,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
