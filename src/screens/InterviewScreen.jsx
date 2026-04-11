@@ -38,6 +38,23 @@ export default function InterviewScreen({ go, shareCode }) {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [ttsBlocked, setTtsBlocked] = useState(false);
   const audioRef = useRef(null);
+  const ttsCacheRef = useRef({}); // { [question_id]: url }
+
+  const prefetchTts = async (q) => {
+    if (!q || ttsCacheRef.current[q.id]) return;
+    try {
+      let url = q.tts_url;
+      if (!url) {
+        const r = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: q.content, question_id: q.id }),
+        });
+        if (r.ok) { const d = await r.json(); url = d.url; }
+      }
+      if (url) ttsCacheRef.current[q.id] = url;
+    } catch {}
+  };
 
   // Load interview
   useEffect(() => {
@@ -51,7 +68,7 @@ export default function InterviewScreen({ go, shareCode }) {
     })();
   }, [shareCode]);
 
-  // TTS playback when question changes
+  // TTS playback when question changes — uses cache first
   useEffect(() => {
     if (!interview || introStep !== "started" || phase !== "ai_speaking") return;
     const q = interview.questions[qIndex];
@@ -59,7 +76,8 @@ export default function InterviewScreen({ go, shareCode }) {
     let cancelled = false;
     (async () => {
       try {
-        let url = q.tts_url;
+        // Use cached URL if available, otherwise fetch
+        let url = ttsCacheRef.current[q.id] || q.tts_url;
         if (!url) {
           const r = await fetch("/api/tts", {
             method: "POST",
@@ -68,6 +86,7 @@ export default function InterviewScreen({ go, shareCode }) {
           });
           if (r.ok) { const d = await r.json(); url = d.url; }
         }
+        if (url) ttsCacheRef.current[q.id] = url;
         if (url && !cancelled) {
           const audio = new Audio(url);
           audioRef.current = audio;
@@ -76,16 +95,30 @@ export default function InterviewScreen({ go, shareCode }) {
             await audio.play();
             setTtsBlocked(false);
           } catch {
-            // Autoplay blocked or device muted
             if (!cancelled) setTtsBlocked(true);
           }
           return;
         }
       } catch {}
-      // Fallback: show blocked state
       if (!cancelled) setTtsBlocked(true);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      // Stop audio immediately when question changes
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current = null;
+      }
+    };
+  }, [qIndex, phase, introStep, interview]);
+
+  // Prefetch next question's TTS while user is answering current one
+  useEffect(() => {
+    if (!interview || introStep !== "started") return;
+    if (phase !== "ready" && phase !== "recording") return;
+    const nextQ = interview.questions[qIndex + 1];
+    if (nextQ) prefetchTts(nextQ);
   }, [qIndex, phase, introStep, interview]);
 
   // Recording timer
@@ -99,6 +132,11 @@ export default function InterviewScreen({ go, shareCode }) {
   }, [phase]);
 
   const startSession = async () => {
+    // Prefetch first two questions' TTS immediately on session start
+    const qs = interview?.questions ?? [];
+    prefetchTts(qs[0]);
+    prefetchTts(qs[1]);
+
     const res = await fetch("/api/session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
