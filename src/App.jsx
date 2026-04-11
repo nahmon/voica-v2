@@ -3,6 +3,7 @@ import { supabase } from "./supabase.js";
 import { C, F } from "./lib/constants.jsx";
 
 import LandingScreen from "./screens/LandingScreen.jsx";
+import RoleSelectScreen from "./screens/RoleSelectScreen.jsx";
 import AuthScreen from "./screens/AuthScreen.jsx";
 import DashboardScreen from "./screens/DashboardScreen.jsx";
 import EditorScreen from "./screens/EditorScreen.jsx";
@@ -32,20 +33,22 @@ export default function Voica() {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user && !match) setScreen("dashboard");
+      if (session?.user && !match) {
+        const role = session.user.user_metadata?.role;
+        if (!role) setScreen("role_select");
+        else if (role === "panel") setScreen("panel_board");
+        else setScreen("dashboard");
+      }
       setAuthLoading(false);
     });
-    // Handle OAuth redirect back (hash contains access_token)
-    if (window.location.hash.includes("access_token") || window.location.search.includes("code=")) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) setScreen("dashboard");
-      });
-    }
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       const publicScreens = ["landing", "advertiser_login", "pricing", "support", "faq", "panel_entry", "panel_board"];
       if (session?.user && publicScreens.includes(screen)) {
-        setScreen("dashboard");
+        const role = session.user.user_metadata?.role;
+        if (!role) setScreen("role_select");
+        else if (role === "panel") setScreen("panel_board");
+        else setScreen("dashboard");
       }
     });
     return () => subscription.unsubscribe();
@@ -67,6 +70,7 @@ export default function Voica() {
         @keyframes wave-2 { from { height: 8px } to { height: 22px } }
       `}</style>
       {screen === "landing"          && <LandingScreen go={go} user={user} logout={logout} />}
+      {screen === "role_select"      && <RoleSelectScreen go={go} user={user} />}
       {screen === "advertiser_login" && <AuthScreen go={go} />}
       {screen === "dashboard"        && <DashboardScreen go={go} user={user} logout={logout} />}
       {screen === "editor"           && <EditorScreen go={go} user={user} />}

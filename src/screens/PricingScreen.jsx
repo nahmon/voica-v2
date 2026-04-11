@@ -5,20 +5,22 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function PricingScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
-  const [probilling, setProBilling] = useState("monthly"); // monthly | yearly
+  const [billing, setBilling] = useState("monthly");
 
-  // ── 1. Pay as you go ──
   const credits = [
-    { id: "c10", label: "스타터 팩", count: 10, price: 59000, unit: 5900, badge: null },
-    { id: "c30", label: "스탠다드 팩", count: 30, price: 149000, unit: 4967, badge: "인기", highlight: true },
-    { id: "c100", label: "볼륨 팩", count: 100, price: 390000, unit: 3900, badge: "34% 절약" },
+    { id: "c10",  label: "스타터 팩",   count: 10,  price: 59000,  unit: 5900, badge: null,      highlight: false },
+    { id: "c30",  label: "스탠다드 팩", count: 30,  price: 149000, unit: 4967, badge: "인기",     highlight: true  },
+    { id: "c100", label: "볼륨 팩",     count: 100, price: 390000, unit: 3900, badge: "34% 절약", highlight: false },
   ];
 
-  // ── 2. PRO ──
   const proMonthly = 99000;
-  const proYearly = Math.round(proMonthly * 12 * 0.8); // 20% 할인
-  const proPrice = probilling === "yearly" ? `${(proYearly / 12).toLocaleString()}원/월` : `${proMonthly.toLocaleString()}원/월`;
-  const proSub = probilling === "yearly" ? `연 ${proYearly.toLocaleString()}원 청구 · 20% 절약` : "매월 청구 · 언제든 해지";
+  const proYearlyTotal = Math.round(proMonthly * 12 * 0.8);
+  const proDisplayPrice = billing === "yearly"
+    ? `${Math.round(proYearlyTotal / 12).toLocaleString()}원/월`
+    : `${proMonthly.toLocaleString()}원/월`;
+  const proDisplaySub = billing === "yearly"
+    ? `연 ${proYearlyTotal.toLocaleString()}원 청구 · 20% 절약`
+    : "매월 청구 · 언제든 해지";
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, fontFeatureSettings: '"ss01"' }}>
@@ -29,15 +31,15 @@ export default function PricingScreen({ go, user, logout }) {
         <div style={{ position: "absolute", top: -80, right: "10%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle,rgba(83,58,253,0.07),transparent 70%)", filter: "blur(70px)", pointerEvents: "none" }} />
         <Badge variant="purple" style={{ marginBottom: 16 }}>요금제</Badge>
         <h1 style={{ fontSize: isMobile ? 28 : 38, fontWeight: 700, color: C.navy, margin: "0 0 12px", lineHeight: 1.08 }}>필요한 만큼만, 원하는 방식으로</h1>
-        <p style={{ fontSize: 15, color: C.body, margin: 0 }}>크레딧 충전 · 월간/연간 구독 · 대규모 맞춤 계약</p>
+        <p style={{ fontSize: 15, color: C.body, margin: 0 }}>건별 충전 · 월간/연간 구독 · 대규모 맞춤 계약</p>
       </div>
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 24px 80px" }}>
 
-        {/* ── Section 1: Pay as you go ── */}
+        {/* ── Section 1: 건별 충전 ── */}
         <div style={{ marginBottom: 64 }}>
           <div style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Pay as you go</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 6 }}>건별 충전</div>
             <div style={{ fontSize: 14, color: C.body }}>구독 없이 인터뷰 횟수를 크레딧으로 구매하세요. 유효기간 1년, 미사용 시 환불 가능.</div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16 }}>
@@ -64,7 +66,7 @@ export default function PricingScreen({ go, user, logout }) {
           </div>
         </div>
 
-        {/* ── Section 2: PRO ── */}
+        {/* ── Section 2: PRO 구독 ── */}
         <div style={{ marginBottom: 64 }}>
           <div style={{ marginBottom: 24 }}>
             <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 6 }}>PRO 구독</div>
@@ -75,8 +77,8 @@ export default function PricingScreen({ go, user, logout }) {
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
             <div style={{ display: "inline-flex", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 3, gap: 2 }}>
               {[["monthly", "월간 결제"], ["yearly", "연간 결제"]].map(([val, label]) => (
-                <button key={val} onClick={() => setProBilling(val)}
-                  style={{ padding: "6px 20px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: probilling === val ? 600 : 400, background: probilling === val ? C.white : "transparent", color: probling === val ? C.navy : C.body, boxShadow: probling === val ? S.ambient : "none", transition: "all 0.15s" }}>
+                <button key={val} onClick={() => setBilling(val)}
+                  style={{ padding: "6px 20px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: billing === val ? 600 : 400, background: billing === val ? C.white : "transparent", color: billing === val ? C.navy : C.body, boxShadow: billing === val ? S.ambient : "none", transition: "all 0.15s" }}>
                   {label}
                   {val === "yearly" && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: C.success }}>20% 할인</span>}
                 </button>
@@ -90,8 +92,8 @@ export default function PricingScreen({ go, user, logout }) {
               <span style={{ fontSize: 10, fontWeight: 700, background: C.purpleBg, color: C.purple, padding: "3px 8px", borderRadius: 4 }}>가장 인기</span>
             </div>
             <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, marginBottom: 6, letterSpacing: 0.5 }}>PRO</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: C.navy, lineHeight: 1, marginBottom: 4 }}>{proPrice}</div>
-            <div style={{ fontSize: 12, color: C.body, marginBottom: 24 }}>{proSub}</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: C.navy, lineHeight: 1, marginBottom: 4 }}>{proDisplayPrice}</div>
+            <div style={{ fontSize: 12, color: C.body, marginBottom: 24 }}>{proDisplaySub}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {[
                 "월 30건 인터뷰 (초과 시 건당 3,900원)",
@@ -112,7 +114,7 @@ export default function PricingScreen({ go, user, logout }) {
           </div>
         </div>
 
-        {/* ── Section 3: Enterprise ── */}
+        {/* ── Section 3: 엔터프라이즈 ── */}
         <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 20, padding: isMobile ? "28px 24px" : "40px 44px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 32, flexWrap: "wrap", boxShadow: S.standard }}>
           <div style={{ flex: 1, minWidth: 240 }}>
             <Badge variant="neutral" style={{ marginBottom: 14 }}>엔터프라이즈</Badge>
