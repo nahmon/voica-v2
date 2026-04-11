@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     .from("interviews")
     .select("id, title, description, share_code, status, questions(id, order_num, type, content, options, tts_url)")
     .eq("share_code", code)
-    .eq("status", "active")
+    .in("status", ["active", "draft"])
     .single();
 
   if (error || !interview) return res.status(404).json({ error: "Interview not found" });

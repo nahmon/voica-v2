@@ -40,7 +40,7 @@ export default async function handler(req, res) {
   // Create interview
   const { data: interview, error: ivError } = await supabase
     .from("interviews")
-    .insert({ user_id: user.id, title, description, share_code, status: "draft" })
+    .insert({ user_id: user.id, title, description, share_code, status: "active" })
     .select()
     .single();
 
