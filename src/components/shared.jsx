@@ -114,15 +114,18 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
               <>
                 <Btn size="sm" onClick={() => go("editor")}>+ 인터뷰 시작하기</Btn>
                 <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>
-                  {user?.user_metadata?.name || user?.email?.split("@")[0] || ""}
+                  {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || ""}
                   {user?.user_metadata?.company ? ` · ${user.user_metadata.company}` : ""}
                 </div>
-                {user?.user_metadata?.avatar_url
-                  ? <img src={user.user_metadata.avatar_url} alt="profile" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover", cursor: "pointer", border: `1px solid ${C.border}` }} />
-                  : <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.purple, cursor: "pointer" }}>
-                      {(user?.user_metadata?.name || user?.email || "U")[0].toUpperCase()}
-                    </div>
-                }
+                {(() => {
+                  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+                  const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "U";
+                  return avatarUrl
+                    ? <img src={avatarUrl} alt="profile" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover", cursor: "pointer", border: `1px solid ${C.border}` }} />
+                    : <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.purple, cursor: "pointer" }}>
+                        {displayName[0].toUpperCase()}
+                      </div>;
+                })()}
                 {logout && <Btn variant="ghost" size="sm" onClick={logout}>로그아웃</Btn>}
               </>
             )}
