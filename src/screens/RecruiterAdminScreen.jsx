@@ -61,45 +61,58 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
         </div>
 
         <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, overflow: "auto", boxShadow: S.ambient }}>
-          <div style={{ display: "grid", gridTemplateColumns: "36px 1fr 64px 64px 160px 110px 90px 200px", gap: 0, padding: "10px 16px", borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 860 }}>
+          {/* Table header */}
+          <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 68px 68px 164px 120px 110px 180px", columnGap: 8, alignItems: "center", padding: "0 20px", height: 38, borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 920 }}>
             {["", "패널", "연령", "성별", "지원일시", "AI 적합도", "상태", "액션"].map((h, i) => (
-              <div key={i} style={{ fontSize: 11, fontWeight: 500, color: C.body, letterSpacing: "0.2px" }}>{h}</div>
+              <div key={i} style={{ fontSize: 11, fontWeight: 600, color: C.body, letterSpacing: "0.3px", textTransform: "uppercase" }}>{h}</div>
             ))}
           </div>
 
+          {/* Table rows */}
           {filtered.map((p, i) => {
             const ss = statusStyle[p.status];
             const isSelected = selected.has(p.id);
+            const scoreColor = p.score >= 85 ? C.success : p.score >= 70 ? "#f59e0b" : C.ruby;
             return (
-              <div key={p.id} style={{ display: "grid", gridTemplateColumns: "36px 1fr 64px 64px 160px 110px 90px 200px", gap: 0, padding: "14px 16px", minWidth: 860, borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : "none", background: isSelected ? C.purpleBg : "transparent", alignItems: "center", transition: "background 0.15s" }}>
+              <div key={p.id} style={{ display: "grid", gridTemplateColumns: "40px 1fr 68px 68px 164px 120px 110px 180px", columnGap: 8, alignItems: "center", padding: "0 20px", minHeight: 56, minWidth: 920, borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : "none", background: isSelected ? C.purpleBg : "transparent", transition: "background 0.15s" }}>
+                {/* Checkbox */}
                 <div onClick={() => setSelected(prev => { const n = new Set(prev); n.has(p.id) ? n.delete(p.id) : n.add(p.id); return n; })}
                   style={{ width: 16, height: 16, borderRadius: 3, border: `1.5px solid ${isSelected ? C.purple : C.border}`, background: isSelected ? C.purple : C.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
                   {isSelected && <span style={{ color: C.white, fontSize: 10 }}>✓</span>}
                 </div>
+                {/* Name */}
                 <div>
-                  <div style={{ fontSize: 14, color: C.navy }}>{p.name}</div>
-                  <div style={{ fontSize: 11, color: C.body }}>인터뷰 {p.intv}회 참여</div>
+                  <div style={{ fontSize: 14, fontWeight: 400, color: C.navy, lineHeight: 1.3 }}>{p.name}</div>
+                  <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>인터뷰 {p.intv}회 참여</div>
                 </div>
+                {/* Age */}
                 <div style={{ fontSize: 13, color: C.navy }}>{p.age}</div>
+                {/* Gender */}
                 <div style={{ fontSize: 13, color: C.navy }}>{p.gender}</div>
-                <div style={{ fontSize: 12, color: C.body, fontFeatureSettings: '"tnum"' }}>{p.applied}</div>
+                {/* Applied at */}
+                <div style={{ fontSize: 12, color: C.body, fontFeatureSettings: '"tnum"', lineHeight: 1.4 }}>{p.applied}</div>
+                {/* AI Score */}
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 400, color: p.score >= 85 ? C.success : p.score >= 70 ? "#f59e0b" : C.ruby, marginBottom: 4, fontFeatureSettings: '"tnum"' }}>{p.score}점</div>
-                  <div style={{ height: 3, background: C.border, borderRadius: 2, width: 60 }}>
-                    <div style={{ height: "100%", width: `${p.score}%`, background: p.score >= 85 ? C.success : p.score >= 70 ? "#f59e0b" : C.ruby, borderRadius: 2 }} />
+                  <div style={{ fontSize: 13, fontWeight: 600, color: scoreColor, marginBottom: 5, fontFeatureSettings: '"tnum"' }}>{p.score}점</div>
+                  <div style={{ height: 3, background: C.border, borderRadius: 2, width: "80%" }}>
+                    <div style={{ height: "100%", width: `${p.score}%`, background: scoreColor, borderRadius: 2 }} />
                   </div>
                 </div>
-                <span style={{ display: "inline-flex", alignItems: "center", padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 400, background: ss.bg, color: ss.color, border: `1px solid ${ss.border}` }}>{p.status}</span>
-                <div style={{ display: "flex", gap: 6 }}>
+                {/* Status badge */}
+                <div>
+                  <span style={{ display: "inline-flex", alignItems: "center", padding: "3px 9px", borderRadius: 4, fontSize: 11, fontWeight: 500, background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, whiteSpace: "nowrap" }}>{p.status}</span>
+                </div>
+                {/* Actions */}
+                <div style={{ display: "flex", gap: 6, alignItems: "center", paddingLeft: 8, borderLeft: `1px solid ${C.border}` }}>
                   {p.status === "신청" && (
                     <>
-                      <button style={{ padding: "4px 10px", fontSize: 12, borderRadius: 4, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F }}>승인</button>
-                      <button style={{ padding: "4px 10px", fontSize: 12, borderRadius: 4, border: "1px solid rgba(217,48,37,0.25)", background: "rgba(217,48,37,0.06)", color: C.ruby, cursor: "pointer", fontFamily: F }}>거절</button>
+                      <button style={{ padding: "4px 12px", fontSize: 12, borderRadius: 6, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>승인</button>
+                      <button style={{ padding: "4px 12px", fontSize: 12, borderRadius: 6, border: "1px solid rgba(217,48,37,0.25)", background: "rgba(217,48,37,0.06)", color: C.ruby, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>거절</button>
                     </>
                   )}
                   {p.status === "적합" && <Btn size="sm" onClick={() => go("interview")}>인터뷰 시작</Btn>}
                   {p.status === "완료" && <Btn variant="ghost" size="sm" onClick={() => go("report")}>리포트</Btn>}
-                  {p.status === "부적합" && <span style={{ fontSize: 12, color: C.body }}>—</span>}
+                  {p.status === "부적합" && <span style={{ fontSize: 13, color: C.body }}>—</span>}
                 </div>
               </div>
             );
