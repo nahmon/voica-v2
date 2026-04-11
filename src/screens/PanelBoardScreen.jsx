@@ -111,7 +111,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
 }
 
 function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, go }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const remaining = job.total - job.filled;
   const fillPct = Math.round((job.filled / job.total) * 100);
   const isConfirmed = status === "confirmed";
