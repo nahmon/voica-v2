@@ -141,7 +141,7 @@ export default function EditorScreen({ go, user, logout }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "리커트" };
+  const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "평점" };
   const typeVariant = { voice: "purple", multiple_choice: "success", likert: "warning" };
 
   // ─── Overlays (share success + incomplete warning) ───
@@ -271,7 +271,7 @@ export default function EditorScreen({ go, user, logout }) {
             <Btn size="sm" full onClick={() => setAddTypeOpen(v => !v)}>+ 질문 추가</Btn>
             {addTypeOpen && (
               <div style={{ position: "absolute", top: "100%", left: 14, right: 14, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 10 }}>
-                {[["voice", "🎙 음성 질문"], ["multiple_choice", "☑ 객관식"], ["likert", "📊 리커트 척도"]].map(([type, label]) => (
+                {[["voice", "🎙 음성 질문"], ["multiple_choice", "☑ 객관식"], ["likert", "📊 평점 선택"]].map(([type, label]) => (
                   <div key={type} onClick={() => addQuestion(type)}
                     style={{ padding: "10px 14px", fontSize: 13, color: C.navy, cursor: "pointer", borderBottom: `1px solid ${C.border}` }}
                     onMouseEnter={e => e.currentTarget.style.background = C.bg}
@@ -415,7 +415,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
   if (!q) return null;
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>질문 설정 — {typeLabel[q.type]}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>질문 설정 — {typeLabel[q.type] ?? q.type}</div>
       <div style={{ marginBottom: 14 }}>
         <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>질문 텍스트</label>
         <textarea

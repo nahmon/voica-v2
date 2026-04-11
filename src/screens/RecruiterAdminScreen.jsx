@@ -62,7 +62,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
 
         <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, overflow: "auto", boxShadow: S.ambient }}>
           {/* Table header */}
-          <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 68px 68px 164px 120px 110px 180px", columnGap: 8, alignItems: "center", padding: "0 20px", height: 38, borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 920 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 72px 72px 168px 124px 116px 180px", columnGap: 16, alignItems: "center", padding: "0 24px", height: 40, borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 980 }}>
             {["", "패널", "연령", "성별", "지원일시", "AI 적합도", "상태", "액션"].map((h, i) => (
               <div key={i} style={{ fontSize: 11, fontWeight: 600, color: C.body, letterSpacing: "0.3px", textTransform: "uppercase" }}>{h}</div>
             ))}
@@ -74,7 +74,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
             const isSelected = selected.has(p.id);
             const scoreColor = p.score >= 85 ? C.success : p.score >= 70 ? "#f59e0b" : C.ruby;
             return (
-              <div key={p.id} style={{ display: "grid", gridTemplateColumns: "40px 1fr 68px 68px 164px 120px 110px 180px", columnGap: 8, alignItems: "center", padding: "0 20px", minHeight: 56, minWidth: 920, borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : "none", background: isSelected ? C.purpleBg : "transparent", transition: "background 0.15s" }}>
+              <div key={p.id} style={{ display: "grid", gridTemplateColumns: "40px 1fr 72px 72px 168px 124px 116px 180px", columnGap: 16, alignItems: "center", padding: "0 24px", minHeight: 60, minWidth: 980, borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : "none", background: isSelected ? C.purpleBg : "transparent", transition: "background 0.15s" }}>
                 {/* Checkbox */}
                 <div onClick={() => setSelected(prev => { const n = new Set(prev); n.has(p.id) ? n.delete(p.id) : n.add(p.id); return n; })}
                   style={{ width: 16, height: 16, borderRadius: 3, border: `1.5px solid ${isSelected ? C.purple : C.border}`, background: isSelected ? C.purple : C.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
@@ -103,7 +103,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
                   <span style={{ display: "inline-flex", alignItems: "center", padding: "3px 9px", borderRadius: 4, fontSize: 11, fontWeight: 500, background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, whiteSpace: "nowrap" }}>{p.status}</span>
                 </div>
                 {/* Actions */}
-                <div style={{ display: "flex", gap: 6, alignItems: "center", paddingLeft: 8, borderLeft: `1px solid ${C.border}` }}>
+                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                   {p.status === "신청" && (
                     <>
                       <button style={{ padding: "4px 12px", fontSize: 12, borderRadius: 6, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>승인</button>

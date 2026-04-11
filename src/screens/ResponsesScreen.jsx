@@ -146,7 +146,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
 }
 
 function QuestionAnswer({ question, response, index }) {
-  const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "리커트" };
+  const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "평점" };
   const typeColor = {
     voice: { bg: C.purpleBg, color: C.purple },
     multiple_choice: { bg: "rgba(21,190,83,0.1)", color: C.successText },
