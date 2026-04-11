@@ -38,7 +38,7 @@ export default function DashboardScreen({ go, user, logout }) {
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
-      <GlobalNav go={go} activeTab="dashboard" variant="app" logout={logout} isMobile={isMobile} />
+      <GlobalNav go={go} activeTab="dashboard" variant="app" logout={logout} isMobile={isMobile} user={user} />
 
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 16 }}>
