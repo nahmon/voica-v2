@@ -61,9 +61,9 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
         </div>
 
         <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, overflow: "auto", boxShadow: S.ambient }}>
-          <div style={{ display: "grid", gridTemplateColumns: "36px 140px 60px 60px 150px 100px 80px 180px", gap: 0, padding: "10px 16px", borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 820 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "36px 1fr 64px 64px 160px 110px 90px 200px", gap: 0, padding: "10px 16px", borderBottom: `1px solid ${C.border}`, background: C.bg, minWidth: 860 }}>
             {["", "패널", "연령", "성별", "지원일시", "AI 적합도", "상태", "액션"].map((h, i) => (
-              <div key={i} style={{ fontSize: 11, fontWeight: 400, color: C.body }}>{h}</div>
+              <div key={i} style={{ fontSize: 11, fontWeight: 500, color: C.body, letterSpacing: "0.2px" }}>{h}</div>
             ))}
           </div>
 
@@ -71,7 +71,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
             const ss = statusStyle[p.status];
             const isSelected = selected.has(p.id);
             return (
-              <div key={p.id} style={{ display: "grid", gridTemplateColumns: "36px 140px 60px 60px 150px 100px 80px 180px", gap: 0, padding: "12px 16px", minWidth: 820, borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : "none", background: isSelected ? C.purpleBg : "transparent", alignItems: "center", transition: "background 0.15s" }}>
+              <div key={p.id} style={{ display: "grid", gridTemplateColumns: "36px 1fr 64px 64px 160px 110px 90px 200px", gap: 0, padding: "14px 16px", minWidth: 860, borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : "none", background: isSelected ? C.purpleBg : "transparent", alignItems: "center", transition: "background 0.15s" }}>
                 <div onClick={() => setSelected(prev => { const n = new Set(prev); n.has(p.id) ? n.delete(p.id) : n.add(p.id); return n; })}
                   style={{ width: 16, height: 16, borderRadius: 3, border: `1.5px solid ${isSelected ? C.purple : C.border}`, background: isSelected ? C.purple : C.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
                   {isSelected && <span style={{ color: C.white, fontSize: 10 }}>✓</span>}
