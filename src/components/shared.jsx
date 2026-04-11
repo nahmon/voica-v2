@@ -616,42 +616,46 @@ export function VoicePlayer({ audioUrl, transcript }) {
 
   const pct = duration ? Math.min((current / duration) * 100, 100) : 0;
 
-  if (!audioUrl) return <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>녹음 없음</div>;
+  if (!audioUrl && !transcript) return <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>녹음 없음</div>;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <audio
-        ref={audioRef}
-        src={audioUrl}
-        onTimeUpdate={e => setCurrent(e.target.currentTime)}
-        onLoadedMetadata={e => setDuration(e.target.duration)}
-        onEnded={() => { setPlaying(false); setCurrent(0); }}
-      />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}` }}>
-        <button
-          onClick={toggle}
-          style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.12s" }}
-          onMouseEnter={e => e.currentTarget.style.background = "#4434d4"}
-          onMouseLeave={e => e.currentTarget.style.background = C.purple}
-        >
-          {playing
-            ? <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><rect x="1.5" y="1" width="3.5" height="11" rx="1"/><rect x="8" y="1" width="3.5" height="11" rx="1"/></svg>
-            : <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><path d="M2.5 1.5l9 5-9 5z"/></svg>
-          }
-        </button>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
-          <div
-            onClick={seek}
-            style={{ height: 4, background: C.border, borderRadius: 2, cursor: "pointer", position: "relative" }}
-          >
-            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${pct}%`, background: C.purple, borderRadius: 2, transition: "width 0.1s linear" }} />
+      {audioUrl && (
+        <>
+          <audio
+            ref={audioRef}
+            src={audioUrl}
+            onTimeUpdate={e => setCurrent(e.target.currentTime)}
+            onLoadedMetadata={e => setDuration(e.target.duration)}
+            onEnded={() => { setPlaying(false); setCurrent(0); }}
+          />
+          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}` }}>
+            <button
+              onClick={toggle}
+              style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.12s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#4434d4"}
+              onMouseLeave={e => e.currentTarget.style.background = C.purple}
+            >
+              {playing
+                ? <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><rect x="1.5" y="1" width="3.5" height="11" rx="1"/><rect x="8" y="1" width="3.5" height="11" rx="1"/></svg>
+                : <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><path d="M2.5 1.5l9 5-9 5z"/></svg>
+              }
+            </button>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
+              <div
+                onClick={seek}
+                style={{ height: 4, background: C.border, borderRadius: 2, cursor: "pointer", position: "relative" }}
+              >
+                <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${pct}%`, background: C.purple, borderRadius: 2, transition: "width 0.1s linear" }} />
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(current)}</span>
+                <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(duration)}</span>
+              </div>
+            </div>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(current)}</span>
-            <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(duration)}</span>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
       {transcript && (
         <div style={{ padding: "10px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${C.border}` }}>
           <div style={{ fontSize: 10, color: C.body, fontWeight: 600, marginBottom: 6, letterSpacing: 0.4 }}>전사 텍스트</div>

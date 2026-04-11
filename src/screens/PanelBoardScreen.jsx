@@ -69,8 +69,8 @@ export default function PanelBoardScreen({ go, user, logout }) {
               <button key={c} onClick={() => setCatFilter(c)}
                 style={{
                   padding: "6px 14px", borderRadius: 20, fontSize: 13, fontFamily: F, cursor: "pointer",
-                  border: `1px solid ${active ? C.purple : C.border}`,
-                  background: active ? C.purple : C.white,
+                  border: "none",
+                  background: active ? C.purple : "rgba(0,0,0,0.06)",
                   color: active ? "#fff" : C.body,
                   fontWeight: active ? 600 : 400,
                   transition: "all 0.12s",
@@ -116,10 +116,9 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
 
   return (
     <div style={{
-      background: C.white,
+      background: isRecommended ? "#faf9ff" : C.white,
       borderRadius: 12,
-      border: `1px solid ${C.border}`,
-      borderLeft: isRecommended ? `3px solid ${C.purple}` : `1px solid ${C.border}`,
+      boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
       overflow: "hidden",
     }}>
       <div style={{ padding: isMobile ? "16px" : "18px 20px" }}>
