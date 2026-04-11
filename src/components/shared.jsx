@@ -113,8 +113,13 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             {variant === "app" && !isMobile && (
               <>
                 <Btn size="sm" onClick={() => go("editor")}>+ 인터뷰 시작하기</Btn>
-                <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>김민준 · (주)리서치랩</div>
-                <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.purple, cursor: "pointer" }}>김</div>
+                <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>
+                  {user?.user_metadata?.name || user?.email?.split("@")[0] || ""}
+                  {user?.user_metadata?.company ? ` · ${user.user_metadata.company}` : ""}
+                </div>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.purple, cursor: "pointer" }}>
+                  {(user?.user_metadata?.name || user?.email || "?")[0].toUpperCase()}
+                </div>
                 {logout && <Btn variant="ghost" size="sm" onClick={logout}>로그아웃</Btn>}
               </>
             )}
