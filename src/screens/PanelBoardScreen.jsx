@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { PANEL_JOBS, MOCK_PANEL_PROFILE, getMatchScore } from "../lib/mockData.js";
-import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
+import { GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const APPLY_STEPS = ["none", "applied", "ai_screening", "confirmed"];
@@ -35,55 +35,58 @@ export default function PanelBoardScreen({ go, user, logout }) {
       <GlobalNav go={go} activeTab="panel_board" variant={user?.user_metadata?.role === "researcher" ? "app" : "panel"} user={user} logout={logout} />
 
       {/* Hero */}
-      <div style={{ background: C.navy, padding: isMobile ? "36px 20px 32px" : "48px 24px 40px", textAlign: "center" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.1)", borderRadius: 20, padding: "4px 12px", marginBottom: 16 }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", display: "inline-block" }} />
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>지금 모집 중</span>
-        </div>
-        <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: C.white, marginBottom: 8, lineHeight: 1.25 }}>
-          인터뷰 참여하고 리워드 받기
-        </div>
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 24 }}>
-          AI 음성 인터뷰 · 평균 10분 · 완료 즉시 지급
-        </div>
-        <div style={{ maxWidth: 440, margin: "0 auto", position: "relative" }}>
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="인터뷰 주제 또는 기업명 검색"
-            style={{ width: "100%", padding: "12px 42px 12px 16px", borderRadius: 10, border: "none", background: "rgba(255,255,255,0.1)", color: C.white, fontSize: 14, fontFamily: F, outline: "none", boxSizing: "border-box" }}
-          />
-          <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", opacity: 0.4, display: "flex" }}>
-            {Ic.Search({ s: 16, c: "#fff" })}
-          </span>
+      <div style={{ background: C.navy, padding: isMobile ? "32px 20px 28px" : "44px 24px 36px" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", display: "inline-block" }} />
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>지금 {filtered.length}개 모집 중</span>
+          </div>
+          <div style={{ fontSize: isMobile ? 20 : 26, fontWeight: 700, color: C.white, marginBottom: 16, lineHeight: 1.3 }}>
+            인터뷰 참여하고 리워드 받기
+          </div>
+          <div style={{ position: "relative" }}>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="주제 또는 기업명 검색"
+              style={{
+                width: "100%", padding: "11px 40px 11px 14px",
+                borderRadius: 8, border: "none",
+                background: "rgba(255,255,255,0.1)",
+                color: C.white, fontSize: 14, fontFamily: F, outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+            <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", opacity: 0.4, display: "flex" }}>
+              {Ic.Search({ s: 16, c: "#fff" })}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 60px" : "28px 24px 80px" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "16px 16px 60px" : "24px 24px 80px" }}>
 
         {/* Category filter */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "nowrap", overflowX: "auto", marginBottom: 20, paddingBottom: 4, scrollbarWidth: "none" }}>
           {categories.map(c => {
             const active = catFilter === c;
             return (
               <button key={c} onClick={() => setCatFilter(c)}
                 style={{
                   padding: "6px 14px", borderRadius: 20, fontSize: 13, fontFamily: F, cursor: "pointer",
-                  border: "none",
-                  background: active ? C.purple : "rgba(0,0,0,0.06)",
+                  border: "none", flexShrink: 0,
+                  background: active ? C.navy : "rgba(0,0,0,0.06)",
                   color: active ? "#fff" : C.body,
                   fontWeight: active ? 600 : 400,
-                  transition: "all 0.12s",
                 }}>
                 {c === "추천" ? `✦ 추천 ${recommendedCount}` : c}
               </button>
             );
           })}
-          <span style={{ marginLeft: "auto", fontSize: 12, color: C.body }}>{filtered.length}개</span>
         </div>
 
         {/* Job list */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {filtered.map(job => (
             <JobCard
               key={job.id}
@@ -110,33 +113,51 @@ export default function PanelBoardScreen({ go, user, logout }) {
 function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, go }) {
   const [expanded, setExpanded] = useState(false);
   const remaining = job.total - job.filled;
+  const fillPct = Math.round((job.filled / job.total) * 100);
   const isConfirmed = status === "confirmed";
   const isApplied = status !== "none";
-  const isUrgent = job.urgent || remaining <= 5;
+  const isUrgent = job.urgent || remaining <= 10;
 
   return (
-    <div style={{
-      background: isRecommended ? "#faf9ff" : C.white,
-      borderRadius: 12,
-      boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
-      overflow: "hidden",
-    }}>
-      <div style={{ padding: isMobile ? "16px" : "18px 20px" }}>
+    <div
+      onClick={() => !isApplied && setExpanded(v => !v)}
+      style={{
+        background: C.white,
+        borderRadius: 12,
+        boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+        overflow: "hidden",
+        cursor: isApplied ? "default" : "pointer",
+        transition: "box-shadow 0.12s",
+      }}
+      onMouseEnter={e => { if (!isApplied) e.currentTarget.style.boxShadow = "0 3px 10px rgba(0,0,0,0.1)"; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)"; }}
+    >
+      <div style={{ padding: isMobile ? "14px 16px" : "16px 20px" }}>
 
-        {/* Meta row */}
-        <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
-          <span style={{ fontSize: 12, color: C.body }}>{job.company}</span>
-          <span style={{ fontSize: 12, color: C.border }}>·</span>
-          <span style={{ fontSize: 12, color: C.body }}>{job.category}</span>
-          {isUrgent && (
-            <>
-              <span style={{ fontSize: 12, color: C.border }}>·</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#dc2626" }}>마감임박</span>
-            </>
-          )}
-          {isRecommended && (
-            <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 600, color: C.purple }}>✦ 추천</span>
-          )}
+        {/* Top row: badges + reward */}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 12, color: C.body }}>{job.company}</span>
+            <span style={{ fontSize: 12, color: C.border }}>·</span>
+            <span style={{ fontSize: 12, color: C.body }}>{job.category}</span>
+            {isUrgent && (
+              <span style={{
+                fontSize: 11, fontWeight: 600, color: "#dc2626",
+                background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 4,
+              }}>마감임박</span>
+            )}
+            {isRecommended && (
+              <span style={{
+                fontSize: 11, fontWeight: 600, color: C.purple,
+                background: "rgba(108,63,219,0.08)", padding: "2px 7px", borderRadius: 4,
+              }}>✦ 추천</span>
+            )}
+          </div>
+          {/* Reward — hero number */}
+          <div style={{ flexShrink: 0, marginLeft: 12, textAlign: "right" }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, lineHeight: 1 }}>{job.reward}</div>
+            <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>{job.duration}</div>
+          </div>
         </div>
 
         {/* Title */}
@@ -144,20 +165,30 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
           {job.title}
         </div>
 
-        {/* Stats: duration · deadline · reward */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-          <span style={{ fontSize: 13, color: C.body }}>{job.duration}</span>
-          <span style={{ color: C.border, fontSize: 12 }}>·</span>
-          <span style={{ fontSize: 13, color: C.body }}>~{job.deadline}</span>
-          <span style={{ marginLeft: "auto", fontSize: 15, fontWeight: 700, color: C.navy }}>{job.reward}</span>
+        {/* Urgency bar + remaining */}
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+            <span style={{ fontSize: 11, color: isUrgent ? "#dc2626" : C.body }}>
+              {isUrgent ? `⚡ 남은 자리 ${remaining}명` : `남은 자리 ${remaining}명`}
+            </span>
+            <span style={{ fontSize: 11, color: C.body }}>~{job.deadline}</span>
+          </div>
+          <div style={{ height: 3, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{
+              height: "100%", borderRadius: 2,
+              width: `${fillPct}%`,
+              background: fillPct >= 80 ? "#dc2626" : C.purple,
+              transition: "width 0.3s",
+            }} />
+          </div>
         </div>
 
         {/* CTA */}
         {isConfirmed ? (
-          <div style={{ display: "flex", gap: 8 }}>
-            <div style={{ flex: 1, padding: "9px 14px", background: C.successBg, borderRadius: 8, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, flexShrink: 0 }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: C.successText }}>참여 확정</span>
+          <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
+            <div style={{ flex: 1, padding: "9px 14px", background: "rgba(22,163,74,0.08)", borderRadius: 8, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#15803d" }}>참여 확정</span>
             </div>
             <button onClick={() => go("consent")}
               style={{ padding: "9px 18px", background: C.purple, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: F }}>
@@ -165,7 +196,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
             </button>
           </div>
         ) : isApplied ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", background: C.purpleBg, borderRadius: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", background: "rgba(108,63,219,0.07)", borderRadius: 8 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.purple, flexShrink: 0 }} />
             <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>
               {status === "applied" ? "AI 적합성 검토 중" : "리서처 최종 검토 대기"}
@@ -173,30 +204,30 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
             <button onClick={onCycleDemo} style={{ marginLeft: "auto", fontSize: 10, color: "rgba(0,0,0,0.1)", background: "none", border: "none", cursor: "pointer", fontFamily: F }}>[dev]</button>
           </div>
         ) : (
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => setExpanded(v => !v)}
-              style={{ padding: "9px 14px", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 13, cursor: "pointer", fontFamily: F, whiteSpace: "nowrap" }}>
-              {expanded ? "접기" : "상세보기"}
-            </button>
-            <button onClick={onApply}
-              style={{ flex: 1, padding: "9px 14px", borderRadius: 8, border: "none", background: C.purple, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: F }}>
-              지원하기
-            </button>
-          </div>
+          <button
+            onClick={e => { e.stopPropagation(); onApply(); }}
+            style={{
+              width: "100%", padding: "10px 14px",
+              borderRadius: 8, border: "none",
+              background: C.purple, color: "#fff",
+              fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F,
+            }}>
+            지원하기
+          </button>
         )}
 
         {/* Expanded detail */}
         {expanded && (
-          <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}>
             {job.description && (
-              <div style={{ fontSize: 13, color: C.body, lineHeight: 1.75 }}>{job.description}</div>
+              <div style={{ fontSize: 13, color: C.body, lineHeight: 1.75, marginBottom: 12 }}>{job.description}</div>
             )}
             {job.targetProfile && (
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 8, letterSpacing: 0.5 }}>찾는 패널</div>
-                <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 6, letterSpacing: 0.5 }}>찾는 패널</div>
+                <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 6 }}>
                   {[job.targetProfile.age, job.targetProfile.gender, job.targetProfile.region].map((v, i) => (
-                    <span key={i} style={{ fontSize: 12, padding: "4px 10px", borderRadius: 6, background: C.bg, color: C.navy }}>{v}</span>
+                    <span key={i} style={{ fontSize: 12, padding: "3px 9px", borderRadius: 5, background: C.bg, color: C.navy }}>{v}</span>
                   ))}
                 </div>
                 {job.targetProfile.lifestyle && (
@@ -208,10 +239,10 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
               </div>
             )}
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 8, letterSpacing: 0.5 }}>참여 조건</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 6, letterSpacing: 0.5 }}>참여 조건</div>
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                 {job.conditions.map(c => (
-                  <span key={c} style={{ fontSize: 12, padding: "4px 10px", borderRadius: 6, background: C.bg, color: C.navy }}>{c}</span>
+                  <span key={c} style={{ fontSize: 12, padding: "3px 9px", borderRadius: 5, background: C.bg, color: C.navy }}>{c}</span>
                 ))}
               </div>
             </div>

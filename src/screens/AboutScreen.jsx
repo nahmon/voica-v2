@@ -5,19 +5,6 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 export default function AboutScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
 
-  const values = [
-    { icon: "🎙", title: "음성이 데이터다", desc: "텍스트 설문으로는 잡히지 않는 망설임, 감정, 뉘앙스. Voica는 음성 그대로를 기록합니다." },
-    { icon: "⚡", title: "10분이면 충분하다", desc: "AI 인터뷰어가 24시간 패널과 대화합니다. 리서처는 결과만 받으면 됩니다." },
-    { icon: "🔍", title: "인사이트, 바로 꺼내라", desc: "녹취록을 읽을 시간이 없습니다. AI가 핵심 주제와 패턴을 즉시 추출합니다." },
-  ];
-
-  const timeline = [
-    { year: "2024", text: "사용자 인터뷰를 수십 번 하며 느꼈습니다. 일정 조율, 기록, 분석 — 모든 것이 너무 느립니다." },
-    { year: "2025 Q1", text: "AI 인터뷰어 프로토타입 첫 시도. 음성 품질과 자연스러운 대화 흐름이 핵심임을 확인했습니다." },
-    { year: "2025 Q3", text: "패널 모집 + 인터뷰 + 분석을 하나의 플로우로. Voica v1 내부 출시." },
-    { year: "2026", text: "Voica v2 — 더 빠르고, 더 정확하고, 더 많은 팀이 쓸 수 있도록." },
-  ];
-
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
       <GlobalNav go={go} variant={user ? "app" : "public"} user={user} logout={logout} />
@@ -47,38 +34,6 @@ export default function AboutScreen({ go, user, logout }) {
           <p style={{ fontSize: 15, color: C.body, lineHeight: 1.9, margin: 0 }}>
             좋은 제품은 사용자를 이해하는 팀에서 나옵니다. 하지만 인터뷰는 비쌉니다. 일정을 맞추고, 녹취를 풀고, 패턴을 찾는 데 일주일이 걸립니다. Voica는 그 비용을 10분으로 압축합니다. 리서치 인프라가 없는 스타트업도, 글로벌 리서치를 돌리는 대기업도 — 같은 도구로.
           </p>
-        </section>
-
-        {/* Values */}
-        <section style={{ marginBottom: 64 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: C.purple, letterSpacing: 2, textTransform: "uppercase", marginBottom: 24 }}>Why We Built This</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {values.map(v => (
-              <div key={v.title} style={{ background: C.white, borderRadius: 12, border: `1px solid ${C.border}`, padding: "22px 24px", display: "flex", gap: 20, alignItems: "flex-start" }}>
-                <div style={{ fontSize: 28, flexShrink: 0, lineHeight: 1 }}>{v.icon}</div>
-                <div>
-                  <div style={{ fontSize: 16, fontWeight: 600, color: C.navy, marginBottom: 6 }}>{v.title}</div>
-                  <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7 }}>{v.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Timeline */}
-        <section style={{ marginBottom: 64 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: C.purple, letterSpacing: 2, textTransform: "uppercase", marginBottom: 24 }}>Story</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-            {timeline.map((t, i) => (
-              <div key={t.year} style={{ display: "flex", gap: 24, paddingBottom: i < timeline.length - 1 ? 28 : 0 }}>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 80, flexShrink: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: C.purple, whiteSpace: "nowrap" }}>{t.year}</div>
-                  {i < timeline.length - 1 && <div style={{ width: 1, flex: 1, background: C.border, marginTop: 8 }} />}
-                </div>
-                <div style={{ fontSize: 14, color: C.body, lineHeight: 1.75, paddingTop: 1 }}>{t.text}</div>
-              </div>
-            ))}
-          </div>
         </section>
 
         {/* CTA + Legal links */}
