@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav } from "../components/shared.jsx";
@@ -179,21 +179,80 @@ function QuestionAnswer({ question, response, index }) {
 }
 
 function VoiceAnswer({ response }) {
+  const audioRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const fmt = s => {
+    if (!isFinite(s) || s < 0) return "0:00";
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${String(sec).padStart(2, "0")}`;
+  };
+
+  const toggle = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (playing) { a.pause(); setPlaying(false); }
+    else { a.play(); setPlaying(true); }
+  };
+
+  const seek = (e) => {
+    const a = audioRef.current;
+    if (!a || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    a.currentTime = ((e.clientX - rect.left) / rect.width) * duration;
+  };
+
+  const pct = duration ? Math.min((current / duration) * 100, 100) : 0;
+
   return (
-    <div>
-      {response.audio_url && (
-        <div style={{ marginBottom: 12 }}>
-          <audio controls src={response.audio_url} style={{ width: "100%", height: 36, outline: "none", borderRadius: 8 }} />
-        </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {response.audio_url ? (
+        <>
+          <audio
+            ref={audioRef}
+            src={response.audio_url}
+            onTimeUpdate={e => setCurrent(e.target.currentTime)}
+            onLoadedMetadata={e => setDuration(e.target.duration)}
+            onEnded={() => { setPlaying(false); setCurrent(0); }}
+          />
+          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}` }}>
+            <button
+              onClick={toggle}
+              style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.12s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#4434d4"}
+              onMouseLeave={e => e.currentTarget.style.background = C.purple}
+            >
+              {playing
+                ? <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><rect x="1.5" y="1" width="3.5" height="11" rx="1"/><rect x="8" y="1" width="3.5" height="11" rx="1"/></svg>
+                : <svg width={13} height={13} viewBox="0 0 13 13" fill="white"><path d="M2.5 1.5l9 5-9 5z"/></svg>
+              }
+            </button>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
+              <div
+                onClick={seek}
+                style={{ height: 4, background: C.border, borderRadius: 2, cursor: "pointer", position: "relative" }}
+              >
+                <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${pct}%`, background: C.purple, borderRadius: 2 }} />
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(current)}</span>
+                <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(duration)}</span>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>녹음 없음</div>
       )}
-      {response.transcript ? (
+      {response.transcript && (
         <div style={{ padding: "10px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${C.border}` }}>
           <div style={{ fontSize: 10, color: C.body, fontWeight: 600, marginBottom: 6, letterSpacing: 0.4 }}>전사 텍스트</div>
           <div style={{ fontSize: 13, color: C.navy, lineHeight: 1.75 }}>{response.transcript}</div>
         </div>
-      ) : !response.audio_url ? (
-        <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>녹음 없음</div>
-      ) : null}
+      )}
     </div>
   );
 }
