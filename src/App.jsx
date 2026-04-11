@@ -35,9 +35,16 @@ export default function Voica() {
       if (session?.user && !match) setScreen("dashboard");
       setAuthLoading(false);
     });
+    // Handle OAuth redirect back (hash contains access_token)
+    if (window.location.hash.includes("access_token") || window.location.search.includes("code=")) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) setScreen("dashboard");
+      });
+    }
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user && screen === "advertiser_login") {
+      const publicScreens = ["landing", "advertiser_login", "pricing", "support", "faq", "panel_entry", "panel_board"];
+      if (session?.user && publicScreens.includes(screen)) {
         setScreen("dashboard");
       }
     });
