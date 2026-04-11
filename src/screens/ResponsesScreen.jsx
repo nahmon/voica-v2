@@ -8,40 +8,35 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   const [questions, setQuestions] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
-  const [responses, setResponses] = useState([]);
+  const [allResponses, setAllResponses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingResponses, setLoadingResponses] = useState(false);
 
   useEffect(() => {
     if (!interviewId) return;
     (async () => {
-      const [{ data: iv }, { data: qs }, { data: ss }] = await Promise.all([
-        supabase.from("interviews").select("id, title, status").eq("id", interviewId).single(),
-        supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
-        supabase.from("sessions").select("id, respondent, status, completed_at, created_at")
-          .eq("interview_id", interviewId)
-          .order("created_at", { ascending: false }),
-      ]);
-      setInterview(iv);
+      const { data: qs } = await supabase
+        .from("questions").select("*").eq("interview_id", interviewId).order("order_num");
       setQuestions(qs ?? []);
-      setSessions(ss ?? []);
-      if (ss?.length > 0) setSelectedSession(ss[0]);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch(`/api/interview/${interviewId}/sessions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const { interview: iv, sessions: ss, responses: resp } = await res.json();
+        setInterview(iv);
+        setSessions(ss ?? []);
+        setAllResponses(resp ?? []);
+        if (ss?.length > 0) setSelectedSession(ss[0]);
+      }
       setLoading(false);
     })();
   }, [interviewId]);
 
-  useEffect(() => {
-    if (!selectedSession) return;
-    setLoadingResponses(true);
-    (async () => {
-      const { data } = await supabase
-        .from("responses")
-        .select("*")
-        .eq("session_id", selectedSession.id);
-      setResponses(data ?? []);
-      setLoadingResponses(false);
-    })();
-  }, [selectedSession?.id]);
+  const responses = selectedSession
+    ? allResponses.filter(r => r.session_id === selectedSession.id)
+    : [];
 
   if (loading) return (
     <div style={{ fontFamily: F, display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", color: C.body, fontSize: 14 }}>
@@ -111,10 +106,6 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           {!selectedSession ? (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: C.body, fontSize: 14 }}>
               왼쪽에서 응답자를 선택하세요
-            </div>
-          ) : loadingResponses ? (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: C.body, fontSize: 14 }}>
-              불러오는 중…
             </div>
           ) : (
             <div style={{ maxWidth: 720 }}>

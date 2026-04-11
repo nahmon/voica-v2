@@ -18,6 +18,8 @@ import PanelBoardScreen from "./screens/PanelBoardScreen.jsx";
 import PricingScreen from "./screens/PricingScreen.jsx";
 import SupportScreen from "./screens/SupportScreen.jsx";
 import FAQScreen from "./screens/FAQScreen.jsx";
+import TermsScreen from "./screens/TermsScreen.jsx";
+import PrivacyScreen from "./screens/PrivacyScreen.jsx";
 
 export default function Voica() {
   const [screen, setScreen] = useState("landing");
@@ -86,6 +88,8 @@ export default function Voica() {
       {screen === "pricing"          && <PricingScreen go={go} user={user} logout={logout} />}
       {screen === "support"          && <SupportScreen go={go} user={user} logout={logout} />}
       {screen === "faq"              && <FAQScreen go={go} user={user} logout={logout} />}
+      {screen === "terms"            && <TermsScreen go={go} user={user} logout={logout} />}
+      {screen === "privacy"          && <PrivacyScreen go={go} user={user} logout={logout} />}
     </div>
   );
 }

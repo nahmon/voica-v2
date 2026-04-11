@@ -17,7 +17,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
       const [ivRes, sessRes, repRes] = await Promise.all([
         supabase.from("interviews").select("id, title, status").eq("id", interviewId).single(),
         supabase.from("sessions")
-          .select("id, respondent, status, started_at, completed_at, responses(id, type, transcript, value, question_id, questions(content, order_num, type))")
+          .select("id, respondent, status, started_at, completed_at, responses(id, type, transcript, value, audio_url, question_id, questions(content, order_num, type))")
           .eq("interview_id", interviewId)
           .order("started_at", { ascending: false }),
         supabase.from("reports").select("*").eq("interview_id", interviewId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
@@ -127,8 +127,13 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                     <div key={r.id} style={{ borderBottom: `1px solid ${C.border}`, paddingBottom: 12 }}>
                       <div style={{ fontSize: 12, color: C.body, marginBottom: 4 }}>Q{i + 1} · {r.questions?.content}</div>
                       {r.type === "voice" && (
-                        <div style={{ fontSize: 13, color: C.navy, lineHeight: 1.6 }}>
-                          {r.transcript ? <span>"{r.transcript}"</span> : <span style={{ color: C.body, fontStyle: "italic" }}>트랜스크립트 없음</span>}
+                        <div>
+                          {r.audio_url && (
+                            <audio controls src={r.audio_url} style={{ width: "100%", height: 32, marginBottom: 8, borderRadius: 6 }} />
+                          )}
+                          <div style={{ fontSize: 13, color: C.navy, lineHeight: 1.6 }}>
+                            {r.transcript ? <span>"{r.transcript}"</span> : <span style={{ color: C.body, fontStyle: "italic" }}>트랜스크립트 없음</span>}
+                          </div>
                         </div>
                       )}
                       {r.type === "multiple_choice" && (

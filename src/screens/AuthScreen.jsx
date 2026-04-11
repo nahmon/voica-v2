@@ -184,7 +184,7 @@ export default function AdvertiserLoginScreen({ go }) {
                 {authError && <div style={{ marginBottom: 12, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
                 <Btn full size="lg" disabled={loading || !email || !pw || !name} onClick={handleSignup}>{loading ? "가입 중..." : role === "panel" ? "패널로 가입하기" : "가입하고 시작하기"}</Btn>
                 <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 12, lineHeight: 1.6 }}>
-                  가입 시 <a href="#" style={{ color: C.purple }}>서비스 이용약관</a> 및 <a href="#" style={{ color: C.purple }}>개인정보처리방침</a>에 동의하게 됩니다.
+                  가입 시 <a href="#" onClick={e => { e.preventDefault(); go("terms"); }} style={{ color: C.purple }}>서비스 이용약관</a> 및 <a href="#" onClick={e => { e.preventDefault(); go("privacy"); }} style={{ color: C.purple }}>개인정보처리방침</a>에 동의하게 됩니다.
                 </div>
                 <Divider label="간편 가입" />
                 <SocialBtns />
