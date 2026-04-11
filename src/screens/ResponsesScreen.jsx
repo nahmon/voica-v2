@@ -20,7 +20,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
 
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-      const res = await fetch(`/api/interview/${interviewId}/sessions`, {
+      const res = await fetch(`/api/interview-sessions/${interviewId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
