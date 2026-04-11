@@ -262,8 +262,10 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
             </div>
           ) : (
             <button onClick={() => setExpanded(v => !v)}
-              style={{ width: "100%", padding: "11px", borderRadius: 12, border: "none", background: expanded ? "#e8e8f0" : "#0d0f1a", color: expanded ? "#555" : "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F, transition: "background 0.12s" }}>
-              {expanded ? "접기" : "상세 보기"}
+              style={{ width: "100%", padding: "10px", borderRadius: 12, border: "none", background: "transparent", color: C.body, fontSize: 13, fontWeight: 400, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, transition: "color 0.12s" }}
+              onMouseEnter={e => e.currentTarget.style.color = C.navy}
+              onMouseLeave={e => e.currentTarget.style.color = C.body}>
+              {expanded ? "접기 ∧" : "상세 보기 ∨"}
             </button>
           )}
         </div>
