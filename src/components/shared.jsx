@@ -121,6 +121,9 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {variant === "app" && !isMobile && (
               <>
+                <Btn size="sm" onClick={() => go("editor")}>+ 인터뷰 시작하기</Btn>
+                {logout && <Btn variant="ghost" size="sm" onClick={logout}>로그아웃</Btn>}
+                <div style={{ width: 1, height: 16, background: C.border }} />
                 {(() => {
                   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
                   const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "U";
@@ -133,9 +136,6 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                 <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>
                   {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || ""}
                 </div>
-                <div style={{ width: 1, height: 16, background: C.border }} />
-                <Btn size="sm" onClick={() => go("editor")}>+ 인터뷰 시작하기</Btn>
-                {logout && <Btn variant="ghost" size="sm" onClick={logout}>로그아웃</Btn>}
               </>
             )}
             {variant === "panel" && !isMobile && (
