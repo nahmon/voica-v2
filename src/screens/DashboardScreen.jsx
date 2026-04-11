@@ -129,6 +129,7 @@ export default function DashboardScreen({ go, user, logout }) {
                 {/* Actions — visually separated */}
                 <div style={{ display: "flex", gap: 8, paddingLeft: 8, borderLeft: `1px solid ${C.border}` }}>
                   {p.status !== "closed" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("editor", p.id); }}>편집</Btn>}
+                  {sessionCount > 0 && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("responses", p.id); }}>응답 보기</Btn>}
                   {p.status === "closed" && <Btn size="sm" onClick={e => { e.stopPropagation(); go("report", p.id); }}>리포트</Btn>}
                 </div>
               </div>

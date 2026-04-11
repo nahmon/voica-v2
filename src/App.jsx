@@ -12,6 +12,7 @@ import PanelMyPageScreen from "./screens/PanelMyPageScreen.jsx";
 import ConsentScreen from "./screens/ConsentScreen.jsx";
 import InterviewScreen from "./screens/InterviewScreen.jsx";
 import ReportScreen from "./screens/ReportScreen.jsx";
+import ResponsesScreen from "./screens/ResponsesScreen.jsx";
 import RecruiterAdminScreen from "./screens/RecruiterAdminScreen.jsx";
 import PanelBoardScreen from "./screens/PanelBoardScreen.jsx";
 import PricingScreen from "./screens/PricingScreen.jsx";
@@ -79,6 +80,7 @@ export default function Voica() {
       {screen === "consent"          && <ConsentScreen go={go} user={user} logout={logout} />}
       {screen === "interview"        && <InterviewScreen go={go} shareCode={shareCode} />}
       {screen === "report"           && <ReportScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
+      {screen === "responses"        && <ResponsesScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
       {screen === "recruiter_admin"  && <RecruiterAdminScreen go={go} user={user} logout={logout} />}
       {screen === "panel_board"      && <PanelBoardScreen go={go} user={user} logout={logout} />}
       {screen === "pricing"          && <PricingScreen go={go} user={user} logout={logout} />}

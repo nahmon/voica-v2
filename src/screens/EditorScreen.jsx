@@ -47,6 +47,7 @@ export default function EditorScreen({ go, user, logout }) {
   const [addTypeOpen, setAddTypeOpen] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
+  const [showIncompleteWarn, setShowIncompleteWarn] = useState(false);
   const [dragOver, setDragOver] = useState(null);
   const dragIdx = useRef(null);
   const isMobile = useIsMobile();
@@ -96,9 +97,8 @@ export default function EditorScreen({ go, user, logout }) {
     setSelectedIdx(target);
   };
 
-  const handleSave = async () => {
-    if (!title.trim()) { alert("인터뷰 제목을 입력해 주세요"); return; }
-    if (questions.some(q => !q.content.trim())) { alert("모든 질문 텍스트를 입력해 주세요"); return; }
+  const doSave = async () => {
+    setShowIncompleteWarn(false);
     setSaving(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -127,6 +127,13 @@ export default function EditorScreen({ go, user, logout }) {
     }
   };
 
+  const handleSave = () => {
+    if (!title.trim()) { alert("인터뷰 제목을 입력해 주세요"); return; }
+    if (questions.some(q => !q.content.trim())) { alert("모든 질문 텍스트를 입력해 주세요"); return; }
+    if (questions.length < 10) { setShowIncompleteWarn(true); return; }
+    doSave();
+  };
+
   const handleCopy = () => {
     const url = `${window.location.origin}/i/${shareCode}`;
     navigator.clipboard.writeText(url);
@@ -137,28 +144,49 @@ export default function EditorScreen({ go, user, logout }) {
   const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "리커트" };
   const typeVariant = { voice: "purple", multiple_choice: "success", likert: "warning" };
 
-  // ─── Share link modal ───
-  if (shareCode) {
-    const url = `${window.location.origin}/i/${shareCode}`;
-    return (
-      <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <div style={{ background: C.white, borderRadius: 20, padding: "40px 36px", maxWidth: 440, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.15) 0px 30px 60px -12px" }}>
-          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(21,190,83,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-            {Ic.CheckCircle({ s: 28, c: C.success })}
-          </div>
-          <div style={{ fontSize: 20, fontWeight: 500, color: C.navy, marginBottom: 8 }}>인터뷰 링크가 생성됐습니다</div>
-          <div style={{ fontSize: 13, color: C.body, marginBottom: 28, lineHeight: 1.6 }}>
-            아래 링크를 참여자에게 공유하세요.<br />로그인 없이 바로 참여할 수 있습니다.
-          </div>
-          <div style={{ background: C.bg, borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, marginBottom: 20, border: `1px solid ${C.border}` }}>
-            <span style={{ flex: 1, fontSize: 13, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</span>
-            <Btn size="sm" onClick={handleCopy}>{copied ? "복사됨 ✓" : "복사"}</Btn>
-          </div>
+  // ─── Overlays (share success + incomplete warning) ───
+  const shareUrl = shareCode ? `${window.location.origin}/i/${shareCode}` : null;
+
+  const ShareOverlay = shareCode && (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ background: C.white, borderRadius: 20, padding: "40px 36px", maxWidth: 440, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px", animation: "fadeInUp 0.2s ease" }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(21,190,83,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+          {Ic.CheckCircle({ s: 28, c: C.success })}
+        </div>
+        <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 8 }}>링크가 생성됐습니다</div>
+        <div style={{ fontSize: 13, color: C.body, marginBottom: 24, lineHeight: 1.6 }}>
+          아래 링크를 참여자에게 공유하세요.<br />로그인 없이 바로 참여할 수 있습니다.
+        </div>
+        <div style={{ background: C.bg, borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, marginBottom: 20, border: `1px solid ${C.border}` }}>
+          <span style={{ flex: 1, fontSize: 13, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
+          <Btn size="sm" onClick={handleCopy}>{copied ? "복사됨 ✓" : "복사"}</Btn>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Btn full variant="ghost" onClick={() => setShareCode(null)}>계속 편집</Btn>
           <Btn full onClick={() => go("dashboard")}>대시보드로 이동</Btn>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+
+  const IncompleteWarnOverlay = showIncompleteWarn && (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ background: C.white, borderRadius: 16, padding: "32px 32px 28px", maxWidth: 400, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.18) 0px 30px 60px -12px" }}>
+        <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 22 }}>✏️</div>
+        <div style={{ fontSize: 18, fontWeight: 600, color: C.navy, marginBottom: 8 }}>아직 인터뷰가 완성되지 않았습니다</div>
+        <div style={{ fontSize: 13, color: C.body, marginBottom: 6, lineHeight: 1.65 }}>
+          현재 질문이 <strong style={{ color: C.navy }}>{questions.length}개</strong>입니다.
+        </div>
+        <div style={{ fontSize: 13, color: C.body, marginBottom: 28, lineHeight: 1.65 }}>
+          충분한 인사이트를 얻으려면 10개 이상의 질문을 권장합니다. 계속 작성하시겠어요?
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Btn full variant="ghost" onClick={() => setShowIncompleteWarn(false)}>계속 작성</Btn>
+          <Btn full onClick={doSave} style={{ background: "#f59e0b", border: "none" }}>그래도 생성하기</Btn>
+        </div>
+      </div>
+    </div>
+  );
 
   // ─── Top nav bar (back + draft indicator + template + save) ───
   const NavBar = (
@@ -193,6 +221,8 @@ export default function EditorScreen({ go, user, logout }) {
   // ─── Mobile layout ───
   if (isMobile) return (
     <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>
+      {ShareOverlay}
+      {IncompleteWarnOverlay}
       {NavBar}
       {/* Title area */}
       <div style={{ background: C.white, padding: "16px 16px 12px", borderBottom: `1px solid ${C.border}` }}>
@@ -228,6 +258,8 @@ export default function EditorScreen({ go, user, logout }) {
   // ─── Desktop layout ───
   return (
     <div style={{ fontFamily: F, height: "100vh", display: "flex", flexDirection: "column" }}>
+      {ShareOverlay}
+      {IncompleteWarnOverlay}
       {NavBar}
 
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
