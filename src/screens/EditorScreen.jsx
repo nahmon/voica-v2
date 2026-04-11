@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
@@ -11,15 +11,60 @@ function newQ(type = "voice") {
   return { id, type, content: "" };
 }
 
+function mkId() { return Math.random().toString(36).slice(2, 10); }
+
+const VOICA_SURVEY_TEMPLATE = {
+  title: "Voica 사용자 만족도 조사 — 리서처/마케터 대상",
+  questions: [
+    { id: mkId(), type: "multiple_choice", content: "현재 주요 업무를 가장 잘 나타내는 것은 무엇인가요?", options: ["UX 리서처 / 디자인 리서처", "마케터 / 브랜드 매니저", "프로덕트 매니저", "사업개발 / 전략기획", "기타"] },
+    { id: mkId(), type: "multiple_choice", content: "사용자/고객 조사를 얼마나 자주 직접 수행하시나요?", options: ["거의 매주", "월 1~2회", "분기 1회", "필요할 때만 (연 2회 이하)"] },
+    { id: mkId(), type: "voice", content: "현재 사용자 인터뷰나 설문조사를 진행할 때 어떤 방식과 툴을 주로 쓰시나요? 섭외부터 분석까지 어떻게 하시는지 전체 흐름을 설명해 주세요." },
+    { id: mkId(), type: "voice", content: "그 과정에서 가장 시간이 많이 걸리거나 스트레스를 받는 단계는 어디인가요? 최근에 실제로 힘들었던 상황이 있다면 구체적으로 말씀해 주세요." },
+    { id: mkId(), type: "multiple_choice", content: "사용자 인터뷰 1회 프로젝트 기준 평균 총 비용은 얼마인가요? (참여자 섭외 + 진행 + 분석 인건비 포함)", options: ["50만원 미만", "50~200만원", "200~500만원", "500만원 이상", "외부 에이전시에 아웃소싱"] },
+    { id: mkId(), type: "multiple_choice", content: "연간 사용자 리서치에 쓰는 총 예산 규모는 어느 정도인가요? (인건비 제외 순수 리서치 비용)", options: ["500만원 미만", "500만~2,000만원", "2,000만~5,000만원", "5,000만원 이상"] },
+    { id: mkId(), type: "multiple_choice", content: "인터뷰 1건 완료까지 평균 소요 시간은?", options: ["1~2일 이내", "3~7일", "2주 이상", "한 달 이상"] },
+    { id: mkId(), type: "multiple_choice", content: "다음 중 가장 번거로운 단계는 무엇인가요?", options: ["참여자 섭외 및 일정 조율", "인터뷰 진행 자체", "녹취 정리 및 전사", "인사이트 분석 및 보고서 작성"] },
+    { id: mkId(), type: "voice", content: "AI가 수백 명과 동시에 음성 인터뷰를 진행하고, 10분 안에 분석 리포트가 나온다면 — 지금 하시는 리서치 방식과 비교해서 어떤 생각이 드시나요? 솔직하게 말씀해 주세요." },
+    { id: mkId(), type: "voice", content: "이런 AI 인터뷰 방식에서 가장 걱정되는 점이나 믿기 어려운 부분이 있다면 무엇인가요?" },
+    { id: mkId(), type: "voice", content: "팀이나 조직에서 Voica 같은 툴을 도입하려면 어떤 조건이 갖춰져야 할 것 같으세요? 예산, 보안, 데이터 품질 등 어떤 허들이 있을지 말씀해 주세요." },
+    { id: mkId(), type: "multiple_choice", content: "참여자 50명 기준 인터뷰 1회 프로젝트 (AI 진행 + 분석 리포트 포함) 적정 비용은?", options: ["5만원 미만", "5~15만원", "15~30만원", "30~50만원", "50만원 이상도 가치 있다"] },
+    { id: mkId(), type: "multiple_choice", content: "선호하는 요금 방식은 무엇인가요?", options: ["건별 충전 (쓴 만큼만)", "월 구독 (예측 가능한 비용)", "연간 계약 (할인 중심)", "팀/기업 단위 계약"] },
+    { id: mkId(), type: "voice", content: "마지막으로, 리서치 업무에서 Voica가 딱 한 가지만 해결해 준다면 어떤 문제를 해결해 주길 바라시나요?" },
+  ],
+};
+
+const DRAFT_KEY = "voica_editor_draft";
+
 export default function EditorScreen({ go, user }) {
-  const [title, setTitle] = useState("");
-  const [questions, setQuestions] = useState([newQ("voice")]);
+  // Restore draft from localStorage
+  const savedDraft = (() => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; } })();
+  const [title, setTitle] = useState(savedDraft?.title ?? "");
+  const [questions, setQuestions] = useState(savedDraft?.questions ?? [newQ("voice")]);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [saving, setSaving] = useState(false);
   const [shareCode, setShareCode] = useState(null);
   const [copied, setCopied] = useState(false);
   const [addTypeOpen, setAddTypeOpen] = useState(false);
+  const [draftSaved, setDraftSaved] = useState(false);
+  const [templateOpen, setTemplateOpen] = useState(false);
   const isMobile = useIsMobile();
+
+  // Auto-save draft to localStorage
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, questions }));
+      setDraftSaved(true);
+      setTimeout(() => setDraftSaved(false), 1500);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [title, questions]);
+
+  const loadTemplate = () => {
+    setTitle(VOICA_SURVEY_TEMPLATE.title);
+    setQuestions(VOICA_SURVEY_TEMPLATE.questions.map(q => ({ ...q, id: mkId() })));
+    setSelectedIdx(0);
+    setTemplateOpen(false);
+  };
 
   const q = questions[selectedIdx] ?? questions[0];
 
@@ -72,6 +117,7 @@ export default function EditorScreen({ go, user }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "저장 실패");
       setShareCode(data.share_code);
+      localStorage.removeItem(DRAFT_KEY);
     } catch (e) {
       alert(e.message);
     } finally {
@@ -112,14 +158,28 @@ export default function EditorScreen({ go, user }) {
     );
   }
 
-  // ─── Top nav bar (back + save only) ───
+  // ─── Top nav bar (back + draft indicator + template + save) ───
   const NavBar = (
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
       <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ fontSize: 12, color: title ? C.body : C.border }}>
-          {title || "제목 없음"}
-        </span>
+        {draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시저장됨 ✓</span>}
+        {!draftSaved && <span style={{ fontSize: 11, color: C.body, opacity: 0.5 }}>자동저장 중…</span>}
+        <div style={{ position: "relative" }}>
+          <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>템플릿</Btn>
+          {templateOpen && (
+            <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 4, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 100, minWidth: 220 }}>
+              <div style={{ padding: "8px 14px 4px", fontSize: 10, color: C.body, fontWeight: 600, letterSpacing: 0.5 }}>템플릿 불러오기</div>
+              <div onClick={loadTemplate}
+                style={{ padding: "10px 14px", fontSize: 13, color: C.navy, cursor: "pointer", borderTop: `1px solid ${C.border}` }}
+                onMouseEnter={e => e.currentTarget.style.background = C.bg}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                <div style={{ fontWeight: 500 }}>Voica 사용자 만족도 조사</div>
+                <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>음성 7개 + 객관식 7개 · 14문항</div>
+              </div>
+            </div>
+          )}
+        </div>
         <Btn size="sm" onClick={handleSave} disabled={saving}>
           {saving ? "저장 중…" : "링크 생성 →"}
         </Btn>
