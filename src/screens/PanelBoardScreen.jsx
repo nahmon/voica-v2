@@ -6,6 +6,15 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const APPLY_STEPS = ["none", "applied", "ai_screening", "confirmed"];
 
+// Reward color tiers: parse "3,000원" → 3000 → tier color
+function rewardTier(rewardStr) {
+  const n = parseInt(rewardStr.replace(/[^0-9]/g, ""), 10) || 0;
+  if (n >= 80000) return { color: "#92400e", bg: "rgba(251,191,36,0.14)", label: "전문가" };
+  if (n >= 20000) return { color: "#b45309", bg: "rgba(251,191,36,0.08)", label: "프리미엄" };
+  if (n >= 5000)  return { color: C.successText, bg: "rgba(21,190,83,0.06)", label: null };
+  return { color: C.navy, bg: "transparent", label: null };
+}
+
 export default function PanelBoardScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const [search, setSearch]       = useState("");
@@ -32,7 +41,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
-      <GlobalNav go={go} activeTab="panel_board" variant="panel" user={user} logout={logout} />
+      <GlobalNav go={go} activeTab="panel_board" variant={user?.user_metadata?.role === "researcher" ? "app" : "panel"} user={user} logout={logout} />
 
       {/* Hero */}
       <div style={{ background: C.navy, padding: isMobile ? "32px 20px 28px" : "40px 24px 32px", textAlign: "center" }}>
@@ -98,6 +107,7 @@ function JobRow({ job, status, isRecommended, isMobile, onApply, onCycleDemo, go
   const remaining = job.total - job.filled;
   const isConfirmed = status === "confirmed";
   const isApplied   = status !== "none";
+  const tier = rewardTier(job.reward);
 
   return (
     <div
@@ -145,11 +155,13 @@ function JobRow({ job, status, isRecommended, isMobile, onApply, onCycleDemo, go
           </div>
 
           {/* Reward */}
-          <div style={{ flexShrink: 0, textAlign: "right" }}>
-            <div style={{ fontSize: job.expert ? 20 : 18, fontWeight: 700, color: job.expert ? "#92400e" : C.navy, lineHeight: 1, marginBottom: 2, fontFeatureSettings: '"tnum"' }}>
+          <div style={{ flexShrink: 0, textAlign: "right", background: tier.bg, borderRadius: 8, padding: tier.bg !== "transparent" ? "6px 10px" : "0" }}>
+            <div style={{ fontSize: job.expert ? 20 : 18, fontWeight: 700, color: tier.color, lineHeight: 1, marginBottom: 2, fontFeatureSettings: '"tnum"' }}>
               {job.reward}
             </div>
-            <div style={{ fontSize: 10, color: C.body }}>리워드</div>
+            <div style={{ fontSize: 10, color: tier.label ? tier.color : C.body, fontWeight: tier.label ? 600 : 400 }}>
+              {tier.label ?? "리워드"}
+            </div>
           </div>
         </div>
 
