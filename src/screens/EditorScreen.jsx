@@ -247,7 +247,7 @@ export default function EditorScreen({ go, user, logout }) {
         </button>
       </div>
       <div style={{ padding: 16 }}>
-        <PreviewCard q={q} idx={selectedIdx} total={questions.length} />
+        <PreviewCard q={q} idx={selectedIdx} total={questions.length} updateQ={updateQ} />
       </div>
       <div style={{ padding: "0 16px 24px" }}>
         <QuestionSettings q={q} idx={selectedIdx} updateQ={updateQ} typeLabel={typeLabel} />
@@ -356,8 +356,8 @@ export default function EditorScreen({ go, user, logout }) {
 
           {/* Preview card */}
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 40px", gap: 12 }}>
-            <div style={{ fontSize: 11, color: C.body, letterSpacing: 0.3 }}>참여자에게 보이는 화면</div>
-            <PreviewCard q={q} idx={selectedIdx} total={questions.length} />
+            <div style={{ fontSize: 11, color: C.body, letterSpacing: 0.3 }}>참여자에게 보이는 화면 — 직접 클릭해서 편집하세요</div>
+            <PreviewCard q={q} idx={selectedIdx} total={questions.length} updateQ={updateQ} />
           </div>
         </div>
 
@@ -371,7 +371,8 @@ export default function EditorScreen({ go, user, logout }) {
   );
 }
 
-function PreviewCard({ q, idx, total }) {
+function PreviewCard({ q, idx, total, updateQ }) {
+  const editable = !!updateQ;
   return (
     <div style={{ width: "100%", maxWidth: 420, background: C.interviewBg, borderRadius: 8, padding: "28px 24px", boxShadow: "rgba(50,50,93,0.25) 0px 30px 45px -30px", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: -40, right: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(26,115,232,0.15),transparent)", filter: "blur(40px)", pointerEvents: "none" }} />
@@ -381,9 +382,24 @@ function PreviewCard({ q, idx, total }) {
           <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>AI 인터뷰어 · Voica</span>
           <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,0.25)" }}>Q{idx + 1}/{total}</span>
         </div>
-        <p style={{ fontSize: 15, fontWeight: 400, color: "white", lineHeight: 1.65, letterSpacing: -0.3, margin: "0 0 20px" }}>
-          {q?.content || <span style={{ opacity: 0.3 }}>질문 텍스트를 입력하세요</span>}
-        </p>
+
+        {/* Question text — editable textarea or static */}
+        {editable ? (
+          <textarea
+            value={q?.content ?? ""}
+            onChange={e => updateQ(idx, { content: e.target.value })}
+            placeholder="질문 텍스트를 입력하세요"
+            rows={3}
+            style={{ width: "100%", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.2)", outline: "none", resize: "none", fontSize: 15, fontWeight: 400, color: "white", lineHeight: 1.65, letterSpacing: "-0.3px", fontFamily: F, marginBottom: 20, padding: "0 0 6px", boxSizing: "border-box", caretColor: "rgba(185,185,249,0.9)" }}
+            onFocus={e => e.target.style.borderBottomColor = "rgba(185,185,249,0.7)"}
+            onBlur={e => e.target.style.borderBottomColor = "rgba(255,255,255,0.2)"}
+          />
+        ) : (
+          <p style={{ fontSize: 15, fontWeight: 400, color: "white", lineHeight: 1.65, letterSpacing: -0.3, margin: "0 0 20px" }}>
+            {q?.content || <span style={{ opacity: 0.3 }}>질문 텍스트를 입력하세요</span>}
+          </p>
+        )}
+
         {q?.type === "voice" && (
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(26,115,232,0.25)", border: "1px solid rgba(26,115,232,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -392,13 +408,25 @@ function PreviewCard({ q, idx, total }) {
             <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>버튼을 눌러 답변해 주세요</span>
           </div>
         )}
+
         {q?.type === "multiple_choice" && Array.isArray(q.options) && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {q.options.map((opt, i) => (
+            {q.options.map((opt, i) => editable ? (
+              <input
+                key={i}
+                value={opt}
+                onChange={e => { const next = [...q.options]; next[i] = e.target.value; updateQ(idx, { options: next }); }}
+                placeholder={`보기 ${i + 1}`}
+                style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", fontSize: 13, color: "rgba(255,255,255,0.85)", fontFamily: F, outline: "none", width: "100%", boxSizing: "border-box", caretColor: "rgba(185,185,249,0.9)" }}
+                onFocus={e => e.target.style.borderColor = "rgba(185,185,249,0.5)"}
+                onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.15)"}
+              />
+            ) : (
               <div key={i} style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{opt || `보기 ${i + 1}`}</div>
             ))}
           </div>
         )}
+
         {q?.type === "likert" && (
           <div style={{ display: "flex", justifyContent: "space-between", gap: 6 }}>
             {Array.from({ length: (q.options?.max ?? 5) - (q.options?.min ?? 1) + 1 }, (_, i) => i + (q.options?.min ?? 1)).map(n => (
