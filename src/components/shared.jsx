@@ -139,7 +139,9 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
               </>
             )}
             {variant === "panel" && !isMobile && (
-              <Btn size="sm" onClick={() => go("panel_mypage")}>내 인터뷰</Btn>
+              <>
+                {logout && <Btn variant="ghost" size="sm" onClick={logout}>로그아웃</Btn>}
+              </>
             )}
             {(variant === "public" || variant === "sub") && !isMobile && (
               <>

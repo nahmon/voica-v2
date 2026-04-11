@@ -2,7 +2,7 @@ import { useState } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav } from "../components/shared.jsx";
 
-export default function ConsentScreen({ go }) {
+export default function ConsentScreen({ go, user, logout }) {
   const [agreed1, setAgreed1] = useState(false); // 필수 동의
   const [agreed2, setAgreed2] = useState(false); // 음성 녹음 동의
   const [agreed3, setAgreed3] = useState(false); // 선택 마케팅
@@ -60,7 +60,7 @@ export default function ConsentScreen({ go }) {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
-      <GlobalNav go={go} variant="panel" />
+      <GlobalNav go={go} variant="panel" user={user} logout={logout} />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
         <div style={{ width: "100%", maxWidth: 540 }}>

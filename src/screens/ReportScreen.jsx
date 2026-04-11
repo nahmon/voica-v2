@@ -3,7 +3,7 @@ import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Badge, Btn, GlobalNav } from "../components/shared.jsx";
 
-export default function ReportScreen({ go, user, interviewId }) {
+export default function ReportScreen({ go, user, logout, interviewId }) {
   const [interview, setInterview] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [report, setReport] = useState(null);
@@ -67,7 +67,7 @@ export default function ReportScreen({ go, user, interviewId }) {
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
-      <GlobalNav go={go} variant="app" user={user} />
+      <GlobalNav go={go} variant="app" user={user} logout={logout} />
 
       {/* Sub nav */}
       <div style={{ padding: "10px 24px", background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>

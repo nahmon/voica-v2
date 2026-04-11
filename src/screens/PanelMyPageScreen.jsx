@@ -2,7 +2,7 @@ import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function PanelMyPageScreen({ go }) {
+export default function PanelMyPageScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const MY_INTERVIEWS = [
     { id: 1, title: "앱 사용성 인터뷰 Q2", company: "테크 스타트업 A", status: "completed", reward: "3,000원", date: "2026.04.05", rewardStatus: "지급 완료" },
@@ -21,7 +21,7 @@ export default function PanelMyPageScreen({ go }) {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
-      <GlobalNav go={go} variant="panel" />
+      <GlobalNav go={go} variant="panel" user={user} logout={logout} />
 
       <div style={{ maxWidth: 640, margin: "0 auto", padding: "28px 24px 48px" }}>
         {/* Profile summary */}

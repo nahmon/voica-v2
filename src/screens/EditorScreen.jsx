@@ -35,7 +35,7 @@ const VOICA_SURVEY_TEMPLATE = {
 
 const DRAFT_KEY = "voica_editor_draft";
 
-export default function EditorScreen({ go, user }) {
+export default function EditorScreen({ go, user, logout }) {
   // Restore draft from localStorage
   const savedDraft = (() => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; } })();
   const [title, setTitle] = useState(savedDraft?.title ?? "");
@@ -165,6 +165,7 @@ export default function EditorScreen({ go, user }) {
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
       <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        {logout && <Btn variant="ghost" size="sm" onClick={logout} style={{ fontSize: 12, color: C.body }}>로그아웃</Btn>}
         {draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시저장됨 ✓</span>}
         {!draftSaved && <span style={{ fontSize: 11, color: C.body, opacity: 0.5 }}>자동저장 중…</span>}
         <div style={{ position: "relative" }}>

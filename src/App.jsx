@@ -73,13 +73,13 @@ export default function Voica() {
       {screen === "role_select"      && <RoleSelectScreen go={go} user={user} />}
       {screen === "advertiser_login" && <AuthScreen go={go} />}
       {screen === "dashboard"        && <DashboardScreen go={go} user={user} logout={logout} />}
-      {screen === "editor"           && <EditorScreen go={go} user={user} />}
+      {screen === "editor"           && <EditorScreen go={go} user={user} logout={logout} />}
       {screen === "panel_entry"      && <PanelEntryScreen go={go} />}
-      {screen === "panel_mypage"     && <PanelMyPageScreen go={go} />}
-      {screen === "consent"          && <ConsentScreen go={go} />}
+      {screen === "panel_mypage"     && <PanelMyPageScreen go={go} user={user} logout={logout} />}
+      {screen === "consent"          && <ConsentScreen go={go} user={user} logout={logout} />}
       {screen === "interview"        && <InterviewScreen go={go} shareCode={shareCode} />}
-      {screen === "report"           && <ReportScreen go={go} user={user} interviewId={interviewId} />}
-      {screen === "recruiter_admin"  && <RecruiterAdminScreen go={go} />}
+      {screen === "report"           && <ReportScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
+      {screen === "recruiter_admin"  && <RecruiterAdminScreen go={go} user={user} logout={logout} />}
       {screen === "panel_board"      && <PanelBoardScreen go={go} user={user} logout={logout} />}
       {screen === "pricing"          && <PricingScreen go={go} user={user} logout={logout} />}
       {screen === "support"          && <SupportScreen go={go} user={user} logout={logout} />}

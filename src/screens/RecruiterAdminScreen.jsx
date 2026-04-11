@@ -3,7 +3,7 @@ import { C, S, F } from "../lib/constants.jsx";
 import { PANEL_APPLICANTS } from "../lib/mockData.js";
 import { Btn, GlobalNav } from "../components/shared.jsx";
 
-export default function RecruiterAdminScreen({ go }) {
+export default function RecruiterAdminScreen({ go, user, logout }) {
   const [filter, setFilter] = useState("전체");
   const [selected, setSelected] = useState(new Set());
   const filters = ["전체", "신청", "적합", "부적합", "완료"];
@@ -18,7 +18,7 @@ export default function RecruiterAdminScreen({ go }) {
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
-      <GlobalNav go={go} variant="app" />
+      <GlobalNav go={go} variant="app" user={user} logout={logout} />
       <div style={{ padding: "10px 24px", background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
         <div style={{ display: "flex", gap: 8 }}>
