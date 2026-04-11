@@ -117,9 +117,12 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                   {user?.user_metadata?.name || user?.email?.split("@")[0] || ""}
                   {user?.user_metadata?.company ? ` · ${user.user_metadata.company}` : ""}
                 </div>
-                <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.purple, cursor: "pointer" }}>
-                  {(user?.user_metadata?.name || user?.email || "?")[0].toUpperCase()}
-                </div>
+                {user?.user_metadata?.avatar_url
+                  ? <img src={user.user_metadata.avatar_url} alt="profile" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover", cursor: "pointer", border: `1px solid ${C.border}` }} />
+                  : <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.purple, cursor: "pointer" }}>
+                      {(user?.user_metadata?.name || user?.email || "U")[0].toUpperCase()}
+                    </div>
+                }
                 {logout && <Btn variant="ghost" size="sm" onClick={logout}>로그아웃</Btn>}
               </>
             )}
