@@ -151,7 +151,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "저장 실패");
       setShareCode(data.share_code);
-      setShowShareOverlay(true);
+      if (!editingId) {
+        setShowShareOverlay(true); // only for new interviews
+      } else {
+        showToast("저장됐습니다 ✓", "success");
+      }
       if (!editingId && data.interview?.id) setEditingId(data.interview.id);
       localStorage.removeItem(DRAFT_KEY);
     } catch (e) {
@@ -254,7 +258,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           )}
         </div>
         <Btn size="sm" onClick={handleSave} disabled={saving}>
-          {saving ? "저장 중…" : "링크 생성 →"}
+          {saving ? "저장 중…" : editingId ? "저장" : "링크 생성 →"}
         </Btn>
       </div>
     </div>
