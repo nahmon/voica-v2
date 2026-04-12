@@ -214,7 +214,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
               </>
             )}
             {isMobile && (
-              <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "6px", color: C.navy, fontSize: 20, lineHeight: 1 }}>☰</button>
+              <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", color: C.navy, fontSize: 20, lineHeight: 1 }}>☰</button>
             )}
           </div>
         </div>
@@ -227,7 +227,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
           <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 280, background: C.white, zIndex: 201, boxShadow: S.card, display: "flex", flexDirection: "column", fontFamily: F }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", height: 56, borderBottom: `1px solid rgba(0,0,0,0.08)` }}>
               <span style={{ fontSize: 17, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}><span style={{ color: C.purple }}>Vo</span>ica</span>
-              <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: C.body, lineHeight: 1, padding: 4 }}>✕</button>
+              <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: C.body, lineHeight: 1, padding: 10 }}>✕</button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "12px 0" }}>
               {variant === "app" ? (
@@ -313,7 +313,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                 </>
               )}
             </div>
-            <div style={{ padding: "16px 20px", borderTop: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ padding: "16px 20px", paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))", borderTop: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
               {(variant === "app" || variant === "panel") && logout ? (
                 <Btn full size="md" variant="ghost" onClick={() => { logout(); setMenuOpen(false); }}>로그아웃</Btn>
               ) : (
@@ -391,7 +391,7 @@ export function VoCCarousel() {
         </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 24 }}>
           {VOC_LIST.map((_, i) => (
-            <button key={i} onClick={() => setIdx(i)} aria-label={`후기 ${i + 1}번으로 이동`} style={{ width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: "none", cursor: "pointer", background: i === idx ? "#533afd" : "rgba(23,23,23,0.3)", transition: "all 0.3s", padding: 0 }} />
+            <button key={i} onClick={() => setIdx(i)} aria-label={`후기 ${i + 1}번으로 이동`} style={{ width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: "none", cursor: "pointer", background: i === idx ? "#533afd" : "rgba(23,23,23,0.3)", transition: "all 0.3s", padding: "10px 4px", margin: "-10px -4px", boxSizing: "content-box" }} />
           ))}
         </div>
       </div>

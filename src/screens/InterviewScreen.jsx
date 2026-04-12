@@ -346,7 +346,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Intro / Info ───
   if (introStep === "info") return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124 0%,#292a2d 50%,#202124 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124 0%,#292a2d 50%,#202124 100%)", display: "flex", alignItems: "flex-start", justifyContent: "center", fontFamily: F, padding: "40px 24px 40px", overflowY: "auto" }}>
       <div style={{ width: "100%", maxWidth: 440 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
           <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
@@ -419,8 +419,8 @@ export default function InterviewScreen({ go, shareCode }) {
             <div style={{ fontSize: 17, fontWeight: 700, color: C.white, marginBottom: 8 }}>인터뷰를 중단하시겠습니까?</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>지금 나가면 저장된 답변이 유지되지 않을 수 있습니다.</div>
             <div style={{ display: "flex", gap: 10 }}>
-              <Btn variant="ghost" size="lg" style={{ flex: 1, borderColor: "rgba(255,255,255,0.2)", color: C.white }} onClick={() => setShowExitConfirm(false)}>계속 진행</Btn>
-              <Btn size="lg" style={{ flex: 1, background: "rgba(217,48,37,0.8)", border: "none" }} onClick={() => { setShowExitConfirm(false); go("landing"); }}>나가기</Btn>
+              <Btn size="lg" style={{ flex: 1 }} onClick={() => setShowExitConfirm(false)}>계속 진행</Btn>
+              <Btn variant="ghost" size="lg" style={{ flex: 1, borderColor: "rgba(255,255,255,0.2)", color: C.white }} onClick={() => { setShowExitConfirm(false); go("landing"); }}>나가기</Btn>
             </div>
           </div>
         </div>
@@ -492,7 +492,7 @@ export default function InterviewScreen({ go, shareCode }) {
                       } else {
                         setPhase(q.type === "voice" ? "ready" : q.type);
                       }
-                    }} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
+                    }} style={{ padding: "14px 24px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 15, fontWeight: 500, fontFamily: F, cursor: "pointer", width: "100%" }}>
                       🔊 소리 켜고 다시 듣기
                     </button>
                     <button onClick={() => setPhase(q.type === "voice" ? "ready" : q.type)}
@@ -536,11 +536,16 @@ export default function InterviewScreen({ go, shareCode }) {
                 )}
 
                 {(phase === "ready" || phase === "recording") && (
-                  <button
-                    onClick={() => phase === "ready" ? startRecording() : stopRecording()}
-                    style={{ width: 68, height: 68, borderRadius: "50%", border: "none", cursor: "pointer", background: phase === "recording" ? C.ruby : C.purple, boxShadow: phase === "recording" ? "0 0 0 8px rgba(217,48,37,0.2),0 0 0 16px rgba(217,48,37,0.08)" : "0 0 0 8px rgba(26,115,232,0.2)", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.25s" }}>
-                    {phase === "recording" ? Ic.Stop({ s: 24, c: "white" }) : Ic.Mic({ s: 24, c: "white" })}
-                  </button>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                    <button
+                      onClick={() => phase === "ready" ? startRecording() : stopRecording()}
+                      style={{ width: 68, height: 68, borderRadius: "50%", border: "none", cursor: "pointer", background: phase === "recording" ? C.ruby : C.purple, boxShadow: phase === "recording" ? "0 0 0 8px rgba(217,48,37,0.2),0 0 0 16px rgba(217,48,37,0.08)" : "0 0 0 8px rgba(26,115,232,0.2)", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.25s" }}>
+                      {phase === "recording" ? Ic.Stop({ s: 24, c: "white" }) : Ic.Mic({ s: 24, c: "white" })}
+                    </button>
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
+                      {phase === "recording" ? "탭하여 완료" : "탭하여 녹음 시작"}
+                    </span>
+                  </div>
                 )}
 
                 {phase === "ready" && (
@@ -581,13 +586,16 @@ export default function InterviewScreen({ go, shareCode }) {
             {/* Likert scale */}
             {q.type === "likert" && q.options && phase !== "review_pass" && (
               <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
-                <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-                  {Array.from({ length: (q.options.max ?? 5) - (q.options.min ?? 1) + 1 }, (_, i) => i + (q.options.min ?? 1)).map(n => (
-                    <button key={n} onClick={() => setSelectedValue(n)}
-                      style={{ width: 52, height: 52, borderRadius: 10, border: `1px solid ${selectedValue === n ? C.purple : "rgba(255,255,255,0.2)"}`, background: selectedValue === n ? "rgba(83,58,253,0.3)" : "rgba(255,255,255,0.04)", color: selectedValue === n ? C.purpleLight : "rgba(255,255,255,0.6)", fontSize: 18, fontFamily: F, cursor: "pointer", transition: "all 0.15s" }}>
-                      {n}
-                    </button>
-                  ))}
+                <div style={{ display: "flex", gap: 8, justifyContent: "center", width: "100%", flexWrap: "wrap" }}>
+                  {Array.from({ length: (q.options.max ?? 5) - (q.options.min ?? 1) + 1 }, (_, i) => i + (q.options.min ?? 1)).map(n => {
+                    const count = (q.options.max ?? 5) - (q.options.min ?? 1) + 1;
+                    return (
+                      <button key={n} onClick={() => setSelectedValue(n)}
+                        style={{ width: `calc((100% - ${(count - 1) * 8}px) / ${count})`, minWidth: 40, maxWidth: 60, height: 52, borderRadius: 10, border: `1px solid ${selectedValue === n ? C.purple : "rgba(255,255,255,0.2)"}`, background: selectedValue === n ? "rgba(83,58,253,0.3)" : "rgba(255,255,255,0.04)", color: selectedValue === n ? C.purpleLight : "rgba(255,255,255,0.6)", fontSize: 18, fontFamily: F, cursor: "pointer", transition: "all 0.15s", flexShrink: 0 }}>
+                        {n}
+                      </button>
+                    );
+                  })}
                 </div>
                 {Array.isArray(q.options.labels) && q.options.labels.length >= 2 && (
                   <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 320 }}>
