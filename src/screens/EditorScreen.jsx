@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, Btn, useToast } from "../components/shared.jsx";
+import { track } from "../lib/analytics.js";
 
 function newQ(type = "voice") {
   const id = Math.random().toString(36).slice(2, 10);
@@ -152,6 +153,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       if (!res.ok) throw new Error(data.error || "저장 실패");
       setShareCode(data.share_code);
       if (!editingId) {
+        track("interview_published", { shareCode: data.share_code, questionCount: questions.length });
         setShowShareOverlay(true); // only for new interviews
       } else {
         showToast("저장됐습니다 ✓", "success");
