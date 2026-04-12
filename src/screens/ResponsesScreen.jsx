@@ -4,12 +4,68 @@ import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, VoicePlayer, Skeleton } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
+function FunnelCard({ funnel, compact }) {
+  if (!funnel) return null;
+  const opened    = funnel.interview_link_opened    || 0;
+  const started   = funnel.interview_info_submitted || 0;
+  const completed = funnel.interview_completed      || 0;
+  const abandoned = funnel.interview_abandoned      || 0;
+  if (opened === 0) return null;
+
+  const pct = (n) => opened > 0 ? Math.round(n / opened * 100) : 0;
+  const steps = [
+    { label: "링크 접속",  count: opened,    color: C.purple },
+    { label: "정보 입력",  count: started,   color: "#1a73e8" },
+    { label: "완료",       count: completed, color: "#1e8e3e" },
+  ];
+
+  if (compact) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderBottom: `1px solid ${C.border}`, background: C.white, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.5, marginRight: 4 }}>참여 깔때기</span>
+        {steps.map((s, i) => (
+          <span key={s.label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            {i > 0 && <span style={{ color: C.border, fontSize: 10 }}>›</span>}
+            <span style={{ fontSize: 11, color: C.navy }}>{s.label} <strong style={{ color: s.color }}>{s.count}</strong></span>
+            {i > 0 && <span style={{ fontSize: 10, color: C.body }}>({pct(s.count)}%)</span>}
+          </span>
+        ))}
+        {abandoned > 0 && <span style={{ fontSize: 10, color: "#b45309", marginLeft: 4 }}>이탈 {abandoned}명</span>}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ background: "rgba(26,115,232,0.03)", border: `1px solid rgba(26,115,232,0.12)`, borderRadius: 8, padding: "14px 16px", marginBottom: 14 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, marginBottom: 12 }}>참여 깔때기</div>
+      {steps.map((step) => {
+        const p = pct(step.count);
+        return (
+          <div key={step.label} style={{ marginBottom: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 12 }}>
+              <span style={{ color: C.body }}>{step.label}</span>
+              <span style={{ fontWeight: 600, color: C.navy }}>{step.count}명 <span style={{ fontWeight: 400, color: C.body }}>({p}%)</span></span>
+            </div>
+            <div style={{ height: 6, background: C.border, borderRadius: 3, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${p}%`, background: step.color, borderRadius: 3 }} />
+            </div>
+          </div>
+        );
+      })}
+      {abandoned > 0 && (
+        <div style={{ marginTop: 6, fontSize: 11, color: "#b45309" }}>이탈 {abandoned}명</div>
+      )}
+    </div>
+  );
+}
+
 export default function ResponsesScreen({ go, user, logout, interviewId }) {
   const [interview, setInterview] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [allResponses, setAllResponses] = useState([]);
+  const [funnel, setFunnel] = useState(null);
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
 
@@ -24,6 +80,14 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
         ]);
         setQuestions(qs ?? []);
         setInterview(iv ?? null);
+
+        if (iv?.share_code) {
+          const { data: fRows } = await supabase
+            .from("funnel_events").select("event_name").eq("share_code", iv.share_code);
+          const fc = {};
+          (fRows ?? []).forEach(r => { fc[r.event_name] = (fc[r.event_name] || 0) + 1; });
+          setFunnel(fc);
+        }
 
         const sorted = (ss ?? []).sort((a, b) => {
           if (a.status === "completed" && b.status !== "completed") return -1;
@@ -114,6 +178,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           <div style={{ fontSize: 12, color: C.body, whiteSpace: "nowrap" }}>완료 {completedCount}명</div>
         </div>
         <div style={{ padding: "12px 16px" }}>
+          <FunnelCard funnel={funnel} />
           <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 10, letterSpacing: 0.5 }}>
             응답자 목록 ({sessions.length})
           </div>
@@ -174,6 +239,8 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
         </div>
         <Btn size="sm" onClick={() => go("report", interviewId)}>리포트 보기</Btn>
       </div>
+
+      <FunnelCard funnel={funnel} compact />
 
       {/* Body */}
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
