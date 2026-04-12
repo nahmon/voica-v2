@@ -521,7 +521,7 @@ export default function InterviewScreen({ go, shareCode }) {
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 3, height: 36 }}>
                       {Array.from({ length: 22 }).map((_, i) => (
-                        <div key={i} style={{ width: 3, borderRadius: 2, background: C.ruby, height: `${6 + Math.random() * 22}px`, transition: "height 0.15s" }} />
+                        <div key={i} style={{ width: 3, borderRadius: 2, background: C.ruby, animation: `wave-${i % 3} 0.5s ease-in-out ${(i * 0.05).toFixed(2)}s infinite alternate` }} />
                       ))}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

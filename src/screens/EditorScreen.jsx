@@ -166,8 +166,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   };
 
   const handleSave = () => {
-    if (!title.trim()) { alert("인터뷰 제목을 입력해 주세요"); return; }
-    if (questions.some(q => !q.content.trim())) { alert("모든 질문 텍스트를 입력해 주세요"); return; }
+    if (!title.trim()) { showToast("인터뷰 제목을 입력해 주세요", "error"); return; }
+    if (questions.some(q => !q.content.trim())) { showToast("모든 질문 텍스트를 입력해 주세요", "error"); return; }
     if (questions.length < 10) { setShowIncompleteWarn(true); return; }
     doSave();
   };
