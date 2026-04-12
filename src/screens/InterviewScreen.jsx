@@ -369,7 +369,7 @@ export default function InterviewScreen({ go, shareCode }) {
         <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 20 }}>질문 {interview.questions.length}개 · 음성 응답 포함</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
           {[
-            { key: "name", label: "이름 (선택)", placeholder: "홍길동" },
+            { key: "name", label: "닉네임 (선택)", placeholder: "예: 커피좋아하는직장인" },
             { key: "age", label: "나이 (선택)", placeholder: "예: 29", inputMode: "numeric" },
           ].map(f => (
             <div key={f.key}>
