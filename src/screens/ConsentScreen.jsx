@@ -21,38 +21,36 @@ export default function ConsentScreen({ go, user, logout }) {
       required: true,
       checked: agreed1,
       setChecked: setAgreed1,
-      detail: (
-        {isMobile ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {[
-              { label: "수집 항목", value: "성명, 이메일, 음성 녹음 데이터, 발화 텍스트(STT)" },
-              { label: "수집·이용 목적", value: "음성 인터뷰 진행 및 리서치 분석" },
-              { label: "보유·이용 기간", value: "인터뷰 완료일로부터 1년, 이후 파기" },
-            ].map(row => (
-              <div key={row.label} style={{ background: "rgba(26,115,232,0.03)", borderRadius: 6, padding: "8px 10px", border: `1px solid ${C.border}` }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 3 }}>{row.label}</div>
-                <div style={{ fontSize: 12, color: C.body, lineHeight: 1.6 }}>{row.value}</div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div style={{ overflowX: "auto" }}><table style={{ width: "100%", minWidth: 420, fontSize: 12, borderCollapse: "collapse", lineHeight: 1.7 }}>
-            <thead>
-              <tr style={{ background: "rgba(26,115,232,0.05)" }}>
-                {["수집 항목", "수집·이용 목적", "보유·이용 기간"].map(h => (
-                  <th key={h} style={{ padding: "6px 10px", fontWeight: 600, color: C.label, borderBottom: `1px solid ${C.border}`, textAlign: "left" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, color: C.body, verticalAlign: "top" }}>성명, 이메일, 음성 녹음 데이터, 발화 텍스트(STT)</td>
-                <td style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, color: C.body, verticalAlign: "top" }}>음성 인터뷰 진행 및 리서치 분석</td>
-                <td style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, color: C.body, verticalAlign: "top" }}>인터뷰 완료일로부터 1년, 이후 파기</td>
-              </tr>
-            </tbody>
-          </table></div>
-        )}
+      detail: isMobile ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {[
+            { label: "수집 항목", value: "성명, 이메일, 음성 녹음 데이터, 발화 텍스트(STT)" },
+            { label: "수집·이용 목적", value: "음성 인터뷰 진행 및 리서치 분석" },
+            { label: "보유·이용 기간", value: "인터뷰 완료일로부터 1년, 이후 파기" },
+          ].map(row => (
+            <div key={row.label} style={{ background: "rgba(26,115,232,0.03)", borderRadius: 6, padding: "8px 10px", border: `1px solid ${C.border}` }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 3 }}>{row.label}</div>
+              <div style={{ fontSize: 12, color: C.body, lineHeight: 1.6 }}>{row.value}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={{ overflowX: "auto" }}><table style={{ width: "100%", minWidth: 420, fontSize: 12, borderCollapse: "collapse", lineHeight: 1.7 }}>
+          <thead>
+            <tr style={{ background: "rgba(26,115,232,0.05)" }}>
+              {["수집 항목", "수집·이용 목적", "보유·이용 기간"].map(h => (
+                <th key={h} style={{ padding: "6px 10px", fontWeight: 600, color: C.label, borderBottom: `1px solid ${C.border}`, textAlign: "left" }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, color: C.body, verticalAlign: "top" }}>성명, 이메일, 음성 녹음 데이터, 발화 텍스트(STT)</td>
+              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, color: C.body, verticalAlign: "top" }}>음성 인터뷰 진행 및 리서치 분석</td>
+              <td style={{ padding: "8px 10px", borderBottom: `1px solid ${C.border}`, color: C.body, verticalAlign: "top" }}>인터뷰 완료일로부터 1년, 이후 파기</td>
+            </tr>
+          </tbody>
+        </table></div>
       ),
     },
     {

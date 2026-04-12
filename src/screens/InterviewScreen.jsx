@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Btn, WaveAnimation, useToast } from "../components/shared.jsx";
+import { track } from "../lib/analytics.js";
 
 const MIN_RECORD_SECS = 5;
 
@@ -68,6 +69,7 @@ export default function InterviewScreen({ go, shareCode }) {
       const data = await res.json();
       setInterview(data);
       setLoading(false);
+      track("interview_link_opened", { shareCode });
     })();
   }, [shareCode]);
 
@@ -178,6 +180,12 @@ export default function InterviewScreen({ go, shareCode }) {
     localStorage.setItem(key, JSON.stringify({ sessionId, qIndex, startedAt: Date.now() }));
   }, [qIndex, sessionId, shareCode]);
 
+  // Track each question start
+  useEffect(() => {
+    if (introStep !== "started" || !sessionId || !interview) return;
+    track("interview_q_started", { shareCode, sessionId, qIndex, total: interview.questions.length });
+  }, [qIndex, introStep, sessionId]);
+
   const [starting, setStarting] = useState(false);
 
   const startSession = async () => {
@@ -196,6 +204,7 @@ export default function InterviewScreen({ go, shareCode }) {
         const d = await res.json();
         setSessionId(d.session_id);
         setIntroStep("started");
+        track("interview_info_submitted", { shareCode, sessionId: d.session_id });
       } else {
         const d = await res.json().catch(() => ({}));
         showToast(d.error || "인터뷰를 시작할 수 없어요. 다시 시도해 주세요.", "error");
@@ -223,6 +232,8 @@ export default function InterviewScreen({ go, shareCode }) {
   };
 
   const advanceOrComplete = () => {
+    const qType = interview.questions[qIndex]?.type;
+    track("interview_q_answered", { shareCode, sessionId, qIndex, qType });
     if (qIndex < interview.questions.length - 1) {
       setQIndex(i => i + 1);
       setPhase("ai_speaking");
@@ -232,6 +243,7 @@ export default function InterviewScreen({ go, shareCode }) {
       // Complete session
       if (sessionId) fetch("/api/session", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, status: "completed" }) });
       if (shareCode) localStorage.removeItem(`voica_session_${shareCode}`);
+      track("interview_completed", { shareCode, sessionId, total: interview.questions.length });
       setCompleted(true);
     }
   };
@@ -420,7 +432,7 @@ export default function InterviewScreen({ go, shareCode }) {
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>지금 나가면 저장된 답변이 유지되지 않을 수 있습니다.</div>
             <div style={{ display: "flex", gap: 10 }}>
               <Btn size="lg" style={{ flex: 1 }} onClick={() => setShowExitConfirm(false)}>계속 진행</Btn>
-              <Btn variant="ghost" size="lg" style={{ flex: 1, borderColor: "rgba(255,255,255,0.2)", color: C.white }} onClick={() => { setShowExitConfirm(false); go("landing"); }}>나가기</Btn>
+              <Btn variant="ghost" size="lg" style={{ flex: 1, borderColor: "rgba(255,255,255,0.2)", color: C.white }} onClick={() => { track("interview_abandoned", { shareCode, sessionId, qIndex }); setShowExitConfirm(false); go("landing"); }}>나가기</Btn>
             </div>
           </div>
         </div>
