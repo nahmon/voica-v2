@@ -652,10 +652,10 @@ export function Footer({ go }) {
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
             {[["서비스 소개", "about"], ["요금제", "pricing"], ["패널 참여", "panel_board"], ["고객센터", "support"]].map(([l, target]) => (
-              <a key={l} href="#" onClick={e => { e.preventDefault(); if (target) go(target); }}
-                style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", textDecoration: "none", letterSpacing: "0.16px" }}
+              <button key={l} onClick={() => go(target)}
+                style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: F, letterSpacing: "0.16px" }}
                 onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.88)"}
-                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.48)"}>{l}</a>
+                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.48)"}>{l}</button>
             ))}
           </div>
         </div>

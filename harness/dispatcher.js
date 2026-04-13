@@ -1,5 +1,6 @@
 // harness/dispatcher.js
 import 'dotenv/config'
+import { createServer } from 'http'
 import { createClient } from '@supabase/supabase-js'
 import { runTask } from './runner.js'
 
@@ -60,5 +61,35 @@ supabase
 
 // 시작 시 오프라인 동안 쌓인 pending 처리
 await drainPending()
+
+// Telegram webhook 수신 HTTP 서버 (Vercel 대체)
+const PORT = process.env.PORT ?? 3000
+createServer(async (req, res) => {
+  if (req.method !== 'POST' || req.url !== '/telegram-webhook') {
+    res.writeHead(200).end('ok')
+    return
+  }
+  let body = ''
+  req.on('data', (chunk) => { body += chunk })
+  req.on('end', async () => {
+    res.writeHead(200).end('ok')
+    try {
+      const { message } = JSON.parse(body)
+      if (!message?.text) return
+      const { error } = await supabase.from('agent_tasks').insert({
+        instruction: message.text,
+        tg_chat_id: String(message.chat?.id ?? ''),
+        tg_message_id: String(message.message_id),
+        status: 'pending',
+      })
+      if (error) console.error('[webhook] insert failed:', error)
+      else console.log('[webhook] 태스크 등록:', message.text.slice(0, 60))
+    } catch (err) {
+      console.error('[webhook] parse error:', err.message)
+    }
+  })
+}).listen(PORT, () => {
+  console.log(`[webhook] HTTP 서버 포트 ${PORT} 에서 수신 중`)
+})
 
 console.log(`[harness] 디스패처 실행 중. MAX_PARALLEL=${MAX_PARALLEL}`)

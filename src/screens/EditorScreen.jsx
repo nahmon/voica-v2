@@ -244,6 +244,9 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {logout && <Btn variant="ghost" size="sm" onClick={logout} style={{ fontSize: 12, color: C.body }}>로그아웃</Btn>}
         {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시저장됨 ✓</span>}
+        <span style={{ fontSize: 11, color: questions.length >= 10 ? C.success : "rgba(180,120,0,0.85)", fontWeight: 500 }}>
+          질문 {questions.length}{questions.length < 10 ? ` / 10 권장` : ` ✓`}
+        </span>
         <div style={{ position: "relative" }}>
           <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>템플릿</Btn>
           {templateOpen && (

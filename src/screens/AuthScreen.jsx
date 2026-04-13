@@ -120,7 +120,7 @@ export default function AdvertiserLoginScreen({ go }) {
           <div style={{ background: C.white, borderRadius: 12, padding: "28px 28px", boxShadow: S.card }}>
             <div style={{ display: "flex", background: C.bg, borderRadius: 6, padding: 3, marginBottom: 24 }}>
               {["login", "signup"].map(t => (
-                <button key={t} onClick={() => { setTab(t); setResetMode(false); setAuthError(""); }} style={{ flex: 1, padding: "6px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: 400, transition: "all 0.15s", background: tab === t ? C.white : "transparent", color: tab === t ? C.navy : C.body, boxShadow: tab === t ? S.ambient : "none" }}>
+                <button key={t} onClick={() => { setTab(t); setResetMode(false); setAuthError(""); }} style={{ flex: 1, padding: "10px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: 400, transition: "all 0.15s", background: tab === t ? C.white : "transparent", color: tab === t ? C.navy : C.body, boxShadow: tab === t ? S.ambient : "none" }}>
                   {t === "login" ? "로그인" : "회원가입"}
                 </button>
               ))}

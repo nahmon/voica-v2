@@ -3,7 +3,7 @@ import { C, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function ConsentScreen({ go, user, logout }) {
+export default function ConsentScreen({ go, user, logout, shareCode }) {
   const isMobile = useIsMobile();
   const [agreed1, setAgreed1] = useState(false); // 필수 동의
   const [agreed2, setAgreed2] = useState(false); // 음성 녹음 동의
@@ -153,11 +153,11 @@ export default function ConsentScreen({ go, user, logout }) {
             </ul>
           </div>
 
-          <Btn full size="lg" disabled={!allRequired} onClick={() => go("panel_board")}>
-            {Ic.Mic({s:16,c:"white"})} 동의 완료 — 인터뷰 보드로 이동
+          <Btn full size="lg" disabled={!allRequired} onClick={() => go(shareCode ? "interview" : "panel_board")}>
+            {Ic.Mic({s:16,c:"white"})} 동의 완료 — {shareCode ? "인터뷰 시작하기" : "모집 보드로 이동"}
           </Btn>
           <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 10 }}>
-            리서처가 보낸 인터뷰 링크로 바로 참여하세요
+            {shareCode ? "동의 후 AI 인터뷰가 바로 시작됩니다" : "모집 보드에서 원하는 인터뷰를 시작할 수 있어요"}
           </div>
         </div>
       </div>

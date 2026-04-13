@@ -38,7 +38,7 @@ export default function PanelEntryScreen({ go }) {
           const active = multi ? value.includes(o) : value === o;
           return (
             <button key={o} onClick={() => onSelect(o)}
-              style={{ padding: "7px 13px", borderRadius: 6, fontSize: 13, fontFamily: F, cursor: "pointer", border: `1.5px solid ${active ? C.purple : C.border}`, background: active ? C.purple : C.white, color: active ? C.white : C.body, transition: "all 0.15s", fontWeight: active ? 500 : 400 }}>
+              style={{ padding: "10px 16px", borderRadius: 6, fontSize: 13, fontFamily: F, cursor: "pointer", border: `1.5px solid ${active ? C.purple : C.border}`, background: active ? C.purple : C.white, color: active ? C.white : C.body, transition: "all 0.15s", fontWeight: active ? 500 : 400 }}>
               {o}
             </button>
           );

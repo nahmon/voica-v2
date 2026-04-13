@@ -13,6 +13,15 @@ async function sendMessage(chatId, replyToMessageId, text) {
   if (!res.ok) throw new Error(await res.text())
 }
 
+// 진행 상황 업데이트 (실패해도 무시)
+export async function sendUpdate(chatId, replyToMessageId, text) {
+  try {
+    await sendMessage(chatId, replyToMessageId, text)
+  } catch (err) {
+    console.error('[notify] 업데이트 실패 (무시):', err.message)
+  }
+}
+
 export async function notify(chatId, replyToMessageId, resultUrl, success) {
   const text = success
     ? `✅ 완료\n${resultUrl}`

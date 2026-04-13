@@ -29,7 +29,7 @@ export default function Voica() {
   const [authLoading, setAuthLoading] = useState(true);
   const [shareCode, setShareCode] = useState(null);
   const [interviewId, setInterviewId] = useState(null);
-  const go = (s, id) => { setInterviewId(id ?? null); setScreen(s); };
+  const go = (s, id, code) => { setInterviewId(id ?? null); if (code !== undefined) setShareCode(code); setScreen(s); };
 
   useEffect(() => {
     // Detect /i/[code] URL for panel interview
@@ -82,7 +82,7 @@ export default function Voica() {
       {screen === "editor"           && <EditorScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
       {screen === "panel_entry"      && <PanelEntryScreen go={go} />}
       {screen === "panel_mypage"     && <PanelMyPageScreen go={go} user={user} logout={logout} />}
-      {screen === "consent"          && <ConsentScreen go={go} user={user} logout={logout} />}
+      {screen === "consent"          && <ConsentScreen go={go} user={user} logout={logout} shareCode={shareCode} />}
       {screen === "interview"        && <InterviewScreen go={go} shareCode={shareCode} />}
       {screen === "report"           && <ReportScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
       {screen === "responses"        && <ResponsesScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
