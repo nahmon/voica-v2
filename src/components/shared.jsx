@@ -746,3 +746,122 @@ export function VoicePlayer({ audioUrl, transcript }) {
     </div>
   );
 }
+
+// ─── ProgressSteps ─────────────────────────────────────────────────────────
+// Shows numbered step progress with a thin bar. Props: current (1-based), total, color.
+export function ProgressSteps({ current, total, color = C.purple }) {
+  const pct = total > 0 ? Math.min((current / total) * 100, 100) : 0;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          {Array.from({ length: total }, (_, i) => (
+            <div key={i} style={{
+              width: 24, height: 24, borderRadius: "50%",
+              background: i < current ? color : "transparent",
+              border: `1.5px solid ${i < current ? color : C.border}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 11, fontWeight: 600, fontFamily: F,
+              color: i < current ? "#fff" : C.body,
+              transition: "all 0.2s",
+            }}>
+              {i < current - 1 ? "✓" : i + 1}
+            </div>
+          ))}
+        </div>
+        <span style={{ fontSize: 12, color: C.body, fontFamily: F, fontFeatureSettings: '"tnum"' }}>
+          {current} / {total}
+        </span>
+      </div>
+      <div style={{ height: 3, background: C.border, borderRadius: 2 }}>
+        <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 2, transition: "width 0.4s ease" }} />
+      </div>
+    </div>
+  );
+}
+
+// ─── EmptyState ─────────────────────────────────────────────────────────────
+// Centered placeholder with icon, title, description, optional CTA.
+export function EmptyState({ icon, title, description, action, onAction }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "48px 24px", textAlign: "center", gap: 12 }}>
+      {icon && (
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 4, fontSize: 26 }}>
+          {icon}
+        </div>
+      )}
+      <div style={{ fontSize: 17, fontWeight: 600, color: C.navy, fontFamily: F, letterSpacing: "0.16px" }}>{title}</div>
+      {description && (
+        <div style={{ fontSize: 14, color: C.body, fontFamily: F, letterSpacing: "0.16px", lineHeight: 1.6, maxWidth: 320 }}>{description}</div>
+      )}
+      {action && onAction && (
+        <button onClick={onAction} style={{ marginTop: 8, padding: "9px 20px", borderRadius: 9999, border: "none", background: C.purple, color: "#fff", fontSize: 14, fontWeight: 500, fontFamily: F, cursor: "pointer", transition: "background 0.15s" }}
+          onMouseEnter={e => e.currentTarget.style.background = C.purpleHover}
+          onMouseLeave={e => e.currentTarget.style.background = C.purple}>
+          {action}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ─── Tooltip ────────────────────────────────────────────────────────────────
+// Simple hover tooltip. Props: text, children, position ("top"|"bottom").
+export function Tooltip({ text, children, position = "top" }) {
+  const [visible, setVisible] = useState(false);
+  const isTop = position !== "bottom";
+  return (
+    <div style={{ position: "relative", display: "inline-flex" }}
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}>
+      {children}
+      {visible && (
+        <div style={{
+          position: "absolute",
+          [isTop ? "bottom" : "top"]: "calc(100% + 6px)",
+          left: "50%", transform: "translateX(-50%)",
+          background: C.navy, color: "#fff",
+          fontSize: 12, fontFamily: F, fontWeight: 400,
+          padding: "5px 10px", borderRadius: 6,
+          whiteSpace: "nowrap", pointerEvents: "none",
+          boxShadow: S.float, zIndex: 9000,
+          letterSpacing: "0.16px",
+        }}>
+          {text}
+          <div style={{
+            position: "absolute",
+            [isTop ? "top" : "bottom"]: "100%",
+            left: "50%", transform: "translateX(-50%)",
+            width: 0, height: 0,
+            borderLeft: "5px solid transparent",
+            borderRight: "5px solid transparent",
+            [isTop ? "borderBottom" : "borderTop"]: `5px solid ${C.navy}`,
+          }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── FadeIn ──────────────────────────────────────────────────────────────────
+// Wraps children in a subtle fade + slide-up animation on mount.
+// Props: delay (ms, default 0), children.
+export function FadeIn({ delay = 0, children }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+  return (
+    <>
+      <style>{`@keyframes fadein-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      <div style={{
+        opacity: visible ? 1 : 0,
+        animation: visible ? `fadein-up 0.35s ease forwards` : "none",
+        animationDelay: "0ms",
+      }}>
+        {children}
+      </div>
+    </>
+  );
+}

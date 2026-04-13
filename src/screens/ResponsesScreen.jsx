@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Btn, GlobalNav, VoicePlayer, Skeleton } from "../components/shared.jsx";
+import { Btn, GlobalNav, VoicePlayer, Skeleton, useToast } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
+// ── Funnel visualization (enhanced with colored bars + % labels) ──────────────
 function FunnelCard({ funnel, compact }) {
   if (!funnel) return null;
   const opened    = funnel.interview_link_opened    || 0;
@@ -14,9 +15,9 @@ function FunnelCard({ funnel, compact }) {
 
   const pct = (n) => opened > 0 ? Math.round(n / opened * 100) : 0;
   const steps = [
-    { label: "링크 접속",  count: opened,    color: C.purple },
-    { label: "정보 입력",  count: started,   color: "#1a73e8" },
-    { label: "완료",       count: completed, color: "#1e8e3e" },
+    { label: "링크 접속",  count: opened,    color: C.purple,   bg: C.purpleBg },
+    { label: "정보 입력",  count: started,   color: "#1a73e8",  bg: "rgba(26,115,232,0.08)" },
+    { label: "완료",       count: completed, color: C.success,  bg: C.successBg },
   ];
 
   if (compact) {
@@ -26,35 +27,105 @@ function FunnelCard({ funnel, compact }) {
         {steps.map((s, i) => (
           <span key={s.label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
             {i > 0 && <span style={{ color: C.border, fontSize: 10 }}>›</span>}
-            <span style={{ fontSize: 11, color: C.navy }}>{s.label} <strong style={{ color: s.color }}>{s.count}</strong></span>
-            {i > 0 && <span style={{ fontSize: 10, color: C.body }}>({pct(s.count)}%)</span>}
+            <span style={{ display: "flex", alignItems: "center", gap: 3, padding: "2px 7px", borderRadius: 4, background: s.bg }}>
+              <span style={{ fontSize: 11, color: C.navy }}>{s.label} <strong style={{ color: s.color }}>{s.count}</strong></span>
+              {i > 0 && <span style={{ fontSize: 10, color: s.color, fontWeight: 600 }}>{pct(s.count)}%</span>}
+            </span>
           </span>
         ))}
-        {abandoned > 0 && <span style={{ fontSize: 10, color: "#b45309", marginLeft: 4 }}>이탈 {abandoned}명</span>}
+        {abandoned > 0 && <span style={{ fontSize: 10, color: "#b45309", marginLeft: 4, padding: "2px 6px", borderRadius: 4, background: "rgba(180,83,9,0.08)" }}>이탈 {abandoned}명</span>}
       </div>
     );
   }
 
   return (
-    <div style={{ background: "rgba(26,115,232,0.03)", border: `1px solid rgba(26,115,232,0.12)`, borderRadius: 8, padding: "14px 16px", marginBottom: 14 }}>
-      <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, marginBottom: 12 }}>참여 깔때기</div>
-      {steps.map((step) => {
+    <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "16px 18px", marginBottom: 14 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, marginBottom: 14 }}>참여 깔때기</div>
+      {steps.map((step, i) => {
         const p = pct(step.count);
         return (
-          <div key={step.label} style={{ marginBottom: 10 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 12 }}>
-              <span style={{ color: C.body }}>{step.label}</span>
-              <span style={{ fontWeight: 600, color: C.navy }}>{step.count}명 <span style={{ fontWeight: 400, color: C.body }}>({p}%)</span></span>
+          <div key={step.label} style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, fontSize: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: step.color }} />
+                <span style={{ color: C.body }}>{step.label}</span>
+              </div>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <span style={{ fontWeight: 700, color: step.color, fontSize: 14 }}>{step.count}명</span>
+                <span style={{ fontSize: 11, color: C.body, background: step.bg, padding: "1px 6px", borderRadius: 4 }}>{p}%</span>
+              </div>
             </div>
-            <div style={{ height: 6, background: C.border, borderRadius: 3, overflow: "hidden" }}>
-              <div style={{ height: "100%", width: `${p}%`, background: step.color, borderRadius: 3 }} />
+            <div style={{ height: 8, background: C.border, borderRadius: 4, overflow: "hidden", position: "relative" }}>
+              <div style={{
+                height: "100%",
+                width: `${p}%`,
+                background: `linear-gradient(90deg, ${step.color}, ${step.color}cc)`,
+                borderRadius: 4,
+                transition: "width 0.6s ease",
+              }} />
             </div>
           </div>
         );
       })}
       {abandoned > 0 && (
-        <div style={{ marginTop: 6, fontSize: 11, color: "#b45309" }}>이탈 {abandoned}명</div>
+        <div style={{ marginTop: 8, padding: "6px 10px", background: "rgba(180,83,9,0.06)", borderRadius: 6, display: "flex", alignItems: "center", gap: 6 }}>
+          {Ic.Warning({ s: 13, c: "#b45309" })}
+          <span style={{ fontSize: 11, color: "#b45309" }}>이탈 {abandoned}명 ({pct(abandoned)}%)</span>
+        </div>
       )}
+    </div>
+  );
+}
+
+// ── CSV export ────────────────────────────────────────────────────────────────
+function buildCsv(sessions, questions, allResponses) {
+  const headers = ["응답자", "상태", "시작 시간", "완료 시간", ...questions.map((q, i) => `Q${i + 1}: ${q.content}`)];
+  const rows = sessions.map((s, si) => {
+    const statusLabel = s.status === "completed" ? "완료" : "진행 중";
+    const started = s.started_at ? new Date(s.started_at).toLocaleString("ko-KR") : "";
+    const completed = s.completed_at ? new Date(s.completed_at).toLocaleString("ko-KR") : "";
+    const answers = questions.map(q => {
+      const r = allResponses.find(r => r.session_id === s.id && r.question_id === q.id);
+      if (!r) return "";
+      if (q.type === "voice") return r.transcript ?? "(음성 응답)";
+      if (Array.isArray(r.value)) return r.value.join("; ");
+      return String(r.value ?? "");
+    });
+    return [`응답자 ${si + 1}`, statusLabel, started, completed, ...answers];
+  });
+
+  const escape = (v) => `"${String(v).replace(/"/g, '""')}"`;
+  const lines = [headers, ...rows].map(row => row.map(escape).join(","));
+  return "\uFEFF" + lines.join("\n"); // BOM for Excel Korean
+}
+
+// ── Stats bar ─────────────────────────────────────────────────────────────────
+function StatsBar({ sessions, allResponses }) {
+  const total = sessions.length;
+  const completed = sessions.filter(s => s.status === "completed").length;
+  const inProgress = sessions.filter(s => s.status !== "completed").length;
+  const avgMs = (() => {
+    const timed = sessions.filter(s => s.completed_at && s.started_at);
+    if (!timed.length) return null;
+    return timed.reduce((sum, s) => sum + (new Date(s.completed_at) - new Date(s.started_at)), 0) / timed.length;
+  })();
+  const avgMin = avgMs !== null ? Math.round(avgMs / 60000) : null;
+
+  const items = [
+    { label: "전체", value: total, color: C.navy },
+    { label: "완료", value: completed, color: C.success },
+    { label: "진행 중", value: inProgress, color: "#b45309" },
+    ...(avgMin !== null ? [{ label: "평균 완료", value: `${avgMin}분`, color: "#1a73e8" }] : []),
+  ];
+
+  return (
+    <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
+      {items.map(item => (
+        <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", background: C.white, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+          <span style={{ fontSize: 11, color: C.body }}>{item.label}</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: item.color }}>{item.value}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -67,7 +138,10 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   const [allResponses, setAllResponses] = useState([]);
   const [funnel, setFunnel] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState("all"); // "all" | "completed" | "in_progress"
+  const [viewMode, setViewMode] = useState("expanded"); // "expanded" | "compact"
   const isMobile = useIsMobile();
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!interviewId) return;
@@ -111,9 +185,30 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
     })();
   }, [interviewId]);
 
+  const handleExportCsv = () => {
+    if (sessions.length === 0) { showToast("내보낼 응답이 없어요", "error"); return; }
+    const csv = buildCsv(sessions, questions, allResponses);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${interview?.title ?? "responses"}_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("CSV 파일이 다운로드됩니다", "success");
+  };
+
+  const filteredSessions = sessions.filter(s => {
+    if (filterStatus === "completed") return s.status === "completed";
+    if (filterStatus === "in_progress") return s.status !== "completed";
+    return true;
+  });
+
   const responses = selectedSession
     ? allResponses.filter(r => r.session_id === selectedSession.id)
     : [];
+
+  const completedCount = sessions.filter(s => s.status === "completed").length;
 
   if (loading) return (
     <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>
@@ -132,8 +227,6 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
       </div>
     </div>
   );
-
-  const completedCount = sessions.filter(s => s.status === "completed").length;
 
   /* ── Mobile: detail view ── */
   if (isMobile && selectedSession) {
@@ -178,9 +271,19 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           <div style={{ fontSize: 12, color: C.body, whiteSpace: "nowrap" }}>완료 {completedCount}명</div>
         </div>
         <div style={{ padding: "12px 16px" }}>
+          <StatsBar sessions={sessions} allResponses={allResponses} />
           <FunnelCard funnel={funnel} />
+
+          {/* Filter + export toolbar */}
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12, flexWrap: "wrap" }}>
+            <FilterTabs value={filterStatus} onChange={setFilterStatus} />
+            <button onClick={handleExportCsv} style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 6, border: `1px solid ${C.border}`, background: C.white, fontSize: 11, color: C.purple, fontFamily: F, cursor: "pointer", fontWeight: 500 }}>
+              {Ic.BarChart({ s: 12, c: C.purple })} CSV 내보내기
+            </button>
+          </div>
+
           <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 10, letterSpacing: 0.5 }}>
-            응답자 목록 ({sessions.length})
+            응답자 목록 ({filteredSessions.length})
           </div>
           {sessions.length === 0 ? (
             <div style={{ textAlign: "center", padding: "56px 20px" }}>
@@ -194,8 +297,9 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                 </button>
               )}
             </div>
-          ) : sessions.map((s, i) => {
+          ) : filteredSessions.map((s, i) => {
             const isCompleted = s.status === "completed";
+            const originalIdx = sessions.indexOf(s);
             const dt = s.completed_at
               ? new Date(s.completed_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
               : "진행 중";
@@ -204,10 +308,10 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
               <div key={s.id} onClick={() => setSelectedSession(s)}
                 style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px", marginBottom: 8, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, boxShadow: S.ambient }}>
                 <div style={{ width: 36, height: 36, borderRadius: "50%", background: isCompleted ? "rgba(21,190,83,0.12)" : "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: isCompleted ? C.successText : "#92650a", flexShrink: 0 }}>
-                  {i + 1}
+                  {originalIdx + 1}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>응답자 {i + 1}</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>응답자 {originalIdx + 1}</div>
                   <div style={{ fontSize: 12, color: C.body }}>{dt} · {respCount}개 응답</div>
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 600, color: isCompleted ? C.successText : "#b45309", whiteSpace: "nowrap" }}>
@@ -237,6 +341,9 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
         <div style={{ fontSize: 12, color: C.body, whiteSpace: "nowrap" }}>
           완료 {completedCount}명
         </div>
+        <button onClick={handleExportCsv} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 6, border: `1px solid ${C.border}`, background: C.white, fontSize: 12, color: C.purple, fontFamily: F, cursor: "pointer", fontWeight: 500 }}>
+          {Ic.BarChart({ s: 13, c: C.purple })} CSV 내보내기
+        </button>
         <Btn size="sm" onClick={() => go("report", interviewId)}>리포트 보기</Btn>
       </div>
 
@@ -246,10 +353,28 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
         {/* Left: session list */}
-        <div style={{ width: 240, borderRight: `1px solid ${C.border}`, background: C.white, display: "flex", flexDirection: "column", flexShrink: 0 }}>
-          <div style={{ padding: "10px 14px 8px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.5, borderBottom: `1px solid ${C.border}` }}>
-            응답자 목록 ({sessions.length})
+        <div style={{ width: 260, borderRight: `1px solid ${C.border}`, background: C.white, display: "flex", flexDirection: "column", flexShrink: 0 }}>
+
+          {/* Stats + toolbar */}
+          <div style={{ padding: "10px 12px", borderBottom: `1px solid ${C.border}` }}>
+            <StatsBar sessions={sessions} allResponses={allResponses} />
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <FilterTabs value={filterStatus} onChange={setFilterStatus} small />
+              <button
+                onClick={() => setViewMode(v => v === "expanded" ? "compact" : "expanded")}
+                title={viewMode === "expanded" ? "컴팩트 보기" : "확장 보기"}
+                style={{ marginLeft: "auto", padding: "4px 8px", borderRadius: 5, border: `1px solid ${C.border}`, background: viewMode === "compact" ? C.purpleBg : C.white, cursor: "pointer", display: "flex", alignItems: "center", color: viewMode === "compact" ? C.purple : C.body }}>
+                {viewMode === "compact"
+                  ? Ic.BarChart({ s: 13, c: C.purple })
+                  : Ic.BarChart({ s: 13, c: C.body })}
+              </button>
+            </div>
           </div>
+
+          <div style={{ padding: "6px 12px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.5 }}>
+            응답자 목록 ({filteredSessions.length})
+          </div>
+
           <div style={{ flex: 1, overflowY: "auto" }}>
             {sessions.length === 0 ? (
               <div style={{ textAlign: "center", padding: "48px 16px" }}>
@@ -263,22 +388,45 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                   </button>
                 )}
               </div>
-            ) : sessions.map((s, i) => {
+            ) : filteredSessions.map((s) => {
+              const originalIdx = sessions.indexOf(s);
               const isSelected = selectedSession?.id === s.id;
               const isCompleted = s.status === "completed";
               const dt = s.completed_at
                 ? new Date(s.completed_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
                 : "진행 중";
+              const respCount = allResponses.filter(r => r.session_id === s.id).length;
+              const durMin = s.completed_at && s.started_at
+                ? Math.round((new Date(s.completed_at) - new Date(s.started_at)) / 60000)
+                : null;
+
+              if (viewMode === "compact") {
+                return (
+                  <div key={s.id} onClick={() => setSelectedSession(s)}
+                    style={{ padding: "8px 12px", borderBottom: `1px solid ${C.border}`, cursor: "pointer", background: isSelected ? C.purpleBg : "transparent", borderLeft: `3px solid ${isSelected ? C.purple : "transparent"}`, display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 20, height: 20, borderRadius: "50%", background: isCompleted ? "rgba(21,190,83,0.12)" : "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600, color: isCompleted ? C.successText : "#92650a", flexShrink: 0 }}>
+                      {originalIdx + 1}
+                    </div>
+                    <span style={{ flex: 1, fontSize: 12, color: isSelected ? C.purple : C.navy }}>응답자 {originalIdx + 1}</span>
+                    <span style={{ fontSize: 10, color: isCompleted ? C.successText : "#b45309" }}>{isCompleted ? "완료" : "진행"}</span>
+                  </div>
+                );
+              }
+
               return (
                 <div key={s.id} onClick={() => setSelectedSession(s)}
                   style={{ padding: "12px 14px", borderBottom: `1px solid ${C.border}`, cursor: "pointer", background: isSelected ? C.purpleBg : "transparent", borderLeft: `3px solid ${isSelected ? C.purple : "transparent"}`, transition: "background 0.1s" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
                     <div style={{ width: 26, height: 26, borderRadius: "50%", background: isCompleted ? "rgba(21,190,83,0.12)" : "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: isCompleted ? C.successText : "#92650a", flexShrink: 0 }}>
-                      {i + 1}
+                      {originalIdx + 1}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, color: isSelected ? C.purple : C.navy, fontWeight: isSelected ? 500 : 400 }}>응답자 {i + 1}</div>
+                      <div style={{ fontSize: 13, color: isSelected ? C.purple : C.navy, fontWeight: isSelected ? 500 : 400 }}>응답자 {originalIdx + 1}</div>
                       <div style={{ fontSize: 11, color: isCompleted ? C.successText : "#b45309" }}>{isCompleted ? "완료" : "진행 중"}</div>
+                    </div>
+                    <div style={{ fontSize: 10, color: C.body, textAlign: "right", flexShrink: 0 }}>
+                      {respCount}개
+                      {durMin !== null && <div style={{ fontSize: 10, color: C.body }}>{durMin}분</div>}
                     </div>
                   </div>
                   <div style={{ fontSize: 11, color: C.body, paddingLeft: 34 }}>{dt}</div>
@@ -323,23 +471,51 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   );
 }
 
+// ── Filter tabs ───────────────────────────────────────────────────────────────
+function FilterTabs({ value, onChange, small }) {
+  const options = [
+    { v: "all", label: "전체" },
+    { v: "completed", label: "완료" },
+    { v: "in_progress", label: "진행 중" },
+  ];
+  return (
+    <div style={{ display: "flex", gap: 2, background: C.bg, padding: 2, borderRadius: 7, border: `1px solid ${C.border}` }}>
+      {options.map(opt => (
+        <button key={opt.v} onClick={() => onChange(opt.v)} style={{ padding: small ? "3px 8px" : "4px 10px", borderRadius: 5, border: "none", background: value === opt.v ? C.white : "transparent", color: value === opt.v ? C.navy : C.body, fontSize: small ? 10 : 11, fontWeight: value === opt.v ? 600 : 400, cursor: "pointer", fontFamily: F, boxShadow: value === opt.v ? S.card : "none", transition: "all 0.15s" }}>
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ── Q&A card ──────────────────────────────────────────────────────────────────
 function QuestionAnswer({ question, response, index }) {
   const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "평점" };
+  const typeIcon = {
+    voice: Ic.Mic,
+    multiple_choice: Ic.Check,
+    likert: Ic.Star,
+  };
   const typeColor = {
     voice: { bg: C.purpleBg, color: C.purple },
     multiple_choice: { bg: "rgba(21,190,83,0.1)", color: C.successText },
     likert: { bg: "rgba(245,158,11,0.1)", color: "#92650a" },
   };
   const tc = typeColor[question.type] ?? { bg: C.bg, color: C.body };
+  const TypeIconComp = typeIcon[question.type] ?? Ic.Chat;
 
   return (
     <div style={{ background: C.white, borderRadius: 12, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: S.ambient }}>
       <div style={{ padding: "12px 18px", background: C.bg, borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "flex-start", gap: 10 }}>
         <span style={{ fontSize: 11, fontWeight: 600, color: C.body, marginTop: 2, flexShrink: 0 }}>Q{index + 1}</span>
         <div style={{ flex: 1 }}>
-          <span style={{ display: "inline-block", fontSize: 10, padding: "2px 7px", borderRadius: 4, background: tc.bg, color: tc.color, fontWeight: 600, marginBottom: 5 }}>
-            {typeLabel[question.type]}
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 5 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10, padding: "2px 7px", borderRadius: 4, background: tc.bg, color: tc.color, fontWeight: 600 }}>
+              {TypeIconComp({ s: 11, c: tc.color })}
+              {typeLabel[question.type]}
+            </span>
+          </div>
           <div style={{ fontSize: 14, color: C.navy, lineHeight: 1.55 }}>{question.content}</div>
         </div>
       </div>

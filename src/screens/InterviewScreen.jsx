@@ -5,6 +5,13 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Btn, WaveAnimation, useToast } from "../components/shared.jsx";
 import { track } from "../lib/analytics.js";
 
+// Keyframes injected once
+const INTERVIEW_STYLES = `
+@keyframes rec-pulse{0%{box-shadow:0 0 0 0 rgba(217,48,37,0.5)}70%{box-shadow:0 0 0 10px rgba(217,48,37,0)}100%{box-shadow:0 0 0 0 rgba(217,48,37,0)}}
+@keyframes q-fade-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes confetti-fall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(120px) rotate(360deg)}}
+`;
+
 const MIN_RECORD_SECS = 5;
 
 export default function InterviewScreen({ go, shareCode }) {
@@ -41,6 +48,13 @@ export default function InterviewScreen({ go, shareCode }) {
   const [recordingWarning, setRecordingWarning] = useState(null);
   const [resumeData, setResumeData] = useState(null); // { sessionId, qIndex }
   const { showToast } = useToast();
+
+  // Question transition animation key
+  const [qAnimKey, setQAnimKey] = useState(0);
+  // Skip question confirm
+  const [showSkipConfirm, setShowSkipConfirm] = useState(false);
+  // TTS text fallback — show question text prominently when TTS fails
+  const [ttsReadFallback, setTtsReadFallback] = useState(false);
   const audioRef = useRef(null);
   const ttsCacheRef = useRef({}); // { [question_id]: url }
 
@@ -236,9 +250,11 @@ export default function InterviewScreen({ go, shareCode }) {
     track("interview_q_answered", { shareCode, sessionId, qIndex, qType });
     if (qIndex < interview.questions.length - 1) {
       setQIndex(i => i + 1);
+      setQAnimKey(k => k + 1);
       setPhase("ai_speaking");
       setRecordTime(0);
       setSelectedValue(null);
+      setTtsReadFallback(false);
     } else {
       // Complete session
       if (sessionId) fetch("/api/session", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, status: "completed" }) });
@@ -310,6 +326,13 @@ export default function InterviewScreen({ go, shareCode }) {
     await saveResponse({ value: isLikert ? selectedValue : [selectedValue] });
     setPhase("review_pass");
     setTimeout(advanceOrComplete, 800);
+  };
+
+  const skipQuestion = async () => {
+    setShowSkipConfirm(false);
+    await saveResponse({ skipped: true });
+    track("interview_q_skipped", { shareCode, sessionId, qIndex });
+    advanceOrComplete();
   };
 
   const fmt = s => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -418,18 +441,66 @@ export default function InterviewScreen({ go, shareCode }) {
     }
   };
 
+  // Confetti dots data — generated once
+  const CONFETTI = Array.from({ length: 18 }, (_, i) => ({
+    left: `${5 + (i * 17) % 90}%`,
+    delay: `${(i * 0.13).toFixed(2)}s`,
+    dur: `${0.9 + (i % 4) * 0.2}s`,
+    color: [C.purple, C.magenta, "#1a73e8", "#15be53", "#f96bee", "#e8710a"][i % 6],
+    size: 6 + (i % 3) * 3,
+  }));
+
   if (completed) return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d,#202124)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, fontFamily: F }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d,#202124)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, fontFamily: F, position: "relative", overflow: "hidden" }}>
+      <style>{INTERVIEW_STYLES}</style>
+
+      {/* Confetti dots */}
+      {CONFETTI.map((c, i) => (
+        <div key={i} style={{
+          position: "absolute", top: "-10px", left: c.left,
+          width: c.size, height: c.size, borderRadius: "50%",
+          background: c.color, opacity: 0,
+          animation: `confetti-fall ${c.dur} ease-out ${c.delay} 3 forwards`,
+          pointerEvents: "none",
+        }} />
+      ))}
+
+      {/* Ambient glow */}
       <div style={{ position: "absolute", top: "15%", right: "10%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle,rgba(30,142,62,0.2),transparent 70%)", filter: "blur(70px)", pointerEvents: "none" }} />
-      <div style={{ textAlign: "center", position: "relative", maxWidth: 400, width: "100%" }}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(30,142,62,0.2)", border: "1px solid rgba(30,142,62,0.4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>✓</div>
-        <div style={{ fontSize: 30, fontWeight: 700, color: C.white, marginBottom: 10 }}>인터뷰 완료!</div>
-        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 32 }}>소중한 의견 감사해요.<br />답변을 저장했어요.</div>
+
+      <div style={{ textAlign: "center", position: "relative", maxWidth: 400, width: "100%", animation: "q-fade-in 0.4s ease forwards" }}>
+        {/* Success icon */}
+        <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(30,142,62,0.18)", border: "1.5px solid rgba(30,142,62,0.5)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 32 }}>✓</div>
+
+        <div style={{ fontSize: 32, fontWeight: 700, color: C.white, marginBottom: 10 }}>인터뷰 완료!</div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 20 }}>소중한 의견 감사해요.<br />답변을 안전하게 저장했어요.</div>
+
+        {/* Summary card */}
+        <div style={{ padding: "16px 20px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", marginBottom: 24, textAlign: "left" }}>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontWeight: 600, letterSpacing: 0.6, marginBottom: 10 }}>답변 요약</div>
+          <div style={{ display: "flex", gap: 16 }}>
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <div style={{ fontSize: 28, fontWeight: 700, color: C.white, fontFeatureSettings: '"tnum"' }}>{interview.questions.length}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>전체 질문</div>
+            </div>
+            <div style={{ width: 1, background: "rgba(255,255,255,0.1)" }} />
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <div style={{ fontSize: 28, fontWeight: 700, color: "#15be53", fontFeatureSettings: '"tnum"' }}>{interview.questions.length}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>완료한 답변</div>
+            </div>
+          </div>
+        </div>
 
         {/* Share button */}
         <button onClick={handleShare}
-          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.75)", fontSize: 14, fontFamily: F, cursor: "pointer", marginBottom: 24, width: "100%", justifyContent: "center" }}>
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.75)", fontSize: 14, fontFamily: F, cursor: "pointer", marginBottom: 16, width: "100%", justifyContent: "center" }}>
           {shareCopied ? "✓ 복사됐어요!" : "🔗 완료 인증 공유하기"}
+        </button>
+
+        {/* Primary CTA — go back */}
+        <button onClick={() => go("landing")}
+          style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "13px 20px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 15, fontWeight: 600, fontFamily: F, cursor: "pointer", marginBottom: 24, width: "100%" }}>
+          홈으로 돌아가기 →
         </button>
 
         {/* Powered by Voica footer */}
@@ -452,6 +523,7 @@ export default function InterviewScreen({ go, shareCode }) {
   // ─── Main interview ───
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124 0%,#292a2d 45%,#303134 80%,#202124 100%)", display: "flex", flexDirection: "column", fontFamily: F, position: "relative", overflow: "hidden" }}>
+      <style>{INTERVIEW_STYLES}</style>
 
       {showExitConfirm && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -467,6 +539,20 @@ export default function InterviewScreen({ go, shareCode }) {
         </div>
       )}
 
+      {showSkipConfirm && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ background: "#292a2d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>⏭️</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: C.white, marginBottom: 8 }}>이 질문을 건너뛸까요?</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>답변하기 어렵거나 관련 없는 질문이라면 건너뛸 수 있어요.</div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <Btn size="lg" style={{ flex: 1 }} onClick={() => setShowSkipConfirm(false)}>계속 답변</Btn>
+              <Btn variant="ghost" size="lg" style={{ flex: 1, borderColor: "rgba(255,255,255,0.2)", color: C.white }} onClick={skipQuestion}>건너뛰기</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Ambient glows */}
       <div style={{ position: "absolute", top: -100, right: -80, width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle,rgba(26,115,232,0.2),transparent 70%)", filter: "blur(80px)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: -80, left: -60, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle,rgba(232,113,10,0.15),transparent)", filter: "blur(70px)", pointerEvents: "none" }} />
@@ -476,17 +562,19 @@ export default function InterviewScreen({ go, shareCode }) {
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
             <button onClick={() => setShowExitConfirm(true)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer", fontFamily: F, padding: 0 }}>나가기</button>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>{qIndex + 1} / {interview.questions.length}</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontFeatureSettings: '"tnum"', fontWeight: 500 }}>
+              질문 {qIndex + 1} / {interview.questions.length}
+            </span>
           </div>
-          <div style={{ height: 2, background: "rgba(255,255,255,0.1)", borderRadius: 1 }}>
-            <div style={{ height: "100%", width: `${((qIndex + 0.5) / interview.questions.length) * 100}%`, background: `linear-gradient(90deg,${C.purple},${C.magenta})`, borderRadius: 1, transition: "width 0.5s ease" }} />
+          <div style={{ height: 3, background: "rgba(255,255,255,0.1)", borderRadius: 2 }}>
+            <div style={{ height: "100%", width: `${((qIndex + 1) / interview.questions.length) * 100}%`, background: `linear-gradient(90deg,${C.purple},${C.magenta})`, borderRadius: 2, transition: "width 0.5s ease" }} />
           </div>
         </div>
       </div>
 
       {/* Content */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? "24px 16px" : "32px" }}>
-        <div style={{ width: "100%", maxWidth: 700 }}>
+        <div key={qAnimKey} style={{ width: "100%", maxWidth: 700, animation: "q-fade-in 0.35s ease forwards" }}>
 
           {/* AI avatar */}
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
@@ -517,12 +605,12 @@ export default function InterviewScreen({ go, shareCode }) {
                 )}
                 {phase === "ai_speaking" && !ttsBlocked && <div style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>AI가 질문을 읽고 있어요...</div>}
                 {phase === "ai_speaking" && ttsBlocked && (
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 8, background: "rgba(255,200,50,0.1)", border: "1px solid rgba(255,200,50,0.25)" }}>
-                      <span style={{ fontSize: 18 }}>🔇</span>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 16px", borderRadius: 8, background: "rgba(255,200,50,0.08)", border: "1px solid rgba(255,200,50,0.25)", width: "100%", boxSizing: "border-box" }}>
+                      <span style={{ fontSize: 18, flexShrink: 0 }}>🔇</span>
                       <div>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,200,50,0.9)" }}>오디오가 차단됐습니다</div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>기기 소리를 켠 후 아래 버튼을 눌러주세요</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,200,50,0.9)", marginBottom: 2 }}>음성 재생이 차단됐어요</div>
+                        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>기기 소리를 켜거나, 질문 텍스트를 직접 확인하세요.</div>
                       </div>
                     </div>
                     <button onClick={async () => {
@@ -533,12 +621,12 @@ export default function InterviewScreen({ go, shareCode }) {
                       } else {
                         setPhase(q.type === "voice" ? "ready" : q.type);
                       }
-                    }} style={{ padding: "14px 24px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 15, fontWeight: 500, fontFamily: F, cursor: "pointer", width: "100%" }}>
+                    }} style={{ padding: "12px 24px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 14, fontWeight: 500, fontFamily: F, cursor: "pointer", width: "100%" }}>
                       🔊 소리 켜고 다시 듣기
                     </button>
-                    <button onClick={() => setPhase(q.type === "voice" ? "ready" : q.type)}
-                      style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", background: "none", border: "none", cursor: "pointer", fontFamily: F }}>
-                      소리 없이 텍스트로 진행
+                    <button onClick={() => { setTtsReadFallback(true); setPhase(q.type === "voice" ? "ready" : q.type); }}
+                      style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, cursor: "pointer", fontFamily: F, padding: "10px 16px", width: "100%" }}>
+                      📖 질문 텍스트로 확인하고 진행
                     </button>
                   </div>
                 )}
@@ -559,15 +647,16 @@ export default function InterviewScreen({ go, shareCode }) {
                 )}
 
                 {phase === "recording" && (
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 3, height: 36 }}>
                       {Array.from({ length: 22 }).map((_, i) => (
                         <div key={i} style={{ width: 3, borderRadius: 2, background: C.ruby, animation: `wave-${i % 3} 0.5s ease-in-out ${(i * 0.05).toFixed(2)}s infinite alternate` }} />
                       ))}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 12, color: "rgba(217,48,37,0.8)", fontFeatureSettings: '"tnum"', display: "inline-flex", alignItems: "center", gap: 5 }}>
-                        {Ic.RecDot({ s: 8, c: "rgba(217,48,37,0.9)" })} {fmt(recordTime)}
+                      <span style={{ fontSize: 13, color: "rgba(217,48,37,0.9)", fontFeatureSettings: '"tnum"', display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 500 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: C.ruby, display: "inline-block", animation: "rec-pulse 1.2s ease-in-out infinite" }} />
+                        {fmt(recordTime)}
                       </span>
                       {recordTime < MIN_RECORD_SECS && (
                         <span style={{ fontSize: 11, color: "rgba(255,200,100,0.7)" }}>최소 {MIN_RECORD_SECS - recordTime}초 더 답변해 주세요</span>
@@ -590,7 +679,13 @@ export default function InterviewScreen({ go, shareCode }) {
                 )}
 
                 {phase === "ready" && (
-                  <div style={{ textAlign: "center" }}>
+                  <div style={{ textAlign: "center", width: "100%" }}>
+                    {ttsReadFallback && (
+                      <div style={{ padding: "14px 18px", borderRadius: 10, background: "rgba(83,58,253,0.12)", border: `1px solid rgba(83,58,253,0.3)`, marginBottom: 14, textAlign: "left" }}>
+                        <div style={{ fontSize: 11, color: C.purpleLight, marginBottom: 6, fontWeight: 600 }}>질문 텍스트</div>
+                        <div style={{ fontSize: 16, color: C.white, lineHeight: 1.65, fontWeight: 400 }}>{q.content}</div>
+                      </div>
+                    )}
                     {recordingWarning ? (
                       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 8, background: "rgba(217,48,37,0.1)", border: "1px solid rgba(217,48,37,0.25)", marginBottom: 10 }}
                         onClick={() => setRecordingWarning(null)}>
@@ -603,6 +698,9 @@ export default function InterviewScreen({ go, shareCode }) {
                         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.22)" }}>최소 {MIN_RECORD_SECS}초 이상 답변 후 다시 눌러 완료</div>
                       </>
                     )}
+                    <button onClick={() => setShowSkipConfirm(true)} style={{ marginTop: 16, fontSize: 12, color: "rgba(255,255,255,0.28)", background: "none", border: "none", cursor: "pointer", fontFamily: F, textDecoration: "underline" }}>
+                      이 질문 건너뛰기
+                    </button>
                   </div>
                 )}
               </>

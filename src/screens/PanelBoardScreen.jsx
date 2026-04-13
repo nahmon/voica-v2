@@ -1,16 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { PANEL_JOBS, MOCK_PANEL_PROFILE, getMatchScore } from "../lib/mockData.js";
 import { GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const APPLY_STEPS = ["none", "applied", "ai_screening", "confirmed"];
+const SORT_OPTIONS = [
+  { key: "추천순", label: "추천순" },
+  { key: "최신순", label: "최신순" },
+  { key: "리워드순", label: "리워드순" },
+];
+
+function parseReward(r) {
+  return parseInt((r || "0").replace(/[^0-9]/g, ""), 10) || 0;
+}
+
+function matchPct(score) {
+  // score max is ~8 (3+2+1+2), map to 0-100
+  return Math.min(100, Math.round((score / 8) * 100));
+}
+
+function MatchBadge({ score }) {
+  const pct = matchPct(score);
+  let color, bg;
+  if (pct >= 70) { color = "#15803d"; bg = "rgba(21,190,83,0.12)"; }
+  else if (pct >= 40) { color = "#92650a"; bg = "rgba(251,191,36,0.13)"; }
+  else { color = "#64748d"; bg = "rgba(100,116,141,0.1)"; }
+  return (
+    <span style={{
+      fontSize: 11, fontWeight: 600, color, background: bg,
+      padding: "2px 8px", borderRadius: 4, flexShrink: 0,
+    }}>매칭 {pct}%</span>
+  );
+}
+
+const RECENTLY_VIEWED_KEY = "voica_recently_viewed";
+
+function getRecentlyViewed() {
+  try { return JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY) || "[]"); }
+  catch { return []; }
+}
+
+function addRecentlyViewed(jobId) {
+  const prev = getRecentlyViewed().filter(id => id !== jobId);
+  localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify([jobId, ...prev].slice(0, 6)));
+}
 
 export default function PanelBoardScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("전체");
+  const [sortKey, setSortKey] = useState("추천순");
   const [applyState, setApplyState] = useState({});
+  const [recentIds, setRecentIds] = useState(getRecentlyViewed);
   const categories = ["전체", "추천", "전문가", "테크", "뷰티", "미디어", "식품", "금융", "교육"];
   const profile = MOCK_PANEL_PROFILE;
 
@@ -24,11 +66,22 @@ export default function PanelBoardScreen({ go, user, logout }) {
     )
     .filter(j => catFilter === "추천" ? j._matchScore >= MATCH_THRESHOLD : true)
     .sort((a, b) => {
-      if (catFilter === "전체" || catFilter === "추천") return b._matchScore - a._matchScore;
-      return 0;
+      if (sortKey === "최신순") return a.id - b.id; // mock: lower id = older, invert
+      if (sortKey === "리워드순") return parseReward(b.reward) - parseReward(a.reward);
+      // 추천순 (default)
+      return b._matchScore - a._matchScore;
     });
 
   const recommendedCount = jobsWithScore.filter(j => j._matchScore >= MATCH_THRESHOLD).length;
+
+  const recentJobs = recentIds
+    .map(id => jobsWithScore.find(j => j.id === id))
+    .filter(Boolean);
+
+  function handleView(jobId) {
+    addRecentlyViewed(jobId);
+    setRecentIds(getRecentlyViewed());
+  }
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
@@ -67,7 +120,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
       <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "16px 16px 60px" : "24px 24px 80px" }}>
 
         {/* Category filter */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "nowrap", overflowX: "auto", marginBottom: 20, paddingBottom: 4, scrollbarWidth: "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "nowrap", overflowX: "auto", marginBottom: 12, paddingBottom: 4, scrollbarWidth: "none" }}>
           {categories.map(c => {
             const active = catFilter === c;
             return (
@@ -85,6 +138,27 @@ export default function PanelBoardScreen({ go, user, logout }) {
           })}
         </div>
 
+        {/* Sort toggle */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
+          <span style={{ fontSize: 12, color: C.body, flexShrink: 0 }}>정렬:</span>
+          {SORT_OPTIONS.map(opt => {
+            const active = sortKey === opt.key;
+            return (
+              <button key={opt.key} onClick={() => setSortKey(opt.key)}
+                style={{
+                  padding: "4px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer",
+                  border: `1px solid ${active ? C.purple : C.border}`,
+                  background: active ? C.purpleBg : "transparent",
+                  color: active ? C.purple : C.body,
+                  fontWeight: active ? 600 : 400,
+                  transition: "all 0.12s",
+                }}>
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+
         {/* Job list */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {filtered.map(job => (
@@ -94,7 +168,11 @@ export default function PanelBoardScreen({ go, user, logout }) {
               status={applyState[job.id] || "none"}
               isRecommended={job._matchScore >= MATCH_THRESHOLD}
               isMobile={isMobile}
-              onApply={() => setApplyState(prev => ({ ...prev, [job.id]: "applied" }))}
+              onApply={() => {
+                setApplyState(prev => ({ ...prev, [job.id]: "applied" }));
+                handleView(job.id);
+              }}
+              onView={() => handleView(job.id)}
               onCycleDemo={() => {
                 const idx = APPLY_STEPS.indexOf(applyState[job.id] || "none");
                 const next = APPLY_STEPS[Math.min(idx + 1, APPLY_STEPS.length - 1)];
@@ -104,13 +182,38 @@ export default function PanelBoardScreen({ go, user, logout }) {
             />
           ))}
         </div>
+
+        {/* 최근 본 공고 */}
+        {recentJobs.length > 0 && (
+          <div style={{ marginTop: 40 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 12 }}>최근 본 공고</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {recentJobs.map(job => (
+                <div key={job.id} style={{
+                  background: C.white, borderRadius: 10, padding: "12px 16px",
+                  border: `1px solid ${C.border}`,
+                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+                }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: C.navy, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{job.title}</div>
+                    <div style={{ fontSize: 11, color: C.body }}>{job.company} · {job.duration}</div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{job.reward}</span>
+                    <MatchBadge score={job._matchScore} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       <Footer go={go} />
     </div>
   );
 }
 
-function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, go }) {
+function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycleDemo, go }) {
   const [expanded, setExpanded] = useState(true);
   const remaining = job.total - job.filled;
   const fillPct = Math.round((job.filled / job.total) * 100);
@@ -118,9 +221,16 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
   const isApplied = status !== "none";
   const isUrgent = job.urgent || remaining <= 10;
 
+  function handleToggle() {
+    if (!isApplied) {
+      setExpanded(v => !v);
+      onView();
+    }
+  }
+
   return (
     <div
-      onClick={() => !isApplied && setExpanded(v => !v)}
+      onClick={handleToggle}
       style={{
         background: C.white,
         borderRadius: 12,
@@ -152,11 +262,15 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onCycleDemo, g
                 background: "rgba(108,63,219,0.08)", padding: "2px 7px", borderRadius: 4,
               }}>✦ 추천</span>
             )}
+            <MatchBadge score={job._matchScore} />
           </div>
-          {/* Reward — hero number */}
+          {/* Reward + duration — hero numbers */}
           <div style={{ flexShrink: 0, marginLeft: 12, textAlign: "right" }}>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, lineHeight: 1 }}>{job.reward}</div>
-            <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>{job.duration}</div>
+            <div style={{ fontSize: 11, color: C.body, marginTop: 3, display: "flex", alignItems: "center", gap: 3, justifyContent: "flex-end" }}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={C.body} strokeWidth="1.4" strokeLinecap="round"><circle cx="5" cy="5" r="4"/><path d="M5 3v2l1.5 1.5"/></svg>
+              {job.duration}
+            </div>
           </div>
         </div>
 

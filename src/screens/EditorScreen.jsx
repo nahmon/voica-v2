@@ -36,6 +36,14 @@ const VOICA_SURVEY_TEMPLATE = {
 };
 
 const DRAFT_KEY = "voica_editor_draft";
+const MAX_Q_CHARS = 200;
+
+// Question type definitions with icons and descriptions
+const Q_TYPES = [
+  { type: "voice",           icon: "🎙", label: "음성 답변",  desc: "참여자가 음성으로 자유롭게 답변합니다" },
+  { type: "multiple_choice", icon: "☑",  label: "객관식",    desc: "미리 정해진 보기 중 하나를 선택합니다" },
+  { type: "likert",          icon: "📊", label: "평점",       desc: "1~5점 척도로 평가합니다" },
+];
 
 export default function EditorScreen({ go, user, logout, interviewId }) {
   const { showToast } = useToast();
@@ -55,8 +63,14 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [templateOpen, setTemplateOpen] = useState(false);
   const [showIncompleteWarn, setShowIncompleteWarn] = useState(false);
   const [dragOver, setDragOver] = useState(null);
+  const [savedTitle, setSavedTitle] = useState(savedDraft?.title ?? "");
+  const [savedQuestions, setSavedQuestions] = useState(savedDraft?.questions ?? [newQ("voice")]);
+  const [showSaveTooltip, setShowSaveTooltip] = useState(false);
   const dragIdx = useRef(null);
   const isMobile = useIsMobile();
+
+  // Track whether there are unsaved changes
+  const hasUnsaved = title !== savedTitle || JSON.stringify(questions) !== JSON.stringify(savedQuestions);
 
   // Load existing interview from DB when editing
   useEffect(() => {
@@ -67,9 +81,15 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           supabase.from("interviews").select("id, title, share_code").eq("id", interviewId).single(),
           supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
         ]);
-        if (iv) { setTitle(iv.title ?? ""); if (iv.share_code) setShareCode(iv.share_code); }
+        if (iv) {
+          setTitle(iv.title ?? "");
+          setSavedTitle(iv.title ?? "");
+          if (iv.share_code) setShareCode(iv.share_code);
+        }
         if (qs && qs.length > 0) {
-          setQuestions(qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options })));
+          const loaded = qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options }));
+          setQuestions(loaded);
+          setSavedQuestions(loaded);
           setSelectedIdx(0);
         }
       } catch (e) {
@@ -90,6 +110,18 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     }, 800);
     return () => clearTimeout(timer);
   }, [title, questions, editingId]);
+
+  // Keyboard shortcut: Cmd+S / Ctrl+S to save
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  });
 
   const loadTemplate = () => {
     const hasContent = title.trim() || questions.some(q => q.content.trim());
@@ -149,6 +181,16 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     setAddTypeOpen(false);
   };
 
+  const duplicateQ = (idx, e) => {
+    e.stopPropagation();
+    const orig = questions[idx];
+    const copy = { ...orig, id: mkId() };
+    const next = [...questions];
+    next.splice(idx + 1, 0, copy);
+    setQuestions(next);
+    setSelectedIdx(idx + 1);
+  };
+
   const removeQ = (idx) => {
     if (questions.length === 1) return;
     const next = questions.filter((_, i) => i !== idx);
@@ -190,6 +232,9 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "저장 실패");
       setShareCode(data.share_code);
+      // Mark as saved
+      setSavedTitle(title);
+      setSavedQuestions(questions);
       if (!editingId) {
         track("interview_published", { shareCode: data.share_code, questionCount: questions.length });
         setShowShareOverlay(true); // only for new interviews
@@ -286,12 +331,19 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     </div>
   );
 
-  // ─── Top nav bar (back + draft indicator + template + save) ───
+  // ─── Top nav bar ───
   const NavBar = (
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
       <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {logout && <Btn variant="ghost" size="sm" onClick={logout} style={{ fontSize: 12, color: C.body }}>로그아웃</Btn>}
+        {/* Unsaved changes indicator */}
+        {editingId && hasUnsaved && (
+          <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#f59e0b", fontWeight: 500 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
+            저장되지 않은 변경사항
+          </span>
+        )}
         {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시저장됨 ✓</span>}
         <span style={{ fontSize: 11, color: questions.length >= 10 ? C.success : "rgba(180,120,0,0.85)", fontWeight: 500 }}>
           질문 {questions.length}{questions.length < 10 ? ` / 10 권장` : ` ✓`}
@@ -311,9 +363,19 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             </div>
           )}
         </div>
-        <Btn size="sm" onClick={handleSave} disabled={saving}>
-          {saving ? "저장 중…" : editingId ? "저장" : "링크 생성 →"}
-        </Btn>
+        {/* Save button with ⌘S tooltip */}
+        <div style={{ position: "relative" }}
+          onMouseEnter={() => setShowSaveTooltip(true)}
+          onMouseLeave={() => setShowSaveTooltip(false)}>
+          <Btn size="sm" onClick={handleSave} disabled={saving}>
+            {saving ? "저장 중…" : editingId ? "저장" : "링크 생성 →"}
+          </Btn>
+          {showSaveTooltip && (
+            <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: C.navy, color: C.white, fontSize: 11, padding: "4px 8px", borderRadius: 6, whiteSpace: "nowrap", zIndex: 200, pointerEvents: "none" }}>
+              ⌘S로 저장
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -348,10 +410,10 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           </button>
           {addTypeOpen && (
             <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 100 }}>
-              {[["voice", "🎙 음성"], ["multiple_choice", "☑ 객관식"], ["likert", "📊 평점"]].map(([type, label]) => (
+              {Q_TYPES.map(({ type, icon, label }) => (
                 <div key={type} onClick={() => addQuestion(type)}
                   style={{ padding: "10px 16px", fontSize: 13, color: C.navy, cursor: "pointer", whiteSpace: "nowrap", borderBottom: `1px solid ${C.border}` }}>
-                  {label}
+                  {icon} {label}
                 </div>
               ))}
             </div>
@@ -383,12 +445,13 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             <Btn size="sm" full onClick={() => setAddTypeOpen(v => !v)}>+ 질문 추가</Btn>
             {addTypeOpen && (
               <div style={{ position: "absolute", top: "100%", left: 14, right: 14, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 10 }}>
-                {[["voice", "🎙 음성 질문"], ["multiple_choice", "☑ 객관식"], ["likert", "📊 평점 선택"]].map(([type, label]) => (
+                {Q_TYPES.map(({ type, icon, label, desc }) => (
                   <div key={type} onClick={() => addQuestion(type)}
-                    style={{ padding: "10px 14px", fontSize: 13, color: C.navy, cursor: "pointer", borderBottom: `1px solid ${C.border}` }}
+                    style={{ padding: "10px 14px", cursor: "pointer", borderBottom: `1px solid ${C.border}` }}
                     onMouseEnter={e => e.currentTarget.style.background = C.bg}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    {label}
+                    <div style={{ fontSize: 13, color: C.navy, fontWeight: 500, marginBottom: 2 }}>{icon} {label}</div>
+                    <div style={{ fontSize: 11, color: C.body }}>{desc}</div>
                   </div>
                 ))}
               </div>
@@ -426,6 +489,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
                   <span style={{ fontSize: 11, color: selectedIdx === i ? C.purple : C.body }}>Q{i + 1}</span>
                   <Badge variant={selectedIdx === i ? typeVariant[qq.type] : "neutral"} style={{ fontSize: 10 }}>{typeLabel[qq.type]}</Badge>
                   <div style={{ marginLeft: "auto", display: "flex", gap: 2 }}>
+                    {/* Duplicate button */}
+                    <button onClick={e => duplicateQ(i, e)} title="복제" style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px", opacity: 0.6 }}>⧉</button>
                     <button onClick={e => { e.stopPropagation(); removeQ(i); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px" }}>✕</button>
                   </div>
                 </div>
@@ -470,6 +535,10 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 40px", gap: 12 }}>
             <div style={{ fontSize: 11, color: C.body, letterSpacing: 0.3 }}>참여자에게 보이는 화면 — 직접 클릭해서 편집하세요</div>
             <PreviewCard q={q} idx={selectedIdx} total={questions.length} updateQ={updateQ} />
+            {/* Character count */}
+            <div style={{ fontSize: 11, color: (q?.content?.length ?? 0) > MAX_Q_CHARS ? C.ruby : C.body, alignSelf: "flex-end", marginRight: 0 }}>
+              {q?.content?.length ?? 0}/{MAX_Q_CHARS}자
+            </div>
           </div>
         </div>
 
@@ -553,9 +622,31 @@ function PreviewCard({ q, idx, total, updateQ }) {
 
 function QuestionSettings({ q, idx, updateQ, typeLabel }) {
   if (!q) return null;
+
+  const currentTypeDef = Q_TYPES.find(t => t.type === q.type);
+
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>질문 설정 — {typeLabel[q.type] ?? q.type}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>질문 설정</div>
+
+      {/* Type selector with icons and descriptions */}
+      <div style={{ marginBottom: 14 }}>
+        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 8 }}>질문 유형</label>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {Q_TYPES.map(({ type, icon, label, desc }) => (
+            <div key={type}
+              onClick={() => updateQ(idx, { type, options: type === "multiple_choice" ? ["", "", ""] : type === "likert" ? { min: 1, max: 5, labels: ["매우 아니다", "아니다", "보통", "그렇다", "매우 그렇다"] } : undefined })}
+              style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${q.type === type ? C.purple : C.border}`, background: q.type === type ? C.purpleBg : "transparent", cursor: "pointer", transition: "all 0.1s" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                <span style={{ fontSize: 14 }}>{icon}</span>
+                <span style={{ fontSize: 12, fontWeight: q.type === type ? 600 : 400, color: q.type === type ? C.purple : C.navy }}>{label}</span>
+              </div>
+              <div style={{ fontSize: 10, color: C.body, lineHeight: 1.4 }}>{desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div style={{ marginBottom: 14 }}>
         <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>질문 텍스트</label>
         <textarea
@@ -565,6 +656,9 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
           placeholder="질문을 입력하세요"
           style={{ width: "100%", padding: "8px 10px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.5 }}
         />
+        <div style={{ fontSize: 10, color: (q.content?.length ?? 0) > 200 ? C.ruby : C.body, textAlign: "right", marginTop: 3 }}>
+          {q.content?.length ?? 0}/200자
+        </div>
       </div>
       {q.type === "multiple_choice" && Array.isArray(q.options) && (
         <div style={{ marginBottom: 14 }}>
