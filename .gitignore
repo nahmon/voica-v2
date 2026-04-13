@@ -6,4 +6,7 @@ dist/
 .omc/
 .claude/
 *.log
+harness/.env
+harness/node_modules/
+harness/logs/
 
