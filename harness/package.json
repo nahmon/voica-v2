@@ -1,0 +1,12 @@
+{
+  "name": "harness",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node dispatcher.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.103.0",
+    "dotenv": "^16.4.0"
+  }
+}
