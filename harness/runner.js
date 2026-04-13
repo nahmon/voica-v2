@@ -3,6 +3,7 @@ import { spawn } from 'child_process'
 import { createClient } from '@supabase/supabase-js'
 import { notify, sendUpdate } from './notify.js'
 import { postToNotion } from './notion.js'
+import { sendGmail } from './gmail.js'
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -11,6 +12,10 @@ const supabase = createClient(
 
 function wantsNotion(instruction) {
   return /notion/i.test(instruction)
+}
+
+function wantsGmail(instruction) {
+  return /gmail|이메일|메일/i.test(instruction)
 }
 
 export async function runTask(task) {
@@ -65,6 +70,17 @@ export async function runTask(task) {
   }, 60000)
 
   return new Promise((resolve) => {
+    proc.on('error', async (err) => {
+      clearInterval(progressInterval)
+      console.error('[runner] spawn error:', err.message)
+      await supabase
+        .from('agent_tasks')
+        .update({ status: 'failed', error_msg: err.message, done_at: new Date().toISOString() })
+        .eq('id', task.id)
+      await notify(task.tg_chat_id, task.tg_message_id, '', false)
+      resolve()
+    })
+
     proc.on('close', async (code) => {
       clearInterval(progressInterval)
 
@@ -84,18 +100,31 @@ export async function runTask(task) {
 
       if (error) console.error('[runner] update failed:', error)
 
-      // Notion 업로드 (지시문에 "notion" 포함 시)
-      if (success && wantsNotion(task.instruction)) {
-        try {
-          const notionUrl = await postToNotion(task.instruction, resultUrl, output.slice(-3000))
-          await notify(task.tg_chat_id, task.tg_message_id, resultUrl, true)
-          await sendUpdate(task.tg_chat_id, task.tg_message_id, `📝 Notion 저장 완료\n${notionUrl}`)
-        } catch (err) {
-          console.error('[runner] notion failed:', err.message)
-          await notify(task.tg_chat_id, task.tg_message_id, resultUrl, true)
+      // 완료 알림
+      await notify(task.tg_chat_id, task.tg_message_id, resultUrl, success)
+
+      if (success) {
+        // Notion 업로드 (지시문에 "notion" 포함 시)
+        if (wantsNotion(task.instruction)) {
+          try {
+            const notionUrl = await postToNotion(task.instruction, resultUrl, output.slice(-3000))
+            await sendUpdate(task.tg_chat_id, task.tg_message_id, `📝 Notion 저장 완료\n${notionUrl}`)
+          } catch (err) {
+            console.error('[runner] notion failed:', err.message)
+            await sendUpdate(task.tg_chat_id, task.tg_message_id, `⚠️ Notion 저장 실패: ${err.message}`)
+          }
         }
-      } else {
-        await notify(task.tg_chat_id, task.tg_message_id, resultUrl, success)
+
+        // Gmail 전송 (지시문에 "gmail/이메일/메일" 포함 시)
+        if (wantsGmail(task.instruction)) {
+          try {
+            await sendGmail(task.instruction, resultUrl, output.slice(-5000))
+            await sendUpdate(task.tg_chat_id, task.tg_message_id, `📧 Gmail 전송 완료\n${process.env.GMAIL_USER}`)
+          } catch (err) {
+            console.error('[runner] gmail failed:', err.message)
+            await sendUpdate(task.tg_chat_id, task.tg_message_id, `⚠️ Gmail 전송 실패: ${err.message}`)
+          }
+        }
       }
 
       resolve()

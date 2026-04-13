@@ -55,8 +55,9 @@ supabase
       await tryDispatch(payload.new)
     }
   )
-  .subscribe((status) => {
+  .subscribe(async (status) => {
     console.log('[realtime] 구독 상태:', status)
+    if (status === 'SUBSCRIBED') await drainPending()
   })
 
 // 시작 시 오프라인 동안 쌓인 pending 처리
@@ -79,7 +80,7 @@ createServer(async (req, res) => {
       const { error } = await supabase.from('agent_tasks').insert({
         instruction: message.text,
         tg_chat_id: String(message.chat?.id ?? ''),
-        tg_message_id: String(message.message_id),
+        tg_message_id: String(message?.message_id ?? ''),
         status: 'pending',
       })
       if (error) console.error('[webhook] insert failed:', error)
