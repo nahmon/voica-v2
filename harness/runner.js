@@ -14,9 +14,8 @@ export async function runTask(task) {
     .update({ status: 'running', started_at: new Date().toISOString() })
     .eq('id', task.id)
 
-  const safeInstruction = task.instruction.replace(/"/g, '\\"')
   const prompt =
-    `/team 5 "${safeInstruction}. ` +
+    `/team 5 "${task.instruction}. ` +
     `결과는 GitHub에 커밋하고 완료 시 결과 URL(GitHub PR 또는 커밋 링크)을 stdout 마지막 줄에 단독으로 출력해줘."`
 
   let output = ''
