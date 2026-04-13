@@ -4,6 +4,7 @@ import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, Btn, useToast } from "../components/shared.jsx";
 import { track } from "../lib/analytics.js";
+import { TEMPLATES, templateToQuestions } from "../lib/templates.js";
 
 function newQ(type = "voice") {
   const id = Math.random().toString(36).slice(2, 10);
@@ -98,6 +99,43 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     setSelectedIdx(0);
     setTemplateOpen(false);
   };
+
+  const applyTemplate = (tpl) => {
+    setTitle(tpl.title);
+    setQuestions(templateToQuestions(tpl));
+    setSelectedIdx(0);
+  };
+
+  const isEmpty = !title.trim() && questions.length === 1 && !questions[0].content.trim();
+
+  const TemplateBanner = isEmpty && !editingId && (
+    <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "20px 24px 16px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>템플릿으로 시작하기</div>
+        <button
+          onClick={() => applyTemplate({ title: "", questions: [] }) || setTitle("") || setQuestions([newQ("voice")])}
+          style={{ background: "none", border: "none", fontSize: 12, color: C.body, cursor: "pointer", padding: 0, textDecoration: "underline" }}
+        >
+          처음부터 작성
+        </button>
+      </div>
+      <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
+        {TEMPLATES.map(tpl => (
+          <div key={tpl.id} style={{ flexShrink: 0, width: 160, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: "14px 14px 12px", display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ fontSize: 22 }}>{tpl.icon}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, lineHeight: 1.3 }}>{tpl.title}</div>
+            <div style={{ fontSize: 11, color: C.body, lineHeight: 1.4, flex: 1 }}>{tpl.desc}</div>
+            <button
+              onClick={() => applyTemplate(tpl)}
+              style={{ marginTop: 4, padding: "6px 0", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 12, fontWeight: 500, fontFamily: F, cursor: "pointer" }}
+            >
+              사용하기
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   const q = questions[selectedIdx] ?? questions[0];
 
@@ -209,6 +247,17 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         <div style={{ background: C.bg, borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, marginBottom: 20, border: `1px solid ${C.border}` }}>
           <span style={{ flex: 1, fontSize: 13, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
           <Btn size="sm" onClick={handleCopy}>{copied ? "복사됨 ✓" : "복사"}</Btn>
+        </div>
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 12, color: C.body, marginBottom: 10 }}>📱 QR 코드로 공유</div>
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`}
+            alt="QR 코드"
+            style={{ width: 180, height: 180, borderRadius: 12, border: `1px solid ${C.border}` }}
+          />
+          <div style={{ marginTop: 10 }}>
+            <Btn size="sm" variant="ghost" onClick={() => window.open(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`, "_blank")}>QR 코드 저장</Btn>
+          </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <Btn full variant="ghost" onClick={() => setShowShareOverlay(false)}>계속 편집</Btn>

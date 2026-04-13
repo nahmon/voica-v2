@@ -26,6 +26,10 @@ export default function DashboardScreen({ go, user, logout }) {
     })();
   }, [user]);
 
+  const markAsSeen = (interviewId, count) => {
+    localStorage.setItem(`voica_seen_${interviewId}`, String(count));
+  };
+
   const statusLabel = { draft: "초안", active: "진행 중", closed: "완료" };
   const statusStyle = {
     "진행 중": { variant: "success", dot: C.success },
@@ -81,8 +85,9 @@ export default function DashboardScreen({ go, user, logout }) {
           ))}
         </div>
 
-        <div style={{ marginBottom: 10 }}>
+        <div style={{ marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontSize: 14, fontWeight: 400, color: C.label }}>프로젝트</div>
+          <div style={{ fontSize: 12, color: C.body }}>🔔 응답 알림 활성</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {!loading && interviews.length === 0 && (
@@ -102,13 +107,18 @@ export default function DashboardScreen({ go, user, logout }) {
             const label = statusLabel[p.status] ?? p.status;
             const st = statusStyle[label] ?? { variant: "neutral", dot: C.body };
             const date = new Date(p.created_at).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\. /g, ".").replace(/\.$/, "");
+            const seenCount = parseInt(localStorage.getItem(`voica_seen_${p.id}`) ?? "0", 10);
+            const newResponses = sessionCount - seenCount;
             return (
-              <div key={p.id} onClick={() => go(p.status === "closed" ? "report" : "editor", p.id)} style={{ background: C.white, borderRadius: 16, padding: isMobile ? "16px" : "20px 24px", boxShadow: S.ambient, border: `1px solid ${C.border}`, cursor: "pointer", transition: "box-shadow 0.2s" }}
+              <div key={p.id} onClick={() => { markAsSeen(p.id, sessionCount); go(p.status === "closed" ? "report" : "editor", p.id); }} style={{ background: C.white, borderRadius: 16, padding: isMobile ? "16px" : "20px 24px", boxShadow: S.ambient, border: `1px solid ${C.border}`, cursor: "pointer", transition: "box-shadow 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.boxShadow = S.card; }}
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = S.ambient; }}>
                 {/* Title + status */}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 15, fontWeight: 400, color: C.navy, fontFeatureSettings: '"ss01"', flex: 1, minWidth: 0 }}>{p.title}</span>
+                  {newResponses > 0 && (
+                    <span style={{ fontSize: 11, fontWeight: 600, color: C.white, background: C.ruby, borderRadius: 20, padding: "2px 8px", letterSpacing: "0.1px" }}>새 응답 {newResponses}건</span>
+                  )}
                   <Badge variant={st.variant}>{label}</Badge>
                 </div>
                 <div style={{ fontSize: 12, color: C.body, marginBottom: 12 }}>질문 {questionCount}개 · {date}</div>

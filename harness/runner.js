@@ -39,7 +39,7 @@ export async function runTask(task) {
 
   const proc = spawn(
     '/opt/homebrew/bin/claude',
-    ['-p', prompt, '--allowedTools', 'all', '--dangerously-skip-permissions'],
+    ['-p', prompt, '--model', 'claude-opus-4-6', '--allowedTools', 'all', '--dangerously-skip-permissions'],
     {
       cwd: process.env.WORKSPACE_DIR ?? process.env.HOME,
       env: process.env,

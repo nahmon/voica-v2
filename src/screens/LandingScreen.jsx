@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { C, F } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, GlobalNav, VoCCarousel, HowItWorksCarousel, Footer } from "../components/shared.jsx";
+import { track } from "../lib/analytics.js";
 
 function CounterStat({ end, suffix, label, delay, color, labelColor }) {
   const [val, setVal] = useState(0);
@@ -50,6 +51,11 @@ function CounterStat({ end, suffix, label, delay, color, labelColor }) {
 export default function LandingScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const [liveCount, setLiveCount] = useState(247);
+  const refParam = new URLSearchParams(window.location.search).get("ref");
+  const fromInterview = refParam === "interview";
+  useEffect(() => {
+    if (fromInterview) track("referral_from_interview", { ref: refParam });
+  }, []);
   useEffect(() => {
     const tick = () => {
       setLiveCount(prev => {
@@ -73,7 +79,7 @@ export default function LandingScreen({ go, user, logout }) {
 
           <h1 style={{ fontSize: isMobile ? 36 : 52, fontWeight: 700, lineHeight: 1.1, margin: "0 0 24px", fontFamily: F }}>
             <span style={{ color: "#061b31", display: "block" }}>
-              시간과 비용이 많이 들었던 인터뷰
+              {fromInterview ? "AI 인터뷰를 경험하셨나요?" : "시간과 비용이 많이 들었던 인터뷰"}
             </span>
             <span style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "block" }}>
               AI로 수백 명의 인터뷰를 동시에<span className="cursor-blink" style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)` }} />

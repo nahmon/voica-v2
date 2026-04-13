@@ -407,13 +407,42 @@ export default function InterviewScreen({ go, shareCode }) {
   );
 
   // ─── Completed ───
+  const [shareCopied, setShareCopied] = useState(false);
+  const handleShare = () => {
+    track("viral_share_clicked", {});
+    const shareText = "나는 방금 Voica AI 인터뷰에 참여했어요! 🎤 voica.kr";
+    if (navigator.share) {
+      navigator.share({ title: "Voica 인터뷰 완료!", text: "방금 AI 음성 인터뷰에 참여했어요. 당신도 해보세요!", url: "https://voica.kr" }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareText).then(() => { setShareCopied(true); setTimeout(() => setShareCopied(false), 2500); }).catch(() => {});
+    }
+  };
+
   if (completed) return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d,#202124)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, fontFamily: F }}>
       <div style={{ position: "absolute", top: "15%", right: "10%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle,rgba(30,142,62,0.2),transparent 70%)", filter: "blur(70px)", pointerEvents: "none" }} />
-      <div style={{ textAlign: "center", position: "relative" }}>
+      <div style={{ textAlign: "center", position: "relative", maxWidth: 400, width: "100%" }}>
         <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(30,142,62,0.2)", border: "1px solid rgba(30,142,62,0.4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>✓</div>
         <div style={{ fontSize: 30, fontWeight: 700, color: C.white, marginBottom: 10 }}>인터뷰 완료!</div>
-        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>소중한 의견 감사해요.<br />답변을 저장했어요.</div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 32 }}>소중한 의견 감사해요.<br />답변을 저장했어요.</div>
+
+        {/* Share button */}
+        <button onClick={handleShare}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.75)", fontSize: 14, fontFamily: F, cursor: "pointer", marginBottom: 24, width: "100%", justifyContent: "center" }}>
+          {shareCopied ? "✓ 복사됐어요!" : "🔗 완료 인증 공유하기"}
+        </button>
+
+        {/* Powered by Voica footer */}
+        <div style={{ padding: "16px 20px", borderRadius: 12, border: `1px solid rgba(124,58,237,0.3)`, background: "rgba(124,58,237,0.08)", textAlign: "left" }}>
+          <div style={{ fontSize: 12, color: `${C.purpleLight}`, marginBottom: 8, fontWeight: 500 }}>🎤 Voica로 만들어진 인터뷰예요</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>당신의 목소리로 리서치하고 싶다면 →</span>
+            <button onClick={() => { track("powered_by_voica_clicked", {}); window.location.href = "/"; }}
+              style={{ flexShrink: 0, padding: "7px 14px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 12, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap" }}>
+              무료로 시작하기 →
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
