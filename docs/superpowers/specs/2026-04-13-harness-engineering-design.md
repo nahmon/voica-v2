@@ -32,7 +32,8 @@ Vercel: api/telegram-webhook.js
 Mac Mini: harness/dispatcher.js (PM2 데몬)
     - Supabase Realtime 구독 (폴링 없음)
     - 새 태스크 → claude -p 서브프로세스 실행
-    - 최대 3개 병렬 실행 (Mac Mini 부하 고려)
+    - 최대 3개 Claude Code 세션 병렬 실행 (Mac Mini 부하 고려)
+    - 각 세션 내부에서 Sonnet 워커 5명 실행 → 최대 15 Sonnet 동시 실행
     │ claude -p 서브프로세스
     ▼
 Claude Code 세션 (태스크당 1개)
@@ -131,16 +132,29 @@ harness/
 const MAX_PARALLEL = 3
 let activeJobs = 0
 
+// Realtime: 새 태스크 INSERT 즉시 수신
 supabase.channel('tasks')
   .on('postgres_changes', { event: 'INSERT', table: 'agent_tasks' },
     async (payload) => {
-      if (activeJobs < MAX_PARALLEL) {
-        activeJobs++
-        await runTask(payload.new)
-        activeJobs--
-      }
+      await tryDispatch(payload.new)
     })
   .subscribe()
+
+async function tryDispatch(task) {
+  if (activeJobs >= MAX_PARALLEL) return  // 슬롯 초과 시 pending 유지
+  activeJobs++
+  await runTask(task)
+  activeJobs--
+  // 슬롯이 빌 때마다 pending 태스크 재조회 (Realtime은 INSERT만 감지)
+  await drainPending()
+}
+
+async function drainPending() {
+  if (activeJobs >= MAX_PARALLEL) return
+  const { data } = await supabase.from('agent_tasks')
+    .select('*').eq('status', 'pending').order('created_at').limit(1)
+  if (data?.[0]) await tryDispatch(data[0])
+}
 ```
 
 **runner.js 핵심 로직:**
@@ -150,14 +164,17 @@ async function runTask(task) {
     .update({ status: 'running', started_at: new Date() })
     .eq('id', task.id)
 
+  let output = ''
   const proc = spawn('claude', [
     '-p',
     `/team 5 "${task.instruction}. 결과는 GitHub에 커밋하고 완료 시 결과 URL을 마지막 줄에 출력해줘."`,
     '--allowedTools', 'all'
   ])
+  proc.stdout.on('data', (chunk) => { output += chunk.toString() })
 
   proc.on('close', async (code) => {
-    const resultUrl = parseLastLine(proc.stdout)
+    const lines = output.trim().split('\n')
+    const resultUrl = lines[lines.length - 1] || ''
     await supabase.from('agent_tasks')
       .update({
         status: code === 0 ? 'done' : 'failed',
