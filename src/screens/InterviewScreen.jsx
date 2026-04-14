@@ -102,7 +102,17 @@ export default function InterviewScreen({ go, shareCode }) {
     if (!shareCode) { setLoadError("인터뷰 링크가 맞지 않아요"); setLoading(false); return; }
     (async () => {
       const res = await fetch(`/api/interview/${shareCode}`);
-      if (!res.ok) { setLoadError("인터뷰를 찾지 못했어요. 링크를 다시 확인해요."); setLoading(false); return; }
+      if (!res.ok) {
+        let msg = "인터뷰를 찾지 못했어요. 링크를 다시 확인해요.";
+        try {
+          const errData = await res.json();
+          if (errData.status === "draft") msg = "이 인터뷰는 아직 게시되지 않았어요. 인터뷰를 활성화한 후 공유해 주세요.";
+          else if (errData.detail === "Missing Supabase credentials") msg = "서버 설정 오류가 발생했어요. 관리자에게 문의해 주세요.";
+        } catch {}
+        setLoadError(msg);
+        setLoading(false);
+        return;
+      }
       const data = await res.json();
       setInterview(data);
       setLoading(false);
