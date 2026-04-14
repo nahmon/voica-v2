@@ -576,10 +576,13 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
   const price = plan.price[billing];
 
   const methods = [
-    { id: "naverpay", label: "네이버페이", color: "#03C75A", icon: <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>N Pay</span> },
-    { id: "tosspay",  label: "토스페이",   color: "#0064FF", icon: <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>toss</span> },
-    { id: "stripe",   label: "신용/체크카드 (Stripe)", color: "#635bff", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg> },
+    { id: "naverpay",  label: "네이버페이",           color: "#03C75A", hint: "네이버 앱으로 연결됩니다...",  icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z"/></svg> },
+    { id: "tosspay",   label: "토스페이",             color: "#0064FF", hint: "토스 앱으로 연결됩니다...",    icon: <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>toss</span> },
+    { id: "kakaopay",  label: "카카오페이",           color: "#FEE500", hint: "카카오 앱으로 연결됩니다...", icon: <span style={{ fontSize: 11, fontWeight: 800, color: "#191919" }}>kakao pay</span> },
+    { id: "stripe",    label: "신용/체크카드 (Stripe)", color: "#635bff", hint: null, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg> },
   ];
+
+  const selectedMethod = methods.find(m => m.id === method);
 
   const confirm = () => {
     if (!method) return;
@@ -596,7 +599,9 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
           <div style={{ textAlign: "center", padding: "16px 0" }}>
             <div style={{ width: 56, height: 56, borderRadius: "50%", background: C.successBg, border: `1px solid ${C.successBorder}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 24 }}>✓</div>
             <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>결제 완료!</div>
-            <div style={{ fontSize: 14, color: C.body, marginBottom: 24 }}>{plan.name} 플랜이 시작되었습니다</div>
+            <div style={{ fontSize: 14, color: C.body, marginBottom: 4 }}>{plan.name} 플랜 · {billing === "annual" ? "연 결제" : "월 결제"}</div>
+            <div style={{ fontSize: 13, color: C.body, marginBottom: 4 }}>₩{price.toLocaleString()} 결제됨</div>
+            <div style={{ fontSize: 12, color: C.body, marginBottom: 24 }}>영수증이 이메일로 발송됩니다</div>
             <Btn full onClick={() => { onClose(); onDone(); }}>대시보드로 이동</Btn>
           </div>
         ) : (
@@ -612,19 +617,41 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
             </div>
 
             <div style={{ fontSize: 13, fontWeight: 600, color: C.label, marginBottom: 12 }}>결제 수단 선택</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
               {methods.map(m => (
                 <div key={m.id} onClick={() => setMethod(m.id)}
                   style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 8, border: `2px solid ${method === m.id ? m.color : C.border}`, cursor: "pointer", background: method === m.id ? `${m.color}08` : C.white, transition: "all 0.15s" }}>
                   <div style={{ width: 40, height: 26, borderRadius: 6, background: m.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     {m.icon}
                   </div>
-                  <span style={{ fontSize: 14, color: C.navy, fontWeight: method === m.id ? 500 : 400 }}>{m.label}</span>
-                  <div style={{ marginLeft: "auto", width: 18, height: 18, borderRadius: "50%", border: `2px solid ${method === m.id ? m.color : C.border}`, background: method === m.id ? m.color : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontSize: 14, color: C.navy, fontWeight: method === m.id ? 500 : 400 }}>{m.label}</span>
+                    <div style={{ fontSize: 10, color: C.body, marginTop: 1 }}>실제 결제 연동 전 테스트 모드</div>
+                  </div>
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${method === m.id ? m.color : C.border}`, background: method === m.id ? m.color : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     {method === m.id && <span style={{ color: C.white, fontSize: 10 }}>✓</span>}
                   </div>
                 </div>
               ))}
+            </div>
+
+            {method && selectedMethod && (
+              <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: `${selectedMethod.color}10`, border: `1px solid ${selectedMethod.color}30`, fontSize: 13, color: C.navy }}>
+                {selectedMethod.hint ? selectedMethod.hint : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: 12, color: C.body, marginBottom: 2 }}>카드 정보 입력 (시뮬레이션)</div>
+                    <input placeholder="카드 번호 0000 0000 0000 0000" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, width: "100%", boxSizing: "border-box", cursor: "default" }} />
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input placeholder="MM / YY" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, flex: 1, cursor: "default" }} />
+                      <input placeholder="CVC" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, flex: 1, cursor: "default" }} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginBottom: 8, padding: "6px 12px", background: "rgba(251,191,36,0.08)", borderRadius: 6, border: "1px solid rgba(251,191,36,0.2)" }}>
+              ⚠️ 현재 테스트 모드입니다. 실제 결제가 이루어지지 않습니다.
             </div>
 
             <Btn full size="lg" disabled={!method || processing} onClick={confirm}>
