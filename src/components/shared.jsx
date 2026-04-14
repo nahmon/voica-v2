@@ -644,7 +644,7 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
 export function Footer({ go }) {
   const isMobile = useIsMobile();
   return (
-    <footer style={{ background: C.brandDark, padding: isMobile ? "40px 20px" : "48px 24px", borderTop: "1px solid rgba(255,255,255,0.08)", fontFamily: F }}>
+    <footer style={{ background: "#060f1f", padding: isMobile ? "40px 20px" : "48px 24px", borderTop: "1px solid rgba(255,255,255,0.08)", fontFamily: F }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: "flex-start", gap: 28, marginBottom: 28 }}>
           <div>
