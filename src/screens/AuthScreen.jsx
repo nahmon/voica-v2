@@ -102,7 +102,7 @@ export default function AdvertiserLoginScreen({ go }) {
             <div style={{ fontSize: 28, fontWeight: 600, color: C.navy, letterSpacing: "0.196px", lineHeight: 1.14, marginBottom: 6, fontFamily: F }}>
               {tab === "login" ? "로그인" : "회원가입"}
             </div>
-            <div style={{ fontSize: 14, color: C.body }}>{tab === "login" ? "이메일로 로그인해요" : "Voica에 가입해요"}</div>
+            <div style={{ fontSize: 14, color: C.body }}>{tab === "login" ? "이메일로 로그인해요" : "Voice Survey에 가입해요"}</div>
           </div>
 
           {tab === "signup" && (

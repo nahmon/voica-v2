@@ -68,7 +68,7 @@ export default function RoleSelectScreen({ go, user }) {
           <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(21,190,83,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
             {Ic.Mic({ s: 24, c: C.success })}
           </div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Voica 패널</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Voice Survey 패널</div>
           <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 20 }}>
             보이스 인터뷰에 참여하고 리워드를 받아요. 8분 참여로 수입을 만들 수 있어요.
           </div>

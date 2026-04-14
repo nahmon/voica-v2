@@ -12,12 +12,12 @@ export default function AboutScreen({ go, user, logout }) {
       {/* Hero */}
       <div style={{ background: C.navy, padding: isMobile ? "56px 24px 48px" : "80px 40px 72px", textAlign: "center" }}>
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>About Voica</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>About Voice Survey</div>
           <h1 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 700, color: C.white, lineHeight: 1.2, margin: "0 0 20px" }}>
             리서치를 느리게 만드는<br />모든 것을 없앴습니다
           </h1>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.55)", lineHeight: 1.8, margin: 0 }}>
-            Voica는 AI 보이스 인터뷰 플랫폼입니다.<br />
+            Voice Survey는 AI 보이스 인터뷰 플랫폼입니다.<br />
             패널 모집부터 인터뷰 진행, 분석 리포트까지 — 하나의 도구로.
           </p>
         </div>
@@ -32,7 +32,7 @@ export default function AboutScreen({ go, user, logout }) {
             "모든 팀이 깊은 사용자 이해를 바탕으로<br />제품을 만들 수 있도록"
           </div>
           <p style={{ fontSize: 15, color: C.body, lineHeight: 1.9, margin: 0 }}>
-            좋은 제품은 사용자를 이해하는 팀에서 나옵니다. 하지만 인터뷰는 비쌉니다. 일정을 맞추고, 녹취를 풀고, 패턴을 찾는 데 일주일이 걸립니다. Voica는 그 비용을 10분으로 압축합니다. 리서치 인프라가 없는 스타트업도, 글로벌 리서치를 돌리는 대기업도 — 같은 도구로.
+            좋은 제품은 사용자를 이해하는 팀에서 나옵니다. 하지만 인터뷰는 비쌉니다. 일정을 맞추고, 녹취를 풀고, 패턴을 찾는 데 일주일이 걸립니다. Voice Survey는 그 비용을 10분으로 압축합니다. 리서치 인프라가 없는 스타트업도, 글로벌 리서치를 돌리는 대기업도 — 같은 도구로.
           </p>
         </section>
 

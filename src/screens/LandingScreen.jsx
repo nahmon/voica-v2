@@ -102,7 +102,7 @@ function BeforeAfterSection({ isMobile }) {
       border: side === "after" ? "none" : `1px solid ${C.border}`,
     }}>
       <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: side === "after" ? "rgba(255,255,255,0.65)" : C.body, marginBottom: 16 }}>
-        {side === "before" ? "기존 방식" : "✦ Voica"}
+        {side === "before" ? "기존 방식" : "✦ Voice Survey"}
       </div>
       {items.map(({ icon, bold, rest }) => (
         <div key={bold} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -122,7 +122,7 @@ function BeforeAfterSection({ isMobile }) {
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <Badge variant="purple" style={{ marginBottom: 12 }}>비교</Badge>
             <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, color: C.navy, margin: "0 0 12px", fontFamily: F }}>
-              기존 방식 vs Voica
+              기존 방식 vs Voice Survey
             </h2>
             <p style={{ fontSize: 15, color: C.body, margin: 0 }}>같은 인사이트, 훨씬 빠르고 저렴하게</p>
           </div>
@@ -284,7 +284,7 @@ export default function LandingScreen({ go, user, logout }) {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(83,58,253,0.14), 0 8px 28px rgba(83,58,253,0.1)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "none"; }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>🎙️</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>Voica 패널</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>Voice Survey 패널</div>
               <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>보이스로 인터뷰 참여하고 리워드 받기</div>
               <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: C.purple, background: "rgba(83,58,253,0.07)", padding: "5px 10px", borderRadius: 6 }}>참여하기 →</div>
             </button>

@@ -17,7 +17,7 @@ export default function PrivacyScreen({ go, user, logout }) {
           <p style={{ fontSize: 13, color: C.body, marginBottom: 40 }}>시행일: 2026년 4월 11일 · 최종 개정일: 2026년 4월 11일</p>
 
           <div style={{ fontSize: 13, color: "#3a3a3a", lineHeight: 2, marginBottom: 32, padding: "16px 20px", background: "rgba(83,58,253,0.04)", borderRadius: 8, borderLeft: "3px solid #533afd" }}>
-            Voica Inc.(이하 "회사")은 「개인정보 보호법」, 「정보통신망 이용촉진 및 정보보호에 관한 법률」 등 관련 법령에 따라 이용자의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보처리방침을 수립·공개합니다.
+            Voice Survey Inc.(이하 "회사")은 「개인정보 보호법」, 「정보통신망 이용촉진 및 정보보호에 관한 법률」 등 관련 법령에 따라 이용자의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보처리방침을 수립·공개합니다.
           </div>
 
           <Section title="제1조 (개인정보의 처리 목적)">
@@ -129,7 +129,7 @@ export default function PrivacyScreen({ go, user, logout }) {
             </ol>
             <div style={{ marginTop: 12, padding: "14px 18px", background: C.bg, borderRadius: 8, fontSize: 13, color: "#3a3a3a", lineHeight: 2 }}>
               <strong>개인정보 보호책임자</strong><br />
-              성명: Voica 운영팀<br />
+              성명: Voice Survey 운영팀<br />
               이메일: voica.support@gmail.com<br />
               전화: 문의는 이메일로 접수해 주세요
             </div>
@@ -153,7 +153,7 @@ export default function PrivacyScreen({ go, user, logout }) {
           </Section>
 
           <div style={{ marginTop: 40, paddingTop: 24, borderTop: `1px solid ${C.border}`, fontSize: 12, color: C.body, lineHeight: 1.8 }}>
-            <strong style={{ color: C.navy }}>Voica Inc.</strong><br />
+            <strong style={{ color: C.navy }}>Voice Survey Inc.</strong><br />
             개인정보 보호책임자 이메일: voica.support@gmail.com<br />
             <br />
             본 개인정보처리방침은 2026년 4월 11일부터 시행됩니다.

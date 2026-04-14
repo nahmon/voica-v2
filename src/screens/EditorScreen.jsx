@@ -16,7 +16,7 @@ function newQ(type = "voice") {
 function mkId() { return Math.random().toString(36).slice(2, 10); }
 
 const VOICA_SURVEY_TEMPLATE = {
-  title: "Voica 사용자 만족도 조사 — 리서처/마케터 대상",
+  title: "Voice Survey 사용자 만족도 조사 — 리서처/마케터 대상",
   questions: [
     { id: mkId(), type: "multiple_choice", content: "현재 주요 업무를 가장 잘 나타내는 것은 무엇인가요?", options: ["UX 리서처 / 디자인 리서처", "마케터 / 브랜드 매니저", "프로덕트 매니저", "사업개발 / 전략기획", "기타"] },
     { id: mkId(), type: "multiple_choice", content: "사용자/고객 조사를 얼마나 자주 직접 수행하시나요?", options: ["거의 매주", "월 1~2회", "분기 1회", "필요할 때만 (연 2회 이하)"] },
@@ -28,10 +28,10 @@ const VOICA_SURVEY_TEMPLATE = {
     { id: mkId(), type: "multiple_choice", content: "다음 중 가장 번거로운 단계는 무엇인가요?", options: ["참여자 섭외 및 일정 조율", "인터뷰 진행 자체", "녹취 정리 및 전사", "인사이트 분석 및 보고서 작성"] },
     { id: mkId(), type: "voice", content: "AI가 수백 명과 동시에 음성 인터뷰를 진행하고, 10분 안에 분석 리포트가 나온다면 — 지금 하시는 리서치 방식과 비교해서 어떤 생각이 드시나요? 솔직하게 말씀해 주세요." },
     { id: mkId(), type: "voice", content: "이런 AI 인터뷰 방식에서 가장 걱정되는 점이나 믿기 어려운 부분이 있다면 무엇인가요?" },
-    { id: mkId(), type: "voice", content: "팀이나 조직에서 Voica 같은 툴을 도입하려면 어떤 조건이 갖춰져야 할 것 같으세요? 예산, 보안, 데이터 품질 등 어떤 허들이 있을지 말씀해 주세요." },
+    { id: mkId(), type: "voice", content: "팀이나 조직에서 Voice Survey 같은 툴을 도입하려면 어떤 조건이 갖춰져야 할 것 같으세요? 예산, 보안, 데이터 품질 등 어떤 허들이 있을지 말씀해 주세요." },
     { id: mkId(), type: "multiple_choice", content: "참여자 50명 기준 인터뷰 1회 프로젝트 (AI 진행 + 분석 리포트 포함) 적정 비용은?", options: ["5만원 미만", "5~15만원", "15~30만원", "30~50만원", "50만원 이상도 가치 있다"] },
     { id: mkId(), type: "multiple_choice", content: "선호하는 요금 방식은 무엇인가요?", options: ["건별 충전 (쓴 만큼만)", "월 구독 (예측 가능한 비용)", "연간 계약 (할인 중심)", "팀/기업 단위 계약"] },
-    { id: mkId(), type: "voice", content: "마지막으로, 리서치 업무에서 Voica가 딱 한 가지만 해결해 준다면 어떤 문제를 해결해 주길 바라시나요?" },
+    { id: mkId(), type: "voice", content: "마지막으로, 리서치 업무에서 Voice Survey가 딱 한 가지만 해결해 준다면 어떤 문제를 해결해 주길 바라시나요?" },
   ],
 };
 
@@ -363,7 +363,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
                 style={{ padding: "10px 14px", fontSize: 13, color: C.navy, cursor: "pointer", borderTop: `1px solid ${C.border}` }}
                 onMouseEnter={e => e.currentTarget.style.background = C.bg}
                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                <div style={{ fontWeight: 500 }}>Voica 사용자 만족도 조사</div>
+                <div style={{ fontWeight: 500 }}>Voice Survey 사용자 만족도 조사</div>
                 <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>음성 7개 + 객관식 7개 · 14문항</div>
               </div>
             </div>
@@ -598,7 +598,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
       <div style={{ position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
           <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>✦</div>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>AI 인터뷰어 · Voica</span>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>AI 인터뷰어 · Voice Survey</span>
           <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,0.25)" }}>Q{idx + 1}/{total}</span>
         </div>
 

@@ -172,7 +172,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
       <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "stretch", justifyContent: "space-between", height: 56, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go(homeTarget)}>
-            <span style={{ fontSize: 17, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}><span style={{ color: C.purple }}>Vo</span>ica</span>
+            <img src="/logo-voice-survey.svg" alt="Voice Survey" style={{ height: 28 }} />
           </div>
           {!isMobile && (
             <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, transform: "translateX(-50%)", display: "flex", alignItems: "stretch" }}>
@@ -226,7 +226,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
           <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, backdropFilter: "blur(2px)" }} />
           <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 280, background: C.white, zIndex: 201, boxShadow: S.card, display: "flex", flexDirection: "column", fontFamily: F }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", height: 56, borderBottom: `1px solid rgba(0,0,0,0.08)` }}>
-              <span style={{ fontSize: 17, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}><span style={{ color: C.purple }}>Vo</span>ica</span>
+              <img src="/logo-voice-survey.svg" alt="Voice Survey" style={{ height: 28 }} />
               <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: C.body, lineHeight: 1, padding: 10 }}>✕</button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "12px 0" }}>
@@ -277,7 +277,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                 <>
                   <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>서비스</div>
                   {[
-                    { label: "서비스 소개", target: "about", desc: "Voica가 하는 일" },
+                    { label: "서비스 소개", target: "about", desc: "Voice Survey가 하는 일" },
                     { label: "요금제", target: "pricing", desc: "플랜별 기능 비교" },
                     { label: "FAQ", target: "faq", desc: "자주 묻는 질문" },
                     { label: "고객센터", target: "support", desc: "문의 및 도움말" },
@@ -332,9 +332,9 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
 
 // ─── VoC Carousel ───
 const VOC_LIST = [
-  { quote: "평소 사용자 인터뷰 하나 진행하려면 섭외부터 일정 조율까지 최소 일주일이 걸렸는데, Voica로 하루 만에 100명 인터뷰 결과를 받았습니다. 리포트 퀄리티도 기대 이상이었어요.", name: "이강인", title: "과장", company: "**전자 MX사업부 마케팅팀", photo: "/profiles/male-1.png" },
-  { quote: "기존엔 FGI 한 번 진행하면 진행비만 수백만 원이었어요. Voica는 비용도 10분의 1 수준이고, 결과물은 훨씬 빠르게 나오더라고요. 이제 정성 리서치 방식이 완전히 바뀔 것 같습니다.", name: "김지수", title: "브랜드 매니저", company: "LG**건강 브랜드전략팀", photo: "/profiles/female-1.png" },
-  { quote: "신제품 론칭 전 2주 안에 소비자 반응을 확인해야 했는데, Voica 덕분에 3일 만에 200명 인터뷰 분석 결과를 받을 수 있었습니다. 의사결정 속도가 완전히 달라졌어요.", name: "박성현", title: "PM", company: "**카오 서비스기획팀" },
+  { quote: "평소 사용자 인터뷰 하나 진행하려면 섭외부터 일정 조율까지 최소 일주일이 걸렸는데, Voice Survey로 하루 만에 100명 인터뷰 결과를 받았습니다. 리포트 퀄리티도 기대 이상이었어요.", name: "이강인", title: "과장", company: "**전자 MX사업부 마케팅팀", photo: "/profiles/male-1.png" },
+  { quote: "기존엔 FGI 한 번 진행하면 진행비만 수백만 원이었어요. Voice Survey는 비용도 10분의 1 수준이고, 결과물은 훨씬 빠르게 나오더라고요. 이제 정성 리서치 방식이 완전히 바뀔 것 같습니다.", name: "김지수", title: "브랜드 매니저", company: "LG**건강 브랜드전략팀", photo: "/profiles/female-1.png" },
+  { quote: "신제품 론칭 전 2주 안에 소비자 반응을 확인해야 했는데, Voice Survey 덕분에 3일 만에 200명 인터뷰 분석 결과를 받을 수 있었습니다. 의사결정 속도가 완전히 달라졌어요.", name: "박성현", title: "PM", company: "**카오 서비스기획팀" },
   { quote: "500명 동시 인터뷰를 5만원에 진행했습니다. 품질도 전통 방식과 다르지 않았고 AI 리포트가 특히 탁월했어요.", name: "박현우", title: "제품 마케팅 매니저", company: "**이버 마케팅팀" },
   { quote: "AI가 인터뷰를 직접 진행한다는 게 처음엔 반신반의했는데, 실제 녹취록을 보니 사용자가 자연스럽게 속마음을 털어놓더라고요. 면접관 눈치 없이 솔직한 답변이 많이 나왔습니다.", name: "최예린", title: "UX 리서처", company: "**이버 UX리서치실", photo: "/profiles/female-2.png" },
   { quote: "패널 참여가 정말 쉽고 리워드도 바로 들어왔어요. 보이스 인터뷰라 더 자연스럽게 의견을 말할 수 있었습니다.", name: "이서연", title: "프리랜서 패널", company: "개인 참여자" },
@@ -663,7 +663,7 @@ export function Footer({ go }) {
           </div>
         </div>
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 20 }}>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.16px" }}>Copyright © {new Date().getFullYear()} Voica Inc. All rights reserved.</div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.16px" }}>Copyright © {new Date().getFullYear()} Voice Survey Inc. All rights reserved.</div>
         </div>
       </div>
     </footer>

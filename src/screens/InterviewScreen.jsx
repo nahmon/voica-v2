@@ -494,7 +494,7 @@ export default function InterviewScreen({ go, shareCode }) {
       <div style={{ width: "100%", maxWidth: 440 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
           <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
-          <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", fontWeight: 400 }}>Voica AI 인터뷰</span>
+          <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", fontWeight: 400 }}>Voice Survey AI 인터뷰</span>
         </div>
         <div style={{ fontSize: 22, fontWeight: 500, color: C.white, marginBottom: 8, lineHeight: 1.3 }}>{interview.title}</div>
         {interview.description && <div style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", marginBottom: 16, lineHeight: 1.6 }}>{interview.description}</div>}
@@ -557,9 +557,9 @@ export default function InterviewScreen({ go, shareCode }) {
   const [shareCopied, setShareCopied] = useState(false);
   const handleShare = () => {
     track("viral_share_clicked", {});
-    const shareText = "나는 방금 Voica AI 인터뷰에 참여했어요! 🎤 voica.kr";
+    const shareText = "나는 방금 Voice Survey AI 인터뷰에 참여했어요! 🎤 voica.kr";
     if (navigator.share) {
-      navigator.share({ title: "Voica 인터뷰 완료!", text: "방금 AI 음성 인터뷰에 참여했어요. 당신도 해보세요!", url: "https://voica.kr" }).catch(() => {});
+      navigator.share({ title: "Voice Survey 인터뷰 완료!", text: "방금 AI 음성 인터뷰에 참여했어요. 당신도 해보세요!", url: "https://voica.kr" }).catch(() => {});
     } else {
       navigator.clipboard.writeText(shareText).then(() => { setShareCopied(true); setTimeout(() => setShareCopied(false), 2500); }).catch(() => {});
     }
@@ -638,7 +638,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
         {/* Powered by Voica footer */}
         <div style={{ padding: "16px 20px", borderRadius: 12, border: `1px solid rgba(124,58,237,0.3)`, background: "rgba(124,58,237,0.08)", textAlign: "left" }}>
-          <div style={{ fontSize: 12, color: `${C.purpleLight}`, marginBottom: 8, fontWeight: 500 }}>🎤 Voica로 만들어진 인터뷰예요</div>
+          <div style={{ fontSize: 12, color: `${C.purpleLight}`, marginBottom: 8, fontWeight: 500 }}>🎤 Voice Survey로 만들어진 인터뷰예요</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>당신의 목소리로 리서치하고 싶다면 →</span>
             <button onClick={() => { track("powered_by_voica_clicked", {}); window.location.href = "/"; }}
@@ -725,7 +725,7 @@ export default function InterviewScreen({ go, shareCode }) {
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
             <div style={{ width: 42, height: 42, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0, boxShadow: phase === "ai_speaking" ? "0 0 20px rgba(26,115,232,0.5)" : "none", transition: "box-shadow 0.5s" }}>✦</div>
             <div>
-              <div style={{ fontSize: 11, color: C.purpleLight, marginBottom: 2 }}>AI 인터뷰어 · Voica</div>
+              <div style={{ fontSize: 11, color: C.purpleLight, marginBottom: 2 }}>AI 인터뷰어 · Voice Survey</div>
               {phase === "ai_speaking" ? <WaveAnimation active /> : <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>질문이 끝났어요</span>}
             </div>
           </div>

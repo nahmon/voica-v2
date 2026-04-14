@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 100" width="560" height="100">
+  <rect width="560" height="100" fill="#060f1f" rx="0"/>
+
+  <!-- Voice — white -->
+  <text
+    x="20"
+    y="74"
+    font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+    font-weight="700"
+    font-size="62"
+    letter-spacing="-2"
+    fill="#ffffff"
+  >Voice</text>
+
+  <!-- Survey — brand purple -->
+  <text
+    x="198"
+    y="74"
+    font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+    font-weight="700"
+    font-size="62"
+    letter-spacing="-2"
+    fill="#7c65ff"
+  >Survey</text>
+</svg>

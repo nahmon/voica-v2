@@ -17,7 +17,7 @@ export default function TermsScreen({ go, user, logout }) {
           <p style={{ fontSize: 13, color: C.body, marginBottom: 40 }}>시행일: 2026년 4월 11일 · 최종 개정일: 2026년 4월 11일</p>
 
           <Section title="제1조 (목적)">
-            이 약관은 Voica Inc.(이하 "회사")이 운영하는 AI 보이스 인터뷰 플랫폼 Voica(이하 "서비스")의 이용에 관한 조건 및 절차, 회사와 이용자의 권리·의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+            이 약관은 Voice Survey Inc.(이하 "회사")이 운영하는 AI 보이스 인터뷰 플랫폼 Voice Survey(이하 "서비스")의 이용에 관한 조건 및 절차, 회사와 이용자의 권리·의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
           </Section>
 
           <Section title="제2조 (용어의 정의)">
@@ -164,7 +164,7 @@ export default function TermsScreen({ go, user, logout }) {
           </Section>
 
           <div style={{ marginTop: 40, paddingTop: 24, borderTop: `1px solid ${C.border}`, fontSize: 12, color: C.body, lineHeight: 1.8 }}>
-            <strong style={{ color: C.navy }}>Voica Inc.</strong><br />
+            <strong style={{ color: C.navy }}>Voice Survey Inc.</strong><br />
             대표자: [대표자 실명 기재 필요]<br />
             사업자등록번호: [000-00-00000]<br />
             통신판매업 신고번호: [제 0000-서울00-0000호]<br />

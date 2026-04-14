@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 100" width="560" height="100">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&amp;display=swap');
+    </style>
+  </defs>
+  <rect width="560" height="100" fill="#ffffff" rx="0"/>
+
+  <!-- Voice — deep navy, black 900 -->
+  <text
+    x="20"
+    y="74"
+    font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+    font-weight="700"
+    font-size="62"
+    letter-spacing="-2"
+    fill="#060f1f"
+  >Voice</text>
+
+  <!-- Survey — brand purple, black 700 -->
+  <text
+    x="198"
+    y="74"
+    font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+    font-weight="700"
+    font-size="62"
+    letter-spacing="-2"
+    fill="#533afd"
+  >Survey</text>
+</svg>
