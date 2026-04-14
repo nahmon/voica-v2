@@ -96,9 +96,6 @@ export default function AdvertiserLoginScreen({ go }) {
     window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
   };
 
-  const handleTossLogin = () => {
-    setSocialMsg("토스 로그인은 준비 중이에요");
-  };
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
@@ -159,10 +156,6 @@ export default function AdvertiserLoginScreen({ go }) {
                     </svg>
                     Naver로 계속하기
                   </Btn>
-                  <Btn variant="white" full size="md" style={{ background: "#0064FF", color: "white" }} onClick={handleTossLogin}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "white", letterSpacing: -0.5 }}>toss</span>
-                    Toss로 계속하기
-                  </Btn>
                   {socialMsg && <div style={{ marginTop: 8, fontSize: 12, color: C.body, textAlign: "center" }}>{socialMsg}</div>}
                 </div>
               </>
@@ -217,10 +210,6 @@ export default function AdvertiserLoginScreen({ go }) {
                       <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z"/>
                     </svg>
                     Naver로 계속하기
-                  </Btn>
-                  <Btn variant="white" full size="md" style={{ background: "#0064FF", color: "white" }} onClick={handleTossLogin}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "white", letterSpacing: -0.5 }}>toss</span>
-                    Toss로 계속하기
                   </Btn>
                   {socialMsg && <div style={{ marginTop: 8, fontSize: 12, color: C.body, textAlign: "center" }}>{socialMsg}</div>}
                 </div>

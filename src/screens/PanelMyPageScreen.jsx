@@ -34,7 +34,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const [notifInterview, setNotifInterview] = useState(true);
   const [notifReward, setNotifReward] = useState(true);
-  const [payoutMethod, setPayoutMethod] = useState(null); // null | "naverpay" | "tossmoney"
+  const [payoutMethod, setPayoutMethod] = useState(null); // null | "naverpay"
   const [payoutAccount, setPayoutAccount] = useState("");
   const [payoutSaved, setPayoutSaved] = useState(false);
   const [showWithdrawMsg, setShowWithdrawMsg] = useState(null);
@@ -230,7 +230,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
         {/* Payout method card */}
         <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 24px", marginTop: 16, boxShadow: S.ambient }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 14 }}>출금 수단 설정</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+          <div style={{ marginBottom: 14 }}>
             {/* NaverPay option */}
             <button
               onClick={() => { setPayoutMethod("naverpay"); setPayoutAccount(""); setPayoutSaved(false); }}
@@ -259,45 +259,14 @@ export default function PanelMyPageScreen({ go, user, logout }) {
               }}>N</div>
               <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>네이버페이</div>
             </button>
-            {/* Toss Money option */}
-            <button
-              onClick={() => { setPayoutMethod("tossmoney"); setPayoutAccount(""); setPayoutSaved(false); }}
-              style={{
-                background: C.white, borderRadius: 10, padding: "14px 12px",
-                border: payoutMethod === "tossmoney" ? `2px solid ${C.purple}` : `1px solid ${C.border}`,
-                cursor: "pointer", textAlign: "center", position: "relative",
-                transition: "border 0.15s",
-              }}
-            >
-              {payoutMethod === "tossmoney" && (
-                <div style={{
-                  position: "absolute", top: 8, right: 8, width: 18, height: 18,
-                  borderRadius: "50%", background: C.purple,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                    <path d="M1 4l2.5 2.5L9 1" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              )}
-              <div style={{
-                width: 36, height: 36, borderRadius: 8, background: "#0064FF",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                margin: "0 auto 8px", fontFamily: F, fontWeight: 700, fontSize: 11, color: "#fff",
-                letterSpacing: "-0.5px",
-              }}>toss</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>토스머니</div>
-            </button>
           </div>
           {/* Account input */}
           {payoutMethod && (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: C.body, marginBottom: 6 }}>
-                {payoutMethod === "naverpay" ? "네이버 아이디" : "전화번호"}
-              </div>
+              <div style={{ fontSize: 12, color: C.body, marginBottom: 6 }}>네이버 아이디</div>
               <input
-                type={payoutMethod === "tossmoney" ? "tel" : "text"}
-                placeholder={payoutMethod === "naverpay" ? "네이버 아이디를 입력해 주세요" : "010-XXXX-XXXX"}
+                type="text"
+                placeholder="네이버 아이디를 입력해 주세요"
                 value={payoutAccount}
                 onChange={e => { setPayoutAccount(e.target.value); setPayoutSaved(false); }}
                 style={{
