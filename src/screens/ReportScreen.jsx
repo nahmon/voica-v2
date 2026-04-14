@@ -136,6 +136,24 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
     } : null;
   })();
 
+  const ratingDists = (() => {
+    const scaleQs = questions.filter(q => q.type === "scale");
+    if (scaleQs.length === 0 || allResponses.length === 0) return [];
+    return scaleQs.map(q => {
+      const min = q.options?.min ?? 1;
+      const max = q.options?.max ?? 5;
+      const resps = allResponses.filter(r => r.question_id === q.id && r.value != null);
+      const dist = {};
+      for (let n = min; n <= max; n++) dist[n] = 0;
+      resps.forEach(r => { const v = Number(r.value); if (v >= min && v <= max) dist[v]++; });
+      const maxCount = Math.max(...Object.values(dist), 1);
+      const avg = resps.length > 0
+        ? (resps.reduce((s, r) => s + Number(r.value), 0) / resps.length).toFixed(1)
+        : null;
+      return { question: q, dist, min, max, maxCount, avg, total: resps.length };
+    }).filter(d => d.total > 0);
+  })();
+
   if (loading) return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
@@ -202,11 +220,18 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 <MetricCard label="평균 소요 시간" value={`${avgDurationMin}분`} icon={Ic.Target({ s: 16, c: "#1a73e8" })} />
               )}
               {sentimentDist && (
-                <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}`, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 11, color: C.body, marginRight: 4 }}>감성 분포</span>
-                  <SentimentBadge label="긍정" pct={sentimentDist.positive} color={C.success} />
-                  <SentimentBadge label="중립" pct={sentimentDist.neutral} color={C.body} />
-                  <SentimentBadge label="부정" pct={sentimentDist.negative} color={C.ruby} />
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}`, minWidth: 220 }}>
+                  <span style={{ fontSize: 11, color: C.body }}>감성 분포</span>
+                  <div style={{ display: "flex", height: 8, borderRadius: 4, overflow: "hidden" }}>
+                    <div style={{ width: `${sentimentDist.positive}%`, background: C.success }} />
+                    <div style={{ width: `${sentimentDist.neutral}%`, background: "#d0d0d8" }} />
+                    <div style={{ width: `${sentimentDist.negative}%`, background: C.ruby }} />
+                  </div>
+                  <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
+                    <span style={{ color: C.success }}>긍정 {sentimentDist.positive}%</span>
+                    <span style={{ color: C.body }}>중립 {sentimentDist.neutral}%</span>
+                    <span style={{ color: C.ruby }}>부정 {sentimentDist.negative}%</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -384,6 +409,34 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 </div>
               )}
 
+              {/* Rating distributions */}
+              {ratingDists.length > 0 && (
+                <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24, boxShadow: S.ambient }}>
+                  <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 16 }}>평점 분포</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                    {ratingDists.map(({ question: q, dist, min, max, maxCount, avg, total }) => (
+                      <div key={q.id}>
+                        <div style={{ fontSize: 12, color: C.body, marginBottom: 12, lineHeight: 1.5 }}>{q.content}</div>
+                        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 60 }}>
+                          {Array.from({ length: max - min + 1 }, (_, k) => k + min).map(n => {
+                            const count = dist[n] ?? 0;
+                            const barH = Math.round(count / maxCount * 44);
+                            return (
+                              <div key={n} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                                <div style={{ fontSize: 10, color: count > 0 ? C.navy : "transparent" }}>{count}</div>
+                                <div style={{ width: "100%", height: barH || 2, background: count > 0 ? C.purple : C.border, borderRadius: "2px 2px 0 0", opacity: count > 0 ? 0.35 + (count / maxCount) * 0.65 : 1 }} />
+                                <div style={{ fontSize: 11, color: C.body }}>{n}</div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div style={{ fontSize: 11, color: C.body, marginTop: 8 }}>평균 {avg}점 · {total}명 응답</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Summary */}
               <div id="section-summary" style={{ background: `linear-gradient(135deg,rgba(83,58,253,0.05),rgba(232,113,10,0.04))`, border: `1px solid rgba(83,58,253,0.1)`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
                 <div style={{ fontSize: 12, fontWeight: 400, color: C.purple, marginBottom: 10 }}>✦ AI 종합 요약</div>
@@ -395,20 +448,28 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 <div id="section-themes" style={{ marginBottom: 24 }}>
                   <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 14 }}>발견된 테마</div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14 }}>
-                    {report.content.themes.map((t, i) => (
-                      <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: 18, boxShadow: S.ambient }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                          <Badge variant={t.sentiment === "positive" ? "success" : t.sentiment === "negative" ? "negative" : "neutral"}>
-                            {t.sentiment === "positive" ? "긍정" : t.sentiment === "negative" ? "부정" : "중립"}
-                          </Badge>
+                    {(() => {
+                      const maxCount = Math.max(...report.content.themes.map(t => t.count ?? 0), 1);
+                      return report.content.themes.map((t, i) => (
+                        <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: 18, boxShadow: S.ambient }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                            <Badge variant={t.sentiment === "positive" ? "success" : t.sentiment === "negative" ? "negative" : "neutral"}>
+                              {t.sentiment === "positive" ? "긍정" : t.sentiment === "negative" ? "부정" : "중립"}
+                            </Badge>
+                          </div>
+                          <div style={{ fontSize: 15, fontWeight: 400, color: C.navy, marginBottom: 8 }}>{t.label}</div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                            <div style={{ flex: 1, height: 4, borderRadius: 2, background: C.border, overflow: "hidden" }}>
+                              <div style={{ width: `${Math.round((t.count ?? 0) / maxCount * 100)}%`, height: "100%", background: t.sentiment === "positive" ? C.success : t.sentiment === "negative" ? C.ruby : C.purple, borderRadius: 2 }} />
+                            </div>
+                            <span style={{ fontSize: 11, color: C.body, whiteSpace: "nowrap" }}>{t.count}회</span>
+                          </div>
+                          {t.quotes?.[0] && (
+                            <div style={{ fontSize: 12, color: C.body, fontStyle: "italic", lineHeight: 1.5, borderLeft: `2px solid ${C.border}`, paddingLeft: 8 }}>"{t.quotes[0]}"</div>
+                          )}
                         </div>
-                        <div style={{ fontSize: 15, fontWeight: 400, color: C.navy, marginBottom: 6 }}>{t.label}</div>
-                        <div style={{ fontSize: 11, color: C.body, marginBottom: 10 }}>언급 {t.count}회</div>
-                        {t.quotes?.[0] && (
-                          <div style={{ fontSize: 12, color: C.body, fontStyle: "italic", lineHeight: 1.5, borderLeft: `2px solid ${C.border}`, paddingLeft: 8 }}>"{t.quotes[0]}"</div>
-                        )}
-                      </div>
-                    ))}
+                      ));
+                    })()}
                   </div>
                 </div>
               )}
