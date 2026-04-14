@@ -32,6 +32,7 @@ export default function DashboardScreen({ go, user, logout }) {
   const [statusFilter, setStatusFilter] = useState("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [copiedId, setCopiedId] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -49,6 +50,18 @@ export default function DashboardScreen({ go, user, logout }) {
       setLoading(false);
     })();
   }, [user]);
+
+  const handleCopyLink = async (e, shareCode) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/i/${shareCode}`;
+    try { await navigator.clipboard.writeText(url); } catch {
+      const el = document.createElement("textarea");
+      el.value = url; document.body.appendChild(el); el.select();
+      document.execCommand("copy"); document.body.removeChild(el);
+    }
+    setCopiedId(shareCode);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const markAsSeen = (interviewId, count) => {
     localStorage.setItem(`voica_seen_${interviewId}`, String(count));
@@ -253,6 +266,11 @@ export default function DashboardScreen({ go, user, logout }) {
                 </div>
                 {/* Actions */}
                 <div style={{ display: "flex", gap: 8, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
+                  {p.share_code && (
+                    <Btn variant="ghost" size="sm" onClick={e => handleCopyLink(e, p.share_code)}>
+                      {copiedId === p.share_code ? "복사됨 ✓" : "링크 복사"}
+                    </Btn>
+                  )}
                   {p.status !== "closed" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("editor", p.id); }}>편집</Btn>}
                   {sessionCount > 0 && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("responses", p.id); }}>응답 보기</Btn>}
                   {p.status === "closed" && <Btn size="sm" onClick={e => { e.stopPropagation(); go("report", p.id); }}>리포트</Btn>}

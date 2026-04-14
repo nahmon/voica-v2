@@ -369,6 +369,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             </div>
           )}
         </div>
+        {shareCode && (
+          <Btn variant="ghost" size="sm" onClick={handleCopy}>
+            {copied ? "복사됨 ✓" : "링크 복사"}
+          </Btn>
+        )}
         {/* Save button with ⌘S tooltip */}
         <div style={{ position: "relative" }}
           onMouseEnter={() => setShowSaveTooltip(true)}
@@ -386,12 +391,21 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     </div>
   );
 
+  const ShareLinkBar = shareCode && editingId && (
+    <div style={{ background: "rgba(83,58,253,0.06)", borderBottom: `1px solid rgba(83,58,253,0.15)`, padding: "8px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+      <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>공유 링크</span>
+      <span style={{ flex: 1, fontSize: 12, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
+      <Btn size="sm" variant="ghost" onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px" }}>{copied ? "복사됨 ✓" : "복사"}</Btn>
+    </div>
+  );
+
   // ─── Mobile layout ───
   if (isMobile) return (
     <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>
       {ShareOverlay}
       {IncompleteWarnOverlay}
       {NavBar}
+      {ShareLinkBar}
       {/* Title area */}
       <div style={{ background: C.white, padding: "16px 16px 12px", borderBottom: `1px solid ${C.border}` }}>
         <input
@@ -447,6 +461,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       {ShareOverlay}
       {IncompleteWarnOverlay}
       {NavBar}
+      {ShareLinkBar}
 
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
