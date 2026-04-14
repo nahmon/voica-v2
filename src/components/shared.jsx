@@ -488,7 +488,7 @@ export function HowItWorksCarousel() {
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: isMobile ? 40 : 56 }}>
           <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", margin: "0 0 14px", lineHeight: 1.10, fontFamily: F }}>
-            {isMobile ? "소비자의 목소리를 정확하고 빠르게" : <>소비자의 목소리를<br />정확하고 빠르게 들어보세요</>}
+            {isMobile ? <>소비자의 목소리를 <span style={{ color: C.purple }}>정확하고 빠르게</span></> : <>소비자의 목소리를<br /><span style={{ color: C.purple }}>정확하고 빠르게</span> 들어보세요</>}
           </h2>
           <p style={{ fontSize: 16, color: "rgba(10,11,13,0.56)", margin: 0, letterSpacing: "0.16px", lineHeight: 1.47 }}>처음부터 끝까지 알아서 되는 인터뷰 플랫폼</p>
         </div>
@@ -648,7 +648,7 @@ export function Footer({ go }) {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: "flex-start", gap: 28, marginBottom: 28 }}>
           <div>
-            <img src="/logo-voice-survey-dark.svg" alt="Voice Survey" style={{ height: 28 }} />
+            <img src="/logo-voice-survey-footer.svg" alt="Voice Survey" style={{ height: 28 }} />
             <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI가 인터뷰하고, AI가 분석합니다</div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>

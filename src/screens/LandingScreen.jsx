@@ -122,9 +122,9 @@ function BeforeAfterSection({ isMobile }) {
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <Badge variant="purple" style={{ marginBottom: 12 }}>비교</Badge>
             <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, color: C.navy, margin: "0 0 12px", fontFamily: F }}>
-              기존 방식 vs Voice Survey
+              기존 방식 vs <span style={{ color: C.purple }}>Voice Survey</span>
             </h2>
-            <p style={{ fontSize: 15, color: C.body, margin: 0 }}>같은 인사이트, 훨씬 빠르고 저렴하게</p>
+            <p style={{ fontSize: 15, color: C.body, margin: 0 }}>같은 인사이트, <span style={{ color: C.purple, fontWeight: 600 }}>훨씬 빠르고 저렴하게</span></p>
           </div>
 
           <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexDirection: isMobile ? "column" : "row", alignItems: "stretch" }}>
@@ -266,7 +266,7 @@ export default function LandingScreen({ go, user, logout }) {
 
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 20, background: C.bg, border: `1px solid ${C.border}`, marginBottom: 32 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.success, animation: "pulse-dot 2s ease-in-out infinite" }} />
-            <span style={{ fontSize: 13, color: C.body }}>지금 <strong style={{ fontWeight: 600, color: C.navy }}>{liveCount}명</strong>이 인터뷰에 참여하고 있어요</span>
+            <span style={{ fontSize: 13, color: C.body }}>지금 <strong style={{ fontWeight: 600, color: C.purple }}>{liveCount}명</strong>이 인터뷰에 참여하고 있어요</span>
           </div>
 
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
