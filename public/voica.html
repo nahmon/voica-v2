@@ -1065,7 +1065,7 @@ function PaymentModal({ plan, billing, onClose, onDone }) {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: C.black, letterSpacing: -0.224 }}>{plan.name} 플랜 · {billing === "annual" ? "연 결제" : "월 결제"}</div>
-                  <div style={{ fontSize: 12, color: C.body, marginTop: 3, letterSpacing: -0.12 }}>월 {plan.sessions}건 슬롯</div>
+                  <div style={{ fontSize: 12, color: C.body, marginTop: 3, letterSpacing: -0.12 }}>{plan.sessions ? `월 ${plan.sessions}건 슬롯` : "인터뷰 무제한"}</div>
                 </div>
                 <div style={{ fontSize: 28, fontWeight: 600, color: C.blue, letterSpacing: -0.56 }}>₩{price.toLocaleString()}</div>
               </div>
@@ -1099,15 +1099,9 @@ function PricingScreen({ go }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
 
   const plans = [
-    { id: "starter", name: "스타터", desc: "검증 단계 · 소규모 팀", price: { monthly: 290000, annual: 232000 }, sessions: 3, report: "기본", reportFeatures: ["테마 자동 분류 (최대 5개)", "감성 분석 (긍정 / 부정 / 중립)", "주요 키워드 클라우드", "응답 원문 열람"], extras: ["프로젝트 3개", "패널 모집 공고 3건", "CSV 다운로드"], highlight: false },
-    { id: "pro", name: "프로", desc: "정기 리서치 · 브랜드 · 에이전시", price: { monthly: 590000, annual: 472000 }, sessions: 8, report: "심화", reportFeatures: ["테마 분류 + 하위 테마 드릴다운", "감성 분석 + 세그먼트 비교", "대표 발화 인용문 자동 추출", "크로스탭 분석 (조건별 비교)", "인사이트 요약 내러티브"], extras: ["프로젝트 무제한", "패널 모집 공고 무제한", "CSV / PDF 다운로드", "팀 멤버 3인"], highlight: true },
-    { id: "enterprise", name: "엔터프라이즈", desc: "대규모 리서치 · 그룹사 · 컨설팅", price: { monthly: 1200000, annual: 960000 }, sessions: 20, report: "풀 패키지", reportFeatures: ["프로 전체 포함", "트렌드 추이 비교 (기간별)", "경쟁 브랜드 언급 분석", "세그먼트별 리포트 분리 출력", "PPT / PDF 슬라이드 자동 생성", "Slack · Notion API 연동"], extras: ["팀 멤버 무제한", "전용 CSM 배정", "SLA 99.9%"], highlight: false },
-  ];
-  const credits = [
-    { qty: 1, price: 120000, badge: null },
-    { qty: 3, price: 330000, badge: "8% 절약" },
-    { qty: 5, price: 525000, badge: "13% 절약" },
-    { qty: 10, price: 900000, badge: "25% 절약" },
+    { id: "free", name: "무료", desc: "소규모 팀 · 첫 인터뷰 체험", price: { monthly: 0, annual: 0 }, sessions: 3, report: "기본", reportFeatures: ["테마 자동 분류 (최대 5개)", "감성 분석 (긍정 / 부정 / 중립)", "주요 키워드 클라우드", "응답 원문 열람"], extras: ["월 3회 인터뷰", "회당 최대 10명", "CSV 다운로드"], highlight: false },
+    { id: "pro", name: "Pro", desc: "정기 리서치 · 브랜드 · 에이전시", price: { monthly: 99000, annual: 79200 }, sessions: null, report: "심화", reportFeatures: ["테마 분류 + 하위 테마 드릴다운", "감성 분석 + 세그먼트 비교", "대표 발화 인용문 자동 추출", "크로스탭 분석 (조건별 비교)", "인사이트 요약 내러티브"], extras: ["프로젝트 무제한", "패널 모집 공고 무제한", "CSV / PDF 다운로드", "팀 멤버 3인"], highlight: true },
+    { id: "enterprise", name: "엔터프라이즈", desc: "대규모 리서치 · 그룹사 · 컨설팅", price: { monthly: null, annual: null }, sessions: null, report: "풀 패키지", reportFeatures: ["Pro 전체 포함", "트렌드 추이 비교 (기간별)", "경쟁 브랜드 언급 분석", "세그먼트별 리포트 분리 출력", "PPT / PDF 슬라이드 자동 생성", "Slack · Notion API 연동"], extras: ["팀 멤버 무제한", "전용 CSM 배정", "SLA 99.9%"], highlight: false },
   ];
 
   return (
@@ -1138,25 +1132,6 @@ function PricingScreen({ go }) {
       </div>
 
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "48px 22px 80px" }}>
-        {/* Credits */}
-        <div style={{ marginBottom: 64 }}>
-          <div style={{ textAlign: "center", marginBottom: 28 }}>
-            <h2 style={{ fontSize: 28, fontWeight: 600, color: C.black, letterSpacing: -0.56, lineHeight: 1.14, marginBottom: 8 }}>크레딧 — 구독 없이 단건 결제</h2>
-            <p style={{ fontSize: 17, color: C.body, margin: 0, letterSpacing: -0.374 }}>1건 = 인터뷰 1회 (패널 최대 75명) · 유효기간 12개월</p>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 16 }}>
-            {credits.map(c => (
-              <div key={c.qty} style={{ background: C.white, borderRadius: 12, padding: "24px", position: "relative" }}>
-                {c.badge && <span style={{ position: "absolute", top: -10, right: 14, fontSize: 12, fontWeight: 600, background: C.success, color: C.white, padding: "3px 10px", borderRadius: 980 }}>{c.badge}</span>}
-                <div style={{ fontSize: 28, fontWeight: 600, color: C.black, letterSpacing: -0.56, lineHeight: 1.14, marginBottom: 4 }}>{c.qty}건</div>
-                <div style={{ fontSize: 21, fontWeight: 600, color: C.blue, letterSpacing: -0.42, marginBottom: 4 }}>₩{c.price.toLocaleString()}</div>
-                <div style={{ fontSize: 14, color: C.body, marginBottom: 16, letterSpacing: -0.224 }}>건당 ₩{Math.round(c.price / c.qty).toLocaleString()}</div>
-                <PillLink onClick={() => setSelectedPlan({ id: "credit", name: `크레딧 ${c.qty}건`, price: { monthly: c.price, annual: c.price }, sessions: c.qty, report: "—" })} style={{ width: "100%", justifyContent: "center" }}>구매하기</PillLink>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Plans */}
         <div style={{ marginBottom: 64 }}>
           <div style={{ textAlign: "center", marginBottom: 28 }}>
@@ -1170,14 +1145,14 @@ function PricingScreen({ go }) {
                 <div style={{ marginBottom: 20 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: plan.highlight ? "rgba(255,255,255,0.45)" : C.body, marginBottom: 8, letterSpacing: 0.5, textTransform: "uppercase" }}>{plan.name}</div>
                   <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 4 }}>
-                    <span style={{ fontSize: 40, fontWeight: 600, color: plan.highlight ? C.white : C.black, letterSpacing: -0.8, lineHeight: 1.1 }}>₩{plan.price[billing].toLocaleString()}</span>
-                    <span style={{ fontSize: 17, color: plan.highlight ? "rgba(255,255,255,0.45)" : C.body, marginBottom: 5, letterSpacing: -0.374 }}>/월</span>
+                    <span style={{ fontSize: 40, fontWeight: 600, color: plan.highlight ? C.white : C.black, letterSpacing: -0.8, lineHeight: 1.1 }}>{plan.price[billing] === null ? "맞춤 견적" : plan.price[billing] === 0 ? "무료" : `₩${plan.price[billing].toLocaleString()}`}</span>
+                    {plan.price[billing] !== null && plan.price[billing] !== 0 && <span style={{ fontSize: 17, color: plan.highlight ? "rgba(255,255,255,0.45)" : C.body, marginBottom: 5, letterSpacing: -0.374 }}>/월</span>}
                   </div>
                   <div style={{ fontSize: 14, color: plan.highlight ? "rgba(255,255,255,0.35)" : C.body, letterSpacing: -0.224 }}>패널 리워드 별도</div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 8, background: plan.highlight ? "rgba(255,255,255,0.08)" : C.blueBg, marginBottom: 20 }}>
-                  <span style={{ fontSize: 17, fontWeight: 600, color: plan.highlight ? C.white : C.blue, letterSpacing: -0.374 }}>월 {plan.sessions}건</span>
-                  <span style={{ fontSize: 14, color: plan.highlight ? "rgba(255,255,255,0.35)" : C.body, letterSpacing: -0.224 }}>건당 패널 최대 75명</span>
+                  <span style={{ fontSize: 17, fontWeight: 600, color: plan.highlight ? C.white : C.blue, letterSpacing: -0.374 }}>{plan.sessions ? `월 ${plan.sessions}건` : "인터뷰 무제한"}</span>
+                  <span style={{ fontSize: 14, color: plan.highlight ? "rgba(255,255,255,0.35)" : C.body, letterSpacing: -0.224 }}>{plan.id === "free" ? "회당 최대 10명" : "회당 최대 인원 맞춤"}</span>
                 </div>
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: plan.highlight ? "rgba(255,255,255,0.4)" : C.body, marginBottom: 10, letterSpacing: -0.12 }}>AI 리포트 — {plan.report}</div>
