@@ -648,9 +648,7 @@ export function Footer({ go }) {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: "flex-start", gap: 28, marginBottom: 28 }}>
           <div>
-            <span style={{ fontSize: 17, fontWeight: 600, color: C.white, letterSpacing: "0.16px" }}>
-              <span style={{ color: C.purpleLight }}>Vo</span>ica
-            </span>
+            <img src="/logo-voice-survey-dark.svg" alt="Voice Survey" style={{ height: 28 }} />
             <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI가 인터뷰하고, AI가 분석합니다</div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
