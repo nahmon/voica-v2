@@ -335,7 +335,9 @@ const VOC_LIST = [
   { quote: "평소 사용자 인터뷰 하나 진행하려면 섭외부터 일정 조율까지 최소 일주일이 걸렸는데, Voica로 하루 만에 100명 인터뷰 결과를 받았습니다. 리포트 퀄리티도 기대 이상이었어요.", name: "이강인", title: "과장", company: "**전자 MX사업부 마케팅팀", photo: "/profiles/male-1.png" },
   { quote: "기존엔 FGI 한 번 진행하면 진행비만 수백만 원이었어요. Voica는 비용도 10분의 1 수준이고, 결과물은 훨씬 빠르게 나오더라고요. 이제 정성 리서치 방식이 완전히 바뀔 것 같습니다.", name: "김지수", title: "브랜드 매니저", company: "LG**건강 브랜드전략팀", photo: "/profiles/female-1.png" },
   { quote: "신제품 론칭 전 2주 안에 소비자 반응을 확인해야 했는데, Voica 덕분에 3일 만에 200명 인터뷰 분석 결과를 받을 수 있었습니다. 의사결정 속도가 완전히 달라졌어요.", name: "박성현", title: "PM", company: "**카오 서비스기획팀" },
+  { quote: "500명 동시 인터뷰를 5만원에 진행했습니다. 품질도 전통 방식과 다르지 않았고 AI 리포트가 특히 탁월했어요.", name: "박현우", title: "제품 마케팅 매니저", company: "**이버 마케팅팀" },
   { quote: "AI가 인터뷰를 직접 진행한다는 게 처음엔 반신반의했는데, 실제 녹취록을 보니 사용자가 자연스럽게 속마음을 털어놓더라고요. 면접관 눈치 없이 솔직한 답변이 많이 나왔습니다.", name: "최예린", title: "UX 리서처", company: "**이버 UX리서치실", photo: "/profiles/female-2.png" },
+  { quote: "패널 참여가 정말 쉽고 리워드도 바로 들어왔어요. 보이스 인터뷰라 더 자연스럽게 의견을 말할 수 있었습니다.", name: "이서연", title: "프리랜서 패널", company: "개인 참여자" },
   { quote: "글로벌 시장 진출 전 국내 타깃 유저 인터뷰가 필요했어요. 지역·연령·직군 조건 설정하니까 딱 맞는 패널이 빠르게 모였고, 리포트까지 영업일 3일 안에 나왔습니다.", name: "정우진", title: "사업개발 팀장", company: "**스 신사업팀", photo: "/profiles/female-4.png" },
   { quote: "분기마다 진행하던 사용성 테스트를 이제 매달 할 수 있게 됐어요. 비용과 시간 장벽이 낮아지니 리서치를 훨씬 자주 의사결정에 활용하게 됐습니다.", name: "한소희", title: "서비스 기획자", company: "**자동차 Connected Car팀", photo: "/profiles/female-3.png" },
   { quote: "외부 리서치 에이전시 대비 비용은 80% 절감되고, 결과물은 2배 빠르게 나왔습니다. 특히 테마 분류와 감성 분석이 자동으로 되니 별도 분석 시간이 거의 필요 없었어요.", name: "오민준", title: "마케팅 이사", company: "**팡 그로스마케팅본부" },
@@ -362,26 +364,30 @@ export function VoCCarousel() {
   return (
     <section style={{ background: C.bg, padding: "72px 0", overflow: "hidden" }}>
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ fontSize: 12, fontWeight: 400, color: C.body, letterSpacing: "0.16px", textAlign: "center", marginBottom: 8, textTransform: "uppercase" }}>REVIEWS</div>
-        <h2 style={{ fontSize: 28, fontWeight: 400, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0 0 40px", fontFamily: F }}>직접 써본 분들의 이야기</h2>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <Badge variant="purple" style={{ marginBottom: 12 }}>고객 후기</Badge>
+          <h2 style={{ fontSize: 28, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>실제 사용자의 이야기</h2>
+        </div>
         <div style={{ overflow: "hidden" }} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
           <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
             {VOC_LIST.map((v, i) => (
               <div key={i} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box" }}>
-                <div style={{ background: C.white, borderRadius: 16, padding: "36px 40px" }}>
-                  <div style={{ fontSize: 24, color: C.purple, marginBottom: 16, lineHeight: 1 }}>❝</div>
-                  <p style={{ margin: "0 0 24px", fontSize: 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px" }}>{v.quote}</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ background: C.white, borderRadius: 16, padding: "36px 40px", border: `1px solid ${C.border}` }}>
+                  <div style={{ display: "flex", gap: 3, marginBottom: 16 }}>
+                    {[1,2,3,4,5].map(n => <Ic.Star key={n} c={C.purple} s={14} />)}
+                  </div>
+                  <p style={{ margin: "0 0 24px", fontSize: 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px" }}>"{v.quote}"</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
                     {v.photo ? (
-                      <img src={v.photo} alt={v.name} style={{ width: 60, height: 60, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                      <img src={v.photo} alt={v.name} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
                     ) : (
-                      <div style={{ width: 60, height: 60, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: C.white, fontWeight: 600, flexShrink: 0 }}>
+                      <div style={{ width: 48, height: 48, borderRadius: "50%", background: `rgba(83,58,253,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: C.purple, fontWeight: 700, flexShrink: 0 }}>
                         {v.name[0]}
                       </div>
                     )}
                     <div>
-                      <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}>{v.name} {v.title}</div>
-                      <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", marginTop: 3, letterSpacing: "0.16px" }}>{v.company}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}>{v.name}</div>
+                      <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", marginTop: 2, letterSpacing: "0.16px" }}>{v.title} · {v.company}</div>
                     </div>
                   </div>
                 </div>

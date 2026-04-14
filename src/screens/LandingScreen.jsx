@@ -181,82 +181,6 @@ function BeforeAfterSection({ isMobile }) {
   );
 }
 
-/* ── Testimonial cards ── */
-function TestimonialsSection({ isMobile }) {
-  const testimonials = [
-    {
-      quote: "인터뷰 설계부터 분석까지 하루 만에 끝냈어요. 기존에는 2주가 걸리던 작업인데 팀 전체가 놀랐습니다.",
-      name: "김지수",
-      title: "UX 리서처",
-      company: "카카오",
-    },
-    {
-      quote: "500명 동시 인터뷰를 5만원에 진행했습니다. 품질도 전통 방식과 다르지 않았고 AI 리포트가 특히 탁월했어요.",
-      name: "박현우",
-      title: "제품 마케팅 매니저",
-      company: "네이버",
-    },
-    {
-      quote: "패널 참여가 정말 쉽고 리워드도 바로 들어왔어요. 보이스 인터뷰라 더 자연스럽게 의견을 말할 수 있었습니다.",
-      name: "이서연",
-      title: "프리랜서 패널",
-      company: "개인 참여자",
-    },
-  ];
-
-  return (
-    <FadeInSection>
-      <section style={{ background: C.bg, padding: isMobile ? "60px 20px" : "80px 24px" }}>
-        <div style={{ maxWidth: 960, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <Badge variant="purple" style={{ marginBottom: 12 }}>고객 후기</Badge>
-            <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, color: C.navy, margin: "0 0 12px", fontFamily: F }}>
-              실제 사용자의 이야기
-            </h2>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 20 }}>
-            {testimonials.map(({ quote, name, title, company }, i) => (
-              <FadeInSection key={name} delay={i * 80}>
-                <div style={{
-                  background: C.white,
-                  border: `1px solid ${C.border}`,
-                  borderRadius: 16,
-                  padding: "28px 24px",
-                  height: "100%",
-                  boxSizing: "border-box",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 16,
-                }}>
-                  {/* Stars */}
-                  <div style={{ display: "flex", gap: 3 }}>
-                    {[1,2,3,4,5].map(n => <Ic.Star key={n} c={C.purple} s={14} />)}
-                  </div>
-                  {/* Quote */}
-                  <p style={{ fontSize: 14, color: C.navy, lineHeight: 1.7, margin: 0, flexGrow: 1 }}>
-                    "{quote}"
-                  </p>
-                  {/* Author */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: `rgba(83,58,253,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, color: C.purple }}>
-                      {name[0]}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{name}</div>
-                      <div style={{ fontSize: 12, color: C.body }}>{title} · {company}</div>
-                    </div>
-                  </div>
-                </div>
-              </FadeInSection>
-            ))}
-          </div>
-        </div>
-      </section>
-    </FadeInSection>
-  );
-}
-
 /* ── Final CTA section ── */
 function FinalCtaSection({ go, isMobile }) {
   return (
@@ -446,9 +370,6 @@ export default function LandingScreen({ go, user, logout }) {
       <FadeInSection>
         <HowItWorksCarousel />
       </FadeInSection>
-
-      {/* ── Testimonials ── */}
-      <TestimonialsSection isMobile={isMobile} />
 
       {/* ── Final CTA ── */}
       <FinalCtaSection go={go} isMobile={isMobile} />
