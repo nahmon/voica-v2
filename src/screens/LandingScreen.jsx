@@ -252,7 +252,7 @@ export default function LandingScreen({ go, user, logout }) {
           </div>
 
           <h1 style={{ fontSize: isMobile ? 36 : 52, fontWeight: 700, lineHeight: 1.1, margin: "0 0 24px", fontFamily: F }}>
-            <span style={{ color: "#061b31", display: "block" }}>
+            <span style={{ color: C.navy, display: "block" }}>
               {fromInterview ? "AI 인터뷰를 경험하셨나요?" : "시간과 비용이 많이 들었던 인터뷰"}
             </span>
             <span style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "block" }}>
@@ -300,7 +300,7 @@ export default function LandingScreen({ go, user, logout }) {
               { end: 12400, suffix: "+", label: "등록된 패널", color: C.purple, delay: 0 },
               { end: 4200, suffix: "건", label: "이번 달 완료 인터뷰", color: C.navy, delay: 100 },
               { end: 94, suffix: "%", label: "AI 분석 정확도", color: C.successText, delay: 200 },
-              { end: 8, suffix: "분", label: "평균 인터뷰 시간", color: "#b91c4a", delay: 300 },
+              { end: 8, suffix: "분", label: "평균 인터뷰 시간", color: C.ruby, delay: 300 },
             ].map(({ label, ...stat }, i) => (
               <div key={label} style={{
                 textAlign: "center",
