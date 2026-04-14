@@ -397,7 +397,7 @@ export function VoCCarousel() {
         </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 24 }}>
           {VOC_LIST.map((_, i) => (
-            <button key={i} onClick={() => setIdx(i)} aria-label={`후기 ${i + 1}번으로 이동`} style={{ width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: "none", cursor: "pointer", background: i === idx ? "#533afd" : "rgba(23,23,23,0.3)", transition: "all 0.3s", padding: "10px 4px", margin: "-10px -4px", boxSizing: "content-box" }} />
+            <button key={i} onClick={() => setIdx(i)} aria-label={`후기 ${i + 1}번으로 이동`} style={{ width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: "none", cursor: "pointer", background: i === idx ? "#533afd" : "rgba(23,23,23,0.3)", transition: "all 0.3s", padding: 0, flexShrink: 0 }} />
           ))}
         </div>
       </div>

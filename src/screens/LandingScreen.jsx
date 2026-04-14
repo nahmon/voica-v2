@@ -90,37 +90,6 @@ function CounterStat({ end, suffix, label, delay, color, labelColor }) {
   );
 }
 
-/* ── Trusted-by logos ── */
-function TrustedBySection({ isMobile }) {
-  const logos = ["삼성전자", "카카오", "네이버", "쿠팡", "토스"];
-  return (
-    <FadeInSection>
-      <section style={{ background: C.bg, padding: isMobile ? "36px 20px" : "48px 24px", borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
-        <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: C.body, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 20 }}>
-            국내 주요 기업이 사용 중
-          </p>
-          <div style={{ display: "flex", gap: isMobile ? 8 : 16, justifyContent: "center", flexWrap: "wrap" }}>
-            {logos.map(name => (
-              <div key={name} style={{
-                padding: isMobile ? "8px 14px" : "10px 20px",
-                borderRadius: 8,
-                background: C.white,
-                border: `1px solid ${C.border}`,
-                fontSize: isMobile ? 13 : 14,
-                fontWeight: 600,
-                color: "rgba(6,27,49,0.4)",
-                letterSpacing: "0.02em",
-              }}>
-                {name}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </FadeInSection>
-  );
-}
 
 /* ── Before vs After comparison ── */
 function BeforeAfterSection({ isMobile }) {
@@ -280,16 +249,6 @@ export default function LandingScreen({ go, user, logout }) {
         <div style={{ maxWidth: 680, margin: "0 auto", textAlign: "center", position: "relative" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
             <Badge variant="purple">✦ AI 보이스 인터뷰 플랫폼</Badge>
-            {/* 무료 체험 badge */}
-            <span style={{
-              display: "inline-flex", alignItems: "center", gap: 4,
-              padding: "5px 10px", borderRadius: 20,
-              background: "rgba(21,190,83,0.12)", border: "1px solid rgba(21,190,83,0.35)",
-              fontSize: 12, fontWeight: 700, color: C.successText,
-              animation: "badge-pulse 2.4s ease-in-out infinite",
-            }}>
-              무료 체험
-            </span>
           </div>
 
           <h1 style={{ fontSize: isMobile ? 36 : 52, fontWeight: 700, lineHeight: 1.1, margin: "0 0 24px", fontFamily: F }}>
@@ -358,7 +317,6 @@ export default function LandingScreen({ go, user, logout }) {
       </FadeInSection>
 
       {/* ── Trusted by logos ── */}
-      <TrustedBySection isMobile={isMobile} />
 
       {/* ── Before vs After ── */}
       <BeforeAfterSection isMobile={isMobile} />
