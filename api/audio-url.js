@@ -1,4 +1,5 @@
-const supabase = (await import("@supabase/supabase-js")).createClient(
+import { createClient } from "@supabase/supabase-js";
+const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
@@ -25,7 +26,7 @@ export default async function handler(req, res) {
   const storagePath = decodeURIComponent(match[1]);
   const { data: signedData, error: signError } = await supabase.storage
     .from("audio-responses")
-    .createSignedUrl(storagePath, 31536000);
+    .createSignedUrl(storagePath, 3600); // 1 hour
 
   if (signError || !signedData) return res.status(500).json({ error: "Failed to create signed URL" });
 

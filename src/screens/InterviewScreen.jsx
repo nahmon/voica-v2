@@ -324,7 +324,7 @@ export default function InterviewScreen({ go, shareCode }) {
         const { data: uploaded, error: uploadError } = await supabase.storage.from("audio-responses").upload(path, blob, { contentType: mimeType, upsert: true });
         if (uploadError) { console.error("[audio upload]", uploadError); showToast("녹음 저장에 실패했어요. 응답은 계속 진행됩니다.", "error"); }
         else if (uploaded) {
-          const { data: signedData } = await supabase.storage.from("audio-responses").createSignedUrl(path, 31536000);
+          const { data: signedData } = await supabase.storage.from("audio-responses").createSignedUrl(path, 7776000); // 90 days
           if (signedData) audioUrl = signedData.signedUrl;
         }
       } catch (e) { console.error("[audio upload exception]", e); }

@@ -4,7 +4,8 @@ import OpenAI from "openai";
 import { toFile } from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const supabase = (await import("@supabase/supabase-js")).createClient(
+import { createClient } from "@supabase/supabase-js";
+const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );

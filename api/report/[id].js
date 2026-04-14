@@ -15,6 +15,20 @@ export default async function handler(req, res) {
 
   // ── GET: fetch existing report ──
   if (req.method === "GET") {
+    const token = req.headers.authorization?.replace("Bearer ", "");
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !user) return res.status(401).json({ error: "Unauthorized" });
+
+    // Verify ownership
+    const { data: interview } = await supabase
+      .from("interviews")
+      .select("id")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+    if (!interview) return res.status(404).json({ error: "Interview not found" });
+
     const { data, error } = await supabase
       .from("reports")
       .select("*")
