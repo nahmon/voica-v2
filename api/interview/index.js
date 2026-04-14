@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
   // ── PUT: update existing interview ──
   if (req.method === "PUT") {
-    const { id, title, questions = [] } = req.body;
+    const { id, title, incentive, questions = [] } = req.body;
     if (!id || !title) return res.status(400).json({ error: "id and title required" });
 
     const { data: existing } = await supabase
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       .eq("id", id).eq("user_id", user.id).single();
     if (!existing) return res.status(403).json({ error: "Not found or access denied" });
 
-    await supabase.from("interviews").update({ title }).eq("id", id);
+    await supabase.from("interviews").update({ title, incentive: incentive ?? null }).eq("id", id);
 
     // Get current question IDs in DB
     const { data: currentQs } = await supabase
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ share_code: existing.share_code });
   }
 
-  const { title, description, questions = [] } = req.body;
+  const { title, description, incentive, questions = [] } = req.body;
   if (!title) return res.status(400).json({ error: "title required" });
 
   // Generate unique share_code
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
   // Create interview
   const { data: interview, error: ivError } = await supabase
     .from("interviews")
-    .insert({ user_id: user.id, title, description, share_code, status: "active" })
+    .insert({ user_id: user.id, title, description, incentive: incentive ?? null, share_code, status: "active" })
     .select()
     .single();
 

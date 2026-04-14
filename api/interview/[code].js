@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   const { data: interview, error } = await supabase
     .from("interviews")
-    .select("id, title, description, share_code, status, questions(id, order_num, type, content, options, tts_url)")
+    .select("id, title, description, incentive, share_code, status, questions(id, order_num, type, content, options, tts_url)")
     .eq("share_code", code)
     .eq("status", "active")
     .single();

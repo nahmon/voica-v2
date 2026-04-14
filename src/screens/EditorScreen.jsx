@@ -50,6 +50,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   // Restore draft from localStorage only when creating new (no interviewId)
   const savedDraft = !interviewId ? (() => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; } })() : null;
   const [title, setTitle] = useState(savedDraft?.title ?? "");
+  const [incentive, setIncentive] = useState(savedDraft?.incentive ?? "");
   const [questions, setQuestions] = useState(savedDraft?.questions ?? [newQ("voice")]);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -64,13 +65,14 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [showIncompleteWarn, setShowIncompleteWarn] = useState(false);
   const [dragOver, setDragOver] = useState(null);
   const [savedTitle, setSavedTitle] = useState(savedDraft?.title ?? "");
+  const [savedIncentive, setSavedIncentive] = useState(savedDraft?.incentive ?? "");
   const [savedQuestions, setSavedQuestions] = useState(savedDraft?.questions ?? [newQ("voice")]);
   const [showSaveTooltip, setShowSaveTooltip] = useState(false);
   const dragIdx = useRef(null);
   const isMobile = useIsMobile();
 
   // Track whether there are unsaved changes
-  const hasUnsaved = title !== savedTitle || JSON.stringify(questions) !== JSON.stringify(savedQuestions);
+  const hasUnsaved = title !== savedTitle || incentive !== savedIncentive || JSON.stringify(questions) !== JSON.stringify(savedQuestions);
 
   // Load existing interview from DB when editing
   useEffect(() => {
@@ -78,12 +80,14 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     (async () => {
       try {
         const [{ data: iv }, { data: qs }] = await Promise.all([
-          supabase.from("interviews").select("id, title, share_code").eq("id", interviewId).single(),
+          supabase.from("interviews").select("id, title, incentive, share_code").eq("id", interviewId).single(),
           supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
         ]);
         if (iv) {
           setTitle(iv.title ?? "");
           setSavedTitle(iv.title ?? "");
+          setIncentive(iv.incentive ?? "");
+          setSavedIncentive(iv.incentive ?? "");
           if (iv.share_code) setShareCode(iv.share_code);
         }
         if (qs && qs.length > 0) {
@@ -104,7 +108,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   useEffect(() => {
     if (editingId) return;
     const timer = setTimeout(() => {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, questions }));
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, incentive, questions }));
       setDraftSaved(true);
       setTimeout(() => setDraftSaved(false), 1500);
     }, 800);
@@ -215,6 +219,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       const token = session?.access_token;
       const payload = {
         title: title.trim(),
+        incentive: incentive.trim() || null,
         questions: questions.map((q, i) => ({
           id: q.id,
           order_num: i + 1,
@@ -234,6 +239,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       setShareCode(data.share_code);
       // Mark as saved
       setSavedTitle(title);
+      setSavedIncentive(incentive);
       setSavedQuestions(questions);
       if (!editingId) {
         track("interview_published", { shareCode: data.share_code, questionCount: questions.length });
@@ -394,6 +400,12 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           placeholder="인터뷰 제목을 입력하세요"
           style={{ width: "100%", border: "none", outline: "none", fontSize: 18, fontFamily: F, fontWeight: 600, color: C.navy, background: "transparent", boxSizing: "border-box" }}
         />
+        <input
+          value={incentive}
+          onChange={e => setIncentive(e.target.value)}
+          placeholder="참여 보상 (선택) — 예: 스타벅스 기프티콘 5,000원"
+          style={{ width: "100%", border: "none", outline: "none", fontSize: 13, fontFamily: F, color: C.body, background: "transparent", boxSizing: "border-box", marginTop: 6 }}
+        />
       </div>
       {/* Question tabs */}
       <div style={{ display: "flex", gap: 6, padding: "10px 16px", overflowX: "auto", background: C.white, borderBottom: `1px solid ${C.border}` }}>
@@ -529,6 +541,17 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               onFocus={e => e.target.style.borderBottomColor = C.purple}
               onBlur={e => e.target.style.borderBottomColor = title ? C.purple : C.border}
             />
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 11, color: C.body, marginBottom: 4, letterSpacing: 0.5 }}>참여 보상 (선택)</div>
+              <input
+                value={incentive}
+                onChange={e => setIncentive(e.target.value)}
+                placeholder="예: 스타벅스 기프티콘 5,000원"
+                style={{ width: "100%", border: "none", borderBottom: `1px solid ${incentive ? C.purple : C.border}`, outline: "none", fontSize: 14, fontFamily: F, color: C.navy, background: "transparent", paddingBottom: 4, boxSizing: "border-box", transition: "border-color 0.15s" }}
+                onFocus={e => e.target.style.borderBottomColor = C.purple}
+                onBlur={e => e.target.style.borderBottomColor = incentive ? C.purple : C.border}
+              />
+            </div>
           </div>
 
           {/* Preview card */}

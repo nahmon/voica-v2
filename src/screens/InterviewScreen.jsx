@@ -14,6 +14,21 @@ const INTERVIEW_STYLES = `
 
 const MIN_RECORD_SECS = 5;
 
+// Estimate total interview duration in seconds
+function estimateDuration(questions) {
+  return questions.reduce((sum, q) => {
+    if (q.type === "voice") return sum + 45;
+    if (q.type === "multiple_choice") return sum + 10;
+    if (q.type === "likert") return sum + 8;
+    return sum + 20;
+  }, 0);
+}
+
+function fmtMinutes(secs) {
+  const m = Math.ceil(secs / 60);
+  return `약 ${m}분`;
+}
+
 export default function InterviewScreen({ go, shareCode }) {
   const isMobile = useIsMobile();
 
@@ -25,7 +40,7 @@ export default function InterviewScreen({ go, shareCode }) {
   // Session
   const [sessionId, setSessionId] = useState(null);
   const [respondent, setRespondent] = useState({ name: "", age: "", gender: "" });
-  const [introStep, setIntroStep] = useState("info"); // "info" | "started"
+  const [introStep, setIntroStep] = useState("info"); // "info" | "warmup" | "started"
 
   // Question progress
   const [qIndex, setQIndex] = useState(0);
@@ -41,6 +56,14 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // MC/Likert
   const [selectedValue, setSelectedValue] = useState(null);
+
+  // Warmup state
+  const [warmupPhase, setWarmupPhase] = useState("idle"); // idle|recording|done
+  const [warmupBlob, setWarmupBlob] = useState(null);
+  const [warmupPlayUrl, setWarmupPlayUrl] = useState(null);
+  const warmupChunksRef = useRef([]);
+  const warmupRecorderRef = useRef(null);
+  const warmupStreamRef = useRef(null);
 
   // Exit confirm
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -217,7 +240,9 @@ export default function InterviewScreen({ go, shareCode }) {
       if (res.ok) {
         const d = await res.json();
         setSessionId(d.session_id);
-        setIntroStep("started");
+        // Go to warmup if there's at least one voice question
+        const hasVoice = interview?.questions?.some(q => q.type === "voice");
+        setIntroStep(hasVoice ? "warmup" : "started");
         track("interview_info_submitted", { shareCode, sessionId: d.session_id });
       } else {
         const d = await res.json().catch(() => ({}));
@@ -335,6 +360,37 @@ export default function InterviewScreen({ go, shareCode }) {
     advanceOrComplete();
   };
 
+  const startWarmup = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      warmupStreamRef.current = stream;
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";
+      const mr = new MediaRecorder(stream, { mimeType });
+      warmupChunksRef.current = [];
+      mr.ondataavailable = e => { if (e.data.size > 0) warmupChunksRef.current.push(e.data); };
+      mr.start();
+      warmupRecorderRef.current = mr;
+      setWarmupPhase("recording");
+    } catch {
+      setRecordingWarning("마이크 권한이 필요해요. 브라우저 설정에서 마이크를 허용한 후 다시 시도해 주세요.");
+    }
+  };
+
+  const stopWarmup = () => {
+    const mr = warmupRecorderRef.current;
+    if (!mr) return;
+    mr.onstop = () => {
+      warmupStreamRef.current?.getTracks().forEach(t => t.stop());
+      const mimeType = mr.mimeType;
+      const blob = new Blob(warmupChunksRef.current, { type: mimeType });
+      setWarmupBlob(blob);
+      const url = URL.createObjectURL(blob);
+      setWarmupPlayUrl(url);
+      setWarmupPhase("done");
+    };
+    mr.stop();
+  };
+
   const fmt = s => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
   // ─── Loading ───
@@ -379,6 +435,59 @@ export default function InterviewScreen({ go, shareCode }) {
     </div>
   );
 
+  // ─── Warmup ───
+  if (introStep === "warmup") return (
+    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
+      <div style={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 20, letterSpacing: 0.3 }}>마이크 테스트</div>
+        <div style={{ fontSize: 20, fontWeight: 600, color: C.white, marginBottom: 8 }}>마이크가 잘 들리나요?</div>
+        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 32, lineHeight: 1.7 }}>
+          3초 정도 짧게 말해보고<br />재생해서 확인해 보세요.
+        </div>
+
+        {warmupPhase === "idle" && (
+          <button onClick={startWarmup}
+            style={{ width: 72, height: 72, borderRadius: "50%", border: "none", cursor: "pointer", background: C.purple, boxShadow: "0 0 0 8px rgba(83,58,253,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+            {Ic.Mic({ s: 28, c: "white" })}
+          </button>
+        )}
+
+        {warmupPhase === "recording" && (
+          <>
+            <button onClick={stopWarmup}
+              style={{ width: 72, height: 72, borderRadius: "50%", border: "none", cursor: "pointer", background: C.ruby, boxShadow: "0 0 0 8px rgba(217,48,37,0.2),0 0 0 16px rgba(217,48,37,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+              {Ic.Stop({ s: 24, c: "white" })}
+            </button>
+            <div style={{ fontSize: 12, color: "rgba(217,48,37,0.9)" }}>녹음 중... 탭하여 중지</div>
+          </>
+        )}
+
+        {warmupPhase === "done" && warmupPlayUrl && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginBottom: 8 }}>
+            <audio controls src={warmupPlayUrl} style={{ width: "100%", maxWidth: 300, borderRadius: 8 }} />
+            <button onClick={() => { setWarmupPhase("idle"); setWarmupPlayUrl(null); setWarmupBlob(null); }}
+              style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", background: "none", border: "none", cursor: "pointer", fontFamily: F, textDecoration: "underline" }}>
+              다시 테스트
+            </button>
+          </div>
+        )}
+
+        {recordingWarning && (
+          <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,200,50,0.08)", border: "1px solid rgba(255,200,50,0.2)", fontSize: 12, color: "rgba(255,200,50,0.9)", textAlign: "left" }}>
+            {recordingWarning}
+          </div>
+        )}
+
+        <button
+          onClick={() => { setIntroStep("started"); }}
+          disabled={warmupPhase === "recording"}
+          style={{ marginTop: 24, width: "100%", padding: "14px", borderRadius: 10, border: "none", background: warmupPhase === "recording" ? "rgba(255,255,255,0.1)" : `linear-gradient(135deg,${C.purple},${C.purpleDeep})`, color: C.white, fontSize: 15, fontWeight: 500, fontFamily: F, cursor: warmupPhase === "recording" ? "not-allowed" : "pointer", opacity: warmupPhase === "recording" ? 0.5 : 1 }}>
+          {warmupPhase === "done" ? "마이크 확인 완료 — 인터뷰 시작 →" : "마이크 테스트 건너뛰고 시작 →"}
+        </button>
+      </div>
+    </div>
+  );
+
   // ─── Intro / Info ───
   if (introStep === "info") return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124 0%,#292a2d 50%,#202124 100%)", display: "flex", alignItems: "flex-start", justifyContent: "center", fontFamily: F, padding: "40px 24px 40px", overflowY: "auto" }}>
@@ -388,8 +497,23 @@ export default function InterviewScreen({ go, shareCode }) {
           <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", fontWeight: 400 }}>Voica AI 인터뷰</span>
         </div>
         <div style={{ fontSize: 22, fontWeight: 500, color: C.white, marginBottom: 8, lineHeight: 1.3 }}>{interview.title}</div>
-        {interview.description && <div style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", marginBottom: 28, lineHeight: 1.6 }}>{interview.description}</div>}
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 20 }}>질문 {interview.questions.length}개 · 음성 응답 포함</div>
+        {interview.description && <div style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", marginBottom: 16, lineHeight: 1.6 }}>{interview.description}</div>}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>질문 {interview.questions.length}개 · 음성 응답 포함</span>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", display: "flex", alignItems: "center", gap: 5 }}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="1.4" strokeLinecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v2.5l1.5 1.5"/></svg>
+            예상 소요시간 {fmtMinutes(estimateDuration(interview.questions))}
+          </span>
+        </div>
+        {interview.incentive && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 8, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.25)", marginBottom: 20 }}>
+            <span style={{ fontSize: 16 }}>🎁</span>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(21,190,83,0.9)" }}>참여 보상</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 1 }}>{interview.incentive}</div>
+            </div>
+          </div>
+        )}
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
           {[
             { key: "name", label: "닉네임 (선택)", placeholder: "예: 커피좋아하는직장인" },
@@ -473,7 +597,16 @@ export default function InterviewScreen({ go, shareCode }) {
         <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(30,142,62,0.18)", border: "1.5px solid rgba(30,142,62,0.5)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 32 }}>✓</div>
 
         <div style={{ fontSize: 32, fontWeight: 700, color: C.white, marginBottom: 10 }}>인터뷰 완료!</div>
-        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 20 }}>소중한 의견 감사해요.<br />답변을 안전하게 저장했어요.</div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: interview.incentive ? 12 : 20 }}>소중한 의견 감사해요.<br />답변을 안전하게 저장했어요.</div>
+        {interview.incentive && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.3)", marginBottom: 20, textAlign: "left" }}>
+            <span style={{ fontSize: 20, flexShrink: 0 }}>🎁</span>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(21,190,83,0.9)", marginBottom: 2 }}>참여 보상</div>
+              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.8)" }}>{interview.incentive}</div>
+            </div>
+          </div>
+        )}
 
         {/* Summary card */}
         <div style={{ padding: "16px 20px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", marginBottom: 24, textAlign: "left" }}>
@@ -562,9 +695,21 @@ export default function InterviewScreen({ go, shareCode }) {
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
             <button onClick={() => setShowExitConfirm(true)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer", fontFamily: F, padding: 0 }}>나가기</button>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontFeatureSettings: '"tnum"', fontWeight: 500 }}>
-              질문 {qIndex + 1} / {interview.questions.length}
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {(() => {
+                const remaining = estimateDuration(interview.questions.slice(qIndex));
+                const mins = Math.ceil(remaining / 60);
+                return mins > 0 ? (
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", display: "flex", alignItems: "center", gap: 4 }}>
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.4" strokeLinecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v2.5l1.5 1.5"/></svg>
+                    예상 남은 시간 약 {mins}분
+                  </span>
+                ) : null;
+              })()}
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontFeatureSettings: '"tnum"', fontWeight: 500 }}>
+                질문 {qIndex + 1} / {interview.questions.length}
+              </span>
+            </div>
           </div>
           <div style={{ height: 3, background: "rgba(255,255,255,0.1)", borderRadius: 2 }}>
             <div style={{ height: "100%", width: `${((qIndex + 1) / interview.questions.length) * 100}%`, background: `linear-gradient(90deg,${C.purple},${C.magenta})`, borderRadius: 2, transition: "width 0.5s ease" }} />
