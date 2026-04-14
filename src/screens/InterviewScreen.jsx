@@ -608,7 +608,7 @@ export default function InterviewScreen({ go, shareCode }) {
         <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(30,142,62,0.18)", border: "1.5px solid rgba(30,142,62,0.5)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 32 }}>✓</div>
 
         <div style={{ fontSize: isMobile ? 26 : 32, fontWeight: 700, color: C.white, marginBottom: 10 }}>인터뷰 완료!</div>
-        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: interview.incentive ? 12 : 20 }}>{isMobile ? "감사해요! 답변이 저장됐어요." : <><br />소중한 의견 감사해요.<br />답변을 안전하게 저장했어요.</>}</div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: interview.incentive ? 12 : 20 }}>{isMobile ? "감사해요! 답변이 저장됐어요." : <>소중한 의견 감사해요.<br />답변을 안전하게 저장했어요.</>}</div>
         {interview.incentive && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.3)", marginBottom: 20, textAlign: "left" }}>
             <span style={{ fontSize: 20, flexShrink: 0 }}>🎁</span>
