@@ -641,7 +641,7 @@ export default function InterviewScreen({ go, shareCode }) {
           <div style={{ fontSize: 12, color: `${C.purpleLight}`, marginBottom: 8, fontWeight: 500 }}>🎤 Voice Survey로 만들어진 인터뷰예요</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>당신의 목소리로 리서치하고 싶다면 →</span>
-            <button onClick={() => { track("powered_by_voica_clicked", {}); window.location.href = "/"; }}
+            <button onClick={() => { track("powered_by_voice_survey_clicked", {}); window.location.href = "/"; }}
               style={{ flexShrink: 0, padding: "7px 14px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 12, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap" }}>
               무료로 시작하기 →
             </button>

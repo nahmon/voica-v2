@@ -118,12 +118,12 @@ export default function PanelMyPageScreen({ go, user, logout }) {
             ₩{withdrawable.toLocaleString()} 출금하기
           </button>
           {showWithdrawMsg === "error" && (
-            <div style={{ marginTop: 8, fontSize: 12, color: "#fca5a5", textAlign: "center" }}>
+            <div style={{ marginTop: 8, fontSize: 12, color: C.ruby, textAlign: "center" }}>
               출금 수단을 먼저 설정해 주세요
             </div>
           )}
           {showWithdrawMsg === "success" && (
-            <div style={{ marginTop: 8, fontSize: 12, color: "#4ade80", textAlign: "center" }}>
+            <div style={{ marginTop: 8, fontSize: 12, color: C.successText, textAlign: "center" }}>
               출금 신청이 완료됐어요. 1-2 영업일 내 지급됩니다
             </div>
           )}
