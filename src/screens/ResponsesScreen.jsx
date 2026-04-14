@@ -140,6 +140,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("all"); // "all" | "completed" | "in_progress"
   const [viewMode, setViewMode] = useState("expanded"); // "expanded" | "compact"
+  const [clipView, setClipView] = useState(false);
   const isMobile = useIsMobile();
   const { showToast } = useToast();
 
@@ -438,22 +439,67 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
 
         {/* Right: answers */}
         <div style={{ flex: 1, overflowY: "auto", padding: "24px 32px" }}>
-          {!selectedSession ? (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: C.body, fontSize: 14 }}>
-              왼쪽에서 응답자를 선택해요
+          {/* Voice clip aggregated view */}
+          {clipView ? (
+            <div style={{ maxWidth: 720 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <div style={{ fontSize: 15, fontWeight: 500, color: C.navy }}>🎙 음성 클립 모아보기</div>
+                <button onClick={() => setClipView(false)} style={{ fontSize: 12, padding: "5px 12px", borderRadius: 6, border: `1px solid ${C.border}`, background: "transparent", color: C.body, cursor: "pointer", fontFamily: F }}>← 응답별 보기</button>
+              </div>
+              {questions.filter(q => q.type === "voice").map(q => {
+                const clips = allResponses.filter(r => r.question_id === q.id && r.audio_url);
+                if (clips.length === 0) return null;
+                return (
+                  <div key={q.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, marginBottom: 16, overflow: "hidden" }}>
+                    <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}`, background: C.bg }}>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: C.navy }}>Q{questions.indexOf(q) + 1}. {q.content}</div>
+                      <div style={{ fontSize: 11, color: C.body, marginTop: 3 }}>음성 클립 {clips.length}개</div>
+                    </div>
+                    <div style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 16 }}>
+                      {clips.map((r, idx) => {
+                        const sess = sessions.find(s => s.id === r.session_id);
+                        const sessNum = sessions.indexOf(sess) + 1;
+                        return (
+                          <div key={r.id} style={{ borderBottom: idx < clips.length - 1 ? `1px solid ${C.border}` : "none", paddingBottom: idx < clips.length - 1 ? 16 : 0 }}>
+                            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>응답자 {sessNum} · {sess?.respondent?.name || "익명"}</div>
+                            <VoicePlayer audioUrl={r.audio_url} transcript={r.transcript} />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+              {questions.filter(q => q.type === "voice" && allResponses.some(r => r.question_id === q.id && r.audio_url)).length === 0 && (
+                <div style={{ textAlign: "center", color: C.body, fontSize: 13, padding: "40px 0" }}>아직 음성 클립이 없습니다</div>
+              )}
+            </div>
+          ) : !selectedSession ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: 16 }}>
+              <div style={{ color: C.body, fontSize: 14 }}>왼쪽에서 응답자를 선택해요</div>
+              {allResponses.some(r => r.audio_url) && (
+                <button onClick={() => setClipView(true)} style={{ fontSize: 12, padding: "7px 16px", borderRadius: 8, border: `1px solid ${C.purple}`, background: C.purpleBg, color: C.purple, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>🎙 음성 클립 모아보기</button>
+              )}
             </div>
           ) : (
             <div style={{ maxWidth: 720 }}>
               <div style={{ marginBottom: 24, paddingBottom: 16, borderBottom: `1px solid ${C.border}` }}>
-                <div style={{ fontSize: 16, fontWeight: 600, color: C.navy, marginBottom: 4 }}>
-                  응답자 {sessions.indexOf(selectedSession) + 1}
-                </div>
-                <div style={{ fontSize: 12, color: C.body }}>
-                  {selectedSession.completed_at
-                    ? `완료 · ${new Date(selectedSession.completed_at).toLocaleString("ko-KR")}`
-                    : "인터뷰 진행 중"
-                  }
-                  {" · "}{responses.length}개 응답
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: C.navy, marginBottom: 4 }}>
+                      응답자 {sessions.indexOf(selectedSession) + 1}
+                    </div>
+                    <div style={{ fontSize: 12, color: C.body }}>
+                      {selectedSession.completed_at
+                        ? `완료 · ${new Date(selectedSession.completed_at).toLocaleString("ko-KR")}`
+                        : "인터뷰 진행 중"
+                      }
+                      {" · "}{responses.length}개 응답
+                    </div>
+                  </div>
+                  {allResponses.some(r => r.audio_url) && (
+                    <button onClick={() => setClipView(true)} style={{ fontSize: 11, padding: "5px 12px", borderRadius: 6, border: `1px solid ${C.purple}`, background: C.purpleBg, color: C.purple, cursor: "pointer", fontFamily: F }}>🎙 음성 클립 모아보기</button>
+                  )}
                 </div>
               </div>
 

@@ -694,6 +694,16 @@ export function VoicePlayer({ audioUrl, transcript }) {
     else { a.play().catch(() => {}); setPlaying(true); }
   };
 
+  const download = () => {
+    const a = document.createElement("a");
+    a.href = audioUrl;
+    a.download = "voice-clip.webm";
+    a.target = "_blank";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   const seek = (e) => {
     const a = audioRef.current;
     if (!a || !duration) return;
@@ -741,6 +751,17 @@ export function VoicePlayer({ audioUrl, transcript }) {
               </div>
             </div>
           </div>
+          {audioUrl && (
+            <button
+              onClick={download}
+              title="다운로드"
+              style={{ width: 30, height: 30, borderRadius: "50%", background: "transparent", border: `1px solid ${C.border}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: C.body, transition: "all 0.12s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.color = C.purple; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.body; }}
+            >
+              <svg width={12} height={12} viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v8.5l3-3 1 1-4 4-4-4 1-1 3 3V1h1zM2 13h12v1H2z"/></svg>
+            </button>
+          )}
         </>
       )}
       {transcript && (

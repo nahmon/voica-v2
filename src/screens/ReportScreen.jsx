@@ -25,6 +25,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState(null);
   const [activeSection, setActiveSection] = useState("summary");
+  const [voiceOnly, setVoiceOnly] = useState(false);
 
   useEffect(() => {
     if (!interviewId) { setLoading(false); return; }
@@ -266,7 +267,12 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                     style={{ background: C.white, border: `1px solid ${selectedSession?.id === s.id ? C.purple : C.border}`, borderRadius: 10, padding: "12px 14px", cursor: "pointer", boxShadow: S.ambient }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                       <span style={{ fontSize: 13, fontWeight: 400, color: C.navy }}>{name}</span>
-                      <Badge variant={s.status === "completed" ? "success" : "warning"}>{s.status === "completed" ? "완료" : "진행 중"}</Badge>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        {allResponses.some(r => r.session_id === s.id && r.audio_url) && (
+                          <svg width={10} height={10} viewBox="0 0 16 16" fill={C.purple} title="음성 녹음 있음"><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M4.5 8a.5.5 0 0 0-1 0 4.5 4.5 0 0 0 9 0 .5.5 0 0 0-1 0A3.5 3.5 0 0 1 8 11.5 3.5 3.5 0 0 1 4.5 8z"/></svg>
+                        )}
+                        <Badge variant={s.status === "completed" ? "success" : "warning"}>{s.status === "completed" ? "완료" : "진행 중"}</Badge>
+                      </div>
                     </div>
                     <div style={{ fontSize: 11, color: C.body }}>{duration} · {allResponses.filter(r => r.session_id === s.id).length}개 답변</div>
                   </div>
@@ -283,17 +289,31 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
           {selectedSession && (
             <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 22px", marginBottom: 24, boxShadow: S.standard }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <div style={{ fontSize: 14, fontWeight: 400, color: C.navy }}>
-                  {selectedSession.respondent?.name || "익명"} 응답 상세
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 400, color: C.navy }}>
+                    {selectedSession.respondent?.name || "익명"} 응답 상세
+                  </div>
+                  <div style={{ fontSize: 11, color: C.body, marginTop: 3 }}>
+                    🎙 음성 {allResponses.filter(r => r.session_id === selectedSession.id && r.audio_url).length}개 · 답변 {allResponses.filter(r => r.session_id === selectedSession.id).length}개
+                  </div>
                 </div>
-                <button onClick={() => setSelectedSession(null)} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 18 }}>✕</button>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <button onClick={() => setVoiceOnly(v => !v)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, border: `1px solid ${voiceOnly ? C.purple : C.border}`, background: voiceOnly ? C.purpleBg : "transparent", color: voiceOnly ? C.purple : C.body, cursor: "pointer", fontFamily: F }}>
+                    {voiceOnly ? "전체 보기" : "🎙 음성만"}
+                  </button>
+                  <button onClick={() => setSelectedSession(null)} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 18 }}>✕</button>
+                </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {questions.map((q, i) => {
+                {questions.filter(q => !voiceOnly || q.type === "voice").map((q, i) => {
                   const r = allResponses.find(r => r.session_id === selectedSession.id && r.question_id === q.id);
+                  const isVoiceWithAudio = q.type === "voice" && r?.audio_url;
                   return (
-                    <div key={q.id} style={{ borderBottom: `1px solid ${C.border}`, paddingBottom: 12 }}>
-                      <div style={{ fontSize: 12, color: C.body, marginBottom: 6 }}>Q{i + 1} · {q.content}</div>
+                    <div key={q.id} style={{ borderBottom: `1px solid ${C.border}`, paddingBottom: 12, background: isVoiceWithAudio ? "rgba(83,58,253,0.03)" : "transparent", borderRadius: isVoiceWithAudio ? 8 : 0, padding: "10px 0" }}>
+                      <div style={{ fontSize: 12, color: C.body, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+                        {isVoiceWithAudio && <svg width={10} height={10} viewBox="0 0 16 16" fill={C.purple}><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/></svg>}
+                        Q{questions.indexOf(q) + 1} · {q.content}
+                      </div>
                       {!r ? (
                         <span style={{ fontSize: 12, color: C.body, fontStyle: "italic" }}>응답 없음</span>
                       ) : q.type === "voice" ? (
