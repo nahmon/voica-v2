@@ -557,9 +557,9 @@ export default function InterviewScreen({ go, shareCode }) {
   const [shareCopied, setShareCopied] = useState(false);
   const handleShare = () => {
     track("viral_share_clicked", {});
-    const shareText = "나는 방금 Voice Survey AI 인터뷰에 참여했어요! 🎤 voica.kr";
+    const shareText = "나는 방금 Voice Survey AI 인터뷰에 참여했어요! 🎤 voicesurvey.ai";
     if (navigator.share) {
-      navigator.share({ title: "Voice Survey 인터뷰 완료!", text: "방금 AI 음성 인터뷰에 참여했어요. 당신도 해보세요!", url: "https://voica.kr" }).catch(() => {});
+      navigator.share({ title: "Voice Survey 인터뷰 완료!", text: "방금 AI 음성 인터뷰에 참여했어요. 당신도 해보세요!", url: "https://voicesurvey.ai" }).catch(() => {});
     } else {
       navigator.clipboard.writeText(shareText).then(() => { setShareCopied(true); setTimeout(() => setShareCopied(false), 2500); }).catch(() => {});
     }
@@ -636,12 +636,12 @@ export default function InterviewScreen({ go, shareCode }) {
           홈으로 돌아가기 →
         </button>
 
-        {/* Powered by Voica footer */}
-        <div style={{ padding: "16px 20px", borderRadius: 12, border: `1px solid rgba(124,58,237,0.3)`, background: "rgba(124,58,237,0.08)", textAlign: "left" }}>
+        {/* Powered by Voice Survey footer */}
+        <div style={{ padding: "16px 20px", borderRadius: 12, border: `1px solid ${C.purpleLight}44`, background: C.purpleBg, textAlign: "left" }}>
           <div style={{ fontSize: 12, color: `${C.purpleLight}`, marginBottom: 8, fontWeight: 500 }}>🎤 Voice Survey로 만들어진 인터뷰예요</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>당신의 목소리로 리서치하고 싶다면 →</span>
-            <button onClick={() => { track("powered_by_voica_clicked", {}); window.location.href = "/"; }}
+            <button onClick={() => { track("powered_by_voice_survey_clicked", {}); window.location.href = "/"; }}
               style={{ flexShrink: 0, padding: "7px 14px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 12, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap" }}>
               무료로 시작하기 →
             </button>
