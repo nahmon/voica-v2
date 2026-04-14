@@ -373,9 +373,6 @@ export function VoCCarousel() {
             {VOC_LIST.map((v, i) => (
               <div key={i} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box" }}>
                 <div style={{ background: C.white, borderRadius: 16, padding: "36px 40px", border: `1px solid ${C.border}` }}>
-                  <div style={{ display: "flex", gap: 3, marginBottom: 16 }}>
-                    {[1,2,3,4,5].map(n => <Ic.Star key={n} c={C.purple} s={14} />)}
-                  </div>
                   <p style={{ margin: "0 0 24px", fontSize: 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px" }}>"{v.quote}"</p>
                   <div style={{ display: "flex", alignItems: "center", gap: 16, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
                     {v.photo ? (
