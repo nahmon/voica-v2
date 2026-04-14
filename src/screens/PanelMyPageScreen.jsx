@@ -34,6 +34,10 @@ export default function PanelMyPageScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const [notifInterview, setNotifInterview] = useState(true);
   const [notifReward, setNotifReward] = useState(true);
+  const [payoutMethod, setPayoutMethod] = useState(null); // null | "naverpay" | "tossmoney"
+  const [payoutAccount, setPayoutAccount] = useState("");
+  const [payoutSaved, setPayoutSaved] = useState(false);
+  const [showWithdrawMsg, setShowWithdrawMsg] = useState(null);
 
   const MY_INTERVIEWS = [
     { id: 1, title: "앱 사용성 인터뷰 Q2", company: "테크 스타트업 A", status: "completed", reward: "3,000원", date: "2026.04.05", rewardStatus: "지급 완료" },
@@ -94,6 +98,35 @@ export default function PanelMyPageScreen({ go, user, logout }) {
               {tierGoal - totalEarned > 0 ? `${(tierGoal - totalEarned).toLocaleString()}원 더 적립하면 우수 등급 달성!` : "우수 등급 달성!"}
             </div>
           </div>
+          {/* Withdraw button */}
+          <button
+            onClick={() => {
+              if (!payoutSaved) {
+                setShowWithdrawMsg("error");
+              } else {
+                setShowWithdrawMsg("success");
+              }
+              setTimeout(() => setShowWithdrawMsg(null), 4000);
+            }}
+            style={{
+              marginTop: 16, width: "100%", padding: "11px 0", borderRadius: 8,
+              border: "none", cursor: "pointer", fontFamily: F, fontWeight: 600,
+              fontSize: 14, background: "rgba(255,255,255,0.13)", color: C.white,
+              transition: "background 0.15s",
+            }}
+          >
+            ₩{withdrawable.toLocaleString()} 출금하기
+          </button>
+          {showWithdrawMsg === "error" && (
+            <div style={{ marginTop: 8, fontSize: 12, color: "#fca5a5", textAlign: "center" }}>
+              출금 수단을 먼저 설정해 주세요
+            </div>
+          )}
+          {showWithdrawMsg === "success" && (
+            <div style={{ marginTop: 8, fontSize: 12, color: "#4ade80", textAlign: "center" }}>
+              출금 신청이 완료됐어요. 1-2 영업일 내 지급됩니다
+            </div>
+          )}
         </div>
 
         {/* Profile summary + Monthly donut */}
@@ -192,6 +225,108 @@ export default function PanelMyPageScreen({ go, user, logout }) {
               </div>
             );
           })}
+        </div>
+
+        {/* Payout method card */}
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 24px", marginTop: 16, boxShadow: S.ambient }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 14 }}>출금 수단 설정</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+            {/* NaverPay option */}
+            <button
+              onClick={() => { setPayoutMethod("naverpay"); setPayoutAccount(""); setPayoutSaved(false); }}
+              style={{
+                background: C.white, borderRadius: 10, padding: "14px 12px",
+                border: payoutMethod === "naverpay" ? `2px solid ${C.purple}` : `1px solid ${C.border}`,
+                cursor: "pointer", textAlign: "center", position: "relative",
+                transition: "border 0.15s",
+              }}
+            >
+              {payoutMethod === "naverpay" && (
+                <div style={{
+                  position: "absolute", top: 8, right: 8, width: 18, height: 18,
+                  borderRadius: "50%", background: C.purple,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                    <path d="M1 4l2.5 2.5L9 1" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              )}
+              <div style={{
+                width: 36, height: 36, borderRadius: 8, background: "#03C75A",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 8px", fontFamily: F, fontWeight: 900, fontSize: 18, color: "#fff",
+              }}>N</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>네이버페이</div>
+            </button>
+            {/* Toss Money option */}
+            <button
+              onClick={() => { setPayoutMethod("tossmoney"); setPayoutAccount(""); setPayoutSaved(false); }}
+              style={{
+                background: C.white, borderRadius: 10, padding: "14px 12px",
+                border: payoutMethod === "tossmoney" ? `2px solid ${C.purple}` : `1px solid ${C.border}`,
+                cursor: "pointer", textAlign: "center", position: "relative",
+                transition: "border 0.15s",
+              }}
+            >
+              {payoutMethod === "tossmoney" && (
+                <div style={{
+                  position: "absolute", top: 8, right: 8, width: 18, height: 18,
+                  borderRadius: "50%", background: C.purple,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                    <path d="M1 4l2.5 2.5L9 1" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              )}
+              <div style={{
+                width: 36, height: 36, borderRadius: 8, background: "#0064FF",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 8px", fontFamily: F, fontWeight: 700, fontSize: 11, color: "#fff",
+                letterSpacing: "-0.5px",
+              }}>toss</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>토스머니</div>
+            </button>
+          </div>
+          {/* Account input */}
+          {payoutMethod && (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 12, color: C.body, marginBottom: 6 }}>
+                {payoutMethod === "naverpay" ? "네이버 아이디" : "전화번호"}
+              </div>
+              <input
+                type={payoutMethod === "tossmoney" ? "tel" : "text"}
+                placeholder={payoutMethod === "naverpay" ? "네이버 아이디를 입력해 주세요" : "010-XXXX-XXXX"}
+                value={payoutAccount}
+                onChange={e => { setPayoutAccount(e.target.value); setPayoutSaved(false); }}
+                style={{
+                  width: "100%", boxSizing: "border-box",
+                  padding: "10px 14px", borderRadius: 8,
+                  border: `1px solid ${C.border}`, fontSize: 14,
+                  fontFamily: F, color: C.navy, outline: "none",
+                  background: C.bg,
+                }}
+              />
+            </div>
+          )}
+          {payoutMethod && (
+            <button
+              onClick={() => {
+                if (payoutAccount.trim()) setPayoutSaved(true);
+              }}
+              style={{
+                width: "100%", padding: "11px 0", borderRadius: 8,
+                border: "none", cursor: payoutAccount.trim() ? "pointer" : "not-allowed",
+                fontFamily: F, fontWeight: 600, fontSize: 14,
+                background: payoutAccount.trim() ? C.purple : C.border,
+                color: payoutAccount.trim() ? C.white : C.body,
+                transition: "background 0.15s",
+              }}
+            >
+              {payoutSaved ? "저장됨 ✓" : "저장"}
+            </button>
+          )}
         </div>
 
         {/* Notification preferences */}
