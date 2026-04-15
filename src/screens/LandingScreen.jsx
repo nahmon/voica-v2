@@ -169,8 +169,9 @@ function FinalCtaSection({ go, isMobile }) {
             지금 무료로 시작하기
           </h2>
           <p style={{ fontSize: isMobile ? 15 : 17, color: "rgba(255,255,255,0.72)", margin: "0 0 44px", lineHeight: 1.6 }}>
-            신용카드 없이도 즉시 시작할 수 있어요.<br style={{ display: isMobile ? "none" : "block" }} />
-            첫 인터뷰 프로젝트는 무료로 진행해 드립니다.
+            {isMobile
+              ? "신용카드 없이, 지금 바로."
+              : <>신용카드 없이도 즉시 시작할 수 있어요.<br />첫 인터뷰 프로젝트는 무료로 진행해 드립니다.</>}
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button
@@ -251,17 +252,23 @@ export default function LandingScreen({ go, user, logout }) {
             <Badge variant="purple">✦ AI 보이스 인터뷰 플랫폼</Badge>
           </div>
 
-          <h1 style={{ fontSize: isMobile ? 36 : 52, fontWeight: 700, lineHeight: 1.1, margin: "0 0 24px", fontFamily: F }}>
+          <h1 style={{ fontSize: isMobile ? 34 : 52, fontWeight: 700, lineHeight: 1.15, margin: "0 0 24px", fontFamily: F }}>
             <span style={{ color: C.navy, display: "block" }}>
-              {fromInterview ? "AI 인터뷰를 경험하셨나요?" : "시간과 비용이 많이 들었던 인터뷰"}
+              {fromInterview
+                ? "AI 인터뷰를 경험하셨나요?"
+                : isMobile
+                  ? "인터뷰, 비싸고 오래 걸리죠?"
+                  : "시간과 비용이 많이 들었던 인터뷰"}
             </span>
             <span style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "block" }}>
-              AI로 수백 명의 인터뷰를 동시에
+              {isMobile ? "AI로 수백 명을 동시에" : "AI로 수백 명의 인터뷰를 동시에"}
             </span>
           </h1>
 
           <p style={{ fontSize: isMobile ? 15 : 17, fontWeight: 400, color: "rgba(10,11,13,0.56)", lineHeight: 1.6, letterSpacing: "0.16px", margin: "0 0 44px", fontFamily: F }}>
-            질문만 설계하면 AI가 수백 명의 패널과 보이스 인터뷰를 직접 진행해요.<br style={{ display: isMobile ? "none" : "block" }} />테마 분석 · 감정 분류 · 인사이트 리포트까지 자동으로 완성돼요.
+            {isMobile
+              ? <>질문만 만들면 AI가 다 해요.<br />분석 · 감정 · 리포트까지 자동으로.</>
+              : <>질문만 설계하면 AI가 수백 명의 패널과 보이스 인터뷰를 직접 진행해요.<br />테마 분석 · 감정 분류 · 인사이트 리포트까지 자동으로 완성돼요.</>}
           </p>
 
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 20, background: C.bg, border: `1px solid ${C.border}`, marginBottom: 32 }}>
@@ -276,7 +283,7 @@ export default function LandingScreen({ go, user, logout }) {
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "none"; }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>🎯</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>리서처 / 기업</div>
-              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>인터뷰 설계부터 리포트 받기까지</div>
+              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>{isMobile ? "인터뷰 만들고 리포트 받기" : "인터뷰 설계부터 리포트 받기까지"}</div>
               <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: C.purple, background: "rgba(83,58,253,0.07)", padding: "5px 10px", borderRadius: 6 }}>시작하기 →</div>
             </button>
             <button onClick={() => go("panel_entry")}
@@ -285,7 +292,7 @@ export default function LandingScreen({ go, user, logout }) {
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "none"; }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>🎙️</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>Voice Survey 패널</div>
-              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>보이스로 인터뷰 참여하고 리워드 받기</div>
+              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>{isMobile ? "말하고 리워드 받기" : "보이스로 인터뷰 참여하고 리워드 받기"}</div>
               <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: C.purple, background: "rgba(83,58,253,0.07)", padding: "5px 10px", borderRadius: 6 }}>참여하기 →</div>
             </button>
           </div>
