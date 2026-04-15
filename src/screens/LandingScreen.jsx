@@ -249,7 +249,7 @@ export default function LandingScreen({ go, user, logout }) {
 
         <div style={{ maxWidth: 680, margin: "0 auto", textAlign: "center", position: "relative" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-            <Badge variant="purple">✦ AI 보이스 인터뷰 플랫폼</Badge>
+            <Badge variant="purple">✦ AI가 인터뷰하고, AI가 분석합니다</Badge>
           </div>
 
           <h1 style={{ fontSize: isMobile ? 34 : 52, fontWeight: 700, lineHeight: 1.15, margin: "0 0 24px", fontFamily: F }}>
