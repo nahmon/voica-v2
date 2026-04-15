@@ -252,16 +252,16 @@ export default function LandingScreen({ go, user, logout }) {
             <Badge variant="purple">✦ AI가 인터뷰하고, AI가 분석합니다</Badge>
           </div>
 
-          <h1 style={{ fontSize: isMobile ? 34 : 52, fontWeight: 700, lineHeight: 1.15, margin: "0 0 24px", fontFamily: F }}>
+          <h1 style={{ fontSize: isMobile ? 32 : 52, fontWeight: 700, lineHeight: 1.2, margin: "0 0 24px", fontFamily: F, wordBreak: "keep-all" }}>
             <span style={{ color: C.navy, display: "block" }}>
               {fromInterview
                 ? "AI 인터뷰를 경험하셨나요?"
                 : isMobile
-                  ? "리서치를 느리게 만드는"
+                  ? "인터뷰, 비싸고 오래 걸리죠?"
                   : "시간과 비용이 많이 들었던 인터뷰"}
             </span>
             <span style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "block" }}>
-              {isMobile ? "모든 것을 없앴습니다" : "누구나 더 빠르고 더 저렴하게"}
+              {isMobile ? "AI로 수백 명을 동시에" : "AI로 수백 명의 인터뷰를 동시에"}
             </span>
           </h1>
 
