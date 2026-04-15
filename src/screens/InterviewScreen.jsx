@@ -413,8 +413,9 @@ export default function InterviewScreen({ go, shareCode }) {
   if (loadError) return (
     <div style={{ minHeight: "100vh", background: "#202124", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24, textAlign: "center" }}>
       <div style={{ fontSize: 32, marginBottom: 16 }}>🔗</div>
-      <div style={{ fontSize: 18, color: C.white, marginBottom: 8 }}>링크를 확인해 주세요</div>
-      <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>{loadError}</div>
+      <div style={{ fontSize: isMobile ? 16 : 18, color: C.white, marginBottom: 8 }}>링크를 확인해 주세요</div>
+      <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>{loadError}</div>
+      <button onClick={() => go("landing")} style={{ padding: "12px 24px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 14, fontWeight: 500, fontFamily: F, cursor: "pointer" }}>홈으로</button>
     </div>
   );
 
@@ -423,8 +424,8 @@ export default function InterviewScreen({ go, shareCode }) {
     <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
       <div style={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
         <div style={{ fontSize: 40, marginBottom: 20 }}>💬</div>
-        <div style={{ fontSize: 20, fontWeight: 600, color: "#fff", marginBottom: 10 }}>이전 인터뷰가 있어요</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 32, lineHeight: 1.6 }}>
+        <div style={{ fontSize: isMobile ? 18 : 20, fontWeight: 600, color: "#fff", marginBottom: 10 }}>이전 인터뷰가 있어요</div>
+        <div style={{ fontSize: isMobile ? 13 : 14, color: "rgba(255,255,255,0.5)", marginBottom: 32, lineHeight: 1.6 }}>
           {resumeData.qIndex + 1}번 질문까지 진행했어요.<br />이어서 계속할까요?
         </div>
         <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
@@ -450,8 +451,8 @@ export default function InterviewScreen({ go, shareCode }) {
     <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
       <div style={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
         <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 20, letterSpacing: 0.3 }}>마이크 테스트</div>
-        <div style={{ fontSize: 20, fontWeight: 600, color: C.white, marginBottom: 8 }}>마이크가 잘 들리나요?</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 32, lineHeight: 1.7 }}>
+        <div style={{ fontSize: isMobile ? 18 : 20, fontWeight: 600, color: C.white, marginBottom: 8 }}>마이크가 잘 들리나요?</div>
+        <div style={{ fontSize: isMobile ? 13 : 14, color: "rgba(255,255,255,0.5)", marginBottom: 32, lineHeight: 1.7 }}>
           3초 정도 짧게 말해보고<br />재생해서 확인해 보세요.
         </div>
 
@@ -492,7 +493,7 @@ export default function InterviewScreen({ go, shareCode }) {
           onClick={() => { setIntroStep("started"); }}
           disabled={warmupPhase === "recording"}
           style={{ marginTop: 24, width: "100%", padding: "14px", borderRadius: 10, border: "none", background: warmupPhase === "recording" ? "rgba(255,255,255,0.1)" : `linear-gradient(135deg,${C.purple},${C.purpleDeep})`, color: C.white, fontSize: 15, fontWeight: 500, fontFamily: F, cursor: warmupPhase === "recording" ? "not-allowed" : "pointer", opacity: warmupPhase === "recording" ? 0.5 : 1 }}>
-          {warmupPhase === "done" ? "마이크 확인 완료 — 인터뷰 시작 →" : "마이크 테스트 건너뛰고 시작 →"}
+          {warmupPhase === "done" ? (isMobile ? "확인 완료 — 시작 →" : "마이크 확인 완료 — 인터뷰 시작 →") : (isMobile ? "테스트 건너뛰기 →" : "마이크 테스트 건너뛰고 시작 →")}
         </button>
       </div>
     </div>
@@ -504,9 +505,9 @@ export default function InterviewScreen({ go, shareCode }) {
       <div style={{ width: "100%", maxWidth: 440 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
           <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
-          <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", fontWeight: 400 }}>Voice Survey AI 인터뷰</span>
+          <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", fontWeight: 400 }}>{isMobile ? "AI 인터뷰" : "Voice Survey AI 인터뷰"}</span>
         </div>
-        <div style={{ fontSize: 22, fontWeight: 500, color: C.white, marginBottom: 8, lineHeight: 1.3 }}>{interview.title}</div>
+        <div style={{ fontSize: isMobile ? 19 : 22, fontWeight: 500, color: C.white, marginBottom: 8, lineHeight: 1.3 }}>{interview.title}</div>
         {interview.description && <div style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", marginBottom: 16, lineHeight: 1.6 }}>{interview.description}</div>}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
           <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>질문 {interview.questions.length}개 · 음성 응답 포함</span>
@@ -552,7 +553,7 @@ export default function InterviewScreen({ go, shareCode }) {
           <span style={{ fontSize: 16 }}>🔊</span>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,200,50,0.9)" }}>소리를 켜주세요</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>AI 인터뷰어가 질문을 음성으로 읽어드립니다. 이어폰 착용을 권장합니다.</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>{isMobile ? "AI가 질문을 읽어드려요. 이어폰을 권장해요." : "AI 인터뷰어가 질문을 음성으로 읽어드립니다. 이어폰 착용을 권장합니다."}</div>
           </div>
         </div>
         <button onClick={startSession} style={{ width: "100%", padding: "14px", borderRadius: 10, border: "none", background: `linear-gradient(135deg,${C.purple},${C.purpleDeep})`, color: C.white, fontSize: 15, fontWeight: 500, fontFamily: F, cursor: "pointer" }}>
@@ -606,8 +607,8 @@ export default function InterviewScreen({ go, shareCode }) {
         {/* Success icon */}
         <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(30,142,62,0.18)", border: "1.5px solid rgba(30,142,62,0.5)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 32 }}>✓</div>
 
-        <div style={{ fontSize: 32, fontWeight: 700, color: C.white, marginBottom: 10 }}>인터뷰 완료!</div>
-        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: interview.incentive ? 12 : 20 }}>소중한 의견 감사해요.<br />답변을 안전하게 저장했어요.</div>
+        <div style={{ fontSize: isMobile ? 26 : 32, fontWeight: 700, color: C.white, marginBottom: 10 }}>인터뷰 완료!</div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: interview.incentive ? 12 : 20 }}>{isMobile ? "감사해요! 답변이 저장됐어요." : <>소중한 의견 감사해요.<br />답변을 안전하게 저장했어요.</>}</div>
         {interview.incentive && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.3)", marginBottom: 20, textAlign: "left" }}>
             <span style={{ fontSize: 20, flexShrink: 0 }}>🎁</span>
@@ -648,9 +649,9 @@ export default function InterviewScreen({ go, shareCode }) {
 
         {/* Powered by Voice Survey footer */}
         <div style={{ padding: "16px 20px", borderRadius: 12, border: `1px solid ${C.purpleLight}44`, background: C.purpleBg, textAlign: "left" }}>
-          <div style={{ fontSize: 12, color: `${C.purpleLight}`, marginBottom: 8, fontWeight: 500 }}>🎤 Voice Survey로 만들어진 인터뷰예요</div>
+          <div style={{ fontSize: 12, color: `${C.purpleLight}`, marginBottom: 8, fontWeight: 500 }}>{isMobile ? "🎤 Voice Survey 인터뷰" : "🎤 Voice Survey로 만들어진 인터뷰예요"}</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>당신의 목소리로 리서치하고 싶다면 →</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>{isMobile ? "나도 리서치 시작 →" : "당신의 목소리로 리서치하고 싶다면 →"}</span>
             <button onClick={() => { track("powered_by_voice_survey_clicked", {}); window.location.href = "/"; }}
               style={{ flexShrink: 0, padding: "7px 14px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 12, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap" }}>
               무료로 시작하기 →
@@ -673,7 +674,7 @@ export default function InterviewScreen({ go, shareCode }) {
           <div style={{ background: "#292a2d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>⚠️</div>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.white, marginBottom: 8 }}>인터뷰를 중단하시겠습니까?</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>지금 나가면 저장된 답변이 유지되지 않을 수 있습니다.</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>{isMobile ? "나가면 답변이 유지되지 않아요." : "지금 나가면 저장된 답변이 유지되지 않을 수 있습니다."}</div>
             <div style={{ display: "flex", gap: 10 }}>
               <Btn size="lg" style={{ flex: 1 }} onClick={() => setShowExitConfirm(false)}>계속 진행</Btn>
               <Btn variant="ghost" size="lg" style={{ flex: 1, borderColor: "rgba(255,255,255,0.2)", color: C.white }} onClick={() => { track("interview_abandoned", { shareCode, sessionId, qIndex }); setShowExitConfirm(false); go("landing"); }}>나가기</Btn>
@@ -687,7 +688,7 @@ export default function InterviewScreen({ go, shareCode }) {
           <div style={{ background: "#292a2d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>⏭️</div>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.white, marginBottom: 8 }}>이 질문을 건너뛸까요?</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>답변하기 어렵거나 관련 없는 질문이라면 건너뛸 수 있어요.</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>{isMobile ? "이 질문을 건너뛸 수 있어요." : "답변하기 어렵거나 관련 없는 질문이라면 건너뛸 수 있어요."}</div>
             <div style={{ display: "flex", gap: 10 }}>
               <Btn size="lg" style={{ flex: 1 }} onClick={() => setShowSkipConfirm(false)}>계속 답변</Btn>
               <Btn variant="ghost" size="lg" style={{ flex: 1, borderColor: "rgba(255,255,255,0.2)", color: C.white }} onClick={skipQuestion}>건너뛰기</Btn>

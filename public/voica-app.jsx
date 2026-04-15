@@ -1175,19 +1175,10 @@ function PricingScreen({ go }) {
   const [billing, setBilling] = useState("monthly");
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  // ── 단가 구조 ──────────────────────────────────────────────────
-  // 1 인터뷰 회차 = 패널 최대 75명 (50~100명 고정 모집)
-  // 구독 = 월 N회차 포함 플랫폼 이용료 (AI 분석·리포트·패널 관리)
-  // 리워드 = 별도 충전 풀 / 수수료 20%
-  // 크레딧 = 단건 회차 구매 (플랫폼 처리비 포함, 리워드 별도)
-  // ──────────────────────────────────────────────────────────────
-
-  const PANEL_SIZE = 75; // 회차당 고정 패널 수
-
   const plans = [
     {
-      id: "starter", name: "스타터", desc: "검증 단계 · 소규모 팀",
-      price: { monthly: 290000, annual: 232000 },
+      id: "free", name: "무료", desc: "소규모 팀 · 첫 인터뷰 체험",
+      price: { monthly: 0, annual: 0 },
       sessions: 3,
       report: "기본",
       reportFeatures: [
@@ -1196,13 +1187,13 @@ function PricingScreen({ go }) {
         "주요 키워드 클라우드",
         "응답 원문 열람",
       ],
-      extras: ["프로젝트 3개", "패널 모집 공고 3건", "CSV 다운로드"],
+      extras: ["월 3회 인터뷰", "회당 최대 10명", "CSV 다운로드"],
       highlight: false, color: C.navy,
     },
     {
-      id: "pro", name: "프로", desc: "정기 리서치 · 브랜드 · 에이전시",
-      price: { monthly: 590000, annual: 472000 },
-      sessions: 8,
+      id: "pro", name: "Pro", desc: "정기 리서치 · 브랜드 · 에이전시",
+      price: { monthly: 99000, annual: 79200 },
+      sessions: null,
       report: "심화",
       reportFeatures: [
         "테마 분류 + 하위 테마 드릴다운",
@@ -1216,28 +1207,20 @@ function PricingScreen({ go }) {
     },
     {
       id: "enterprise", name: "엔터프라이즈", desc: "대규모 리서치 · 그룹사 · 컨설팅",
-      price: { monthly: 1200000, annual: 960000 },
-      sessions: 20,
+      price: { monthly: null, annual: null },
+      sessions: null,
       report: "풀 패키지",
       reportFeatures: [
-        "프로 전체 포함",
+        "Pro 전체 포함",
         "트렌드 추이 비교 (기간별)",
         "경쟁 브랜드 언급 분석",
         "세그먼트별 리포트 분리 출력",
         "PPT / PDF 슬라이드 자동 생성",
         "Slack · Notion API 연동",
       ],
-      extras: ["월 20회 인터뷰 회차", "팀 멤버 무제한", "전용 CSM 배정", "SLA 99.9%"],
+      extras: ["팀 멤버 무제한", "전용 CSM 배정", "SLA 99.9%"],
       highlight: false, color: C.purpleDeep,
     },
-  ];
-
-  // 크레딧: 회차(session) 기준 — 1회차 = 패널 최대 75명
-  const credits = [
-    { qty: 1,  price: 120000, badge: null },
-    { qty: 3,  price: 330000, badge: "8% 절약" },
-    { qty: 5,  price: 525000, badge: "13% 절약" },
-    { qty: 10, price: 900000, badge: "25% 절약" },
   ];
 
 
@@ -1287,26 +1270,6 @@ function PricingScreen({ go }) {
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 80px" }}>
 
-        {/* ── 크레딧 ── */}
-        <div style={{ marginBottom: 64 }}>
-          <div style={{ textAlign: "center", marginBottom: 28 }}>
-            <h2 style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "-0.44px", marginBottom: 8 }}>크레딧 — 구독 없이 단건 결제</h2>
-            <p style={{ fontSize: 13, color: C.body, margin: 0 }}>1건 = 인터뷰 1회 진행 (패널 최대 75명) · 플랫폼 처리비 포함 (AI 분석·리포트) · 패널 리워드 별도 충전 · 유효기간 12개월</p>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14 }}>
-            {credits.map(c => (
-              <div key={c.qty} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: "20px 22px", boxShadow: S.ambient, position: "relative" }}>
-                {c.badge && <span style={{ position: "absolute", top: -10, right: 14, fontSize: 10, fontWeight: 600, background: C.success, color: C.white, padding: "2px 8px", borderRadius: 10 }}>{c.badge}</span>}
-                <div style={{ fontSize: 26, fontWeight: 700, color: C.navy, letterSpacing: -0.5, fontFeatureSettings: '"tnum"', marginBottom: 2 }}>{c.qty}건</div>
-                <div style={{ fontSize: 19, fontWeight: 600, color: C.purple, fontFeatureSettings: '"tnum"', marginBottom: 2 }}>₩{c.price.toLocaleString()}</div>
-                <div style={{ fontSize: 11, color: C.body, marginBottom: 3 }}>건당 ₩{Math.round(c.price / c.qty).toLocaleString()} · 패널 최대 75명</div>
-                <div style={{ fontSize: 11, color: C.body, marginBottom: 14 }}>리워드 별도 · 유효기간 12개월</div>
-                <Btn full variant="ghost" size="sm" onClick={() => setSelectedPlan({ id: "credit", name: `크레딧 ${c.qty}건`, price: { monthly: c.price, annual: c.price }, sessions: c.qty, report: "—" })}>구매하기</Btn>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* ── 플랫폼 구독 ── */}
         <div style={{ marginBottom: 64 }}>
           <div style={{ textAlign: "center", marginBottom: 28 }}>
@@ -1322,17 +1285,17 @@ function PricingScreen({ go }) {
                   <div style={{ fontSize: 12, fontWeight: 600, color: plan.highlight ? "rgba(255,255,255,0.6)" : C.body, marginBottom: 6, letterSpacing: 0.5 }}>{plan.name.toUpperCase()}</div>
                   <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 4 }}>
                     <span style={{ fontSize: 34, fontWeight: 700, color: plan.highlight ? C.white : C.navy, letterSpacing: -1, fontFeatureSettings: '"tnum"' }}>
-                      ₩{plan.price[billing].toLocaleString()}
+                      {plan.price[billing] === null ? "맞춤 견적" : plan.price[billing] === 0 ? "무료" : `₩${plan.price[billing].toLocaleString()}`}
                     </span>
-                    <span style={{ fontSize: 13, color: plan.highlight ? "rgba(255,255,255,0.5)" : C.body, marginBottom: 5 }}>/월</span>
+                    {plan.price[billing] !== null && plan.price[billing] !== 0 && <span style={{ fontSize: 13, color: plan.highlight ? "rgba(255,255,255,0.5)" : C.body, marginBottom: 5 }}>/월</span>}
                   </div>
-                  <div style={{ fontSize: 12, color: plan.highlight ? "rgba(255,255,255,0.5)" : C.body }}>패널 리워드 별도 · 리워드의 20% 수수료</div>
+                  {plan.id !== "enterprise" && <div style={{ fontSize: 12, color: plan.highlight ? "rgba(255,255,255,0.5)" : C.body }}>패널 리워드 별도 · 리워드의 20% 수수료</div>}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: 6, background: plan.highlight ? "rgba(255,255,255,0.1)" : C.purpleBg, marginBottom: 18 }}>
                   <span style={{ fontSize: 15 }}>🎙️</span>
                   <div>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: plan.highlight ? C.white : C.purple }}>월 {plan.sessions}건</span>
-                    <span style={{ fontSize: 11, color: plan.highlight ? "rgba(255,255,255,0.45)" : C.body, marginLeft: 6 }}>건당 패널 최대 75명</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: plan.highlight ? C.white : C.purple }}>{plan.sessions ? `월 ${plan.sessions}건` : "인터뷰 무제한"}</span>
+                    <span style={{ fontSize: 11, color: plan.highlight ? "rgba(255,255,255,0.45)" : C.body, marginLeft: 6 }}>{plan.id === "free" ? "회당 최대 10명" : "회당 최대 인원 맞춤"}</span>
                   </div>
                 </div>
                 <div style={{ marginBottom: 16 }}>

@@ -30,7 +30,7 @@ const VOICA_SURVEY_TEMPLATE = {
     { id: mkId(), type: "voice", content: "이런 AI 인터뷰 방식에서 가장 걱정되는 점이나 믿기 어려운 부분이 있다면 무엇인가요?" },
     { id: mkId(), type: "voice", content: "팀이나 조직에서 Voice Survey 같은 툴을 도입하려면 어떤 조건이 갖춰져야 할 것 같으세요? 예산, 보안, 데이터 품질 등 어떤 허들이 있을지 말씀해 주세요." },
     { id: mkId(), type: "multiple_choice", content: "참여자 50명 기준 인터뷰 1회 프로젝트 (AI 진행 + 분석 리포트 포함) 적정 비용은?", options: ["5만원 미만", "5~15만원", "15~30만원", "30~50만원", "50만원 이상도 가치 있다"] },
-    { id: mkId(), type: "multiple_choice", content: "선호하는 요금 방식은 무엇인가요?", options: ["건별 충전 (쓴 만큼만)", "월 구독 (예측 가능한 비용)", "연간 계약 (할인 중심)", "팀/기업 단위 계약"] },
+    { id: mkId(), type: "multiple_choice", content: "선호하는 요금 방식은 무엇인가요?", options: ["무료 플랜으로 먼저 체험", "월 구독 (예측 가능한 비용)", "연간 계약 (할인 중심)", "팀/기업 단위 계약"] },
     { id: mkId(), type: "voice", content: "마지막으로, 리서치 업무에서 Voice Survey가 딱 한 가지만 해결해 준다면 어떤 문제를 해결해 주길 바라시나요?" },
   ],
 };
