@@ -1,0 +1,22 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="toss-grad-main" x1="4" y1="4" x2="30" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#40CFFF"/>
+      <stop offset="60%" stop-color="#0090FF"/>
+      <stop offset="100%" stop-color="#0064FF"/>
+    </linearGradient>
+    <linearGradient id="toss-grad-fold" x1="14" y1="8" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#60DFFF" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#0072FF" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Toss icon: rounded blob speech bubble shape -->
+  <!-- Main body -->
+  <path d="M 8 6 C 8 6 30 2 34 14 C 38 26 30 34 20 36 C 12 37.5 4 32 4 22 C 4 14 6 8 8 6 Z" fill="url(#toss-grad-main)"/>
+  <!-- 3D fold highlight -->
+  <path d="M 16 7 C 22 5 30 8 32 16 C 28 12 22 10 16 12 Z" fill="url(#toss-grad-fold)"/>
+
+  <!-- "toss" wordmark in dark navy -->
+  <text x="44" y="27" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="22" fill="#1a1f36" letter-spacing="-0.5">toss</text>
+</svg>

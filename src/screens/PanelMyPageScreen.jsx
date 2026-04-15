@@ -3,30 +3,14 @@ import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-// Real Toss wordmark SVG (brand blue #0064FF)
-function TossLogo({ size = 20 }) {
-  return (
-    <svg width={size * 2.6} height={size} viewBox="0 0 52 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <text x="0" y="16" fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-        fontWeight="800" fontSize="18" fill="#0064FF" letterSpacing="-0.5">toss</text>
-    </svg>
-  );
+// Toss logo (full: icon + wordmark)
+function TossLogo({ height = 28 }) {
+  return <img src="/toss-logo.svg" alt="toss" style={{ height, display: "block" }} />;
 }
 
-// Toss icon mark (the 't' in a circle)
+// Toss icon only (blob mark)
 function TossIcon({ size = 36 }) {
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: size * 0.28,
-      background: "#0064FF",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      flexShrink: 0,
-    }}>
-      <svg width={size * 0.55} height={size * 0.7} viewBox="0 0 22 28" fill="none">
-        <path d="M13.5 0H8.5V6H3V11H8.5V22C8.5 25.3 11.2 28 14.5 28H19V23H14.5C13.95 23 13.5 22.55 13.5 22V11H19V6H13.5V0Z" fill="white"/>
-      </svg>
-    </div>
-  );
+  return <img src="/toss-icon.svg" alt="toss" style={{ width: size, height: size, flexShrink: 0 }} />;
 }
 
 function DonutProgress({ pct, size = 72, stroke = 7, color = C.purple }) {
