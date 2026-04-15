@@ -78,6 +78,8 @@ export default function InterviewScreen({ go, shareCode }) {
   const [showSkipConfirm, setShowSkipConfirm] = useState(false);
   // TTS text fallback — show question text prominently when TTS fails
   const [ttsReadFallback, setTtsReadFallback] = useState(false);
+  // Completed share state — must be at top level (Rules of Hooks)
+  const [shareCopied, setShareCopied] = useState(false);
   const audioRef = useRef(null);
   const ttsCacheRef = useRef({}); // { [question_id]: url }
 
@@ -565,7 +567,6 @@ export default function InterviewScreen({ go, shareCode }) {
   );
 
   // ─── Completed ───
-  const [shareCopied, setShareCopied] = useState(false);
   const handleShare = () => {
     track("viral_share_clicked", {});
     const shareText = "나는 방금 Voice Survey AI 인터뷰에 참여했어요! 🎤 voicesurvey.ai";
