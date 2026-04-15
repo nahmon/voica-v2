@@ -257,7 +257,7 @@ export default function LandingScreen({ go, user, logout }) {
               {fromInterview
                 ? "AI 인터뷰를 경험하셨나요?"
                 : isMobile
-                  ? "인터뷰, 비싸고 오래 걸리죠?"
+                  ? "비싸고 오래 걸리는 인터뷰"
                   : "시간과 비용이 많이 들었던 인터뷰"}
             </span>
             <span style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "block" }}>
