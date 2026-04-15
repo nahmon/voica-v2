@@ -257,11 +257,11 @@ export default function LandingScreen({ go, user, logout }) {
               {fromInterview
                 ? "AI 인터뷰를 경험하셨나요?"
                 : isMobile
-                  ? "사용자 인터뷰,"
+                  ? "리서치를 느리게 만드는"
                   : "시간과 비용이 많이 들었던 인터뷰"}
             </span>
             <span style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "block" }}>
-              {isMobile ? "AI로 수백 명을 동시에" : "AI로 수백 명의 인터뷰를 동시에"}
+              {isMobile ? "모든 것을 없앴습니다" : "누구나 더 빠르고 더 저렴하게"}
             </span>
           </h1>
 
