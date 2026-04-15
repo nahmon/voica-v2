@@ -48,8 +48,9 @@ export default function Voica() {
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      const isInterviewUrl = window.location.pathname.match(/^\/i\/([a-z0-9]+)$/i);
       const publicScreens = ["landing", "advertiser_login", "pricing", "support", "faq", "panel_entry", "panel_board"];
-      if (session?.user && publicScreens.includes(screen)) {
+      if (session?.user && publicScreens.includes(screen) && !isInterviewUrl) {
         const role = session.user.user_metadata?.role;
         if (!role) setScreen("role_select");
         else if (role === "panel") setScreen("panel_board");
