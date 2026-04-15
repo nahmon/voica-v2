@@ -679,7 +679,7 @@ export function Footer({ go }) {
             <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI가 인터뷰하고, AI가 분석합니다</div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
-            {[["서비스 소개", "about"], ["요금제", "pricing"], ["패널 참여", "panel_board"], ["고객센터", "support"]].map(([l, target]) => (
+            {[["서비스 소개", "about"], ["요금제", "pricing"], ["패널 참여", "panel_board"], ["고객센터", "support"], ["개인정보처리방침", "privacy"], ["이용약관", "terms"]].map(([l, target]) => (
               <button key={l} onClick={() => go(target)}
                 style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: F, letterSpacing: "0.16px" }}
                 onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.88)"}
