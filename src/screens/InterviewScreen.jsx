@@ -14,6 +14,14 @@ const INTERVIEW_STYLES = `
 
 const MIN_RECORD_SECS = 5;
 
+const BRIDGE_PHRASES = [
+  "네, 감사해요.",
+  "알겠습니다.",
+  "잘 들었어요.",
+  "좋아요, 감사해요.",
+  "네, 잘 알겠어요.",
+];
+
 // Estimate total interview duration in seconds
 function estimateDuration(questions) {
   return questions.reduce((sum, q) => {
@@ -53,6 +61,10 @@ export default function InterviewScreen({ go, shareCode }) {
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
   const streamRef = useRef(null);
+  const recordTimeRef = useRef(0);
+  const audioCtxRef = useRef(null);
+  const silenceAnalyserRef = useRef(null);
+  const silenceRafRef = useRef(null);
 
   // MC/Likert
   const [selectedValue, setSelectedValue] = useState(null);
@@ -178,9 +190,14 @@ export default function InterviewScreen({ go, shareCode }) {
   // Recording timer
   useEffect(() => {
     if (phase === "recording") {
-      timerRef.current = setInterval(() => setRecordTime(t => t + 1), 1000);
+      recordTimeRef.current = 0;
+      timerRef.current = setInterval(() => {
+        setRecordTime(t => { const n = t + 1; recordTimeRef.current = n; return n; });
+      }, 1000);
     } else {
       clearInterval(timerRef.current);
+      setRecordTime(0);
+      recordTimeRef.current = 0;
     }
     return () => clearInterval(timerRef.current);
   }, [phase]);
@@ -301,6 +318,65 @@ export default function InterviewScreen({ go, shareCode }) {
     }
   };
 
+  // ─── Bridge TTS (Phase 2) ───
+  const playBridgeTts = async () => {
+    const phrase = BRIDGE_PHRASES[Math.floor(Math.random() * BRIDGE_PHRASES.length)];
+    try {
+      const r = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: phrase }),
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      if (!d.url) return;
+      const audio = new Audio(d.url);
+      audioRef.current = audio;
+      await new Promise(resolve => {
+        audio.onended = resolve;
+        audio.onerror = resolve;
+        audio.play().catch(resolve);
+      });
+    } catch {}
+  };
+
+  // ─── Silence detection (Phase 3) ───
+  const stopSilenceDetection = () => {
+    if (silenceRafRef.current) { cancelAnimationFrame(silenceRafRef.current); silenceRafRef.current = null; }
+    if (audioCtxRef.current) { audioCtxRef.current.close().catch(() => {}); audioCtxRef.current = null; }
+    silenceAnalyserRef.current = null;
+  };
+
+  const startSilenceDetection = (stream) => {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 512;
+      ctx.createMediaStreamSource(stream).connect(analyser);
+      audioCtxRef.current = ctx;
+      silenceAnalyserRef.current = analyser;
+      const data = new Float32Array(analyser.fftSize);
+      let silenceStart = null;
+      const THRESHOLD = 0.015;
+      const SILENCE_MS = 2500;
+      const check = () => {
+        if (!silenceAnalyserRef.current) return;
+        silenceAnalyserRef.current.getFloatTimeDomainData(data);
+        const rms = Math.sqrt(data.reduce((s, v) => s + v * v, 0) / data.length);
+        if (rms < THRESHOLD) {
+          if (!silenceStart) silenceStart = Date.now();
+          else if (Date.now() - silenceStart >= SILENCE_MS && recordTimeRef.current >= MIN_RECORD_SECS) {
+            stopSilenceDetection();
+            stopRecording();
+            return;
+          }
+        } else { silenceStart = null; }
+        silenceRafRef.current = requestAnimationFrame(check);
+      };
+      silenceRafRef.current = requestAnimationFrame(check);
+    } catch {}
+  };
+
   // ─── Voice recording ───
   const startRecording = async () => {
     try {
@@ -313,6 +389,7 @@ export default function InterviewScreen({ go, shareCode }) {
       mr.start();
       mediaRecorderRef.current = mr;
       setPhase("recording");
+      startSilenceDetection(stream);
     } catch {
       setRecordingWarning("마이크 권한이 필요해요. 브라우저 설정에서 마이크를 허용한 후 다시 시도해 주세요.");
     }
@@ -320,7 +397,8 @@ export default function InterviewScreen({ go, shareCode }) {
 
   const stopRecording = () => {
     const mr = mediaRecorderRef.current;
-    if (!mr) return;
+    if (!mr || mr.state !== "recording") return;
+    stopSilenceDetection();
     setPhase("submitting");
     mr.onstop = async () => {
       streamRef.current?.getTracks().forEach(t => t.stop());
@@ -351,7 +429,8 @@ export default function InterviewScreen({ go, shareCode }) {
       } catch (e) { console.error("[stt exception]", e); }
       await saveResponse({ audio_url: audioUrl, transcript });
       setPhase("review_pass");
-      setTimeout(advanceOrComplete, 1200);
+      await playBridgeTts();
+      advanceOrComplete();
     };
     mr.stop();
   };
