@@ -922,7 +922,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
           {/* Voice controls */}
           {q.type === "voice" && (
-            <>
+            <div style={{ minHeight: 160, display: "flex", flexDirection: "column", justifyContent: "center" }}>
               {phase === "ai_speaking" && !ttsBlocked && (
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", textAlign: "center", paddingBottom: 4 }}>AI가 질문을 읽고 있어요...</div>
               )}
@@ -975,7 +975,7 @@ export default function InterviewScreen({ go, shareCode }) {
                   )}
                 </div>
               )}
-            </>
+            </div>
           )}
 
           {/* Multiple choice */}
