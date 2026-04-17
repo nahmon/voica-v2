@@ -302,8 +302,13 @@ export default function InterviewScreen({ go, shareCode }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId, question_id: q.id, type: q.type, ...patch }),
       });
-      if (!res.ok) showToast("답변 저장에 실패했어요. 연결을 확인해 주세요.", "error");
-    } catch {
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error("[saveResponse]", res.status, errBody);
+        showToast("답변 저장에 실패했어요. 연결을 확인해 주세요.", "error");
+      }
+    } catch (e) {
+      console.error("[saveResponse exception]", e);
       showToast("답변 저장에 실패했어요. 연결을 확인해 주세요.", "error");
     }
   };
