@@ -429,15 +429,20 @@ export default function InterviewScreen({ go, shareCode }) {
       const q = interview.questions[qIndex];
       let audioUrl = null;
       let transcript = null;
-      // Upload audio — independent of STT
+      // Upload audio via server-side signed URL (bypasses anon RLS)
       try {
-        const path = `${sessionId}/${q.id}.${ext}`;
-        const { data: uploaded, error: uploadError } = await supabase.storage.from("audio-responses").upload(path, blob, { contentType: mimeType, upsert: true });
-        if (uploadError) { console.error("[audio upload]", uploadError); showToast("녹음 저장에 실패했어요. 응답은 계속 진행됩니다.", "error"); }
-        else if (uploaded) {
-          const { data: signedData } = await supabase.storage.from("audio-responses").createSignedUrl(path, 7776000); // 90 days
-          if (signedData) audioUrl = signedData.signedUrl;
-        }
+        const urlRes = await fetch("/api/upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, questionId: q.id, ext }),
+        });
+        if (urlRes.ok) {
+          const { signedUrl, downloadUrl } = await urlRes.json();
+          const uploadRes = await fetch(signedUrl, { method: "PUT", body: blob, headers: { "Content-Type": mimeType } });
+          if (uploadRes.ok) {
+            if (downloadUrl) audioUrl = downloadUrl;
+          } else { console.error("[audio upload PUT]", uploadRes.status); }
+        } else { console.error("[upload-url API]", urlRes.status); }
       } catch (e) { console.error("[audio upload exception]", e); }
       // STT — independent of audio upload
       try {
