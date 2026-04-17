@@ -68,11 +68,38 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [savedIncentive, setSavedIncentive] = useState(savedDraft?.incentive ?? "");
   const [savedQuestions, setSavedQuestions] = useState(savedDraft?.questions ?? [newQ("voice")]);
   const [showSaveTooltip, setShowSaveTooltip] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiGenerating, setAiGenerating] = useState(false);
   const dragIdx = useRef(null);
   const isMobile = useIsMobile();
 
   // Track whether there are unsaved changes
   const hasUnsaved = title !== savedTitle || incentive !== savedIncentive || JSON.stringify(questions) !== JSON.stringify(savedQuestions);
+
+  const generateWithAI = async () => {
+    if (!aiPrompt.trim()) return;
+    setAiGenerating(true);
+    try {
+      const res = await fetch("/api/generate-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: aiPrompt.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "생성 실패");
+      const generated = data.questions.map(q => ({ ...q, id: mkId() }));
+      setQuestions(generated);
+      setSelectedIdx(0);
+      setShowAiModal(false);
+      setAiPrompt("");
+      showToast("AI가 질문 초안을 생성했습니다 ✓", "success");
+    } catch (e) {
+      showToast(e.message || "AI 생성에 실패했습니다", "error");
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   // Load existing interview from DB when editing
   useEffect(() => {
@@ -146,6 +173,30 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
   const TemplateBanner = isEmpty && !editingId && (
     <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "20px 24px 16px" }}>
+      {/* AI section */}
+      <div style={{ background: "linear-gradient(135deg,rgba(83,58,253,0.06),rgba(249,107,238,0.06))", border: `1.5px solid rgba(83,58,253,0.18)`, borderRadius: 14, padding: "16px 18px", marginBottom: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✦</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>AI로 질문 초안 만들기</div>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input
+            value={aiPrompt}
+            onChange={e => setAiPrompt(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") { setShowAiModal(true); } }}
+            placeholder="인터뷰 목적을 입력하세요 — 예: 20대 앱 사용자 불편함 파악"
+            style={{ flex: 1, padding: "9px 12px", borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, outline: "none", minWidth: 0 }}
+            onFocus={e => e.target.style.borderColor = C.purple}
+            onBlur={e => e.target.style.borderColor = C.border}
+          />
+          <button
+            onClick={() => setShowAiModal(true)}
+            style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#533afd,#f96bee)", color: C.white, fontSize: 13, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap" }}
+          >
+            초안 생성
+          </button>
+        </div>
+      </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>템플릿으로 시작하기</div>
         <button
@@ -337,6 +388,39 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     </div>
   );
 
+  const AiModal = showAiModal && (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+      onClick={e => { if (e.target === e.currentTarget) setShowAiModal(false); }}>
+      <div style={{ background: C.white, borderRadius: 20, padding: "36px 32px 28px", maxWidth: 480, width: "100%", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>AI 질문 초안 생성</div>
+        </div>
+        <div style={{ fontSize: 13, color: C.body, marginBottom: 20, lineHeight: 1.6 }}>
+          인터뷰 목적을 간단히 설명하면 AI가 10~12개 질문을 생성합니다.
+        </div>
+        <textarea
+          value={aiPrompt}
+          onChange={e => setAiPrompt(e.target.value)}
+          placeholder="예: MZ세대 앱 사용자들의 결제 경험과 불편함 파악. 핀테크 스타트업 UX 개선용."
+          rows={4}
+          autoFocus
+          onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generateWithAI(); }}
+          style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${C.border}`, fontSize: 14, fontFamily: F, color: C.navy, resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.6, transition: "border-color 0.15s" }}
+          onFocus={e => e.target.style.borderColor = C.purple}
+          onBlur={e => e.target.style.borderColor = C.border}
+        />
+        <div style={{ fontSize: 11, color: C.body, textAlign: "right", marginBottom: 20, marginTop: 4 }}>{aiPrompt.length}/600자 · ⌘Enter로 생성</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Btn full variant="ghost" onClick={() => setShowAiModal(false)} disabled={aiGenerating}>취소</Btn>
+          <Btn full onClick={generateWithAI} disabled={aiGenerating || !aiPrompt.trim()}>
+            {aiGenerating ? "생성 중…" : "✦ 초안 생성하기"}
+          </Btn>
+        </div>
+      </div>
+    </div>
+  );
+
   // ─── Top nav bar ───
   const NavBar = (
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
@@ -354,6 +438,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         <span style={{ fontSize: 11, color: questions.length >= 10 ? C.success : "rgba(180,120,0,0.85)", fontWeight: 500 }}>
           질문 {questions.length}{questions.length < 10 ? ` / 10 권장` : ` ✓`}
         </span>
+        <Btn size="sm" onClick={() => setShowAiModal(true)} style={{ background: "linear-gradient(135deg,#533afd,#f96bee)", border: "none", color: C.white, fontWeight: 600 }}>✦ AI 초안</Btn>
         <div style={{ position: "relative" }}>
           <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>템플릿</Btn>
           {templateOpen && (
@@ -404,6 +489,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>
       {ShareOverlay}
       {IncompleteWarnOverlay}
+      {AiModal}
       {NavBar}
       {ShareLinkBar}
       {/* Title area */}
@@ -460,6 +546,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     <div style={{ fontFamily: F, height: "100vh", display: "flex", flexDirection: "column" }}>
       {ShareOverlay}
       {IncompleteWarnOverlay}
+      {AiModal}
       {NavBar}
       {ShareLinkBar}
 
