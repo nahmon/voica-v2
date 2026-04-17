@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       .eq("id", id).eq("user_id", user.id).single();
     if (!existing) return res.status(403).json({ error: "Not found or access denied" });
 
-    await supabase.from("interviews").update({ title, incentive: incentive ?? null }).eq("id", id);
+    await supabase.from("interviews").update({ title, incentive: incentive ?? null, status: "active" }).eq("id", id);
 
     // Get current question IDs in DB
     const { data: currentQs } = await supabase
