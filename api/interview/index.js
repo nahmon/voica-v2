@@ -1,5 +1,23 @@
 // POST /api/interview — create interview + questions atomically
 import { createClient } from "@supabase/supabase-js";
+import OpenAI from "openai";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+async function prewarmTts(supabase, questions) {
+  const voiceQs = questions.filter(q => q.type === "voice" && q.content?.trim());
+  await Promise.all(voiceQs.map(async (q) => {
+    try {
+      const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "nova", input: q.content });
+      const buffer = Buffer.from(await mp3.arrayBuffer());
+      const { error } = await supabase.storage.from("tts-cache").upload(`${q.id}.mp3`, buffer, { contentType: "audio/mpeg", upsert: true });
+      if (!error) {
+        const { data: { publicUrl } } = supabase.storage.from("tts-cache").getPublicUrl(`${q.id}.mp3`);
+        await supabase.from("questions").update({ tts_url: publicUrl }).eq("id", q.id);
+      }
+    } catch {}
+  }));
+}
 
 function nanoid(len = 8) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -59,13 +77,21 @@ export default async function handler(req, res) {
       }).eq("id", q.id);
     }
     if (incomingNew.length > 0) {
-      await supabase.from("questions").insert(
+      const { data: newQs } = await supabase.from("questions").insert(
         incomingNew.map(q => ({
           interview_id: id,
           order_num: questions.indexOf(q) + 1,
           type: q.type, content: q.content, options: q.options ?? null,
         }))
-      );
+      ).select("id, type, content");
+      if (newQs?.length) prewarmTts(supabase, newQs);
+    }
+    // Also prewarm updated voice questions whose tts_url was cleared
+    const updatedVoice = incomingWithDbId.filter(q => q.type === "voice");
+    if (updatedVoice.length) {
+      const { data: dbQs } = await supabase.from("questions").select("id, type, content, tts_url").in("id", updatedVoice.map(q => q.id));
+      const needsRegen = dbQs?.filter(q => !q.tts_url) ?? [];
+      if (needsRegen.length) prewarmTts(supabase, needsRegen);
     }
     return res.status(200).json({ share_code: existing.share_code });
   }
@@ -100,8 +126,10 @@ export default async function handler(req, res) {
       content: q.content,
       options: q.options ?? null,
     }));
-    const { error: qError } = await supabase.from("questions").insert(rows);
+    const { data: insertedQs, error: qError } = await supabase.from("questions").insert(rows).select("id, type, content");
     if (qError) return res.status(500).json({ error: qError.message });
+    // Pre-generate TTS for all voice questions so participants hear audio immediately
+    if (insertedQs?.length) await prewarmTts(supabase, insertedQs);
   }
 
   return res.status(201).json({ interview, share_code });
