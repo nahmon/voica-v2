@@ -139,6 +139,12 @@ export default function InterviewScreen({ go, shareCode }) {
     })();
   }, [shareCode]);
 
+  // Prefetch first 2 questions' TTS as soon as interview loads (while user is on intro screen)
+  useEffect(() => {
+    if (!interview || introStep === "started") return;
+    interview.questions.slice(0, 2).forEach(q => prefetchTts(q));
+  }, [interview]);
+
   // TTS playback when question changes — uses cache first
   useEffect(() => {
     if (!interview || introStep !== "started" || phase !== "ai_speaking") return;
