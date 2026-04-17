@@ -305,7 +305,7 @@ export default function InterviewScreen({ go, shareCode }) {
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
         console.error("[saveResponse]", res.status, errBody);
-        showToast("답변 저장에 실패했어요. 연결을 확인해 주세요.", "error");
+        showToast(`답변 저장 실패 (${res.status}): ${errBody.error ?? "알 수 없는 오류"}`, "error");
       }
     } catch (e) {
       console.error("[saveResponse exception]", e);
