@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   if (q?.tts_url) return res.status(200).json({ url: q.tts_url });
 
   // Generate TTS
-  const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "nova", input: text });
+  const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "shimmer", input: text });
   const buffer = Buffer.from(await mp3.arrayBuffer());
 
   // Upload to Storage
