@@ -26,7 +26,7 @@ export default function PricingScreen({ go, user, logout }) {
         <div style={{ position: "absolute", top: -80, right: "10%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle,rgba(83,58,253,0.07),transparent 70%)", filter: "blur(70px)", pointerEvents: "none" }} />
         <Badge variant="purple" style={{ marginBottom: 16 }}>요금제</Badge>
         <h1 style={{ fontSize: isMobile ? 28 : 38, fontWeight: 700, color: C.navy, margin: "0 0 12px", lineHeight: 1.08 }}>필요한 만큼만, 원하는 방식으로</h1>
-        <p style={{ fontSize: 15, color: C.body, margin: 0 }}>무료로 시작하고, 성장에 맞춰 업그레이드하세요</p>
+        <p style={{ fontSize: 15, color: C.body, margin: 0 }}>팀 규모에 맞는 플랜을 선택하세요</p>
       </div>
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 24px 80px" }}>
@@ -44,31 +44,10 @@ export default function PricingScreen({ go, user, logout }) {
           </div>
         </div>
 
-        {/* 3-tier grid */}
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 20, alignItems: "start" }}>
+        {/* 2-tier grid */}
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2,1fr)", gap: 20, alignItems: "start", maxWidth: 780, margin: "0 auto" }}>
 
-          {/* Tier 1 — Free */}
-          <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.standard, position: "relative", overflow: "hidden" }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 8, letterSpacing: 0.5 }}>무료</div>
-            <div style={{ fontSize: 36, fontWeight: 800, color: C.navy, lineHeight: 1, marginBottom: 4 }}>₩0</div>
-            <div style={{ fontSize: 12, color: C.body, marginBottom: 28 }}>영원히 무료</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-              {[
-                "월 3회 인터뷰",
-                "회당 최대 30명 응답",
-                "기본 AI 리포트",
-                "데이터 보관 30일",
-              ].map(f => (
-                <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                  <span style={{ color: C.success, flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: 13, color: C.navy, lineHeight: 1.45 }}>{f}</span>
-                </div>
-              ))}
-            </div>
-            <Btn full variant="secondary" onClick={() => go("advertiser_login")}>무료로 시작하기</Btn>
-          </div>
-
-          {/* Tier 2 — Pro (highlighted) */}
+          {/* Tier 1 — Pro (highlighted) */}
           <div style={{ background: C.white, border: `2px solid ${C.purple}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.elevated, position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${C.purple},#f96bee)` }} />
             <div style={{ position: "absolute", top: 14, right: 14 }}>
@@ -96,7 +75,7 @@ export default function PricingScreen({ go, user, logout }) {
             <Btn full onClick={() => go("advertiser_login")}>Pro 시작하기 →</Btn>
           </div>
 
-          {/* Tier 3 — Enterprise */}
+          {/* Tier 2 — Enterprise */}
           <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.standard, position: "relative", overflow: "hidden" }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 8, letterSpacing: 0.5 }}>엔터프라이즈</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: C.navy, lineHeight: 1.2, marginBottom: 4 }}>맞춤 견적</div>
