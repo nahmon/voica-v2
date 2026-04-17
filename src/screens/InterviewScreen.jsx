@@ -94,6 +94,7 @@ export default function InterviewScreen({ go, shareCode }) {
   const [showSkipConfirm, setShowSkipConfirm] = useState(false);
   // TTS text fallback — show question text prominently when TTS fails
   const [ttsReadFallback, setTtsReadFallback] = useState(false);
+  const [nameTouched, setNameTouched] = useState(false);
   // Completed share state — must be at top level (Rules of Hooks)
   const [shareCopied, setShareCopied] = useState(false);
   const audioRef = useRef(null);
@@ -161,6 +162,7 @@ export default function InterviewScreen({ go, shareCode }) {
           const audio = new Audio(url);
           audioRef.current = audio;
           audio.onended = () => { if (!cancelled) { setTtsBlocked(false); setPhase(q.type === "voice" ? "ready" : q.type); } };
+          audio.onerror = () => { if (!cancelled) { setTtsReadFallback(true); setPhase(q.type === "voice" ? "ready" : q.type); } };
           try {
             await audio.play();
             setTtsBlocked(false);
@@ -618,7 +620,7 @@ export default function InterviewScreen({ go, shareCode }) {
     <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124 0%,#292a2d 50%,#202124 100%)", display: "flex", alignItems: "flex-start", justifyContent: "center", fontFamily: F, padding: "40px 24px 40px", overflowY: "auto" }}>
       <div style={{ width: "100%", maxWidth: 440 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
-          <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
+          <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
           <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", fontWeight: 400 }}>{isMobile ? "AI 인터뷰" : "Voice Survey AI 인터뷰"}</span>
         </div>
         <div style={{ fontSize: isMobile ? 19 : 22, fontWeight: 500, color: C.white, marginBottom: 8, lineHeight: 1.3 }}>{interview.title}</div>
@@ -648,8 +650,8 @@ export default function InterviewScreen({ go, shareCode }) {
               <label style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>
                 {f.label}{f.required && <span style={{ color: C.magenta, marginLeft: 3 }}>*</span>}
               </label>
-              <input value={respondent[f.key]} onChange={e => setRespondent(r => ({ ...r, [f.key]: e.target.value }))} placeholder={f.placeholder} inputMode={f.inputMode}
-                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${f.required && !respondent[f.key].trim() ? "rgba(255,80,80,0.3)" : "rgba(255,255,255,0.12)"}`, background: "rgba(255,255,255,0.06)", fontSize: 16, fontFamily: F, color: C.white, outline: "none", boxSizing: "border-box" }} />
+              <input value={respondent[f.key]} onChange={e => setRespondent(r => ({ ...r, [f.key]: e.target.value }))} onBlur={() => { if (f.key === "name") setNameTouched(true); }} placeholder={f.placeholder} inputMode={f.inputMode}
+                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${f.required && nameTouched && !respondent[f.key].trim() ? "rgba(255,80,80,0.3)" : "rgba(255,255,255,0.12)"}`, background: "rgba(255,255,255,0.06)", fontSize: 16, fontFamily: F, color: C.white, outline: "none", boxSizing: "border-box" }} />
             </div>
           ))}
           <div>
@@ -672,7 +674,7 @@ export default function InterviewScreen({ go, shareCode }) {
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>{isMobile ? "AI가 질문을 읽어드려요. 이어폰을 권장해요." : "AI 인터뷰어가 질문을 음성으로 읽어드립니다. 이어폰 착용을 권장합니다."}</div>
           </div>
         </div>
-        {!respondent.name.trim() && <div style={{ fontSize: 12, color: "rgba(255,100,100,0.7)", marginBottom: 10 }}>닉네임을 입력해 주세요</div>}
+        {nameTouched && !respondent.name.trim() && <div style={{ fontSize: 12, color: "rgba(255,100,100,0.7)", marginBottom: 10 }}>닉네임을 입력해 주세요</div>}
         <button onClick={startSession} disabled={!respondent.name.trim() || starting} style={{ width: "100%", padding: "14px", borderRadius: 10, border: "none", background: respondent.name.trim() ? `linear-gradient(135deg,${C.purple},${C.purpleDeep})` : "rgba(255,255,255,0.1)", color: C.white, fontSize: 15, fontWeight: 500, fontFamily: F, cursor: respondent.name.trim() ? "pointer" : "not-allowed", opacity: respondent.name.trim() ? 1 : 0.45 }}>
           인터뷰 시작하기 →
         </button>
@@ -814,8 +816,8 @@ export default function InterviewScreen({ go, shareCode }) {
       )}
 
       {/* Ambient glows */}
-      <div style={{ position: "absolute", top: -100, right: -80, width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle,rgba(26,115,232,0.2),transparent 70%)", filter: "blur(80px)", pointerEvents: "none", zIndex: 0 }} />
-      <div style={{ position: "absolute", bottom: -80, left: -60, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle,rgba(232,113,10,0.15),transparent)", filter: "blur(70px)", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "absolute", top: -100, right: -80, width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle,rgba(83,58,253,0.18),transparent 70%)", filter: "blur(80px)", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "absolute", bottom: -80, left: -60, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle,rgba(83,58,253,0.1),transparent)", filter: "blur(70px)", pointerEvents: "none", zIndex: 0 }} />
 
       {/* Progress bar header */}
       <div style={{ flexShrink: 0, position: "relative", zIndex: 1, padding: isMobile ? "14px 16px 10px" : "18px 32px 12px" }}>
@@ -845,20 +847,20 @@ export default function InterviewScreen({ go, shareCode }) {
       </div>
 
       {/* Scrollable chat history */}
-      <div style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 1, padding: isMobile ? "8px 16px 16px" : "8px 32px 16px" }}>
-        <div style={{ maxWidth: 700, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1, padding: isMobile ? "8px 16px 16px" : "8px 32px 16px", display: "flex", flexDirection: "column" }}>
+        <div style={{ maxWidth: 700, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", gap: 20, flex: 1 }}>
           {completedChats.map((chat, i) => (
             <div key={i} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {/* AI question bubble */}
               <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, flexShrink: 0, marginTop: 2 }}>✦</div>
-                <div style={{ maxWidth: "78%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "4px 16px 16px 16px", padding: "10px 14px" }}>
+                <div style={{ width: 26, height: 26, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, flexShrink: 0, marginTop: 2 }}>✦</div>
+                <div style={{ maxWidth: "78%", background: "rgba(255,255,255,0.12)", borderRadius: "4px 16px 16px 16px", padding: "10px 14px" }}>
                   <p style={{ margin: 0, fontSize: isMobile ? 13 : 14, color: "rgba(255,255,255,0.75)", lineHeight: 1.6 }}>{chat.qText}</p>
                 </div>
               </div>
               {/* User answer bubble */}
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <div style={{ maxWidth: "78%", background: "rgba(83,58,253,0.18)", border: "1px solid rgba(83,58,253,0.28)", borderRadius: "16px 4px 16px 16px", padding: "10px 14px" }}>
+                <div style={{ maxWidth: "78%", background: "rgba(83,58,253,0.55)", borderRadius: "16px 4px 16px 16px", padding: "10px 14px" }}>
                   <p style={{ margin: 0, fontSize: isMobile ? 13 : 14, color: chat.skipped ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.8)", lineHeight: 1.6, fontStyle: chat.skipped ? "italic" : "normal" }}>
                     {chat.skipped
                       ? "건너뜀"
@@ -874,12 +876,12 @@ export default function InterviewScreen({ go, shareCode }) {
       </div>
 
       {/* Sticky bottom panel — current question + controls */}
-      <div style={{ flexShrink: 0, position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(28,29,32,0.96)", backdropFilter: "blur(16px)", padding: isMobile ? "16px 16px 28px" : "20px 32px 28px" }}>
+      <div style={{ flexShrink: 0, position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.07)", background: "#1c1d20", padding: isMobile ? "16px 16px calc(28px + env(safe-area-inset-bottom,0px))" : "20px 32px calc(28px + env(safe-area-inset-bottom,0px))" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
 
           {/* AI avatar row + current question */}
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14 }}>
-            <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0, boxShadow: phase === "ai_speaking" ? "0 0 14px rgba(26,115,232,0.5)" : "none", transition: "box-shadow 0.4s" }}>✦</div>
+            <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0, boxShadow: phase === "ai_speaking" ? `0 0 14px rgba(83,58,253,0.6)` : "none", transition: "box-shadow 0.4s" }}>✦</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 11, color: C.purpleLight, marginBottom: 5, display: "flex", alignItems: "center", gap: 6 }}>
                 {phase === "ai_speaking" ? <WaveAnimation active /> : <span style={{ color: "rgba(255,255,255,0.3)" }}>AI 인터뷰어</span>}
@@ -936,40 +938,38 @@ export default function InterviewScreen({ go, shareCode }) {
                 </div>
               )}
               {(phase === "ready" || phase === "recording") && (
-                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                  {/* Inline mic button */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                  {/* Big centered mic button */}
                   <button
                     onClick={() => phase === "ready" ? startRecording() : stopRecording()}
-                    style={{ width: 52, height: 52, borderRadius: "50%", border: "none", cursor: "pointer", flexShrink: 0, background: phase === "recording" ? C.ruby : C.purple, boxShadow: phase === "recording" ? "0 0 0 6px rgba(217,48,37,0.2),0 0 0 12px rgba(217,48,37,0.07)" : "0 0 0 6px rgba(83,58,253,0.2)", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.25s" }}>
-                    {phase === "recording" ? Ic.Stop({ s: 20, c: "white" }) : Ic.Mic({ s: 20, c: "white" })}
+                    style={{ width: 72, height: 72, borderRadius: "50%", border: "none", cursor: "pointer", background: phase === "recording" ? C.ruby : C.purple, boxShadow: phase === "recording" ? "0 0 0 8px rgba(217,48,37,0.2),0 0 0 16px rgba(217,48,37,0.07)" : "0 0 0 8px rgba(83,58,253,0.2),0 0 0 16px rgba(83,58,253,0.07)", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.25s", animation: phase === "recording" ? "rec-pulse 1.2s ease-in-out infinite" : "none" }}>
+                    {phase === "recording" ? Ic.Stop({ s: 28, c: "white" }) : Ic.Mic({ s: 28, c: "white" })}
                   </button>
-                  {/* Status text */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    {phase === "recording" ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.ruby, display: "inline-block", flexShrink: 0, animation: "rec-pulse 1.2s ease-in-out infinite" }} />
-                          <span style={{ fontSize: 13, color: "rgba(217,48,37,0.9)", fontFeatureSettings: '"tnum"', fontWeight: 500 }}>{fmt(recordTime)}</span>
-                          {recordTime < MIN_RECORD_SECS && (
-                            <span style={{ fontSize: 11, color: "rgba(255,200,100,0.7)" }}>최소 {MIN_RECORD_SECS - recordTime}초 더</span>
-                          )}
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 2, height: 14 }}>
-                          {Array.from({ length: 16 }).map((_, i) => (
-                            <div key={i} style={{ width: 3, borderRadius: 2, background: C.ruby, opacity: 0.7, animation: `wave-${i % 3} 0.5s ease-in-out ${(i * 0.06).toFixed(2)}s infinite alternate`, height: `${8 + (i % 3) * 4}px` }} />
-                          ))}
-                        </div>
+                  {/* Status text below */}
+                  {phase === "recording" ? (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.ruby, display: "inline-block", animation: "rec-pulse 1.2s ease-in-out infinite" }} />
+                        <span style={{ fontSize: 14, color: "rgba(217,48,37,0.9)", fontFeatureSettings: '"tnum"', fontWeight: 600 }}>{fmt(recordTime)}</span>
+                        {recordTime < MIN_RECORD_SECS && (
+                          <span style={{ fontSize: 11, color: "rgba(255,200,100,0.7)" }}>최소 {MIN_RECORD_SECS - recordTime}초 더</span>
+                        )}
                       </div>
-                    ) : (
-                      <div>
-                        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>탭해서 답변 시작</div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.22)", marginTop: 2 }}>최소 {MIN_RECORD_SECS}초 이상 답변해 주세요</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 2, height: 14 }}>
+                        {Array.from({ length: 16 }).map((_, i) => (
+                          <div key={i} style={{ width: 3, borderRadius: 2, background: C.ruby, opacity: 0.7, animation: `wave-${i % 3} 0.5s ease-in-out ${(i * 0.06).toFixed(2)}s infinite alternate`, height: `${8 + (i % 3) * 4}px` }} />
+                        ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>탭해서 답변 시작</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginTop: 2 }}>최소 {MIN_RECORD_SECS}초 이상 답변해 주세요</div>
+                    </div>
+                  )}
                   {/* Skip */}
                   {phase === "ready" && (
-                    <button onClick={() => setShowSkipConfirm(true)} style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, cursor: "pointer", fontFamily: F, padding: "6px 10px", flexShrink: 0 }}>
+                    <button onClick={() => setShowSkipConfirm(true)} style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", background: "none", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: F, padding: "4px 8px", marginTop: 2 }}>
                       건너뛰기
                     </button>
                   )}
@@ -983,7 +983,7 @@ export default function InterviewScreen({ go, shareCode }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {q.options.map((opt, i) => (
                 <button key={i} onClick={() => setSelectedValue(opt)}
-                  style={{ padding: "11px 14px", borderRadius: 10, border: `1px solid ${selectedValue === opt ? C.purple : "rgba(255,255,255,0.13)"}`, background: selectedValue === opt ? "rgba(83,58,253,0.2)" : "rgba(255,255,255,0.04)", color: selectedValue === opt ? C.purpleLight : "rgba(255,255,255,0.7)", fontSize: 14, fontFamily: F, cursor: "pointer", textAlign: "left", transition: "all 0.15s" }}>
+                  style={{ padding: "11px 14px", borderRadius: 10, border: "none", background: selectedValue === opt ? C.purple : "rgba(255,255,255,0.1)", color: selectedValue === opt ? C.white : "rgba(255,255,255,0.7)", fontSize: 14, fontFamily: F, cursor: "pointer", textAlign: "left", transition: "all 0.15s" }}>
                   {opt}
                 </button>
               ))}
@@ -1002,7 +1002,7 @@ export default function InterviewScreen({ go, shareCode }) {
                   const count = (q.options.max ?? 5) - (q.options.min ?? 1) + 1;
                   return (
                     <button key={n} onClick={() => setSelectedValue(n)}
-                      style={{ width: `calc((100% - ${(count - 1) * 8}px) / ${count})`, minWidth: 36, maxWidth: 56, height: 48, borderRadius: 10, border: `1px solid ${selectedValue === n ? C.purple : "rgba(255,255,255,0.18)"}`, background: selectedValue === n ? "rgba(83,58,253,0.28)" : "rgba(255,255,255,0.04)", color: selectedValue === n ? C.purpleLight : "rgba(255,255,255,0.6)", fontSize: 17, fontFamily: F, cursor: "pointer", transition: "all 0.15s" }}>
+                      style={{ width: `calc((100% - ${(count - 1) * 8}px) / ${count})`, minWidth: 36, maxWidth: 56, height: 48, borderRadius: 10, border: "none", background: selectedValue === n ? C.purple : "rgba(255,255,255,0.1)", color: selectedValue === n ? C.white : "rgba(255,255,255,0.6)", fontSize: 17, fontFamily: F, cursor: "pointer", transition: "all 0.15s" }}>
                       {n}
                     </button>
                   );
