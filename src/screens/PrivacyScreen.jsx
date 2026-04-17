@@ -9,7 +9,7 @@ export default function PrivacyScreen({ go, user, logout }) {
       <GlobalNav go={go} variant={user ? "app" : "sub"} user={user} logout={logout} />
       <main style={{ maxWidth: 800, margin: "0 auto", padding: "48px 24px 80px" }}>
         <div style={{ marginBottom: 32 }}>
-          <Btn variant="ghost" size="sm" onClick={() => go("advertiser_login")}>← 돌아가기</Btn>
+          <Btn variant="ghost" size="sm" onClick={() => go(user ? "dashboard" : "landing")}>← 돌아가기</Btn>
         </div>
 
         <div style={{ background: C.white, borderRadius: 16, padding: isMobile ? "24px 20px" : "40px 48px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
@@ -51,7 +51,7 @@ export default function PrivacyScreen({ go, user, logout }) {
             회사는 법령에 따른 개인정보 보유·이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의받은 개인정보 보유·이용기간 내에서 개인정보를 처리·보유합니다.
             <Table rows={[
               ["회원 정보", "회원 탈퇴 시까지 (탈퇴 후 즉시 파기)", ""],
-              ["인터뷰 응답 데이터(음성, 전사, 선택지)", "해당 인터뷰 프로젝트 종료 후 3년 또는 리서처 요청 시까지", "「전자상거래 등에서의 소비자보호에 관한 법률」"],
+              ["인터뷰 응답 데이터(음성, 전사, 선택지)", "인터뷰 완료일로부터 1년, 이후 파기", "개인정보 수집·이용 동의 기준"],
               ["계약·청약철회 기록", "5년", "「전자상거래 등에서의 소비자보호에 관한 법률」"],
               ["대금결제 및 재화 공급 기록", "5년", "「전자상거래 등에서의 소비자보호에 관한 법률」"],
               ["소비자 불만·분쟁 처리 기록", "3년", "「전자상거래 등에서의 소비자보호에 관한 법률」"],

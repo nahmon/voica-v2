@@ -74,7 +74,7 @@ function WelcomeIllustration({ isMobile }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 5, background: C.white, borderRadius: 20, padding: "6px 14px", border: `1px solid ${C.border}` }}>
           {Ic.Coin({ s: 12, c: "#15803d" })}
-          <span style={{ fontSize: 12, fontWeight: 600, color: "#15803d" }}>3,000원 리워드</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: "#15803d" }}>리워드 제공</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 5, background: C.white, borderRadius: 20, padding: "6px 14px", border: `1px solid ${C.border}` }}>
           {Ic.Mic({ s: 12, c: C.body })}
@@ -88,7 +88,7 @@ function WelcomeIllustration({ isMobile }) {
 const FAQ_ITEMS = [
   { q: "제 음성 데이터는 어떻게 사용되나요?", a: "음성은 텍스트(STT)로 변환되어 리서치 분석에만 활용됩니다. 인터뷰 완료일로부터 1년 후 자동 파기되며, 제3자에게 판매되지 않습니다." },
   { q: "개인정보는 누구에게 제공되나요?", a: "리서처에게는 음성·텍스트 분석 결과만 제공되며, 이름·연락처 등 식별 정보는 공유되지 않습니다." },
-  { q: "리워드는 언제 지급되나요?", a: "인터뷰 완료 후 24시간 이내에 등록하신 계좌 또는 모바일 상품권으로 지급됩니다." },
+  { q: "리워드는 언제 지급되나요?", a: "리워드는 인터뷰를 의뢰한 리서처(운영자)가 지급합니다. 지급 방식과 일정은 개별 인터뷰 공고에 명시되어 있으니 참여 전 반드시 확인해 주세요." },
   { q: "중간에 그만둬도 되나요?", a: "인터뷰는 언제든지 중단할 수 있지만, 완료한 경우에만 리워드가 지급됩니다. 정당한 사유 없이 3회 이상 중단 시 패널 자격에 영향을 줄 수 있습니다." },
   { q: "음성 인식이 잘 안 될 때는 어떻게 하나요?", a: "조용한 환경에서 마이크에 가까이 대고 말씀해 주세요. 음성 인식이 어렵다면 텍스트로 입력하는 옵션도 제공됩니다." },
 ];
@@ -158,6 +158,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
             <li>음성 데이터는 텍스트(STT)로 변환되어 AI 분석에 활용됩니다.</li>
             <li>음성-텍스트 변환은 OpenAI Whisper (OpenAI, LLC, 미국)를 통해 처리됩니다. API 이용약관에 따라 AI 학습에 사용되지 않습니다.</li>
             <li>전사(STT) 처리를 위해 음성 데이터가 미국 OpenAI 서버로 전송됩니다 (국외 이전).</li>
+            <li>음성 파일 및 전사 데이터는 Supabase Inc.(미국) 서버에 암호화 저장되며, 서비스는 Vercel Inc.(미국) 인프라를 통해 운영됩니다 (국외 이전).</li>
             <li>원본 음성 파일은 인터뷰 완료일로부터 1년 보관 후 파기됩니다.</li>
           </ul>
         </div>
@@ -339,7 +340,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 5, background: C.white, borderRadius: 20, padding: "7px 16px", border: `1px solid ${C.border}` }}>
                 {Ic.Coin({ s: 12, c: "#15803d" })}
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#15803d" }}>완료 후 3,000원 지급</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#15803d" }}>완료 후 리워드 지급</span>
               </div>
             </div>
 

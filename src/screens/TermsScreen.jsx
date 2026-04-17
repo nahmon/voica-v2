@@ -9,7 +9,7 @@ export default function TermsScreen({ go, user, logout }) {
       <GlobalNav go={go} variant={user ? "app" : "sub"} user={user} logout={logout} />
       <main style={{ maxWidth: 800, margin: "0 auto", padding: "48px 24px 80px" }}>
         <div style={{ marginBottom: 32 }}>
-          <Btn variant="ghost" size="sm" onClick={() => go("advertiser_login")}>← 돌아가기</Btn>
+          <Btn variant="ghost" size="sm" onClick={() => go(user ? "dashboard" : "landing")}>← 돌아가기</Btn>
         </div>
 
         <div style={{ background: C.white, borderRadius: 16, padding: isMobile ? "24px 20px" : "40px 48px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
@@ -106,7 +106,7 @@ export default function TermsScreen({ go, user, logout }) {
                   <li>리서처의 응답 검토 기능 제공</li>
                 </ul>
               </li>
-              <li>음성 데이터는 암호화되어 Supabase Storage에 저장되며, 보유 기간은 회원 탈퇴 시 또는 이용자 요청 시까지입니다.</li>
+              <li>음성 데이터는 암호화되어 Supabase Storage에 저장되며, 보유 기간은 인터뷰 완료일로부터 1년입니다. 이후 자동 파기됩니다.</li>
               <li>회사는 법령에서 정한 경우를 제외하고 음성 데이터를 제3자에게 제공하지 않습니다.</li>
             </ol>
           </Section>
@@ -143,7 +143,7 @@ export default function TermsScreen({ go, user, logout }) {
             <ol>
               <li>회사는 천재지변 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다.</li>
               <li>회사는 이용자의 귀책사유로 인한 서비스 이용의 장애에 대하여는 책임을 지지 않습니다.</li>
-              <li>회사는 이용자가 서비스를 이용하여 기대하는 수익을 상실한 것에 대하여 책임을 지지 않으며, 그 밖에 서비스를 통하여 얻은 자료로 인한 손해에 관하여 책임을 지지 않습니다.</li>
+              <li>회사는 이용자가 서비스를 이용하여 기대하는 수익을 상실한 것에 대하여, 회사의 고의 또는 과실이 없는 경우에는 책임을 지지 않습니다.</li>
               <li>회사는 이용자가 게재한 정보, 자료, 사실의 신뢰도, 정확성 등 내용에 관하여는 책임을 지지 않습니다.</li>
             </ol>
           </Section>
@@ -165,12 +165,10 @@ export default function TermsScreen({ go, user, logout }) {
 
           <div style={{ marginTop: 40, paddingTop: 24, borderTop: `1px solid ${C.border}`, fontSize: 12, color: C.body, lineHeight: 1.8 }}>
             <strong style={{ color: C.navy }}>Voice Survey Inc.</strong><br />
-            대표자: [대표자 실명 기재 필요]<br />
-            사업자등록번호: [000-00-00000]<br />
-            통신판매업 신고번호: [제 0000-서울00-0000호]<br />
-            사업장 소재지: [주소 기재 필요]<br />
-            대표전화: [전화번호 기재 필요]<br />
+            사업자등록번호: 사업자등록 진행 중<br />
+            통신판매업 신고번호: 신고 진행 중<br />
             이메일: voica.support@gmail.com<br />
+            <span style={{ fontSize: 11, color: "#aaa" }}>※ 사업자 정보는 등록 완료 즉시 업데이트됩니다.</span><br />
             <br />
             본 약관은 2026년 4월 11일부터 시행됩니다.
           </div>
