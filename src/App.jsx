@@ -29,7 +29,7 @@ export default function Voica() {
   const [authLoading, setAuthLoading] = useState(true);
   const [shareCode, setShareCode] = useState(null);
   const [interviewId, setInterviewId] = useState(null);
-  const go = (s, id, code) => { setInterviewId(id ?? null); if (code !== undefined) setShareCode(code); setScreen(s); };
+  const go = (s, id, code) => { setInterviewId(id ?? null); if (code !== undefined) setShareCode(code); setScreen(s); window.scrollTo(0, 0); };
 
   useEffect(() => {
     // Detect /i/[code] URL for panel interview
