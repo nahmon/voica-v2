@@ -315,7 +315,6 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
             <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>
               {status === "applied" ? "AI 적합성 검토 중이에요" : "리서처 최종 검토를 기다리고 있어요"}
             </span>
-            <button onClick={onCycleDemo} style={{ marginLeft: "auto", fontSize: 10, color: "rgba(0,0,0,0.1)", background: "none", border: "none", cursor: "pointer", fontFamily: F }}>[dev]</button>
           </div>
         ) : (
           <button

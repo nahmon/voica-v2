@@ -7,7 +7,7 @@ export default function PricingScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const [billing, setBilling] = useState("monthly");
 
-  const proMonthly = 99000;
+  const proMonthly = 179000;
   const proYearlyMonthly = Math.round(proMonthly * 0.8);
   const proYearlyTotal = proYearlyMonthly * 12;
   const proDisplayPrice = billing === "yearly"
@@ -55,7 +55,7 @@ export default function PricingScreen({ go, user, logout }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {[
                 "월 3회 인터뷰",
-                "회당 최대 10명 응답",
+                "회당 최대 30명 응답",
                 "기본 AI 리포트",
                 "데이터 보관 30일",
               ].map(f => (
@@ -79,7 +79,7 @@ export default function PricingScreen({ go, user, logout }) {
             <div style={{ fontSize: 12, color: C.body, marginBottom: 28 }}>{proDisplaySub}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {[
-                "월 100응답 포함 (초과 시 응답당 980원)",
+                "월 500응답 포함 (초과 시 응답당 490원)",
                 "AI 심층 분석 + 테마 드릴다운",
                 "대표 발화 인용문 자동 추출",
                 "크로스탭 분석 · 세그먼트 비교",
@@ -116,7 +116,7 @@ export default function PricingScreen({ go, user, logout }) {
                 </div>
               ))}
             </div>
-            <Btn full variant="secondary" onClick={() => go("support")}>견적 문의하기 →</Btn>
+            <Btn full onClick={() => go("support")}>도입 문의하기 →</Btn>
           </div>
 
         </div>

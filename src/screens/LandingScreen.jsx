@@ -76,7 +76,7 @@ function CounterStat({ end, suffix, label, delay, color, labelColor }) {
     return () => cancelAnimationFrame(raf);
   }, [visible, end, delay]);
 
-  const display = val >= 1000 ? val.toLocaleString("ko-KR") : String(val);
+  const display = !visible ? "—" : (val >= 1000 ? val.toLocaleString("ko-KR") : String(val));
 
   return (
     <div ref={ref} style={{ textAlign: "center" }}>
@@ -124,7 +124,7 @@ function BeforeAfterSection({ isMobile }) {
             <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, color: C.navy, margin: "0 0 12px", fontFamily: F }}>
               기존 방식 vs <span style={{ color: C.purple }}>Voice Survey</span>
             </h2>
-            <p style={{ fontSize: 15, color: C.body, margin: 0 }}>같은 인사이트, <span style={{ color: C.purple, fontWeight: 600 }}>훨씬 빠르고 저렴하게</span></p>
+            <p style={{ fontSize: 15, color: C.body, margin: 0 }}>소비자의 목소리를<br />정확하고 빠르게</p>
           </div>
 
           <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexDirection: isMobile ? "column" : "row", alignItems: "stretch" }}>
@@ -214,10 +214,22 @@ function FinalCtaSection({ go, isMobile }) {
 export default function LandingScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const [liveCount, setLiveCount] = useState(247);
+  const [heroIdx, setHeroIdx] = useState(0);
+  const [heroVisible, setHeroVisible] = useState(true);
   const refParam = new URLSearchParams(window.location.search).get("ref");
   const fromInterview = refParam === "interview";
   useEffect(() => {
     if (fromInterview) track("referral_from_interview", { ref: refParam });
+  }, []);
+  useEffect(() => {
+    const cycle = setInterval(() => {
+      setHeroVisible(false);
+      setTimeout(() => {
+        setHeroIdx(i => (i + 1) % 2);
+        setHeroVisible(true);
+      }, 400);
+    }, 4000);
+    return () => clearInterval(cycle);
   }, []);
   useEffect(() => {
     const tick = () => {
@@ -252,18 +264,32 @@ export default function LandingScreen({ go, user, logout }) {
             <Badge variant="purple">✦ AI가 인터뷰하고, AI가 분석합니다</Badge>
           </div>
 
-          <h1 style={{ fontSize: isMobile ? 32 : 52, fontWeight: 700, lineHeight: 1.2, margin: "0 0 24px", fontFamily: F, wordBreak: "keep-all" }}>
-            <span style={{ color: C.navy, display: "block" }}>
-              {fromInterview
-                ? "AI 인터뷰를 경험하셨나요?"
-                : isMobile
-                  ? "인터뷰, 비싸고 오래 걸리죠?"
-                  : "시간과 비용이 많이 들었던 인터뷰"}
-            </span>
-            <span style={{ background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "block" }}>
-              {isMobile ? "AI로 수백 명을 동시에" : "AI로 수백 명의 인터뷰를 동시에"}
-            </span>
-          </h1>
+          {(() => {
+            const heroMessages = [
+              { line1: "비싸고 오래 걸리는 인터뷰", line2: "AI로 수백 명을 동시에" },
+              { line1: "소비자의 목소리를", line2: "정확하고\u00A0빠르게" },
+            ];
+            const msg = fromInterview
+              ? { line1: "AI 인터뷰를 경험하셨나요?", line2: "AI로 수백 명을 동시에" }
+              : heroMessages[heroIdx];
+            return (
+              <h1 style={{
+                fontSize: isMobile ? 30 : 52, fontWeight: 700, lineHeight: 1.3, margin: "0 0 24px",
+                fontFamily: F, wordBreak: "keep-all",
+                opacity: heroVisible ? 1 : 0,
+                transition: "opacity 0.4s ease",
+              }}>
+                <span style={{ color: C.navy }}>{msg.line1}</span>
+                <br />
+                <span style={{
+                  whiteSpace: "nowrap",
+                  ...(isMobile
+                    ? { color: C.purple }
+                    : { background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" })
+                }}>{msg.line2}</span>
+              </h1>
+            );
+          })()}
 
           <p style={{ fontSize: isMobile ? 15 : 17, fontWeight: 400, color: "rgba(10,11,13,0.56)", lineHeight: 1.6, letterSpacing: "0.16px", margin: "0 0 44px", fontFamily: F }}>
             {isMobile

@@ -214,7 +214,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
               </>
             )}
             {isMobile && (
-              <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", color: C.navy, fontSize: 20, lineHeight: 1 }}>☰</button>
+              <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", color: C.navy, fontSize: 20, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
             )}
           </div>
         </div>
@@ -338,7 +338,7 @@ const VOC_LIST = [
   { quote: "500명 동시 인터뷰를 5만원에 진행했습니다. 품질도 전통 방식과 다르지 않았고 AI 리포트가 특히 탁월했어요.", name: "박현우", title: "제품 마케팅 매니저", company: "**이버 마케팅팀" },
   { quote: "AI가 인터뷰를 직접 진행한다는 게 처음엔 반신반의했는데, 실제 녹취록을 보니 사용자가 자연스럽게 속마음을 털어놓더라고요. 면접관 눈치 없이 솔직한 답변이 많이 나왔습니다.", name: "최예린", title: "UX 리서처", company: "**이버 UX리서치실", photo: "/profiles/female-2.png" },
   { quote: "패널 참여가 정말 쉽고 리워드도 바로 들어왔어요. 보이스 인터뷰라 더 자연스럽게 의견을 말할 수 있었습니다.", name: "이서연", title: "프리랜서 패널", company: "개인 참여자" },
-  { quote: "글로벌 시장 진출 전 국내 타깃 유저 인터뷰가 필요했어요. 지역·연령·직군 조건 설정하니까 딱 맞는 패널이 빠르게 모였고, 리포트까지 영업일 3일 안에 나왔습니다.", name: "정우진", title: "사업개발 팀장", company: "**스 신사업팀", photo: "/profiles/female-4.png" },
+  { quote: "글로벌 시장 진출 전 국내 타깃 유저 인터뷰가 필요했어요. 지역·연령·직군 조건 설정하니까 딱 맞는 패널이 빠르게 모였고, 리포트까지 영업일 3일 안에 나왔습니다.", name: "정우진", title: "사업개발 팀장", company: "**스 신사업팀", photo: "/profiles/male-2.png" },
   { quote: "분기마다 진행하던 사용성 테스트를 이제 매달 할 수 있게 됐어요. 비용과 시간 장벽이 낮아지니 리서치를 훨씬 자주 의사결정에 활용하게 됐습니다.", name: "한소희", title: "서비스 기획자", company: "**자동차 Connected Car팀", photo: "/profiles/female-3.png" },
   { quote: "외부 리서치 에이전시 대비 비용은 80% 절감되고, 결과물은 2배 빠르게 나왔습니다. 특히 테마 분류와 감성 분석이 자동으로 되니 별도 분석 시간이 거의 필요 없었어요.", name: "오민준", title: "마케팅 이사", company: "**팡 그로스마케팅본부" },
 ];
@@ -366,7 +366,7 @@ export function VoCCarousel() {
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <Badge variant="purple" style={{ marginBottom: 12 }}>고객 후기</Badge>
-          <h2 style={{ fontSize: 28, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>실제 사용자의 이야기</h2>
+          <h2 style={{ fontSize: 28, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>실제 사용자들의 리뷰</h2>
         </div>
         <div style={{ overflow: "hidden" }} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
           <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
@@ -392,9 +392,12 @@ export function VoCCarousel() {
             ))}
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 24 }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 0, marginTop: 24 }}>
           {VOC_LIST.map((_, i) => (
-            <button key={i} onClick={() => setIdx(i)} aria-label={`후기 ${i + 1}번으로 이동`} style={{ width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: "none", cursor: "pointer", background: i === idx ? C.purple : "rgba(23,23,23,0.3)", transition: "all 0.3s", padding: 0, flexShrink: 0 }} />
+            <button key={i} onClick={() => setIdx(i)} aria-label={`후기 ${i + 1}번으로 이동`}
+              style={{ background: "none", border: "none", cursor: "pointer", padding: "10px 6px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ display: "block", width: i === idx ? 18 : 6, height: 6, borderRadius: 3, background: i === idx ? C.purple : "rgba(23,23,23,0.3)", transition: "all 0.3s", flexShrink: 0 }} />
+            </button>
           ))}
         </div>
       </div>
@@ -458,7 +461,7 @@ export function HowItWorksCarousel() {
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 12 }}>
               {["←", "→"].map((arrow, i) => (
                 <button key={arrow} onClick={() => scroll(i === 0 ? -1 : 1)}
-                  style={{ width: 30, height: 30, borderRadius: "50%", border: `1px solid ${C.border}`, background: C.bg, cursor: "pointer", fontSize: 13, color: C.body, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  style={{ width: 44, height: 44, borderRadius: "50%", border: `1px solid ${C.border}`, background: C.bg, cursor: "pointer", fontSize: 13, color: C.body, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {arrow}
                 </button>
               ))}
@@ -681,7 +684,7 @@ export function Footer({ go }) {
           <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
             {[["서비스 소개", "about"], ["요금제", "pricing"], ["패널 참여", "panel_board"], ["고객센터", "support"], ["개인정보처리방침", "privacy"], ["이용약관", "terms"]].map(([l, target]) => (
               <button key={l} onClick={() => go(target)}
-                style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: F, letterSpacing: "0.16px" }}
+                style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", background: "none", border: "none", cursor: "pointer", padding: "10px 0", minHeight: 44, fontFamily: F, letterSpacing: "0.16px", display: "inline-flex", alignItems: "center" }}
                 onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.88)"}
                 onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.48)"}>{l}</button>
             ))}

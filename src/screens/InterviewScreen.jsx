@@ -667,11 +667,11 @@ export default function InterviewScreen({ go, shareCode }) {
           </div>
         </div>
         {/* Sound notice */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 8, background: "rgba(255,200,50,0.08)", border: "1px solid rgba(255,200,50,0.2)", marginBottom: 20 }}>
-          <span style={{ fontSize: 16 }}>🔊</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(255,200,50,0.14)", border: "1px solid rgba(255,200,50,0.5)", marginBottom: 20, boxShadow: "0 0 12px rgba(255,200,50,0.08)" }}>
+          <span style={{ fontSize: 20, flexShrink: 0 }}>🔊</span>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,200,50,0.9)" }}>소리를 켜주세요</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>{isMobile ? "AI가 질문을 읽어드려요. 이어폰을 권장해요." : "AI 인터뷰어가 질문을 음성으로 읽어드립니다. 이어폰 착용을 권장합니다."}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,210,60,1.0)" }}>소리를 켜주세요</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>{isMobile ? "AI가 질문을 읽어드려요. 이어폰을 권장해요." : "AI 인터뷰어가 질문을 음성으로 읽어드립니다. 이어폰 착용을 권장합니다."}</div>
           </div>
         </div>
         {nameTouched && !respondent.name.trim() && <div style={{ fontSize: 12, color: "rgba(255,100,100,0.7)", marginBottom: 10 }}>닉네임을 입력해 주세요</div>}
