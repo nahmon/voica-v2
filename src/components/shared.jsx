@@ -191,10 +191,10 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
 
   return (
     <>
-      <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
+      <nav style={{ position: "sticky", top: 0, zIndex: 100, background: variant === "app" ? "rgba(11,15,28,0.96)" : "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: variant === "app" ? "1px solid rgba(255,255,255,0.08)" : `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "stretch", justifyContent: "space-between", height: 56, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go(homeTarget)}>
-            <LogoMark />
+            <LogoMark dark={variant === "app"} />
           </div>
           {!isMobile && (
             <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, transform: "translateX(-50%)", display: "flex", alignItems: "stretch" }}>
@@ -219,7 +219,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                     ? <img src={avatarUrl} alt="profile" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover", border: `1px solid ${C.border}` }} onError={e => { e.currentTarget.style.display = "none"; }} />
                     : initials;
                 })()}
-                <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>
+                <div style={{ fontSize: 12, color: "rgba(200,205,230,0.8)", letterSpacing: "0.16px" }}>
                   {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || ""}
                 </div>
               </>
