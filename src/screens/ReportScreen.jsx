@@ -111,6 +111,12 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
   const completedSessions = sessions.filter(s => s.status === "completed");
 
+  const dk = {
+    bg: "#0b0f1c", card: "#141927", card2: "#1a2035",
+    border: "rgba(255,255,255,0.07)", text: "#e8eaf4",
+    muted: "rgba(180,185,215,0.65)", label: "rgba(160,165,200,0.8)",
+  };
+
   // Compute key metrics
   const totalSessions = sessions.length;
   const completionRate = totalSessions > 0 ? Math.round((completedSessions.length / totalSessions) * 100) : 0;
@@ -155,11 +161,11 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   })();
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
+    <div style={{ minHeight: "100vh", background: dk.bg, fontFamily: F }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
         <Skeleton width={220} height={28} borderRadius={8} style={{ marginBottom: 8 }} />
         <Skeleton width={160} height={16} borderRadius={6} style={{ marginBottom: 32 }} />
-        <div style={{ background: "#fff", borderRadius: 16, padding: "28px 24px" }}>
+        <div style={{ background: dk.card, borderRadius: 16, padding: "28px 24px" }}>
           <Skeleton width="100%" height={20} borderRadius={6} style={{ marginBottom: 12 }} />
           <Skeleton width="80%" height={16} borderRadius={6} style={{ marginBottom: 8 }} />
           <Skeleton width="60%" height={16} borderRadius={6} />
@@ -169,8 +175,8 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   );
 
   if (!interviewId) return (
-    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F, gap: 16 }}>
-      <div style={{ fontSize: 16, color: C.navy }}>Please select an interview</div>
+    <div style={{ minHeight: "100vh", background: dk.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F, gap: 16 }}>
+      <div style={{ fontSize: 16, color: dk.text }}>Please select an interview</div>
       <Btn onClick={() => go("dashboard")}>Go to dashboard</Btn>
     </div>
   );
@@ -178,7 +184,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   const hasReport = report?.status === "completed" && report.content;
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
+    <div style={{ background: dk.bg, minHeight: "100vh", fontFamily: F }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse-step { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
@@ -196,9 +202,9 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
       </div>
 
       {/* Sub nav */}
-      <div className="no-print" style={{ padding: isMobile ? "8px 16px" : "10px 24px", background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+      <div className="no-print" style={{ padding: isMobile ? "8px 16px" : "10px 24px", background: dk.card, borderBottom: `1px solid ${dk.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
         <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← {isMobile ? "" : "Dashboard"}</Btn>
-        <div style={{ fontSize: 13, fontWeight: 400, color: C.navy, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>{interview?.title}</div>
+        <div style={{ fontSize: 13, fontWeight: 400, color: dk.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>{interview?.title}</div>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           {hasReport && (
             <Btn variant="ghost" size="sm" onClick={handleShare}>
@@ -211,7 +217,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
       {/* Summary header card — shown when report exists */}
       {hasReport && (
-        <div className="no-print" style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "14px 16px" : "16px 24px" }}>
+        <div className="no-print" style={{ background: dk.card, borderBottom: `1px solid ${dk.border}`, padding: isMobile ? "14px 16px" : "16px 24px" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto" }}>
             <div style={{ display: "flex", gap: isMobile ? 12 : 24, flexWrap: "wrap" }}>
               <MetricCard label="Total responses" value={`${totalSessions}`} icon={Ic.Users({ s: 16, c: C.purple })} />
@@ -220,8 +226,8 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 <MetricCard label="Avg. time to complete" value={`${avgDurationMin} min`} icon={Ic.Target({ s: 16, c: "#1a73e8" })} />
               )}
               {sentimentDist && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}`, minWidth: 220 }}>
-                  <span style={{ fontSize: 11, color: C.body }}>Sentiment distribution</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "10px 14px", background: dk.card2, borderRadius: 10, border: `1px solid ${dk.border}`, minWidth: 220 }}>
+                  <span style={{ fontSize: 11, color: dk.muted }}>Sentiment distribution</span>
                   <div style={{ display: "flex", height: 8, borderRadius: 4, overflow: "hidden" }}>
                     <div style={{ width: `${sentimentDist.positive}%`, background: C.success }} />
                     <div style={{ width: `${sentimentDist.neutral}%`, background: "#d0d0d8" }} />
@@ -229,7 +235,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                   </div>
                   <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
                     <span style={{ color: C.success }}>Positive {sentimentDist.positive}%</span>
-                    <span style={{ color: C.body }}>Neutral {sentimentDist.neutral}%</span>
+                    <span style={{ color: dk.muted }}>Neutral {sentimentDist.neutral}%</span>
                     <span style={{ color: C.ruby }}>Negative {sentimentDist.negative}%</span>
                   </div>
                 </div>
@@ -241,12 +247,12 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
       {/* Section tabs (mobile) / sticky sidebar (desktop) */}
       {hasReport && isMobile && (
-        <div className="no-print" style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 16px", display: "flex", gap: 0, overflowX: "auto" }}>
+        <div className="no-print" style={{ background: dk.card, borderBottom: `1px solid ${dk.border}`, padding: "0 16px", display: "flex", gap: 0, overflowX: "auto" }}>
           {SECTIONS.map(sec => (
             <button key={sec.id} onClick={() => {
               setActiveSection(sec.id);
               document.getElementById(`section-${sec.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }} style={{ background: "none", border: "none", borderBottom: `2px solid ${activeSection === sec.id ? C.purple : "transparent"}`, padding: "10px 16px", fontSize: 13, fontWeight: activeSection === sec.id ? 600 : 400, color: activeSection === sec.id ? C.purple : C.body, cursor: "pointer", whiteSpace: "nowrap", fontFamily: F }}>
+            }} style={{ background: "none", border: "none", borderBottom: `2px solid ${activeSection === sec.id ? C.purple : "transparent"}`, padding: "10px 16px", fontSize: 13, fontWeight: activeSection === sec.id ? 600 : 400, color: activeSection === sec.id ? C.purple : dk.muted, cursor: "pointer", whiteSpace: "nowrap", fontFamily: F }}>
               {sec.label}
             </button>
           ))}
@@ -258,13 +264,13 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
         {/* Sticky sidebar (desktop) */}
         {hasReport && !isMobile && (
           <div className="no-print" style={{ width: 160, flexShrink: 0, position: "sticky", top: 24 }}>
-            <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, overflow: "hidden" }}>
-              <div style={{ padding: "8px 12px", fontSize: 10, fontWeight: 600, color: C.body, borderBottom: `1px solid ${C.border}`, letterSpacing: 0.5 }}>Jump to section</div>
+            <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 10, overflow: "hidden" }}>
+              <div style={{ padding: "8px 12px", fontSize: 10, fontWeight: 600, color: dk.muted, borderBottom: `1px solid ${dk.border}`, letterSpacing: 0.5 }}>Jump to section</div>
               {SECTIONS.map(sec => (
                 <button key={sec.id} onClick={() => {
                   setActiveSection(sec.id);
                   document.getElementById(`section-${sec.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }} style={{ display: "block", width: "100%", background: activeSection === sec.id ? C.purpleBg : "none", border: "none", borderLeft: `3px solid ${activeSection === sec.id ? C.purple : "transparent"}`, padding: "9px 12px", fontSize: 13, fontWeight: activeSection === sec.id ? 500 : 400, color: activeSection === sec.id ? C.purple : C.navy, cursor: "pointer", textAlign: "left", fontFamily: F }}>
+                }} style={{ display: "block", width: "100%", background: activeSection === sec.id ? C.purpleBg : "none", border: "none", borderLeft: `3px solid ${activeSection === sec.id ? C.purple : "transparent"}`, padding: "9px 12px", fontSize: 13, fontWeight: activeSection === sec.id ? 500 : 400, color: activeSection === sec.id ? C.purple : dk.text, cursor: "pointer", textAlign: "left", fontFamily: F }}>
                   {sec.label}
                 </button>
               ))}
@@ -275,11 +281,11 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
         {/* Left: Sessions list (no sidebar) or main area */}
         {!hasReport && (
           <div style={{ width: isMobile ? "100%" : 280, flexShrink: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 12 }}>Responses ({sessions.length})</div>
+            <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 12 }}>Responses ({sessions.length})</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {sessions.length === 0 && (
-                <div style={{ background: C.white, border: `1px dashed ${C.border}`, borderRadius: 8, padding: "24px", textAlign: "center" }}>
-                  <div style={{ fontSize: 13, color: C.body }}>No responses yet</div>
+                <div style={{ background: dk.card, border: `1px dashed ${dk.border}`, borderRadius: 8, padding: "24px", textAlign: "center" }}>
+                  <div style={{ fontSize: 13, color: dk.muted }}>No responses yet</div>
                 </div>
               )}
               {sessions.map((s, i) => {
@@ -289,9 +295,9 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 const name = s.respondent?.name || `Respondent ${i + 1}`;
                 return (
                   <div key={s.id} onClick={() => setSelectedSession(selectedSession?.id === s.id ? null : s)}
-                    style={{ background: C.white, border: `1px solid ${selectedSession?.id === s.id ? C.purple : C.border}`, borderRadius: 10, padding: "12px 14px", cursor: "pointer", boxShadow: S.ambient }}>
+                    style={{ background: dk.card, border: `1px solid ${selectedSession?.id === s.id ? C.purple : dk.border}`, borderRadius: 10, padding: "12px 14px", cursor: "pointer" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                      <span style={{ fontSize: 13, fontWeight: 400, color: C.navy }}>{name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 400, color: dk.text }}>{name}</span>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         {allResponses.some(r => r.session_id === s.id && r.audio_url) && (
                           <svg width={10} height={10} viewBox="0 0 16 16" fill={C.purple} title="Has voice recording"><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M4.5 8a.5.5 0 0 0-1 0 4.5 4.5 0 0 0 9 0 .5.5 0 0 0-1 0A3.5 3.5 0 0 1 8 11.5 3.5 3.5 0 0 1 4.5 8z"/></svg>
@@ -299,7 +305,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                         <Badge variant={s.status === "completed" ? "success" : "warning"}>{s.status === "completed" ? "Completed" : "In progress"}</Badge>
                       </div>
                     </div>
-                    <div style={{ fontSize: 11, color: C.body }}>{duration} · {allResponses.filter(r => r.session_id === s.id).length} responses</div>
+                    <div style={{ fontSize: 11, color: dk.muted }}>{duration} · {allResponses.filter(r => r.session_id === s.id).length} responses</div>
                   </div>
                 );
               })}
@@ -312,21 +318,21 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
           {/* Session detail */}
           {selectedSession && (
-            <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 22px", marginBottom: 24, boxShadow: S.standard }}>
+            <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "20px 22px", marginBottom: 24 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 400, color: C.navy }}>
+                  <div style={{ fontSize: 14, fontWeight: 400, color: dk.text }}>
                     {selectedSession.respondent?.name || "Anonymous"} — Response detail
                   </div>
-                  <div style={{ fontSize: 11, color: C.body, marginTop: 3 }}>
+                  <div style={{ fontSize: 11, color: dk.muted, marginTop: 3 }}>
                     🎙 {allResponses.filter(r => r.session_id === selectedSession.id && r.audio_url).length} voice · {allResponses.filter(r => r.session_id === selectedSession.id).length} responses
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <button onClick={() => setVoiceOnly(v => !v)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, border: `1px solid ${voiceOnly ? C.purple : C.border}`, background: voiceOnly ? C.purpleBg : "transparent", color: voiceOnly ? C.purple : C.body, cursor: "pointer", fontFamily: F }}>
+                  <button onClick={() => setVoiceOnly(v => !v)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, border: `1px solid ${voiceOnly ? C.purple : dk.border}`, background: voiceOnly ? C.purpleBg : "transparent", color: voiceOnly ? C.purple : dk.muted, cursor: "pointer", fontFamily: F }}>
                     {voiceOnly ? "Show all" : "🎙 Voice only"}
                   </button>
-                  <button onClick={() => setSelectedSession(null)} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 18 }}>✕</button>
+                  <button onClick={() => setSelectedSession(null)} style={{ background: "none", border: "none", color: dk.muted, cursor: "pointer", fontSize: 18 }}>✕</button>
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -334,13 +340,13 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                   const r = allResponses.find(r => r.session_id === selectedSession.id && r.question_id === q.id);
                   const isVoiceWithAudio = q.type === "voice" && r?.audio_url;
                   return (
-                    <div key={q.id} style={{ borderBottom: `1px solid ${C.border}`, paddingBottom: 12, background: isVoiceWithAudio ? "rgba(83,58,253,0.03)" : "transparent", borderRadius: isVoiceWithAudio ? 8 : 0, padding: "10px 0" }}>
-                      <div style={{ fontSize: 12, color: C.body, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+                    <div key={q.id} style={{ borderBottom: `1px solid ${dk.border}`, paddingBottom: 12, background: isVoiceWithAudio ? "rgba(83,58,253,0.08)" : "transparent", borderRadius: isVoiceWithAudio ? 8 : 0, padding: "10px 0" }}>
+                      <div style={{ fontSize: 12, color: dk.muted, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
                         {isVoiceWithAudio && <svg width={10} height={10} viewBox="0 0 16 16" fill={C.purple}><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/></svg>}
                         Q{questions.indexOf(q) + 1} · {q.content}
                       </div>
                       {!r ? (
-                        <span style={{ fontSize: 12, color: C.body, fontStyle: "italic" }}>No response</span>
+                        <span style={{ fontSize: 12, color: dk.muted, fontStyle: "italic" }}>No response</span>
                       ) : q.type === "voice" ? (
                         <VoicePlayer audioUrl={r.audio_url} transcript={r.transcript} />
                       ) : q.type === "multiple_choice" ? (
@@ -354,7 +360,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                           {Array.from({ length: (q.options?.max ?? 5) - (q.options?.min ?? 1) + 1 }, (_, k) => k + (q.options?.min ?? 1)).map(n => {
                             const sel = n === Number(r.value);
                             return (
-                              <div key={n} style={{ width: 32, height: 32, borderRadius: 6, border: `2px solid ${sel ? C.purple : C.border}`, background: sel ? C.purple : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: sel ? C.white : C.body }}>
+                              <div key={n} style={{ width: 32, height: 32, borderRadius: 6, border: `2px solid ${sel ? C.purple : dk.border}`, background: sel ? C.purple : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: sel ? "#fff" : dk.muted }}>
                                 {n}
                               </div>
                             );
@@ -370,10 +376,10 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
           {/* Report section */}
           {!report && (
-            <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "32px", textAlign: "center", boxShadow: S.standard }}>
+            <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "32px", textAlign: "center" }}>
               <div style={{ fontSize: 32, marginBottom: 16 }}>✦</div>
-              <div style={{ fontSize: 18, fontWeight: 400, color: C.navy, marginBottom: 8 }}>Generate AI Report</div>
-              <div style={{ fontSize: 13, color: C.body, marginBottom: 24, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 18, fontWeight: 400, color: dk.text, marginBottom: 8 }}>Generate AI Report</div>
+              <div style={{ fontSize: 13, color: dk.muted, marginBottom: 24, lineHeight: 1.6 }}>
                 GPT-4o will analyze {completedSessions.length} completed response{completedSessions.length !== 1 ? "s" : ""} and<br />
                 automatically identify themes, sentiment, and insights.
               </div>
@@ -385,7 +391,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                 </Btn>
               )}
               {completedSessions.length === 0 && !generating && (
-                <div style={{ fontSize: 12, color: C.body, marginTop: 12 }}>You need at least one completed response to generate a report</div>
+                <div style={{ fontSize: 12, color: dk.muted, marginTop: 12 }}>You need at least one completed response to generate a report</div>
               )}
             </div>
           )}
@@ -394,16 +400,16 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
             <div>
               {/* Stats */}
               {report.content.stats && (
-                <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24, boxShadow: S.ambient }}>
-                  <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 14 }}>Response stats</div>
+                <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
+                  <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 14 }}>Response stats</div>
                   <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
                     <div>
-                      <div style={{ fontSize: 11, color: C.body, marginBottom: 4 }}>Total responses</div>
-                      <div style={{ fontSize: 20, fontWeight: 600, color: C.navy }}>{report.content.stats.total_responses}</div>
+                      <div style={{ fontSize: 11, color: dk.muted, marginBottom: 4 }}>Total responses</div>
+                      <div style={{ fontSize: 20, fontWeight: 600, color: dk.text }}>{report.content.stats.total_responses}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: 11, color: C.body, marginBottom: 4 }}>Avg. completion time</div>
-                      <div style={{ fontSize: 20, fontWeight: 600, color: C.navy }}>{report.content.stats.avg_completion_time}</div>
+                      <div style={{ fontSize: 11, color: dk.muted, marginBottom: 4 }}>Avg. completion time</div>
+                      <div style={{ fontSize: 20, fontWeight: 600, color: dk.text }}>{report.content.stats.avg_completion_time}</div>
                     </div>
                   </div>
                 </div>
@@ -411,26 +417,26 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
               {/* Rating distributions */}
               {ratingDists.length > 0 && (
-                <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24, boxShadow: S.ambient }}>
-                  <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 16 }}>Rating distribution</div>
+                <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
+                  <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 16 }}>Rating distribution</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                     {ratingDists.map(({ question: q, dist, min, max, maxCount, avg, total }) => (
                       <div key={q.id}>
-                        <div style={{ fontSize: 12, color: C.body, marginBottom: 12, lineHeight: 1.5 }}>{q.content}</div>
+                        <div style={{ fontSize: 12, color: dk.muted, marginBottom: 12, lineHeight: 1.5 }}>{q.content}</div>
                         <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 60 }}>
                           {Array.from({ length: max - min + 1 }, (_, k) => k + min).map(n => {
                             const count = dist[n] ?? 0;
                             const barH = Math.round(count / maxCount * 44);
                             return (
                               <div key={n} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                                <div style={{ fontSize: 10, color: count > 0 ? C.navy : "transparent" }}>{count}</div>
-                                <div style={{ width: "100%", height: barH || 2, background: count > 0 ? C.purple : C.border, borderRadius: "2px 2px 0 0", opacity: count > 0 ? 0.35 + (count / maxCount) * 0.65 : 1 }} />
-                                <div style={{ fontSize: 11, color: C.body }}>{n}</div>
+                                <div style={{ fontSize: 10, color: count > 0 ? dk.text : "transparent" }}>{count}</div>
+                                <div style={{ width: "100%", height: barH || 2, background: count > 0 ? C.purple : dk.border, borderRadius: "2px 2px 0 0", opacity: count > 0 ? 0.35 + (count / maxCount) * 0.65 : 1 }} />
+                                <div style={{ fontSize: 11, color: dk.muted }}>{n}</div>
                               </div>
                             );
                           })}
                         </div>
-                        <div style={{ fontSize: 11, color: C.body, marginTop: 8 }}>Avg. {avg} · {total} responses</div>
+                        <div style={{ fontSize: 11, color: dk.muted, marginTop: 8 }}>Avg. {avg} · {total} responses</div>
                       </div>
                     ))}
                   </div>
@@ -438,34 +444,34 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
               )}
 
               {/* Summary */}
-              <div id="section-summary" style={{ background: `linear-gradient(135deg,rgba(83,58,253,0.05),rgba(232,113,10,0.04))`, border: `1px solid rgba(83,58,253,0.1)`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
+              <div id="section-summary" style={{ background: `linear-gradient(135deg,rgba(83,58,253,0.12),rgba(83,58,253,0.05))`, border: `1px solid rgba(83,58,253,0.2)`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
                 <div style={{ fontSize: 12, fontWeight: 400, color: C.purple, marginBottom: 10 }}>✦ AI Summary</div>
-                <p style={{ margin: 0, fontSize: 15, color: C.navy, lineHeight: 1.7 }}>{report.content.summary}</p>
+                <p style={{ margin: 0, fontSize: 15, color: dk.text, lineHeight: 1.7 }}>{report.content.summary}</p>
               </div>
 
               {/* Themes */}
               {report.content.themes?.length > 0 && (
                 <div id="section-themes" style={{ marginBottom: 24 }}>
-                  <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 14 }}>Discovered themes</div>
+                  <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 14 }}>Discovered themes</div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14 }}>
                     {(() => {
                       const maxCount = Math.max(...report.content.themes.map(t => t.count ?? 0), 1);
                       return report.content.themes.map((t, i) => (
-                        <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: 18, boxShadow: S.ambient }}>
+                        <div key={i} style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 8, padding: 18 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                            <Badge variant={t.sentiment === "positive" ? "success" : t.sentiment === "negative" ? "negative" : "neutral"}>
+                            <Badge variant={t.sentiment === "positive" ? "success" : t.sentiment === "negative" ? "negative" : "dark"}>
                               {t.sentiment === "positive" ? "Positive" : t.sentiment === "negative" ? "Negative" : "Neutral"}
                             </Badge>
                           </div>
-                          <div style={{ fontSize: 15, fontWeight: 400, color: C.navy, marginBottom: 8 }}>{t.label}</div>
+                          <div style={{ fontSize: 15, fontWeight: 400, color: dk.text, marginBottom: 8 }}>{t.label}</div>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                            <div style={{ flex: 1, height: 4, borderRadius: 2, background: C.border, overflow: "hidden" }}>
+                            <div style={{ flex: 1, height: 4, borderRadius: 2, background: dk.border, overflow: "hidden" }}>
                               <div style={{ width: `${Math.round((t.count ?? 0) / maxCount * 100)}%`, height: "100%", background: t.sentiment === "positive" ? C.success : t.sentiment === "negative" ? C.ruby : C.purple, borderRadius: 2 }} />
                             </div>
-                            <span style={{ fontSize: 11, color: C.body, whiteSpace: "nowrap" }}>{t.count}x</span>
+                            <span style={{ fontSize: 11, color: dk.muted, whiteSpace: "nowrap" }}>{t.count}x</span>
                           </div>
                           {t.quotes?.[0] && (
-                            <div style={{ fontSize: 12, color: C.body, fontStyle: "italic", lineHeight: 1.5, borderLeft: `2px solid ${C.border}`, paddingLeft: 8 }}>"{t.quotes[0]}"</div>
+                            <div style={{ fontSize: 12, color: dk.muted, fontStyle: "italic", lineHeight: 1.5, borderLeft: `2px solid ${dk.border}`, paddingLeft: 8 }}>"{t.quotes[0]}"</div>
                           )}
                         </div>
                       ));
@@ -476,15 +482,15 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
               {/* Recommendations */}
               {report.content.recommendations?.length > 0 && (
-                <div id="section-recommendations" style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: "20px 22px", boxShadow: S.ambient, marginBottom: 24 }}>
-                  <div style={{ fontSize: 13, fontWeight: 400, color: C.label, marginBottom: 14 }}>Recommendations</div>
+                <div id="section-recommendations" style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
+                  <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 14 }}>Recommendations</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {report.content.recommendations.map((r, i) => (
                       <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                         <div style={{ width: 20, height: 20, borderRadius: "50%", background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           {Ic.CheckCircle({ s: 12, c: C.purple })}
                         </div>
-                        <span style={{ fontSize: 13, color: C.navy, lineHeight: 1.6 }}>{r}</span>
+                        <span style={{ fontSize: 13, color: dk.text, lineHeight: 1.6 }}>{r}</span>
                       </div>
                     ))}
                   </div>
@@ -506,7 +512,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
           )}
 
           {report?.status === "failed" && (
-            <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "24px", textAlign: "center" }}>
+            <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "24px", textAlign: "center" }}>
               <div style={{ fontSize: 14, color: C.ruby, marginBottom: 12 }}>Report generation failed</div>
               <Btn size="sm" onClick={handleGenerateReport} disabled={generating}>Try again</Btn>
             </div>
@@ -522,13 +528,13 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
 function MetricCard({ label, value, icon }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}`, minWidth: 120 }}>
-      <div style={{ width: 32, height: 32, borderRadius: 8, background: C.white, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "#1a2035", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)", minWidth: 120 }}>
+      <div style={{ width: 32, height: 32, borderRadius: 8, background: "#141927", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         {icon}
       </div>
       <div>
-        <div style={{ fontSize: 10, color: C.body, marginBottom: 2 }}>{label}</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>{value}</div>
+        <div style={{ fontSize: 10, color: "rgba(180,185,215,0.65)", marginBottom: 2 }}>{label}</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#e8eaf4" }}>{value}</div>
       </div>
     </div>
   );
