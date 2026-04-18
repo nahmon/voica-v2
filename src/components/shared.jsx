@@ -191,8 +191,9 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
 
   return (
     <>
-      <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px", willChange: "transform" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "stretch", height: 56 }}>
+      <nav style={{ position: "sticky", top: 0, zIndex: 100, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
+        <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", pointerEvents: "none" }} />
+        <div style={{ position: "relative", maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "stretch", height: 56 }}>
           <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go(homeTarget)}>
             <LogoMark dark={false} />
           </div>
