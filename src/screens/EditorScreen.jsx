@@ -477,10 +477,6 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             </div>
           )}
         </div>
-        {/* Logout — utility, rightmost, minimal */}
-        {logout && (
-          <button onClick={logout} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 11, color: C.body, fontFamily: F, padding: "4px 6px", opacity: 0.6 }}>로그아웃</button>
-        )}
       </div>
     </div>
   );
@@ -677,8 +673,15 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         </div>
 
         {/* Right: settings */}
-        <div style={{ width: 260, borderLeft: `1px solid ${C.border}`, background: C.white, padding: 18, overflowY: "auto", flexShrink: 0 }}>
-          <QuestionSettings q={q} idx={selectedIdx} updateQ={updateQ} typeLabel={typeLabel} />
+        <div style={{ width: 260, borderLeft: `1px solid ${C.border}`, background: C.white, padding: 18, overflowY: "auto", flexShrink: 0, display: "flex", flexDirection: "column" }}>
+          <div style={{ flex: 1 }}>
+            <QuestionSettings q={q} idx={selectedIdx} updateQ={updateQ} typeLabel={typeLabel} />
+          </div>
+          {logout && (
+            <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 12, marginTop: 12 }}>
+              <button onClick={logout} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: C.body, fontFamily: F, padding: 0, opacity: 0.55, width: "100%", textAlign: "left" }}>로그아웃</button>
+            </div>
+          )}
         </div>
 
       </div>
