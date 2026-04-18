@@ -415,11 +415,6 @@ export default function LandingScreen({ go, user, logout }) {
       {/* ── Final CTA ── */}
       <FinalCtaSection go={go} isMobile={isMobile} />
 
-      <div style={{ background: "#f8fafc", borderTop: `1px solid ${C.border}`, padding: "20px 24px", textAlign: "center" }}>
-        <p style={{ margin: 0, fontSize: 11, color: C.body, lineHeight: 1.65, maxWidth: 720, marginInline: "auto" }}>
-          ⚠️ 본 서비스는 AI 인터뷰 및 리서치 분석을 위한 참고 자료를 제공하며, 매수·매도 또는 투자에 관한 권유·추천이 아닙니다. 제공되는 인사이트 및 분석 결과는 정보 제공 목적에 한하며, 이를 근거로 한 의사결정에 대해 Voice Survey는 법적·재정적 책임을 지지 않습니다.
-        </p>
-      </div>
       <Footer go={go} />
     </div>
   );
