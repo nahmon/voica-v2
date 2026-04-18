@@ -21,7 +21,22 @@ import FAQScreen from "./screens/FAQScreen.jsx";
 import TermsScreen from "./screens/TermsScreen.jsx";
 import PrivacyScreen from "./screens/PrivacyScreen.jsx";
 import AboutScreen from "./screens/AboutScreen.jsx";
-import { ToastProvider } from "./components/shared.jsx";
+import { ToastProvider, useToast } from "./components/shared.jsx";
+
+function OAuthErrorHandler() {
+  const { showToast } = useToast();
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get("error");
+    if (!err) return;
+    const code = params.get("error_code") ?? "";
+    let msg = "로그인 중 오류가 발생했어요. 다시 시도해 주세요.";
+    if (code === "bad_oauth_state") msg = "로그인 세션이 만료됐어요. 다시 시도해 주세요.";
+    showToast(msg, "error");
+    window.history.replaceState({}, "", window.location.pathname);
+  }, []);
+  return null;
+}
 
 export default function Voica() {
   const [screen, setScreen] = useState("landing");
@@ -68,6 +83,7 @@ export default function Voica() {
 
   return (
     <ToastProvider>
+    <OAuthErrorHandler />
     <div style={{ fontFamily: F, fontFeatureSettings: '"ss01"', color: C.navy }}>
       <style>{`@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}.cursor-blink{display:inline-block;width:10px;height:2px;background:${C.purple};margin-left:4px;vertical-align:0.1em;border-radius:0;animation:blink 0.8s step-end infinite;}`}</style>
       <style>{`
