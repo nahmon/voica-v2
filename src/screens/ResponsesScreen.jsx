@@ -152,7 +152,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
         const [{ data: qs }, { data: iv }, { data: ss }] = await Promise.all([
           supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
           supabase.from("interviews").select("*").eq("id", interviewId).single(),
-          supabase.from("sessions").select("*").eq("interview_id", interviewId).order("started_at", { ascending: false }),
+          supabase.from("sessions").select("*, responses(*)").eq("interview_id", interviewId).order("started_at", { ascending: false }),
         ]);
         setQuestions(qs ?? []);
         setInterview(iv ?? null);
@@ -171,14 +171,8 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           return new Date(b.started_at) - new Date(a.started_at);
         });
         setSessions(sorted);
-
-        if (sorted.length > 0) {
-          const sessionIds = sorted.map(s => s.id);
-          const { data: resp } = await supabase
-            .from("responses").select("*").in("session_id", sessionIds);
-          setAllResponses(resp ?? []);
-          if (window.innerWidth >= 768) setSelectedSession(sorted[0]);
-        }
+        setAllResponses(sorted.flatMap(s => s.responses ?? []));
+        if (sorted.length > 0 && window.innerWidth >= 768) setSelectedSession(sorted[0]);
       } catch (e) {
         console.error("[ResponsesScreen load]", e);
       } finally {

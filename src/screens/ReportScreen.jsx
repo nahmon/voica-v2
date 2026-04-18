@@ -35,7 +35,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
         const [ivRes, sessRes, qsRes, repRes] = await Promise.all([
           supabase.from("interviews").select("id, title, status").eq("id", interviewId).single(),
           supabase.from("sessions")
-            .select("id, respondent, status, started_at, completed_at")
+            .select("id, respondent, status, started_at, completed_at, responses(*)")
             .eq("interview_id", interviewId)
             .order("started_at", { ascending: false }),
           supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
@@ -47,13 +47,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
         const ss = sessRes.data ?? [];
         setSessions(ss);
-
-        if (ss.length > 0) {
-          const sessionIds = ss.map(s => s.id);
-          const { data: resp } = await supabase
-            .from("responses").select("*").in("session_id", sessionIds);
-          setAllResponses(resp ?? []);
-        }
+        setAllResponses(ss.flatMap(s => s.responses ?? []));
       } catch (e) {
         console.error("[ReportScreen load]", e);
       } finally {
