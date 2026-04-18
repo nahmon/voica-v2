@@ -1,5 +1,27 @@
 import { useState, useEffect, useRef, createContext, useContext, useCallback } from "react";
 import { C, S, F, Ic } from "../lib/constants.jsx";
+
+function LogoMark({ size = 20, dark = false }) {
+  return (
+    <div style={{ display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
+      <div style={{
+        width: size, height: size, borderRadius: Math.round(size * 0.22),
+        background: C.purple,
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0,
+      }}>
+        <svg width={size * 0.52} height={size * 0.52} viewBox="0 0 11 11" fill="none">
+          <rect x="1" y="4" width="2" height="6" rx="1" fill="white" opacity="0.7"/>
+          <rect x="4.5" y="2" width="2" height="8" rx="1" fill="white"/>
+          <rect x="8" y="5" width="2" height="4" rx="1" fill="white" opacity="0.7"/>
+        </svg>
+      </div>
+      <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: "-0.02em", color: dark ? "rgba(255,255,255,0.9)" : C.navy, fontFamily: F }}>
+        voicesurvey
+      </span>
+    </div>
+  );
+}
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
 
@@ -172,7 +194,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
       <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "stretch", justifyContent: "space-between", height: 56, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go(homeTarget)}>
-            <img src="/logo-voice-survey.svg" alt="Voice Survey" style={{ height: 28 }} />
+            <LogoMark />
           </div>
           {!isMobile && (
             <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, transform: "translateX(-50%)", display: "flex", alignItems: "stretch" }}>
@@ -226,7 +248,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
           <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, backdropFilter: "blur(2px)" }} />
           <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 280, background: C.white, zIndex: 201, boxShadow: S.card, display: "flex", flexDirection: "column", fontFamily: F }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", height: 56, borderBottom: `1px solid rgba(0,0,0,0.08)` }}>
-              <img src="/logo-voice-survey.svg" alt="Voice Survey" style={{ height: 28 }} />
+              <LogoMark />
               <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: C.body, lineHeight: 1, padding: 10 }}>✕</button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "12px 0" }}>
@@ -678,7 +700,7 @@ export function Footer({ go }) {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: "flex-start", gap: 28, marginBottom: 28 }}>
           <div>
-            <img src="/logo-voice-survey-footer.svg" alt="Voice Survey" style={{ height: 28 }} />
+            <LogoMark dark />
             <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI interviews. AI analyzes.</div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
