@@ -191,9 +191,8 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
 
   return (
     <>
-      <nav style={{ position: "sticky", top: 0, zIndex: 100, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
-        <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", pointerEvents: "none" }} />
-        <div style={{ position: "relative", maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "stretch", height: 56 }}>
+      <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.97)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "stretch", height: 56 }}>
           <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go(homeTarget)}>
             <LogoMark dark={false} />
           </div>
@@ -232,7 +231,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             )}
             {(variant === "public" || variant === "sub") && !isMobile && (
               <>
-                <Btn variant="ghost" size="sm" style={{ border: "1px solid rgba(23,23,23,0.2)", borderRadius: 56 }} onClick={() => go("panel_entry")}>{isKo ? "패널리스트 참여" : "Join as Panelist"}</Btn>
+                <Btn variant="ghost" size="sm" style={{ border: "1px solid rgba(23,23,23,0.2)", borderRadius: 56 }} onClick={() => go("panel_entry")}>{isKo ? "인터뷰 패널 참여" : "Join as Panelist"}</Btn>
                 <Btn size="sm" onClick={() => go("advertiser_login")}>{isKo ? "로그인" : "Log In"}</Btn>
               </>
             )}
@@ -342,7 +341,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
               ) : (
                 <>
                   <Btn full size="md" onClick={() => { go("advertiser_login"); setMenuOpen(false); }}>{isKo ? "로그인 / 회원가입" : "Log In / Sign Up"}</Btn>
-                  <Btn full variant="ghost" size="md" onClick={() => { go("panel_entry"); setMenuOpen(false); }}>{isKo ? "패널리스트 참여" : "Join as Panelist"}</Btn>
+                  <Btn full variant="ghost" size="md" onClick={() => { go("panel_entry"); setMenuOpen(false); }}>{isKo ? "인터뷰 패널 참여" : "Join as Panelist"}</Btn>
                 </>
               )}
             </div>
