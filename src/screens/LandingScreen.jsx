@@ -91,8 +91,8 @@ const TRANSLATIONS = {
       fromInterview: { line1: "AI 인터뷰는 어떠셨나요?", line2: "AI로 수백 명과 인터뷰하세요" },
       subtitleDesktop: <>질문만 작성하면 AI가 수백 명의 패널리스트와 동시에 인터뷰를 진행합니다.<br />주제 분석, 감성 태깅, 인사이트 리포트까지 AI가 알아서 만들어줘요.</>,
       subtitleMobile: <>질문만 작성하면 AI가 나머지를 처리합니다.<br />분석, 감성, 리포트 모두 AI가 자동으로 처리해요.</>,
-      cta1: "연구자 / 비즈니스 →",
-      cta2: "패널리스트로 참여",
+      cta1: "인터뷰 만들기 →",
+      cta2: "패널로 참여하기",
       liveCounter: (n) => <><strong style={{ fontWeight: 600, color: C.purple }}>지금 {n}명</strong>이 인터뷰 중입니다</>,
     },
     stats: {
@@ -131,7 +131,7 @@ const TRANSLATIONS = {
       subtitleDesktop: <>신용카드 없이 바로 시작할 수 있어요.<br />첫 번째 인터뷰 프로젝트는 완전 무료예요.</>,
       subtitleMobile: "신용카드 불필요.",
       cta1: "리서치 시작하기 →",
-      cta2: "패널리스트로 참여",
+      cta2: "패널로 참여하기",
     },
   },
 };
