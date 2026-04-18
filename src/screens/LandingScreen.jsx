@@ -106,48 +106,54 @@ function BeforeAfterSection({ isMobile }) {
     { label: "Recruiting", before: "Agency dependent", after: "Matched in-platform" },
   ];
 
+  const darkBg = "#120e2e";
+  const rowBg = "rgba(255,255,255,0.05)";
+  const rowBorder = "rgba(255,255,255,0.08)";
+
   return (
     <FadeInSection>
-      <section style={{ background: "transparent", padding: isMobile ? "60px 20px" : "80px 24px" }}>
+      <section style={{ background: darkBg, padding: isMobile ? "60px 20px" : "80px 24px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           {/* header */}
           <div style={{ marginBottom: 40 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.body, marginBottom: 10 }}>Comparison</div>
-            <h2 style={{ fontSize: isMobile ? 24 : 36, fontWeight: 700, color: C.navy, margin: "0 0 10px", fontFamily: F }}>
-              Traditional flow vs. <span style={{ color: C.purple }}>voicesurvey</span>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(160,140,255,0.7)", marginBottom: 10 }}>Comparison</div>
+            <h2 style={{ fontSize: isMobile ? 24 : 36, fontWeight: 700, color: "#fff", margin: "0 0 10px", fontFamily: F }}>
+              Traditional flow vs. <span style={{ color: C.purpleLight }}>voicesurvey</span>
             </h2>
-            <p style={{ fontSize: 15, color: C.body, margin: 0 }}>Same research, at one-tenth the cost and ten times the sample.</p>
+            <p style={{ fontSize: 15, color: "rgba(200,190,255,0.6)", margin: 0 }}>Same research, at one-tenth the cost and ten times the sample.</p>
           </div>
 
           {/* metric cards */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
             {metrics.map(m => (
-              <div key={m.value} style={{ background: "#fff", border: `1px solid ${C.border}`, borderRadius: 12, padding: isMobile ? "20px 18px" : "28px 24px" }}>
-                <div style={{ fontSize: isMobile ? 36 : 48, fontWeight: 700, color: C.purple, lineHeight: 1, fontFamily: F }}>{m.value}</div>
-                <div style={{ fontSize: 14, color: C.body, marginTop: 10 }}>{m.label}</div>
+              <div key={m.value} style={{ background: "rgba(110,75,255,0.12)", border: "1px solid rgba(110,75,255,0.25)", borderRadius: 12, padding: isMobile ? "20px 18px" : "28px 24px" }}>
+                <div style={{ fontSize: isMobile ? 36 : 48, fontWeight: 700, color: C.purpleLight, lineHeight: 1, fontFamily: F }}>{m.value}</div>
+                <div style={{ fontSize: 14, color: "rgba(200,190,255,0.65)", marginTop: 10 }}>{m.label}</div>
               </div>
             ))}
           </div>
 
-          {/* comparison table */}
-          <div style={{ background: "#fff", border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
-            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "80px 1fr 28px 1fr" : "160px 1fr 36px 1fr", padding: "12px 20px", borderBottom: `1px solid ${C.border}`, background: "#fafbff", gap: 12, alignItems: "center" }}>
-              <div />
-              <div style={{ fontSize: 12, color: C.body, fontWeight: 500 }}>Traditional</div>
-              <div />
-              <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, display: "flex", alignItems: "center", gap: 6 }}>
-                voicesurvey
-                <span style={{ fontSize: 10, background: C.purpleBg, color: C.purple, padding: "2px 7px", borderRadius: 4 }}>Recommended</span>
-              </div>
+          {/* column headers */}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "80px 1fr 28px 1fr" : "160px 1fr 36px 1fr", padding: "10px 20px", marginBottom: 8, gap: 12, alignItems: "center" }}>
+            <div />
+            <div style={{ fontSize: 11, color: "rgba(200,190,255,0.45)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em" }}>Traditional</div>
+            <div />
+            <div style={{ fontSize: 11, fontWeight: 700, color: C.purpleLight, textTransform: "uppercase", letterSpacing: "0.06em", display: "flex", alignItems: "center", gap: 6 }}>
+              voicesurvey
+              <span style={{ fontSize: 10, background: "rgba(110,75,255,0.25)", color: C.purpleLight, padding: "2px 7px", borderRadius: 4, textTransform: "none", letterSpacing: 0 }}>Recommended</span>
             </div>
-            {rows.map((row, i) => (
-              <div key={row.label} style={{ display: "grid", gridTemplateColumns: isMobile ? "80px 1fr 28px 1fr" : "160px 1fr 36px 1fr", padding: isMobile ? "14px 20px" : "16px 20px", borderBottom: i < rows.length - 1 ? `1px solid ${C.border}` : "none", alignItems: "center", gap: 12 }}>
-                <div style={{ fontSize: 13, color: C.body }}>{row.label}</div>
-                <div style={{ fontSize: 13, color: C.body, opacity: 0.55, textDecoration: "line-through" }}>{row.before}</div>
-                <div style={{ width: 26, height: 26, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.purpleLight}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontSize: 11, color: C.purple }}>→</span>
+          </div>
+
+          {/* comparison rows — each as a separate card */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {rows.map((row) => (
+              <div key={row.label} style={{ display: "grid", gridTemplateColumns: isMobile ? "80px 1fr 28px 1fr" : "160px 1fr 36px 1fr", padding: isMobile ? "14px 20px" : "16px 20px", background: rowBg, border: `1px solid ${rowBorder}`, borderRadius: 10, alignItems: "center", gap: 12 }}>
+                <div style={{ fontSize: 13, color: "rgba(200,190,255,0.55)" }}>{row.label}</div>
+                <div style={{ fontSize: 13, color: "rgba(200,190,255,0.35)", textDecoration: "line-through" }}>{row.before}</div>
+                <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(110,75,255,0.2)", border: "1px solid rgba(110,75,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: 11, color: C.purpleLight }}>→</span>
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{row.after}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{row.after}</div>
               </div>
             ))}
           </div>
