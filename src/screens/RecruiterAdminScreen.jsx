@@ -48,7 +48,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
   const counts = filters.slice(1).reduce((acc, f) => ({ ...acc, [f]: PANEL_APPLICANTS.filter(p => p.status === statusMap[f]).length }), {});
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
+    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
       <div style={{ padding: "10px 24px", background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← Dashboard</Btn>

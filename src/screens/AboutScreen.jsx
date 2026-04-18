@@ -9,7 +9,7 @@ export default function AboutScreen({ go, user, logout }) {
   const isKo = lang === "ko";
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
+    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <GlobalNav go={go} variant={user ? "app" : "public"} user={user} logout={logout} lang={lang} />
 
       {/* Hero */}
@@ -27,7 +27,7 @@ export default function AboutScreen({ go, user, logout }) {
         </div>
       </div>
 
-      <main style={{ maxWidth: 800, margin: "0 auto", padding: isMobile ? "40px 20px 60px" : "64px 24px 80px" }}>
+      <main style={{ maxWidth: 800, margin: "0 auto", padding: isMobile ? "40px 20px 60px" : "64px 24px 80px", flex: 1 }}>
 
         {/* Mission */}
         <section style={{ marginBottom: 64 }}>

@@ -74,7 +74,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
   }
 
   return (
-    <div style={{ background: "#f5f6fa", minHeight: "100vh", fontFamily: F }}>
+    <div style={{ background: "#f5f6fa", minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <GlobalNav go={go} activeTab="panel_board" variant={user?.user_metadata?.role === "researcher" ? "app" : "panel"} user={user} logout={logout} lang={lang} />
 
       {/* Hero */}

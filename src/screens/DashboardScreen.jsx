@@ -127,7 +127,7 @@ export default function DashboardScreen({ go, user, logout }) {
   );
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
+    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <style>{`
         @keyframes cardLift {
           to { transform: translateY(-3px); }
@@ -142,7 +142,7 @@ export default function DashboardScreen({ go, user, logout }) {
       `}</style>
       <GlobalNav go={go} activeTab="dashboard" variant="app" logout={logout} isMobile={isMobile} user={user} lang={lang} />
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
+      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px", flex: 1, width: "100%" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 16 }}>
           <div>
             <div style={{ fontSize: 26, fontWeight: 500, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.12, marginBottom: 4, fontFeatureSettings: '"ss01"' }}>{isKo ? `안녕하세요, ${userName} 👋` : `Hello, ${userName} 👋`}</div>

@@ -73,7 +73,7 @@ export default function PricingScreen({ go, user, logout }) {
         </p>
       </div>
 
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 24px 80px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 24px 80px", flex: 1 }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 36 }}>
           <div style={{ display: "inline-flex", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 3, gap: 2 }}>
             {[["monthly", isKo ? "월간" : "Monthly"], ["yearly", isKo ? "연간" : "Annually"]].map(([val, label]) => (

@@ -8,9 +8,9 @@ export default function PrivacyScreen({ go, user, logout }) {
   const [lang, setLang] = useState("ko");
   const isKo = lang === "ko";
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
+    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <GlobalNav go={go} variant={user ? "app" : "sub"} user={user} logout={logout} lang={lang} />
-      <main style={{ maxWidth: 800, margin: "0 auto", padding: "48px 24px 80px" }}>
+      <main style={{ maxWidth: 800, margin: "0 auto", padding: "48px 24px 80px", flex: 1 }}>
         <div style={{ marginBottom: 32 }}>
           <Btn variant="ghost" size="sm" onClick={() => go(user ? "dashboard" : "landing")}>{isKo ? "← 뒤로" : "← Back"}</Btn>
         </div>

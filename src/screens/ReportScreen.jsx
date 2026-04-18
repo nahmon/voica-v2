@@ -185,7 +185,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   const hasReport = report?.status === "completed" && report.content;
 
   return (
-    <div style={{ background: dk.bg, minHeight: "100vh", fontFamily: F }}>
+    <div style={{ background: dk.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse-step { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
