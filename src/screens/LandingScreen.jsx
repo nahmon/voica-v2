@@ -562,7 +562,7 @@ export default function LandingScreen({ go, user, logout }) {
               </div>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.25)", fontSize: 12, fontWeight: 600, color: C.successText }}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
-                live
+                {lang === "ko" ? "실시간" : "live"}
               </span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 0 }}>
