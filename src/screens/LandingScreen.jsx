@@ -26,6 +26,116 @@ const GLOBAL_STYLES = `
 @keyframes typing-dot { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-4px);opacity:1} }
 `;
 
+/* ── Translations ── */
+const TRANSLATIONS = {
+  en: {
+    badge: "✦ AI interviews. AI analyzes. You decide.",
+    hero: {
+      messages: [
+        { line1: "Slow, expensive research?", line2: "Interview hundreds with AI" },
+        { line1: "Hear from your customers,", line2: "accurately\u00A0and\u00A0fast" },
+      ],
+      fromInterview: { line1: "How was your AI interview?", line2: "Interview hundreds with AI" },
+      subtitleDesktop: <>Design your questions and AI conducts live voice interviews with hundreds of panelists at once.<br />Theme analysis, sentiment tagging, and insight reports are generated automatically.</>,
+      subtitleMobile: <>Just write your questions — AI handles the rest.<br />Analysis, sentiment, and reports, fully automated.</>,
+      cta1: "Researcher / Business →",
+      cta2: "Join as Panelist",
+      liveCounter: (n) => <><strong style={{ fontWeight: 600, color: C.purple }}>{n} people</strong> are in an interview right now</>,
+    },
+    stats: {
+      label: "Live Numbers",
+      title: "What's happening on the platform right now",
+      items: [
+        { end: 12400, suffix: "+", label: "Registered panelists" },
+        { end: 4200, suffix: "", label: "Interviews completed this month" },
+        { end: 94, suffix: "%", label: "AI analysis accuracy" },
+        { end: 8, suffix: " min", label: "Average interview length" },
+      ],
+    },
+    comparison: {
+      label: "Comparison",
+      title: (purpleLight) => <>Traditional flow vs. <span style={{ color: purpleLight }}>voicesurvey</span></>,
+      subtitle: "Same research — fifty times the sample, at one-fortieth the cost.",
+      metrics: [
+        { value: "50×", label: "larger sample" },
+        { value: "1/40", label: "the cost" },
+        { value: "×144", label: "faster to launch" },
+      ],
+      rows: [
+        { label: "Timeline", before: "~2 weeks", after: "10 minutes to launch" },
+        { label: "Cost", before: "$2,000+", after: "$49" },
+        { label: "Sample", before: "10 participants", after: "500 parallel" },
+        { label: "Analysis", before: "Manual transcription", after: "Automated, by-theme" },
+        { label: "Recruiting", before: "Agency dependent", after: "Matched in-platform" },
+      ],
+      headerTraditional: "Traditional",
+      headerVS: "voicesurvey",
+      recommended: "Recommended",
+    },
+    cta: {
+      badge: "Start today",
+      title: "Get started for free",
+      subtitleDesktop: <>No credit card needed — start right away.<br />Your first interview project is completely free.</>,
+      subtitleMobile: "No credit card required.",
+      cta1: "Start as researcher →",
+      cta2: "Join as panelist",
+    },
+  },
+  ko: {
+    badge: "✦ AI가 인터뷰하고. AI가 분석합니다.",
+    hero: {
+      messages: [
+        { line1: "비싸고 오래 걸리는 사용자 조사,", line2: "AI로 수백 명을 한 번에" },
+        { line0: "고객의 목소리를", line1: "직접 들으세요,", line2: "정확하고\u00A0빠르게" },
+      ],
+      fromInterview: { line1: "AI 인터뷰는 어떠셨나요?", line2: "AI로 수백 명과 인터뷰하세요" },
+      subtitleDesktop: <>질문만 작성하면 AI가 수백 명의 패널리스트와 동시에 인터뷰를 진행합니다.<br />주제 분석, 감성 태깅, 인사이트 리포트가 자동으로 생성됩니다.</>,
+      subtitleMobile: <>질문만 작성하면 AI가 나머지를 처리합니다.<br />분석, 감성, 리포트 모두 자동화됩니다.</>,
+      cta1: "연구자 / 비즈니스 →",
+      cta2: "패널리스트로 참여",
+      liveCounter: (n) => <><strong style={{ fontWeight: 600, color: C.purple }}>지금 {n}명</strong>이 인터뷰 중입니다</>,
+    },
+    stats: {
+      label: "실시간 현황",
+      title: "지금 이 순간 플랫폼에서 일어나는 일",
+      items: [
+        { end: 12400, suffix: "+", label: "등록된 패널리스트" },
+        { end: 4200, suffix: "", label: "이번 달 완료된 인터뷰" },
+        { end: 94, suffix: "%", label: "AI 분석 정확도" },
+        { end: 8, suffix: " min", label: "평균 인터뷰 시간" },
+      ],
+    },
+    comparison: {
+      label: "비교",
+      title: (purpleLight) => <>기존 방식 vs. <span style={{ color: purpleLight }}>voicesurvey</span></>,
+      subtitle: "같은 조사를, 50배 더 많은 표본으로, 40분의 1 비용으로.",
+      metrics: [
+        { value: "50×", label: "더 큰 표본" },
+        { value: "1/40", label: "비용 절감" },
+        { value: "×144", label: "더 빠른 출시" },
+      ],
+      rows: [
+        { label: "기간", before: "약 2주", after: "10분 안에 시작" },
+        { label: "비용", before: "₩2,600,000+", after: "₩65,000" },
+        { label: "표본", before: "10명", after: "500명 동시" },
+        { label: "분석", before: "직접 전사", after: "자동화, 주제별" },
+        { label: "모집", before: "대행사 의존", after: "플랫폼 내 매칭" },
+      ],
+      headerTraditional: "기존 방식",
+      headerVS: "voicesurvey",
+      recommended: "추천",
+    },
+    cta: {
+      badge: "지금 시작하기",
+      title: "무료로 시작하세요",
+      subtitleDesktop: <>신용카드 없이 바로 시작할 수 있습니다.<br />첫 번째 인터뷰 프로젝트는 완전 무료입니다.</>,
+      subtitleMobile: "신용카드 불필요.",
+      cta1: "연구자로 시작하기 →",
+      cta2: "패널리스트로 참여",
+    },
+  },
+};
+
 /* ── Fade-in-on-scroll wrapper (local, no shared.jsx changes) ── */
 function FadeInSection({ children, delay = 0 }) {
   const ref = useRef(null);
@@ -50,7 +160,7 @@ function FadeInSection({ children, delay = 0 }) {
 }
 
 /* ── CounterStat (unchanged) ── */
-function CounterStat({ end, suffix, label, delay, color, labelColor }) {
+function CounterStat({ end, suffix, label, delay = 0, color, labelColor }) {
   const [val, setVal] = useState(0);
   const [visible, setVisible] = useState(false);
   const ref = useRef(null);
@@ -101,10 +211,17 @@ const CHAT_CONVOS = [
   { q: "How many user interviews do you run per quarter?", a: "Maybe 3 or 4. I wish it were more, but it's just too slow and expensive." },
   { q: "What would faster research unlock for your team?", a: "We'd ship with way more confidence. No more guessing what users actually want." },
 ];
+const CHAT_CONVOS_KO = [
+  { q: "지금 리서치에서 가장 부담스러운 부분이 어디인가요?", a: "솔직히 말하면 섭외요. 10명 찾는 데 2주 걸리는데, 그때쯤엔 이미 질문 자체가 바뀌어 있어요." },
+  { q: "분기에 사용자 인터뷰를 몇 번이나 진행하시나요?", a: "3~4번 정도요. 더 하고 싶은데 너무 느리고 비용도 많이 들어서요." },
+  { q: "리서치가 빨라지면 팀에서 뭘 가장 먼저 바꾸고 싶으세요?", a: "훨씬 자신감 있게 출시할 수 있을 것 같아요. 유저가 뭘 원하는지 더 이상 추측하지 않아도 되니까요." },
+];
 
-function AnimatedChatMockup() {
+function AnimatedChatMockup({ lang = "en" }) {
   const [convoIdx, setConvoIdx] = useState(0);
   const [phase, setPhase] = useState("typing"); // typing → question → recording → response
+  const isKo = lang === "ko";
+  const convos = isKo ? CHAT_CONVOS_KO : CHAT_CONVOS;
 
   useEffect(() => {
     const timers = [];
@@ -113,12 +230,12 @@ function AnimatedChatMockup() {
     else if (phase === "question") { advance(2000, "recording"); }
     else if (phase === "recording") { advance(2200, "response"); }
     else if (phase === "response") {
-      advance(2800, "typing", () => { setConvoIdx(i => (i + 1) % CHAT_CONVOS.length); });
+      advance(2800, "typing", () => { setConvoIdx(i => (i + 1) % convos.length); });
     }
     return () => timers.forEach(clearTimeout);
   }, [phase]);
 
-  const convo = CHAT_CONVOS[convoIdx];
+  const convo = convos[convoIdx];
   const isTyping = phase === "typing";
   const isRecording = phase === "recording";
   const showResponse = phase === "response";
@@ -129,21 +246,22 @@ function AnimatedChatMockup() {
       borderRadius: 16, border: `1px solid ${C.border}`,
       boxShadow: `0 24px 64px -12px rgba(110,75,255,0.18), 0 4px 16px -4px rgba(0,0,0,0.08)`,
       overflow: "hidden", fontFamily: F,
+      display: "flex", flexDirection: "column",
     }}>
       {/* Header */}
-      <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fafbff" }}>
+      <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fafbff", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 12, color: C.body, fontWeight: 500 }}>interview / vs-b2n</span>
-          <span style={{ fontSize: 11, color: C.body }}>· Q{convoIdx + 1} of {CHAT_CONVOS.length}</span>
+          <span style={{ fontSize: 11, color: C.body }}>· Q{convoIdx + 1} {isKo ? "/ " : "of "}{convos.length}</span>
         </div>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, color: C.successText, fontWeight: 600 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
-          live
+          {isKo ? "라이브" : "live"}
         </span>
       </div>
 
-      {/* Chat area */}
-      <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 14, height: 240, position: "relative", overflow: "hidden" }}>
+      {/* Chat area — fixed height prevents layout shift */}
+      <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 14, height: 240, flexShrink: 0, position: "relative", overflow: "hidden" }}>
         {/* AI bubble */}
         <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(110,75,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -174,7 +292,7 @@ function AnimatedChatMockup() {
                   <div key={i} style={{ width: 3, borderRadius: 2, background: "#dc2626", transformOrigin: "bottom", height: `${10 + (i % 3) * 5}px`, animation: `wave-bar 0.6s ease-in-out ${(i * 0.08).toFixed(2)}s infinite` }} />
                 ))}
               </div>
-              <span style={{ fontSize: 12, color: "#dc2626", fontWeight: 600 }}>Recording…</span>
+              <span style={{ fontSize: 12, color: "#dc2626", fontWeight: 600 }}>{isKo ? "녹음 중…" : "Recording…"}</span>
             </div>
           </div>
         )}
@@ -191,10 +309,10 @@ function AnimatedChatMockup() {
       </div>
 
       {/* Footer */}
-      <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fafbff" }}>
-        <span style={{ fontSize: 11, color: C.body }}>🔒 encrypted · end-to-end</span>
+      <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fafbff", flexShrink: 0 }}>
+        <span style={{ fontSize: 11, color: C.body }}>🔒 {isKo ? "종단간 암호화" : "encrypted · end-to-end"}</span>
         <button style={{ padding: "8px 18px", borderRadius: 8, background: isRecording ? "#dc2626" : C.purple, border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "background 0.3s" }}>
-          {isRecording ? "Stop ■" : "Continue →"}
+          {isRecording ? (isKo ? "중지 ■" : "Stop ■") : (isKo ? "계속하기 →" : "Continue →")}
         </button>
       </div>
     </div>
@@ -202,23 +320,10 @@ function AnimatedChatMockup() {
 }
 
 /* ── Comparison section ── */
-function BeforeAfterSection({ isMobile }) {
-  const metrics = [
-    { value: "50×", label: "larger sample" },
-    { value: "1/40", label: "the cost" },
-    { value: "×144", label: "faster launch" },
-  ];
-  const rows = [
-    { label: "Timeline", before: "~2 weeks", after: "10 minutes to launch" },
-    { label: "Cost", before: "$1,500+", after: "$49" },
-    { label: "Sample", before: "10 participants", after: "500 parallel" },
-    { label: "Analysis", before: "Manual transcription", after: "Automated, by-theme" },
-    { label: "Recruiting", before: "Agency dependent", after: "Matched in-platform" },
-  ];
+function BeforeAfterSection({ isMobile, t }) {
+  const { label, title, subtitle, metrics, rows, headerTraditional, headerVS, recommended } = t.comparison;
 
   const darkBg = "#120e2e";
-  const rowBg = "rgba(255,255,255,0.05)";
-  const rowBorder = "rgba(255,255,255,0.08)";
 
   return (
     <FadeInSection>
@@ -226,11 +331,11 @@ function BeforeAfterSection({ isMobile }) {
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           {/* header */}
           <div style={{ marginBottom: 40 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(160,140,255,0.7)", marginBottom: 10 }}>Comparison</div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(160,140,255,0.7)", marginBottom: 10 }}>{label}</div>
             <h2 style={{ fontSize: isMobile ? 24 : 36, fontWeight: 700, color: "#fff", margin: "0 0 10px", fontFamily: F }}>
-              Traditional flow vs. <span style={{ color: C.purpleLight }}>voicesurvey</span>
+              {title(C.purpleLight)}
             </h2>
-            <p style={{ fontSize: 15, color: "rgba(200,190,255,0.6)", margin: 0 }}>Same research, at one-tenth the cost and ten times the sample.</p>
+            <p style={{ fontSize: 15, color: "rgba(200,190,255,0.6)", margin: 0 }}>{subtitle}</p>
           </div>
 
           {/* metric cards */}
@@ -248,7 +353,7 @@ function BeforeAfterSection({ isMobile }) {
             {/* Traditional table */}
             <div style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", overflow: "hidden" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.1)" }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(220,215,255,0.75)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Traditional</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(220,215,255,0.75)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{headerTraditional}</div>
               </div>
               {rows.map((row, i) => (
                 <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none", background: "rgba(255,255,255,0.06)" }}>
@@ -261,11 +366,11 @@ function BeforeAfterSection({ isMobile }) {
             {/* voicesurvey table — brighter */}
             <div style={{ borderRadius: 12, border: "1px solid rgba(110,75,255,0.6)", overflow: "hidden" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(110,75,255,0.4)", background: "rgba(110,75,255,0.35)", display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: "0.08em" }}>voicesurvey</div>
-                <span style={{ fontSize: 10, background: "rgba(255,255,255,0.2)", color: "#fff", padding: "2px 8px", borderRadius: 4 }}>Recommended</span>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: "0.08em" }}>{headerVS}</div>
+                <span style={{ fontSize: 10, background: "rgba(255,255,255,0.2)", color: "#fff", padding: "2px 8px", borderRadius: 4 }}>{recommended}</span>
               </div>
               {rows.map((row, i) => (
-                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(110,75,255,0.2)" : "none", background: "rgba(110,75,255,0.18)" }}>
+                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(110,75,255,0.25)" : "none", background: "rgba(110,75,255,0.28)" }}>
                   <div style={{ fontSize: 13, color: "rgba(220,210,255,0.7)", fontWeight: 500 }}>{row.label}</div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{row.after}</div>
                 </div>
@@ -279,7 +384,8 @@ function BeforeAfterSection({ isMobile }) {
 }
 
 /* ── Final CTA section ── */
-function FinalCtaSection({ go, isMobile }) {
+function FinalCtaSection({ go, isMobile, t }) {
+  const { badge: badgeText, title, subtitleDesktop, subtitleMobile, cta1, cta2 } = t.cta;
   return (
     <FadeInSection>
       <section style={{
@@ -291,15 +397,13 @@ function FinalCtaSection({ go, isMobile }) {
       }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <Badge variant="purple" style={{ marginBottom: 20, background: "rgba(255,255,255,0.12)", color: C.white, border: "1px solid rgba(255,255,255,0.2)" }}>
-            Start today
+            {badgeText}
           </Badge>
           <h2 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 700, color: C.white, margin: "0 0 16px", fontFamily: F, lineHeight: 1.15 }}>
-            Get started for free
+            {title}
           </h2>
           <p style={{ fontSize: isMobile ? 15 : 17, color: "rgba(255,255,255,0.72)", margin: "0 0 44px", lineHeight: 1.6 }}>
-            {isMobile
-              ? "No credit card required."
-              : <>No credit card needed — start right away.<br />Your first interview project is completely free.</>}
+            {isMobile ? subtitleMobile : subtitleDesktop}
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button
@@ -315,7 +419,7 @@ function FinalCtaSection({ go, isMobile }) {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,0,0,0.2)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.15)"; }}
             >
-              Start as researcher →
+              {cta1}
             </button>
             <button
               onClick={() => go("panel_entry")}
@@ -329,7 +433,7 @@ function FinalCtaSection({ go, isMobile }) {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.background = "transparent"; }}
             >
-              Join as panelist
+              {cta2}
             </button>
           </div>
         </div>
@@ -341,11 +445,14 @@ function FinalCtaSection({ go, isMobile }) {
 /* ── Main screen ── */
 export default function LandingScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
+  const [lang, setLang] = useState("ko");
   const [liveCount, setLiveCount] = useState(247);
   const [heroIdx, setHeroIdx] = useState(0);
   const [heroVisible, setHeroVisible] = useState(true);
   const refParam = new URLSearchParams(window.location.search).get("ref");
   const fromInterview = refParam === "interview";
+  const t = TRANSLATIONS[lang];
+
   useEffect(() => {
     if (fromInterview) track("referral_from_interview", { ref: refParam });
   }, []);
@@ -370,10 +477,12 @@ export default function LandingScreen({ go, user, logout }) {
     return () => clearInterval(interval);
   }, []);
 
+  const heroMsg = fromInterview ? t.hero.fromInterview : t.hero.messages[heroIdx];
+
   return (
     <div className="landing-light" style={{ fontFamily: F, fontFeatureSettings: '"ss01"' }}>
       <style>{GLOBAL_STYLES}</style>
-      <GlobalNav go={go} activeTab="landing" variant={user ? "app" : "public"} isMobile={isMobile} user={user} logout={logout} />
+      <GlobalNav go={go} activeTab="landing" variant={user ? "app" : "public"} isMobile={isMobile} user={user} logout={logout} lang={lang} />
 
       {/* ── Hero ── */}
       <section style={{
@@ -385,42 +494,31 @@ export default function LandingScreen({ go, user, logout }) {
         <div style={{ position: "absolute", top: -80, right: "10%", width: 560, height: 560, borderRadius: "50%", background: `radial-gradient(circle, ${C.purple}18, transparent 70%)`, filter: "blur(80px)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: -60, left: "5%", width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle, ${C.purple}10, transparent 70%)`, filter: "blur(60px)", pointerEvents: "none" }} />
 
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", gap: isMobile ? 0 : 64, flexDirection: isMobile ? "column" : "row", position: "relative" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: isMobile ? "flex" : "grid", gridTemplateColumns: "520px 1fr", alignItems: "center", gap: isMobile ? 0 : 64, flexDirection: isMobile ? "column" : "row", position: "relative", minHeight: isMobile ? "auto" : 580 }}>
 
           {/* ── Left: text ── */}
-          <div style={{ flex: "0 0 auto", maxWidth: isMobile ? "100%" : 520 }}>
+          <div style={{ width: isMobile ? "100%" : "100%", minWidth: 0 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
-              <Badge variant="purple">✦ AI interviews. AI analyzes. You decide.</Badge>
+              <Badge variant="purple">{t.badge}</Badge>
             </div>
 
-            {(() => {
-              const heroMessages = [
-                { line1: "Slow, expensive research?", line2: "Interview hundreds with AI" },
-                { line1: "Hear from your customers,", line2: "accurately\u00A0and\u00A0fast" },
-              ];
-              const msg = fromInterview
-                ? { line1: "How was your AI interview?", line2: "Interview hundreds with AI" }
-                : heroMessages[heroIdx];
-              return (
-                <h1 style={{
-                  fontSize: isMobile ? 32 : 52, fontWeight: 700, lineHeight: 1.2, margin: "0 0 20px",
-                  fontFamily: F, wordBreak: "keep-all",
-                  opacity: heroVisible ? 1 : 0,
-                  transition: "opacity 0.4s ease",
-                }}>
-                  <span style={{ color: C.navy }}>{msg.line1}</span>
-                  <br />
-                  <span style={{ background: `linear-gradient(135deg, ${C.purple}, #3d2ab0)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                    {msg.line2}
-                  </span>
-                </h1>
-              );
-            })()}
+            <h1 style={{
+              fontSize: isMobile ? 32 : 52, fontWeight: 700, lineHeight: 1.2, margin: "0 0 20px",
+              fontFamily: F, wordBreak: "keep-all",
+              height: isMobile ? 160 : 260, overflow: "hidden",
+              opacity: heroVisible ? 1 : 0,
+              transition: "opacity 0.4s ease",
+            }}>
+              {heroMsg.line0 && <><span style={{ color: C.navy }}>{heroMsg.line0}</span><br /></>}
+              <span style={{ color: C.navy }}>{heroMsg.line1}</span>
+              <br />
+              <span style={{ background: `linear-gradient(135deg, ${C.purple}, #3d2ab0)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                {heroMsg.line2}
+              </span>
+            </h1>
 
             <p style={{ fontSize: isMobile ? 15 : 16, color: C.body, lineHeight: 1.65, margin: "0 0 36px", fontFamily: F }}>
-              {isMobile
-                ? <>Just write your questions — AI handles the rest.<br />Analysis, sentiment, and reports, fully automated.</>
-                : <>Design your questions and AI conducts live voice interviews with hundreds of panelists at once.<br />Theme analysis, sentiment tagging, and insight reports are generated automatically.</>}
+              {isMobile ? t.hero.subtitleMobile : t.hero.subtitleDesktop}
             </p>
 
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28 }}>
@@ -428,26 +526,26 @@ export default function LandingScreen({ go, user, logout }) {
                 style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: C.purple, border: "none", fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: F, transition: "background 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", gap: 8 }}
                 onMouseEnter={e => { e.currentTarget.style.background = C.purpleHover; e.currentTarget.style.transform = "translateY(-1px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = C.purple; e.currentTarget.style.transform = "none"; }}>
-                Researcher / Business →
+                {t.hero.cta1}
               </button>
               <button onClick={() => go("panel_entry")}
                 style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: "#fff", border: `1.5px solid ${C.purpleLight}`, fontSize: 15, fontWeight: 600, color: C.purple, fontFamily: F, transition: "border-color 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", gap: 8 }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.transform = "translateY(-1px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = C.purpleLight; e.currentTarget.style.transform = "none"; }}>
-                Join as Panelist
+                {t.hero.cta2}
               </button>
             </div>
 
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 14px", borderRadius: 20, background: "rgba(110,75,255,0.07)", border: `1px solid ${C.purpleLight}` }}>
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: C.success, animation: "pulse-dot 2s ease-in-out infinite" }} />
-              <span style={{ fontSize: 13, color: C.body }}><strong style={{ fontWeight: 600, color: C.purple }}>{liveCount} people</strong> are in an interview right now</span>
+              <span style={{ fontSize: 13, color: C.body }}>{t.hero.liveCounter(liveCount)}</span>
             </div>
           </div>
 
           {/* ── Right: animated interview mockup ── */}
           {!isMobile && (
-            <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-              <AnimatedChatMockup />
+            <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <AnimatedChatMockup lang={lang} />
             </div>
           )}
         </div>
@@ -459,8 +557,8 @@ export default function LandingScreen({ go, user, logout }) {
           <div style={{ maxWidth: 1100, margin: "0 auto" }}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 40, flexWrap: "wrap", gap: 12 }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 8 }}>Live Numbers</div>
-                <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: C.navy, margin: 0, fontFamily: F }}>What's happening on the platform right now</h2>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 8 }}>{t.stats.label}</div>
+                <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: C.navy, margin: 0, fontFamily: F }}>{t.stats.title}</h2>
               </div>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.25)", fontSize: 12, fontWeight: 600, color: C.successText }}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
@@ -468,12 +566,7 @@ export default function LandingScreen({ go, user, logout }) {
               </span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 0 }}>
-              {[
-                { end: 12400, suffix: "+", label: "Registered panelists", color: C.purple, delay: 0 },
-                { end: 4200, suffix: "", label: "Interviews completed this month", color: C.purple, delay: 100 },
-                { end: 94, suffix: "%", label: "AI analysis accuracy", color: C.purple, delay: 200 },
-                { end: 8, suffix: " min", label: "Average interview length", color: C.purple, delay: 300 },
-              ].map(({ label, ...stat }, i) => (
+              {t.stats.items.map(({ label, ...stat }, i) => (
                 <div key={label} style={{
                   textAlign: "left",
                   padding: isMobile ? "20px 12px" : "24px 32px",
@@ -481,7 +574,7 @@ export default function LandingScreen({ go, user, logout }) {
                   borderRight: (isMobile ? i % 2 === 0 : i < 3) ? `1px solid ${C.border}` : "none",
                   borderBottom: (isMobile && i < 2) ? `1px solid ${C.border}` : "none",
                 }}>
-                  <CounterStat {...stat} label={label} labelColor={C.body} />
+                  <CounterStat {...stat} label={label} color={C.purple} labelColor={C.body} />
                 </div>
               ))}
             </div>
@@ -489,23 +582,21 @@ export default function LandingScreen({ go, user, logout }) {
         </section>
       </FadeInSection>
 
-      {/* ── Trusted by logos ── */}
-
       {/* ── Before vs After ── */}
-      <BeforeAfterSection isMobile={isMobile} />
+      <BeforeAfterSection isMobile={isMobile} t={t} />
 
       {/* ── Carousels ── */}
       <FadeInSection>
-        <VoCCarousel />
+        <VoCCarousel lang={lang} />
       </FadeInSection>
       <FadeInSection>
-        <HowItWorksCarousel />
+        <HowItWorksCarousel lang={lang} />
       </FadeInSection>
 
       {/* ── Final CTA ── */}
-      <FinalCtaSection go={go} isMobile={isMobile} />
+      <FinalCtaSection go={go} isMobile={isMobile} t={t} />
 
-      <Footer go={go} />
+      <Footer go={go} lang={lang} onLangChange={setLang} />
     </div>
   );
 }
