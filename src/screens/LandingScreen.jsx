@@ -247,87 +247,137 @@ export default function LandingScreen({ go, user, logout }) {
       <style>{GLOBAL_STYLES}</style>
       <GlobalNav go={go} activeTab="landing" variant={user ? "app" : "public"} isMobile={isMobile} user={user} logout={logout} />
 
-      {/* ── Hero — animated gradient background ── */}
+      {/* ── Hero ── */}
       <section style={{
         position: "relative", overflow: "hidden",
-        padding: isMobile ? "80px 20px 90px" : "100px 24px 110px",
-        background: "linear-gradient(135deg, #ffffff 0%, rgba(83,58,253,0.04) 50%, #ffffff 100%)",
-        backgroundSize: "300% 300%",
-        animation: "hero-gradient-shift 10s ease infinite",
+        padding: isMobile ? "72px 20px 80px" : "88px 24px 96px",
+        background: "transparent",
       }}>
-        {/* Radial blob */}
-        <div style={{ position: "absolute", top: -60, left: "5%", width: 480, height: 480, borderRadius: "50%", background: "radial-gradient(circle, rgba(83,58,253,0.07), transparent 70%)", filter: "blur(80px)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -80, right: "8%", width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(83,58,253,0.05), transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
+        {/* blobs */}
+        <div style={{ position: "absolute", top: -80, right: "10%", width: 560, height: 560, borderRadius: "50%", background: `radial-gradient(circle, ${C.purple}18, transparent 70%)`, filter: "blur(80px)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: -60, left: "5%", width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle, ${C.purple}10, transparent 70%)`, filter: "blur(60px)", pointerEvents: "none" }} />
 
-        <div style={{ maxWidth: 680, margin: "0 auto", textAlign: "center", position: "relative" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-            <Badge variant="purple">✦ AI interviews. AI analyzes. You decide.</Badge>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", gap: isMobile ? 0 : 64, flexDirection: isMobile ? "column" : "row", position: "relative" }}>
+
+          {/* ── Left: text ── */}
+          <div style={{ flex: "0 0 auto", maxWidth: isMobile ? "100%" : 520 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
+              <Badge variant="purple">✦ AI interviews. AI analyzes. You decide.</Badge>
+            </div>
+
+            {(() => {
+              const heroMessages = [
+                { line1: "Slow, expensive research?", line2: "Interview hundreds with AI" },
+                { line1: "Hear from your customers,", line2: "accurately\u00A0and\u00A0fast" },
+              ];
+              const msg = fromInterview
+                ? { line1: "How was your AI interview?", line2: "Interview hundreds with AI" }
+                : heroMessages[heroIdx];
+              return (
+                <h1 style={{
+                  fontSize: isMobile ? 32 : 52, fontWeight: 700, lineHeight: 1.2, margin: "0 0 20px",
+                  fontFamily: F, wordBreak: "keep-all",
+                  opacity: heroVisible ? 1 : 0,
+                  transition: "opacity 0.4s ease",
+                }}>
+                  <span style={{ color: C.navy }}>{msg.line1}</span>
+                  <br />
+                  <span style={{ background: `linear-gradient(135deg, ${C.purple}, #3d2ab0)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                    {msg.line2}
+                  </span>
+                </h1>
+              );
+            })()}
+
+            <p style={{ fontSize: isMobile ? 15 : 16, color: C.body, lineHeight: 1.65, margin: "0 0 36px", fontFamily: F }}>
+              {isMobile
+                ? <>Just write your questions — AI handles the rest.<br />Analysis, sentiment, and reports, fully automated.</>
+                : <>Design your questions and AI conducts live voice interviews with hundreds of panelists at once.<br />Theme analysis, sentiment tagging, and insight reports are generated automatically.</>}
+            </p>
+
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28 }}>
+              <button onClick={() => go("advertiser_login")}
+                style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: C.purple, border: "none", fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: F, transition: "background 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", gap: 8 }}
+                onMouseEnter={e => { e.currentTarget.style.background = C.purpleHover; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = C.purple; e.currentTarget.style.transform = "none"; }}>
+                Researcher / Business →
+              </button>
+              <button onClick={() => go("panel_entry")}
+                style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: "#fff", border: `1.5px solid ${C.purpleLight}`, fontSize: 15, fontWeight: 600, color: C.purple, fontFamily: F, transition: "border-color 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", gap: 8 }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = C.purpleLight; e.currentTarget.style.transform = "none"; }}>
+                🎙️ Join as Panelist
+              </button>
+            </div>
+
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 14px", borderRadius: 20, background: "rgba(110,75,255,0.07)", border: `1px solid ${C.purpleLight}` }}>
+              <div style={{ width: 7, height: 7, borderRadius: "50%", background: C.success, animation: "pulse-dot 2s ease-in-out infinite" }} />
+              <span style={{ fontSize: 13, color: C.body }}><strong style={{ fontWeight: 600, color: C.purple }}>{liveCount} people</strong> are in an interview right now</span>
+            </div>
           </div>
 
-          {(() => {
-            const heroMessages = [
-              { line1: "Slow, expensive research?", line2: "Interview hundreds with AI" },
-              { line1: "Hear from your customers,", line2: "accurately\u00A0and\u00A0fast" },
-            ];
-            const msg = fromInterview
-              ? { line1: "How was your AI interview?", line2: "Interview hundreds with AI" }
-              : heroMessages[heroIdx];
-            return (
-              <h1 style={{
-                fontSize: isMobile ? 30 : 52, fontWeight: 700, lineHeight: 1.3, margin: "0 0 24px",
-                fontFamily: F, wordBreak: "keep-all",
-                opacity: heroVisible ? 1 : 0,
-                transition: "opacity 0.4s ease",
+          {/* ── Right: interview mockup ── */}
+          {!isMobile && (
+            <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+              <div style={{
+                width: 460, background: "#fff",
+                borderRadius: 16, border: `1px solid ${C.border}`,
+                boxShadow: `0 24px 64px -12px rgba(110,75,255,0.18), 0 4px 16px -4px rgba(0,0,0,0.08)`,
+                overflow: "hidden", fontFamily: F,
               }}>
-                <span style={{ color: C.navy }}>{msg.line1}</span>
-                <br />
-                <span style={{
-                  whiteSpace: "nowrap",
-                  ...(isMobile
-                    ? { color: C.purple }
-                    : { background: `linear-gradient(135deg, ${C.purple}, #1a1a2e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" })
-                }}>{msg.line2}</span>
-              </h1>
-            );
-          })()}
-
-          <p style={{ fontSize: isMobile ? 15 : 17, fontWeight: 400, color: "rgba(10,11,13,0.56)", lineHeight: 1.6, letterSpacing: "0.16px", margin: "0 0 44px", fontFamily: F }}>
-            {isMobile
-              ? <>Just write your questions — AI handles the rest.<br />Analysis, sentiment, and reports, fully automated.</>
-              : <>Design your questions and AI conducts live voice interviews with hundreds of panelists at once.<br />Theme analysis, sentiment tagging, and insight reports are generated automatically.</>}
-          </p>
-
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 20, background: C.bg, border: `1px solid ${C.border}`, marginBottom: 32 }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.success, animation: "pulse-dot 2s ease-in-out infinite" }} />
-            <span style={{ fontSize: 13, color: C.body }}><strong style={{ fontWeight: 600, color: C.purple }}>{liveCount} people</strong> are in an interview right now</span>
-          </div>
-
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-            <button onClick={() => go("advertiser_login")}
-              style={{ cursor: "pointer", padding: "22px 24px", borderRadius: 16, background: C.white, border: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)", width: isMobile ? "100%" : "auto", minWidth: isMobile ? 0 : 230, transition: "box-shadow 0.2s, transform 0.2s", textAlign: "left", fontFamily: F }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(83,58,253,0.14), 0 8px 28px rgba(83,58,253,0.1)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "none"; }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>🎯</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>Researcher / Business</div>
-              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>{isMobile ? "Build interviews and get reports" : "Design interviews and receive full reports"}</div>
-              <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: C.purple, background: "rgba(83,58,253,0.07)", padding: "5px 10px", borderRadius: 6 }}>Get started →</div>
-            </button>
-            <button onClick={() => go("panel_entry")}
-              style={{ cursor: "pointer", padding: "22px 24px", borderRadius: 16, background: C.white, border: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)", width: isMobile ? "100%" : "auto", minWidth: isMobile ? 0 : 230, transition: "box-shadow 0.2s, transform 0.2s", textAlign: "left", fontFamily: F }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(83,58,253,0.14), 0 8px 28px rgba(83,58,253,0.1)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "none"; }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>🎙️</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>Voice Survey Panel</div>
-              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>{isMobile ? "Speak up and earn rewards" : "Join voice interviews and earn rewards"}</div>
-              <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: C.purple, background: "rgba(83,58,253,0.07)", padding: "5px 10px", borderRadius: 6 }}>Join now →</div>
-            </button>
-          </div>
+                {/* mockup header */}
+                <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fafbff" }}>
+                  <span style={{ fontSize: 12, color: C.body, fontWeight: 500 }}>interview / vs-b2n</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, color: C.successText, fontWeight: 600 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
+                    live
+                  </span>
+                </div>
+                {/* progress */}
+                <div style={{ padding: "16px 20px 0" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: C.purple, letterSpacing: "0.08em" }}>QUESTION 3 OF 14</span>
+                    <span style={{ fontSize: 11, color: C.body }}>≈ 6 min left</span>
+                  </div>
+                  <div style={{ height: 3, background: C.border, borderRadius: 2 }}>
+                    <div style={{ width: "21%", height: "100%", background: C.purple, borderRadius: 2 }} />
+                  </div>
+                </div>
+                {/* question */}
+                <div style={{ padding: "20px 20px 16px", display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: `rgba(110,75,255,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width={14} height={14} viewBox="0 0 20 20" fill="none" stroke={C.purple} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="1" width="6" height="11" rx="3"/><path d="M3.5 10a6.5 6.5 0 0013 0"/><line x1="10" y1="16.5" x2="10" y2="19"/><line x1="7" y1="19" x2="13" y2="19"/></svg>
+                  </div>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: C.navy, margin: 0, lineHeight: 1.45 }}>Biggest friction in your current research flow?</p>
+                </div>
+                {/* options */}
+                <div style={{ padding: "0 20px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
+                  {["Recruiting time & cost", "Designing questions", "Analyzing transcripts", "Measuring business impact"].map((opt, i) => (
+                    <div key={opt} style={{
+                      padding: "11px 14px", borderRadius: 8,
+                      border: `1.5px solid ${i === 2 ? C.purple : C.border}`,
+                      background: i === 2 ? `rgba(110,75,255,0.06)` : "#fff",
+                      fontSize: 13, color: i === 2 ? C.purple : C.navy, fontWeight: i === 2 ? 600 : 400,
+                      cursor: "pointer",
+                    }}>{opt}</div>
+                  ))}
+                </div>
+                {/* footer */}
+                <div style={{ padding: "12px 20px", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fafbff" }}>
+                  <span style={{ fontSize: 11, color: C.body }}>🔒 encrypted end-to-end</span>
+                  <button style={{ padding: "8px 18px", borderRadius: 8, background: C.purple, border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    Continue →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* ── Stats ── */}
       <FadeInSection>
-        <section style={{ background: C.white, padding: isMobile ? "40px 20px" : "52px 24px" }}>
+        <section style={{ background: "#fff", borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "40px 20px" : "52px 24px" }}>
           <div style={{ maxWidth: 800, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)" }}>
             {[
               { end: 12400, suffix: "+", label: "Registered panelists", color: C.purple, delay: 0 },
