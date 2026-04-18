@@ -231,7 +231,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             )}
             {(variant === "public" || variant === "sub") && !isMobile && (
               <>
-                <Btn variant="ghost" size="sm" style={{ border: "1px solid rgba(23,23,23,0.2)", borderRadius: 56 }} onClick={() => go("panel_entry")}>{isKo ? "인터뷰 패널 참여" : "Join as Panelist"}</Btn>
+                <Btn variant="ghost" size="sm" style={{ border: "1px solid rgba(23,23,23,0.2)", borderRadius: 56 }} onClick={() => go("panel_entry")}>{isKo ? "인터뷰 참여" : "Join as Panelist"}</Btn>
                 <Btn size="sm" onClick={() => go("advertiser_login")}>{isKo ? "로그인" : "Log In"}</Btn>
               </>
             )}
@@ -341,7 +341,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
               ) : (
                 <>
                   <Btn full size="md" onClick={() => { go("advertiser_login"); setMenuOpen(false); }}>{isKo ? "로그인 / 회원가입" : "Log In / Sign Up"}</Btn>
-                  <Btn full variant="ghost" size="md" onClick={() => { go("panel_entry"); setMenuOpen(false); }}>{isKo ? "인터뷰 패널 참여" : "Join as Panelist"}</Btn>
+                  <Btn full variant="ghost" size="md" onClick={() => { go("panel_entry"); setMenuOpen(false); }}>{isKo ? "인터뷰 참여" : "Join as Panelist"}</Btn>
                 </>
               )}
             </div>
