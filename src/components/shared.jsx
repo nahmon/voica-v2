@@ -7,15 +7,8 @@ function LogoMark({ size = 20, dark = false }) {
       <div style={{
         width: size, height: size, borderRadius: Math.round(size * 0.22),
         background: C.purple,
-        display: "inline-flex", alignItems: "center", justifyContent: "center",
         flexShrink: 0,
-      }}>
-        <svg width={size * 0.52} height={size * 0.52} viewBox="0 0 11 11" fill="none">
-          <rect x="1" y="4" width="2" height="6" rx="1" fill="white" opacity="0.7"/>
-          <rect x="4.5" y="2" width="2" height="8" rx="1" fill="white"/>
-          <rect x="8" y="5" width="2" height="4" rx="1" fill="white" opacity="0.7"/>
-        </svg>
-      </div>
+      }} />
       <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: "-0.02em", color: dark ? "rgba(255,255,255,0.9)" : C.navy, fontFamily: F }}>
         voicesurvey
       </span>
