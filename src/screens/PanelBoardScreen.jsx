@@ -5,10 +5,15 @@ import { GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const APPLY_STEPS = ["none", "applied", "ai_screening", "confirmed"];
-const SORT_OPTIONS = [
+const SORT_OPTIONS_EN = [
   { key: "recommended", label: "Best Match" },
   { key: "newest", label: "Newest" },
   { key: "reward", label: "Top Reward" },
+];
+const SORT_OPTIONS_KO = [
+  { key: "recommended", label: "추천순" },
+  { key: "newest", label: "최신순" },
+  { key: "reward", label: "리워드 높은 순" },
 ];
 
 function parseReward(r) {
@@ -31,6 +36,7 @@ function addRecentlyViewed(jobId) {
 
 export default function PanelBoardScreen({ go, user, logout }) {
   const [lang, setLang] = useState("ko");
+  const isKo = lang === "ko";
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("All");
@@ -38,7 +44,10 @@ export default function PanelBoardScreen({ go, user, logout }) {
   const [applyState, setApplyState] = useState({});
   const [recentIds, setRecentIds] = useState(getRecentlyViewed);
 
-  const categories = ["All", "Recommended", "Expert", "Tech", "Beauty", "Media", "Food", "Finance", "Education"];
+  const SORT_OPTIONS = isKo ? SORT_OPTIONS_KO : SORT_OPTIONS_EN;
+  const CATEGORY_KEYS = ["All", "Recommended", "Expert", "Tech", "Beauty", "Media", "Food", "Finance", "Education"];
+  const CATEGORY_LABELS_KO = { All: "전체", Recommended: "추천", Expert: "전문직", Tech: "테크", Beauty: "뷰티", Media: "미디어", Food: "식음료", Finance: "금융", Education: "교육" };
+  const catLabel = (key) => isKo ? (CATEGORY_LABELS_KO[key] ?? key) : key;
   const profile = MOCK_PANEL_PROFILE;
 
   const jobsWithScore = PANEL_JOBS.map(j => ({ ...j, _matchScore: getMatchScore(j, profile) }));
@@ -77,14 +86,14 @@ export default function PanelBoardScreen({ go, user, logout }) {
           {/* Live indicator */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "5px 12px", marginBottom: 20 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", display: "inline-block", boxShadow: "0 0 6px #4ade80" }} />
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>{filtered.length} interviews open now</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>{isKo ? `인터뷰 ${filtered.length}건 모집 중` : `${filtered.length} interviews open now`}</span>
           </div>
 
           <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 700, color: "#fff", margin: "0 0 8px", lineHeight: 1.25 }}>
-            Share your voice. Earn rewards.
+            {isKo ? "의견을 나누고, 리워드를 받아요." : "Share your voice. Earn rewards."}
           </h1>
           <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", margin: "0 0 24px" }}>
-            Join AI-powered interviews matched to your profile.
+            {isKo ? "내 프로필에 딱 맞는 AI 인터뷰에 참여해 보세요." : "Join AI-powered interviews matched to your profile."}
           </p>
 
           {/* Search */}
@@ -95,7 +104,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search by topic or company…"
+              placeholder={isKo ? "주제나 기업명으로 검색해 보세요…" : "Search by topic or company…"}
               style={{
                 width: "100%", padding: "13px 16px 13px 42px",
                 borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)",
@@ -109,9 +118,9 @@ export default function PanelBoardScreen({ go, user, logout }) {
           {/* Quick stats */}
           <div style={{ display: "flex", gap: isMobile ? 16 : 28, marginTop: 20, flexWrap: "wrap" }}>
             {[
-              { label: "Avg. reward", value: "₩25,000" },
-              { label: "Avg. duration", value: "8 min" },
-              { label: "Matched for you", value: `${recommendedCount} interviews` },
+              { label: isKo ? "평균 리워드" : "Avg. reward", value: "₩25,000" },
+              { label: isKo ? "평균 소요 시간" : "Avg. duration", value: isKo ? "8분" : "8 min" },
+              { label: isKo ? "나에게 맞는 인터뷰" : "Matched for you", value: isKo ? `${recommendedCount}건` : `${recommendedCount} interviews` },
             ].map(s => (
               <div key={s.label}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{s.value}</div>
@@ -128,7 +137,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
           {/* Category pills */}
           <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto", scrollbarWidth: "none", flex: 1 }}>
-            {categories.map(c => {
+            {CATEGORY_KEYS.map(c => {
               const active = catFilter === c;
               return (
                 <button key={c} onClick={() => setCatFilter(c)} style={{
@@ -139,7 +148,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
                   fontWeight: active ? 600 : 400, flexShrink: 0,
                   transition: "all 0.12s",
                 }}>
-                  {c === "Recommended" ? `✦ Matched (${recommendedCount})` : c}
+                  {c === "Recommended" ? `✦ ${isKo ? `추천 (${recommendedCount})` : `Matched (${recommendedCount})`}` : catLabel(c)}
                 </button>
               );
             })}
@@ -162,7 +171,9 @@ export default function PanelBoardScreen({ go, user, logout }) {
 
         {/* Result count */}
         <div style={{ fontSize: 12, color: C.body, marginBottom: 12 }}>
-          {filtered.length} interview{filtered.length !== 1 ? "s" : ""} {catFilter !== "All" ? `in ${catFilter}` : "available"}
+          {isKo
+            ? `${catFilter !== "All" ? `${catLabel(catFilter)} ` : ""}인터뷰 ${filtered.length}건`
+            : `${filtered.length} interview${filtered.length !== 1 ? "s" : ""} ${catFilter !== "All" ? `in ${catFilter}` : "available"}`}
         </div>
 
         {/* Job cards */}
@@ -170,8 +181,8 @@ export default function PanelBoardScreen({ go, user, logout }) {
           {filtered.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: C.body }}>
               <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
-              <div style={{ fontSize: 15, fontWeight: 500, color: C.navy, marginBottom: 6 }}>No interviews found</div>
-              <div style={{ fontSize: 13 }}>Try a different search or filter</div>
+              <div style={{ fontSize: 15, fontWeight: 500, color: C.navy, marginBottom: 6 }}>{isKo ? "인터뷰를 찾을 수 없어요" : "No interviews found"}</div>
+              <div style={{ fontSize: 13 }}>{isKo ? "다른 검색어나 필터를 써보세요" : "Try a different search or filter"}</div>
             </div>
           ) : filtered.map(job => (
             <JobCard
@@ -195,7 +206,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
         {recentJobs.length > 0 && (
           <div style={{ marginTop: 48 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              Recently viewed
+              {isKo ? "최근 본 인터뷰" : "Recently viewed"}
             </div>
             <div style={{ display: "flex", gap: 10, overflowX: "auto", scrollbarWidth: "none", paddingBottom: 4 }}>
               {recentJobs.map(job => (

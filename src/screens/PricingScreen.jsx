@@ -66,7 +66,7 @@ export default function PricingScreen({ go, user, logout }) {
         <div style={{ position: "absolute", top: -80, right: "10%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle,rgba(83,58,253,0.07),transparent 70%)", filter: "blur(70px)", pointerEvents: "none" }} />
         <Badge variant="purple" style={{ marginBottom: 16 }}>{isKo ? "요금제" : "Pricing"}</Badge>
         <h1 style={{ fontSize: isMobile ? 28 : 38, fontWeight: 700, color: C.navy, margin: "0 0 12px", lineHeight: 1.08 }}>
-          {isKo ? "팀이 커질수록 함께 커지는 요금제" : "Simple pricing that scales with you"}
+          {isKo ? "팀과 함께 성장하는 요금제" : "Simple pricing that scales with you"}
         </h1>
         <p style={{ fontSize: 15, color: C.body, margin: 0 }}>
           {isKo ? "우리 팀에 딱 맞는 플랜을 골라보세요" : "Choose the plan that fits your team"}

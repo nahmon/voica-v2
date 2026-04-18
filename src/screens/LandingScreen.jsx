@@ -63,7 +63,7 @@ const TRANSLATIONS = {
       ],
       rows: [
         { label: "Timeline", before: "~2 weeks", after: "10 minutes to launch" },
-        { label: "Cost", before: "$2,000+", after: "$49" },
+        { label: "Cost", before: "$2,000+", after: "$49~/project" },
         { label: "Sample", before: "10 participants", after: "500 parallel" },
         { label: "Analysis", before: "Manual transcription", after: "Automated, by-theme" },
         { label: "Recruiting", before: "Agency dependent", after: "Matched in-platform" },
@@ -97,7 +97,7 @@ const TRANSLATIONS = {
     },
     stats: {
       label: "실시간 현황",
-      title: "지금 이 순간 플랫폼에서 일어나는 일",
+      title: "지금 플랫폼에서 일어나는 일",
       items: [
         { end: 12400, suffix: "+", label: "등록된 패널리스트" },
         { end: 4200, suffix: "", label: "이번 달 완료된 인터뷰" },
@@ -116,7 +116,7 @@ const TRANSLATIONS = {
       ],
       rows: [
         { label: "기간", before: "약 2주", after: "10분 안에 시작" },
-        { label: "비용", before: "₩2,600,000+", after: "₩65,000" },
+        { label: "비용", before: "₩2,600,000+", after: "₩65,000~/프로젝트" },
         { label: "표본", before: "10명", after: "500명 동시" },
         { label: "분석", before: "직접 전사", after: "자동화, 주제별" },
         { label: "모집", before: "대행사 의존", after: "플랫폼 내 매칭" },
