@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { PANEL_JOBS, MOCK_PANEL_PROFILE, getMatchScore } from "../lib/mockData.js";
 import { GlobalNav, Footer } from "../components/shared.jsx";
@@ -6,9 +6,9 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const APPLY_STEPS = ["none", "applied", "ai_screening", "confirmed"];
 const SORT_OPTIONS = [
-  { key: "recommended", label: "Recommended" },
+  { key: "recommended", label: "Best Match" },
   { key: "newest", label: "Newest" },
-  { key: "reward", label: "Highest Reward" },
+  { key: "reward", label: "Top Reward" },
 ];
 
 function parseReward(r) {
@@ -16,31 +16,14 @@ function parseReward(r) {
 }
 
 function matchPct(score) {
-  // score max is ~8 (3+2+1+2), map to 0-100
   return Math.min(100, Math.round((score / 8) * 100));
 }
 
-function MatchBadge({ score }) {
-  const pct = matchPct(score);
-  let color, bg;
-  if (pct >= 70) { color = "#15803d"; bg = "rgba(21,190,83,0.12)"; }
-  else if (pct >= 40) { color = "#92650a"; bg = "rgba(251,191,36,0.13)"; }
-  else { color = "#64748d"; bg = "rgba(100,116,141,0.1)"; }
-  return (
-    <span style={{
-      fontSize: 11, fontWeight: 600, color, background: bg,
-      padding: "2px 8px", borderRadius: 4, flexShrink: 0,
-    }}>{pct}% Match</span>
-  );
-}
-
 const RECENTLY_VIEWED_KEY = "voica_recently_viewed";
-
 function getRecentlyViewed() {
   try { return JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY) || "[]"); }
   catch { return []; }
 }
-
 function addRecentlyViewed(jobId) {
   const prev = getRecentlyViewed().filter(id => id !== jobId);
   localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify([jobId, ...prev].slice(0, 6)));
@@ -53,6 +36,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
   const [sortKey, setSortKey] = useState("recommended");
   const [applyState, setApplyState] = useState({});
   const [recentIds, setRecentIds] = useState(getRecentlyViewed);
+
   const categories = ["All", "Recommended", "Expert", "Tech", "Beauty", "Media", "Food", "Finance", "Education"];
   const profile = MOCK_PANEL_PROFILE;
 
@@ -66,17 +50,13 @@ export default function PanelBoardScreen({ go, user, logout }) {
     )
     .filter(j => catFilter === "Recommended" ? j._matchScore >= MATCH_THRESHOLD : true)
     .sort((a, b) => {
-      if (sortKey === "newest") return a.id - b.id; // mock: lower id = older, invert
+      if (sortKey === "newest") return a.id - b.id;
       if (sortKey === "reward") return parseReward(b.reward) - parseReward(a.reward);
-      // recommended (default)
       return b._matchScore - a._matchScore;
     });
 
   const recommendedCount = jobsWithScore.filter(j => j._matchScore >= MATCH_THRESHOLD).length;
-
-  const recentJobs = recentIds
-    .map(id => jobsWithScore.find(j => j.id === id))
-    .filter(Boolean);
+  const recentJobs = recentIds.map(id => jobsWithScore.find(j => j.id === id)).filter(Boolean);
 
   function handleView(jobId) {
     addRecentlyViewed(jobId);
@@ -84,99 +64,126 @@ export default function PanelBoardScreen({ go, user, logout }) {
   }
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
+    <div style={{ background: "#f5f6fa", minHeight: "100vh", fontFamily: F }}>
       <GlobalNav go={go} activeTab="panel_board" variant={user?.user_metadata?.role === "researcher" ? "app" : "panel"} user={user} logout={logout} />
 
       {/* Hero */}
-      <div style={{ background: C.navy, padding: isMobile ? "32px 20px 28px" : "44px 24px 36px" }}>
-        <div style={{ maxWidth: 720, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", display: "inline-block" }} />
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>{filtered.length} interviews open now</span>
+      <div style={{
+        background: `linear-gradient(135deg, ${C.navy} 0%, #2d1b6b 100%)`,
+        padding: isMobile ? "32px 20px 40px" : "48px 24px 56px",
+      }}>
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          {/* Live indicator */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "5px 12px", marginBottom: 20 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", display: "inline-block", boxShadow: "0 0 6px #4ade80" }} />
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>{filtered.length} interviews open now</span>
           </div>
-          <div style={{ fontSize: isMobile ? 20 : 26, fontWeight: 700, color: C.white, marginBottom: 16, lineHeight: 1.3 }}>
-            Join an interview and earn rewards
-          </div>
+
+          <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 700, color: "#fff", margin: "0 0 8px", lineHeight: 1.25 }}>
+            Share your voice. Earn rewards.
+          </h1>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", margin: "0 0 24px" }}>
+            Join AI-powered interviews matched to your profile.
+          </p>
+
+          {/* Search */}
           <div style={{ position: "relative" }}>
+            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", opacity: 0.45, display: "flex", pointerEvents: "none" }}>
+              {Ic.Search({ s: 16, c: "#fff" })}
+            </span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search by topic or company"
+              placeholder="Search by topic or company…"
               style={{
-                width: "100%", padding: "11px 40px 11px 14px",
-                borderRadius: 8, border: "none",
+                width: "100%", padding: "13px 16px 13px 42px",
+                borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)",
                 background: "rgba(255,255,255,0.1)",
-                color: C.white, fontSize: 14, fontFamily: F, outline: "none",
-                boxSizing: "border-box",
+                color: "#fff", fontSize: 14, fontFamily: F, outline: "none",
+                boxSizing: "border-box", backdropFilter: "blur(8px)",
               }}
             />
-            <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", opacity: 0.4, display: "flex" }}>
-              {Ic.Search({ s: 16, c: "#fff" })}
-            </span>
+          </div>
+
+          {/* Quick stats */}
+          <div style={{ display: "flex", gap: isMobile ? 16 : 28, marginTop: 20, flexWrap: "wrap" }}>
+            {[
+              { label: "Avg. reward", value: "₩25,000" },
+              { label: "Avg. duration", value: "8 min" },
+              { label: "Matched for you", value: `${recommendedCount} interviews` },
+            ].map(s => (
+              <div key={s.label}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{s.value}</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "16px 16px 60px" : "24px 24px 80px" }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: isMobile ? "20px 16px 80px" : "28px 24px 80px" }}>
 
-        {/* Category filter */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "nowrap", overflowX: "auto", marginBottom: 12, paddingBottom: 4, scrollbarWidth: "none" }}>
-          {categories.map(c => {
-            const active = catFilter === c;
-            return (
-              <button key={c} onClick={() => setCatFilter(c)}
-                style={{
-                  padding: "6px 14px", borderRadius: 20, fontSize: 13, fontFamily: F, cursor: "pointer",
-                  border: "none", flexShrink: 0,
-                  background: active ? C.navy : "rgba(0,0,0,0.06)",
+        {/* Filters + Sort row */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
+          {/* Category pills */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto", scrollbarWidth: "none", flex: 1 }}>
+            {categories.map(c => {
+              const active = catFilter === c;
+              return (
+                <button key={c} onClick={() => setCatFilter(c)} style={{
+                  padding: "6px 14px", borderRadius: 20, fontSize: 12, fontFamily: F, cursor: "pointer",
+                  border: `1px solid ${active ? C.purple : "rgba(0,0,0,0.1)"}`,
+                  background: active ? C.purple : "#fff",
                   color: active ? "#fff" : C.body,
-                  fontWeight: active ? 600 : 400,
-                }}>
-                {c === "Recommended" ? `✦ Recommended ${recommendedCount}` : c}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Sort toggle */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
-          <span style={{ fontSize: 12, color: C.body, flexShrink: 0 }}>Sort:</span>
-          {SORT_OPTIONS.map(opt => {
-            const active = sortKey === opt.key;
-            return (
-              <button key={opt.key} onClick={() => setSortKey(opt.key)}
-                style={{
-                  padding: "4px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer",
-                  border: `1px solid ${active ? C.purple : C.border}`,
-                  background: active ? C.purpleBg : "transparent",
-                  color: active ? C.purple : C.body,
-                  fontWeight: active ? 600 : 400,
+                  fontWeight: active ? 600 : 400, flexShrink: 0,
                   transition: "all 0.12s",
                 }}>
-                {opt.label}
-              </button>
-            );
-          })}
+                  {c === "Recommended" ? `✦ Matched (${recommendedCount})` : c}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Sort dropdown */}
+          {!isMobile && (
+            <select
+              value={sortKey}
+              onChange={e => setSortKey(e.target.value)}
+              style={{
+                padding: "7px 12px", borderRadius: 8, border: `1px solid rgba(0,0,0,0.1)`,
+                background: "#fff", fontSize: 12, fontFamily: F, color: C.navy,
+                cursor: "pointer", flexShrink: 0, outline: "none",
+              }}>
+              {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+            </select>
+          )}
         </div>
 
-        {/* Job list */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {filtered.map(job => (
+        {/* Result count */}
+        <div style={{ fontSize: 12, color: C.body, marginBottom: 12 }}>
+          {filtered.length} interview{filtered.length !== 1 ? "s" : ""} {catFilter !== "All" ? `in ${catFilter}` : "available"}
+        </div>
+
+        {/* Job cards */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {filtered.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "60px 0", color: C.body }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
+              <div style={{ fontSize: 15, fontWeight: 500, color: C.navy, marginBottom: 6 }}>No interviews found</div>
+              <div style={{ fontSize: 13 }}>Try a different search or filter</div>
+            </div>
+          ) : filtered.map(job => (
             <JobCard
               key={job.id}
               job={job}
               status={applyState[job.id] || "none"}
               isRecommended={job._matchScore >= MATCH_THRESHOLD}
               isMobile={isMobile}
-              onApply={() => {
-                setApplyState(prev => ({ ...prev, [job.id]: "applied" }));
-                handleView(job.id);
-              }}
+              onApply={() => { setApplyState(prev => ({ ...prev, [job.id]: "applied" })); handleView(job.id); }}
               onView={() => handleView(job.id)}
               onCycleDemo={() => {
                 const idx = APPLY_STEPS.indexOf(applyState[job.id] || "none");
-                const next = APPLY_STEPS[Math.min(idx + 1, APPLY_STEPS.length - 1)];
-                setApplyState(prev => ({ ...prev, [job.id]: next }));
+                setApplyState(prev => ({ ...prev, [job.id]: APPLY_STEPS[Math.min(idx + 1, APPLY_STEPS.length - 1)] }));
               }}
               go={go}
             />
@@ -185,21 +192,21 @@ export default function PanelBoardScreen({ go, user, logout }) {
 
         {/* Recently viewed */}
         {recentJobs.length > 0 && (
-          <div style={{ marginTop: 40 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 12 }}>Recently Viewed</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div style={{ marginTop: 48 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              Recently viewed
+            </div>
+            <div style={{ display: "flex", gap: 10, overflowX: "auto", scrollbarWidth: "none", paddingBottom: 4 }}>
               {recentJobs.map(job => (
                 <div key={job.id} style={{
-                  background: C.white, borderRadius: 10, padding: "12px 16px",
-                  border: `1px solid ${C.border}`,
-                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+                  background: "#fff", borderRadius: 10, padding: "12px 14px",
+                  border: `1px solid rgba(0,0,0,0.08)`, flexShrink: 0,
+                  minWidth: 200, maxWidth: 240,
                 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: C.navy, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{job.title}</div>
-                    <div style={{ fontSize: 11, color: C.body }}>{job.company} · {job.duration}</div>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{job.reward}</span>
+                  <div style={{ fontSize: 12, color: C.body, marginBottom: 4 }}>{job.company}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{job.title}</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: C.purple }}>{job.reward}</span>
                     <MatchBadge score={job._matchScore} />
                   </div>
                 </div>
@@ -213,6 +220,19 @@ export default function PanelBoardScreen({ go, user, logout }) {
   );
 }
 
+function MatchBadge({ score }) {
+  const pct = Math.min(100, Math.round((score / 8) * 100));
+  let color, bg;
+  if (pct >= 70) { color = "#15803d"; bg = "rgba(21,190,83,0.1)"; }
+  else if (pct >= 40) { color = "#92650a"; bg = "rgba(251,191,36,0.12)"; }
+  else { color = "#64748d"; bg = "rgba(100,116,141,0.08)"; }
+  return (
+    <span style={{ fontSize: 11, fontWeight: 600, color, background: bg, padding: "2px 8px", borderRadius: 4, flexShrink: 0 }}>
+      {pct}% match
+    </span>
+  );
+}
+
 function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycleDemo, go }) {
   const [expanded, setExpanded] = useState(true);
   const remaining = job.total - job.filled;
@@ -220,53 +240,49 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
   const isConfirmed = status === "confirmed";
   const isApplied = status !== "none";
   const isUrgent = job.urgent || remaining <= 10;
+  const matchPct = Math.min(100, Math.round((job._matchScore / 8) * 100));
 
   function handleToggle() {
-    if (!isApplied) {
-      setExpanded(v => !v);
-      onView();
-    }
+    if (!isApplied) { setExpanded(v => !v); onView(); }
   }
 
   return (
     <div
       onClick={handleToggle}
       style={{
-        background: C.white,
-        borderRadius: 12,
-        boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+        background: "#fff",
+        borderRadius: 14,
+        border: isRecommended ? `1.5px solid ${C.purpleLight}40` : "1px solid rgba(0,0,0,0.08)",
         overflow: "hidden",
         cursor: isApplied ? "default" : "pointer",
-        transition: "box-shadow 0.12s",
+        transition: "box-shadow 0.15s, transform 0.15s",
+        boxShadow: isRecommended ? "0 2px 12px rgba(110,75,255,0.08)" : "0 1px 4px rgba(0,0,0,0.05)",
       }}
-      onMouseEnter={e => { if (!isApplied) e.currentTarget.style.boxShadow = "0 3px 10px rgba(0,0,0,0.1)"; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)"; }}
+      onMouseEnter={e => { if (!isApplied) { e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)"; e.currentTarget.style.transform = "translateY(-1px)"; } }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = isRecommended ? "0 2px 12px rgba(110,75,255,0.08)" : "0 1px 4px rgba(0,0,0,0.05)"; e.currentTarget.style.transform = "none"; }}
     >
-      <div style={{ padding: isMobile ? "14px 16px" : "16px 20px" }}>
+      {/* Recommended accent bar */}
+      {isRecommended && <div style={{ height: 3, background: `linear-gradient(90deg, ${C.purple}, ${C.purpleLight})` }} />}
 
-        {/* Top row: badges + reward */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+      <div style={{ padding: isMobile ? "16px" : "18px 22px" }}>
+
+        {/* Header row: company + category / reward */}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 12, color: C.body }}>{job.company}</span>
-            <span style={{ fontSize: 12, color: C.border }}>·</span>
-            <span style={{ fontSize: 12, color: C.body }}>{job.category}</span>
-            {isUrgent && (
-              <span style={{
-                fontSize: 11, fontWeight: 600, color: "#dc2626",
-                background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 4,
-              }}>Closing Soon</span>
-            )}
+            <span style={{ fontSize: 12, fontWeight: 500, color: C.body }}>{job.company}</span>
+            <span style={{ width: 3, height: 3, borderRadius: "50%", background: C.border, display: "inline-block" }} />
+            <span style={{ fontSize: 11, color: C.body, background: "rgba(0,0,0,0.04)", padding: "2px 7px", borderRadius: 4 }}>{job.category}</span>
             {isRecommended && (
-              <span style={{
-                fontSize: 11, fontWeight: 600, color: C.purple,
-                background: "rgba(108,63,219,0.08)", padding: "2px 7px", borderRadius: 4,
-              }}>✦ Recommended</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: C.purple, background: `${C.purpleBg}`, padding: "2px 7px", borderRadius: 4 }}>✦ Matched</span>
             )}
-            <MatchBadge score={job._matchScore} />
+            {isUrgent && (
+              <span style={{ fontSize: 11, fontWeight: 600, color: "#dc2626", background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 4 }}>⚡ Closing Soon</span>
+            )}
           </div>
-          {/* Reward + duration — hero numbers */}
-          <div style={{ flexShrink: 0, marginLeft: 12, textAlign: "right" }}>
-            <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, lineHeight: 1 }}>{job.reward}</div>
+
+          {/* Reward — hero number */}
+          <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 12 }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{job.reward}</div>
             <div style={{ fontSize: 11, color: C.body, marginTop: 3, display: "flex", alignItems: "center", gap: 3, justifyContent: "flex-end" }}>
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={C.body} strokeWidth="1.4" strokeLinecap="round"><circle cx="5" cy="5" r="4"/><path d="M5 3v2l1.5 1.5"/></svg>
               {job.duration}
@@ -275,90 +291,101 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
         </div>
 
         {/* Title */}
-        <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 600, color: C.navy, lineHeight: 1.4, marginBottom: 10 }}>
+        <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 700, color: C.navy, lineHeight: 1.4, marginBottom: 12 }}>
           {job.title}
         </div>
 
-        {/* Urgency bar + remaining */}
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-            <span style={{ fontSize: 11, color: isUrgent ? "#dc2626" : C.body }}>
-              {isUrgent ? `⚡ ${remaining} spots left` : `${remaining} spots left`}
-            </span>
-            <span style={{ fontSize: 11, color: C.body }}>~{job.deadline}</span>
-          </div>
-          <div style={{ height: 3, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" }}>
+        {/* Match + fill row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+          <MatchBadge score={job._matchScore} />
+          <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{
               height: "100%", borderRadius: 2,
               width: `${fillPct}%`,
-              background: fillPct >= 80 ? "#dc2626" : C.purple,
+              background: fillPct >= 80 ? "#ef4444" : C.purple,
               transition: "width 0.3s",
             }} />
           </div>
+          <span style={{ fontSize: 11, color: isUrgent ? "#dc2626" : C.body, fontWeight: isUrgent ? 600 : 400, whiteSpace: "nowrap" }}>
+            {isUrgent ? `⚡ ${remaining} left` : `${remaining} spots`}
+          </span>
+          <span style={{ fontSize: 11, color: C.body, whiteSpace: "nowrap" }}>~{job.deadline}</span>
         </div>
 
         {/* CTA */}
         {isConfirmed ? (
           <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
-            <div style={{ flex: 1, padding: "9px 14px", background: "rgba(22,163,74,0.08)", borderRadius: 8, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#15803d" }}>Confirmed</span>
+            <div style={{ flex: 1, padding: "10px 14px", background: "rgba(22,163,74,0.07)", borderRadius: 8, border: "1px solid rgba(22,163,74,0.2)", display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#15803d" }}>Confirmed — you're in!</span>
             </div>
-            <button onClick={() => go("consent")}
-              style={{ padding: "9px 18px", background: C.purple, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: F }}>
-              Start Interview
+            <button onClick={() => go("consent")} style={{
+              padding: "10px 20px", background: C.purple, color: "#fff",
+              border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600,
+              cursor: "pointer", fontFamily: F, whiteSpace: "nowrap",
+            }}>
+              Start →
             </button>
           </div>
         ) : isApplied ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", background: "rgba(108,63,219,0.07)", borderRadius: 8 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.purple, flexShrink: 0 }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: C.purpleBg, borderRadius: 8, border: `1px solid ${C.purple}20` }}>
+            <div style={{ width: 7, height: 7, borderRadius: "50%", background: C.purple, flexShrink: 0 }} />
             <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>
-              {status === "applied" ? "Under AI screening review" : "Awaiting final Researcher confirmation"}
+              {status === "applied" ? "AI screening in progress…" : "Awaiting researcher confirmation"}
             </span>
           </div>
         ) : (
           <button
             onClick={e => { e.stopPropagation(); onApply(); }}
             style={{
-              width: "100%", padding: "10px 14px",
-              borderRadius: 8, border: "none",
-              background: C.purple, color: "#fff",
-              fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F,
-            }}>
-            Apply Now
+              width: "100%", padding: "11px 14px", borderRadius: 8,
+              border: "none", background: C.purple, color: "#fff",
+              fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: F,
+              transition: "background 0.12s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = C.purpleHover}
+            onMouseLeave={e => e.currentTarget.style.background = C.purple}
+          >
+            Apply Now →
           </button>
         )}
 
-        {/* Expanded detail */}
-        {expanded && (
-          <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}>
+        {/* Expanded details */}
+        {expanded && !isApplied && (
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid rgba(0,0,0,0.06)` }} onClick={e => e.stopPropagation()}>
             {job.description && (
-              <div style={{ fontSize: 13, color: C.body, lineHeight: 1.75, marginBottom: 12 }}>{job.description}</div>
+              <p style={{ fontSize: 13, color: C.body, lineHeight: 1.75, margin: "0 0 14px" }}>{job.description}</p>
             )}
-            {job.targetProfile && (
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 6, letterSpacing: 0.5 }}>Looking For</div>
-                <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 6 }}>
-                  {[job.targetProfile.age, job.targetProfile.gender, job.targetProfile.region].map((v, i) => (
-                    <span key={i} style={{ fontSize: 12, padding: "3px 9px", borderRadius: 5, background: C.bg, color: C.navy }}>{v}</span>
+            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+              {job.targetProfile && (
+                <div style={{ flex: 1, minWidth: 140 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Looking for</div>
+                  <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                    {[job.targetProfile.age, job.targetProfile.gender, job.targetProfile.region].map((v, i) => (
+                      <span key={i} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(0,0,0,0.04)", color: C.navy, fontWeight: 500 }}>{v}</span>
+                    ))}
+                  </div>
+                  {job.targetProfile.lifestyle && (
+                    <div style={{ fontSize: 12, color: C.body, lineHeight: 1.6, marginTop: 6 }}>{job.targetProfile.lifestyle}</div>
+                  )}
+                </div>
+              )}
+              <div style={{ flex: 1, minWidth: 140 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Requirements</div>
+                <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                  {job.conditions.map(c => (
+                    <span key={c} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: C.purpleBg, color: C.purple, fontWeight: 500 }}>{c}</span>
                   ))}
                 </div>
-                {job.targetProfile.lifestyle && (
-                  <div style={{ fontSize: 12, color: C.body, lineHeight: 1.7 }}>{job.targetProfile.lifestyle}</div>
-                )}
-                {job.targetProfile.exclude && (
-                  <div style={{ marginTop: 4, fontSize: 11, color: C.body }}>Excluded: {job.targetProfile.exclude}</div>
-                )}
-              </div>
-            )}
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 6, letterSpacing: 0.5 }}>Requirements</div>
-              <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-                {job.conditions.map(c => (
-                  <span key={c} style={{ fontSize: 12, padding: "3px 9px", borderRadius: 5, background: C.bg, color: C.navy }}>{c}</span>
-                ))}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Collapse hint */}
+        {!isApplied && (
+          <div style={{ textAlign: "center", marginTop: 10 }}>
+            <span style={{ fontSize: 11, color: C.body, opacity: 0.5 }}>{expanded ? "▲ less" : "▼ details"}</span>
           </div>
         )}
       </div>
