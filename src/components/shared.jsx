@@ -192,18 +192,18 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
   return (
     <>
       <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "stretch", justifyContent: "space-between", height: 56, position: "relative" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "stretch", height: 56 }}>
           <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go(homeTarget)}>
             <LogoMark dark={false} />
           </div>
-          {!isMobile && (
-            <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, transform: "translateX(-50%)", display: "flex", alignItems: "stretch" }}>
+          {!isMobile ? (
+            <div style={{ display: "flex", alignItems: "stretch" }}>
               {navLinks.map(([label, target]) => (
                 <NavTab key={label} label={label} active={activeTab === target} onClick={() => go(target)} dark={false} />
               ))}
             </div>
-          )}
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          ) : <div />}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
             {variant === "app" && !isMobile && (
               <>
                 {hasInterviews !== null && (
