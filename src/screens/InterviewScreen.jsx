@@ -773,7 +773,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
         {/* Powered by Voice Survey footer */}
         <div style={{ padding: "16px 20px", borderRadius: 12, border: `1px solid ${C.purpleLight}44`, background: C.purpleBg, textAlign: "left" }}>
-          <div style={{ fontSize: 12, color: `${C.purpleLight}`, marginBottom: 8, fontWeight: 500 }}>{isMobile ? "🎤 Voice Survey Interview" : "🎤 This interview was built with Voice Survey"}</div>
+          <div style={{ fontSize: 12, color: `${C.purpleLight}`, marginBottom: 8, fontWeight: 500 }}>{isMobile ? "Voice Survey Interview" : "This interview was built with Voice Survey"}</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>{isMobile ? "Run your own research →" : "Want to run research with voice? →"}</span>
             <button onClick={() => { track("powered_by_voice_survey_clicked", {}); window.location.href = "/"; }}

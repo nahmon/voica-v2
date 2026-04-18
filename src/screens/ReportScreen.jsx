@@ -325,12 +325,12 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
                     {selectedSession.respondent?.name || "Anonymous"} — Response detail
                   </div>
                   <div style={{ fontSize: 11, color: dk.muted, marginTop: 3 }}>
-                    🎙 {allResponses.filter(r => r.session_id === selectedSession.id && r.audio_url).length} voice · {allResponses.filter(r => r.session_id === selectedSession.id).length} responses
+                    {allResponses.filter(r => r.session_id === selectedSession.id && r.audio_url).length} voice · {allResponses.filter(r => r.session_id === selectedSession.id).length} responses
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <button onClick={() => setVoiceOnly(v => !v)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, border: `1px solid ${voiceOnly ? C.purple : dk.border}`, background: voiceOnly ? C.purpleBg : "transparent", color: voiceOnly ? C.purple : dk.muted, cursor: "pointer", fontFamily: F }}>
-                    {voiceOnly ? "Show all" : "🎙 Voice only"}
+                    {voiceOnly ? "Show all" : "Voice only"}
                   </button>
                   <button onClick={() => setSelectedSession(null)} style={{ background: "none", border: "none", color: dk.muted, cursor: "pointer", fontSize: 18 }}>✕</button>
                 </div>

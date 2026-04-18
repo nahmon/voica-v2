@@ -434,7 +434,7 @@ export default function LandingScreen({ go, user, logout }) {
                 style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: "#fff", border: `1.5px solid ${C.purpleLight}`, fontSize: 15, fontWeight: 600, color: C.purple, fontFamily: F, transition: "border-color 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", gap: 8 }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.transform = "translateY(-1px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = C.purpleLight; e.currentTarget.style.transform = "none"; }}>
-                🎙️ Join as Panelist
+                Join as Panelist
               </button>
             </div>
 

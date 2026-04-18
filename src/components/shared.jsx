@@ -101,12 +101,15 @@ export function Btn({ children, variant = "primary", size = "md", onClick, disab
   );
 }
 
-export function NavTab({ label, onClick, active }) {
+export function NavTab({ label, onClick, active, dark = false }) {
   const [hov, setHov] = useState(false);
+  const color = dark
+    ? active ? "rgba(190,180,255,0.95)" : hov ? "rgba(255,255,255,0.85)" : "rgba(200,205,230,0.65)"
+    : active ? C.purple : C.navy;
   return (
     <button onClick={onClick}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ position: "relative", display: "flex", alignItems: "center", padding: "0 14px", fontSize: 14, fontFamily: F, fontWeight: 400, color: active ? C.purple : C.navy, background: "transparent", border: "none", cursor: "pointer", transition: "color 0.15s", whiteSpace: "nowrap", letterSpacing: "0.16px", textDecoration: hov ? "underline" : "none" }}>
+      style={{ position: "relative", display: "flex", alignItems: "center", padding: "0 14px", fontSize: 14, fontFamily: F, fontWeight: 400, color, background: "transparent", border: "none", cursor: "pointer", transition: "color 0.15s", whiteSpace: "nowrap", letterSpacing: "0.16px", textDecoration: hov ? "underline" : "none" }}>
       {label}
     </button>
   );
@@ -195,7 +198,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
           {!isMobile && (
             <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, transform: "translateX(-50%)", display: "flex", alignItems: "stretch" }}>
               {navLinks.map(([label, target]) => (
-                <NavTab key={label} label={label} active={activeTab === target} onClick={() => go(target)} />
+                <NavTab key={label} label={label} active={activeTab === target} onClick={() => go(target)} dark={variant === "app"} />
               ))}
             </div>
           )}
@@ -206,7 +209,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                   <Btn size="sm" onClick={() => go(hasInterviews ? "dashboard" : "editor")}>{hasInterviews ? "Dashboard" : "+ Start Interview"}</Btn>
                 )}
                 {logout && <Btn variant="ghost" size="sm" onClick={logout}>Log Out</Btn>}
-                <div style={{ width: 1, height: 16, background: C.border }} />
+                <div style={{ width: 1, height: 16, background: variant === "app" ? "rgba(255,255,255,0.12)" : C.border }} />
                 {(() => {
                   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
                   const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "U";
@@ -232,7 +235,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
               </>
             )}
             {isMobile && (
-              <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", color: C.navy, fontSize: 20, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
+              <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", color: variant === "app" ? "rgba(200,205,230,0.8)" : C.navy, fontSize: 20, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
             )}
           </div>
         </div>
@@ -708,8 +711,14 @@ export function Footer({ go }) {
             ))}
           </div>
         </div>
-        <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 20 }}>
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.16px" }}>Copyright © {new Date().getFullYear()} Voice Survey Inc. All rights reserved.</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "2px" }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.9)", background: "rgba(255,255,255,0.12)", borderRadius: 6, padding: "4px 10px", letterSpacing: "0.02em" }}>ENG</span>
+            <a href="https://voica-nv3572kdi-20morn-6473s-projects.vercel.app" style={{ fontSize: 12, fontWeight: 400, color: "rgba(255,255,255,0.4)", padding: "4px 10px", borderRadius: 6, textDecoration: "none", letterSpacing: "0.02em", transition: "color 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.8)"}
+              onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.4)"}>한국어</a>
+          </div>
         </div>
       </div>
     </footer>

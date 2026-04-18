@@ -1,0 +1,31 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - link "QuoteBridge" [ref=e6] [cursor=pointer]:
+        - /url: /
+      - link "+ 새 견적서" [ref=e7] [cursor=pointer]:
+        - /url: /new
+  - main [ref=e8]:
+    - generic [ref=e9]:
+      - generic [ref=e10]: 📋
+      - heading "견적서 한 장, 30초면 됩니다." [level=1] [ref=e11]:
+        - text: 견적서 한 장,
+        - text: 30초면 됩니다.
+      - paragraph [ref=e12]:
+        - text: 거래처 정보와 품목만 넣으면
+        - text: QuoteBridge가 PDF까지 완성해드립니다.
+      - link "첫 견적서 만들기 →" [ref=e13] [cursor=pointer]:
+        - /url: /new
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]: ⚡
+          - generic [ref=e17]: 30초 완성
+          - generic [ref=e18]: 자동완성
+        - generic [ref=e19]:
+          - generic [ref=e20]: 📄
+          - generic [ref=e21]: PDF 즉시 발송
+          - generic [ref=e22]: 원클릭
+        - generic [ref=e23]:
+          - generic [ref=e24]: 🌏
+          - generic [ref=e25]: 다국어·다통화
+          - generic [ref=e26]: KRW·JPY·USD
