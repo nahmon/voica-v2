@@ -20,6 +20,10 @@ const GLOBAL_STYLES = `
   0%,100% { box-shadow: 0 0 0 0 rgba(83,58,253,0.25); }
   50%     { box-shadow: 0 0 0 6px rgba(83,58,253,0); }
 }
+@keyframes bubble-in { from { opacity:0; transform:translateY(10px) scale(0.96); } to { opacity:1; transform:none; } }
+@keyframes rec-ring { 0%{box-shadow:0 0 0 0 rgba(220,38,38,0.5)} 70%{box-shadow:0 0 0 10px rgba(220,38,38,0)} 100%{box-shadow:0 0 0 0 rgba(220,38,38,0)} }
+@keyframes wave-bar { 0%,100%{transform:scaleY(0.4)} 50%{transform:scaleY(1)} }
+@keyframes typing-dot { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-4px);opacity:1} }
 `;
 
 /* ── Fade-in-on-scroll wrapper (local, no shared.jsx changes) ── */
@@ -90,6 +94,112 @@ function CounterStat({ end, suffix, label, delay, color, labelColor }) {
   );
 }
 
+
+/* ── Animated chat mockup ── */
+const CHAT_CONVOS = [
+  { q: "What part of running research feels heaviest right now?", a: "Honestly — recruiting. Two weeks to find ten people, and by then the question's already moved on." },
+  { q: "How many user interviews do you run per quarter?", a: "Maybe 3 or 4. I wish it were more, but it's just too slow and expensive." },
+  { q: "What would faster research unlock for your team?", a: "We'd ship with way more confidence. No more guessing what users actually want." },
+];
+
+function AnimatedChatMockup() {
+  const [convoIdx, setConvoIdx] = useState(0);
+  const [phase, setPhase] = useState("typing"); // typing → question → recording → response
+
+  useEffect(() => {
+    const timers = [];
+    const advance = (delay, nextPhase, cb) => { const t = setTimeout(() => { setPhase(nextPhase); cb && cb(); }, delay); timers.push(t); return t; };
+    if (phase === "typing") { advance(1400, "question"); }
+    else if (phase === "question") { advance(2000, "recording"); }
+    else if (phase === "recording") { advance(2200, "response"); }
+    else if (phase === "response") {
+      advance(2800, "typing", () => { setConvoIdx(i => (i + 1) % CHAT_CONVOS.length); });
+    }
+    return () => timers.forEach(clearTimeout);
+  }, [phase]);
+
+  const convo = CHAT_CONVOS[convoIdx];
+  const isTyping = phase === "typing";
+  const isRecording = phase === "recording";
+  const showResponse = phase === "response";
+
+  return (
+    <div style={{
+      width: 460, background: "#fff",
+      borderRadius: 16, border: `1px solid ${C.border}`,
+      boxShadow: `0 24px 64px -12px rgba(110,75,255,0.18), 0 4px 16px -4px rgba(0,0,0,0.08)`,
+      overflow: "hidden", fontFamily: F,
+    }}>
+      {/* Header */}
+      <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fafbff" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 12, color: C.body, fontWeight: 500 }}>interview / vs-b2n</span>
+          <span style={{ fontSize: 11, color: C.body }}>· Q{convoIdx + 1} of {CHAT_CONVOS.length}</span>
+        </div>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, color: C.successText, fontWeight: 600 }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
+          live
+        </span>
+      </div>
+
+      {/* Chat area */}
+      <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 14, minHeight: 220, position: "relative" }}>
+        {/* AI bubble */}
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(110,75,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <svg width={14} height={14} viewBox="0 0 20 20" fill="none" stroke={C.purple} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="1" width="6" height="11" rx="3"/><path d="M3.5 10a6.5 6.5 0 0013 0"/><line x1="10" y1="16.5" x2="10" y2="19"/><line x1="7" y1="19" x2="13" y2="19"/></svg>
+          </div>
+          <div style={{ background: "#f4f1fe", borderRadius: "4px 12px 12px 12px", padding: "11px 14px", maxWidth: 310, minHeight: 44, display: "flex", alignItems: "center" }}>
+            {isTyping ? (
+              <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                {[0, 1, 2].map(i => (
+                  <div key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: C.purple, animation: `typing-dot 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                ))}
+              </div>
+            ) : (
+              <div style={{ fontSize: 14, color: C.navy, lineHeight: 1.5, animation: "bubble-in 0.35s ease" }}>
+                {convo.q}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Recording state */}
+        {isRecording && (
+          <div style={{ display: "flex", justifyContent: "flex-end", animation: "bubble-in 0.3s ease" }}>
+            <div style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 12, padding: "10px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#dc2626", animation: "rec-ring 1.2s ease infinite, pulse-dot 1.2s ease infinite" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 3, height: 24 }}>
+                {[0,1,2,3,4,5,6].map(i => (
+                  <div key={i} style={{ width: 3, borderRadius: 2, background: "#dc2626", transformOrigin: "bottom", height: `${10 + (i % 3) * 5}px`, animation: `wave-bar 0.6s ease-in-out ${(i * 0.08).toFixed(2)}s infinite` }} />
+                ))}
+              </div>
+              <span style={{ fontSize: 12, color: "#dc2626", fontWeight: 600 }}>Recording…</span>
+            </div>
+          </div>
+        )}
+
+        {/* User response */}
+        {showResponse && (
+          <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-start", gap: 10, animation: "bubble-in 0.35s ease" }}>
+            <div style={{ background: C.purple, borderRadius: "12px 4px 12px 12px", padding: "11px 14px", fontSize: 14, color: "#fff", lineHeight: 1.5, maxWidth: 310 }}>
+              {convo.a}
+            </div>
+            <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.purpleLight}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: C.purple, flexShrink: 0 }}>U</div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fafbff" }}>
+        <span style={{ fontSize: 11, color: C.body }}>🔒 encrypted · end-to-end</span>
+        <button style={{ padding: "8px 18px", borderRadius: 8, background: isRecording ? "#dc2626" : C.purple, border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "background 0.3s" }}>
+          {isRecording ? "Stop ■" : "Continue →"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /* ── Comparison section ── */
 function BeforeAfterSection({ isMobile }) {
@@ -334,50 +444,10 @@ export default function LandingScreen({ go, user, logout }) {
             </div>
           </div>
 
-          {/* ── Right: chat-style interview mockup ── */}
+          {/* ── Right: animated interview mockup ── */}
           {!isMobile && (
             <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-              <div style={{
-                width: 460, background: "#fff",
-                borderRadius: 16, border: `1px solid ${C.border}`,
-                boxShadow: `0 24px 64px -12px rgba(110,75,255,0.18), 0 4px 16px -4px rgba(0,0,0,0.08)`,
-                overflow: "hidden", fontFamily: F,
-              }}>
-                {/* header */}
-                <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fafbff" }}>
-                  <span style={{ fontSize: 12, color: C.body, fontWeight: 500 }}>interview / vs-b2n</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, color: C.successText, fontWeight: 600 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
-                    live
-                  </span>
-                </div>
-                {/* chat area */}
-                <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 14, minHeight: 230 }}>
-                  {/* AI question */}
-                  <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: `rgba(110,75,255,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <svg width={14} height={14} viewBox="0 0 20 20" fill="none" stroke={C.purple} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="1" width="6" height="11" rx="3"/><path d="M3.5 10a6.5 6.5 0 0013 0"/><line x1="10" y1="16.5" x2="10" y2="19"/><line x1="7" y1="19" x2="13" y2="19"/></svg>
-                    </div>
-                    <div style={{ background: "#f4f1fe", borderRadius: "4px 12px 12px 12px", padding: "11px 14px", fontSize: 14, color: C.navy, lineHeight: 1.5, maxWidth: 310 }}>
-                      What part of running research feels heaviest right now?
-                    </div>
-                  </div>
-                  {/* User response */}
-                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-start", gap: 10 }}>
-                    <div style={{ background: C.purple, borderRadius: "12px 4px 12px 12px", padding: "11px 14px", fontSize: 14, color: "#fff", lineHeight: 1.5, maxWidth: 310 }}>
-                      Honestly — recruiting. We burn two weeks finding ten people, and by then the question has already moved on.
-                    </div>
-                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.purpleLight}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: C.purple, flexShrink: 0 }}>U</div>
-                  </div>
-                </div>
-                {/* footer */}
-                <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fafbff" }}>
-                  <span style={{ fontSize: 11, color: C.body }}>🔒 encrypted · end-to-end</span>
-                  <button style={{ padding: "8px 18px", borderRadius: 8, background: C.purple, border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                    Continue →
-                  </button>
-                </div>
-              </div>
+              <AnimatedChatMockup />
             </div>
           )}
         </div>
