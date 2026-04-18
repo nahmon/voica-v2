@@ -4,6 +4,7 @@ import { C, S, F } from "../lib/constants.jsx";
 import { Btn, Input, Divider, GlobalNav } from "../components/shared.jsx";
 
 export default function AdvertiserLoginScreen({ go }) {
+  const [lang] = useState("ko");
   const [role, setRole] = useState("researcher");
   const [tab, setTab] = useState("login");
   const [email, setEmail] = useState("");
@@ -86,7 +87,7 @@ export default function AdvertiserLoginScreen({ go }) {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
-      <GlobalNav go={go} variant="sub" />
+      <GlobalNav go={go} variant="sub" lang={lang} />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: tab === "signup" ? "32px 24px 48px" : "60px 24px" }}>
         <div style={{ width: "100%", maxWidth: 440 }}>

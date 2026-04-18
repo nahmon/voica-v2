@@ -333,7 +333,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   /* ── Desktop: 2-panel layout ── */
   return (
     <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
-      <GlobalNav go={go} variant="app" user={user} logout={logout} />
+      <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
 
       {/* Sub-header */}
       <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 24px", height: 48, display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
