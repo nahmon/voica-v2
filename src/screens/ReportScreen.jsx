@@ -514,6 +514,11 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
         </div>
       </main>
       <div className="no-print">
+        <div style={{ background: "#f8fafc", borderTop: `1px solid ${C.border}`, padding: "20px 24px", textAlign: "center" }}>
+          <p style={{ margin: 0, fontSize: 11, color: C.body, lineHeight: 1.65, maxWidth: 720, marginInline: "auto" }}>
+            ⚠️ 본 리포트는 AI 분석을 기반으로 한 참고 자료이며, 매수·매도 또는 투자에 관한 권유·추천이 아닙니다. 제공되는 인사이트 및 분석 결과는 정보 제공 목적에 한하며, 이를 근거로 한 의사결정에 대해 Voice Survey는 법적·재정적 책임을 지지 않습니다. 투자 결정은 반드시 본인의 판단과 전문가 상담을 통해 이루어져야 합니다.
+          </p>
+        </div>
         <Footer go={go} />
       </div>
     </div>
