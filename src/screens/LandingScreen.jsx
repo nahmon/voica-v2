@@ -136,27 +136,27 @@ function BeforeAfterSection({ isMobile }) {
           {/* two-table layout */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
             {/* Traditional table */}
-            <div style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden" }}>
-              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(200,190,255,0.5)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Traditional</div>
+            <div style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", overflow: "hidden" }}>
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.1)" }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(220,215,255,0.75)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Traditional</div>
               </div>
               {rows.map((row, i) => (
-                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none", background: "rgba(255,255,255,0.02)" }}>
-                  <div style={{ fontSize: 13, color: "rgba(200,190,255,0.45)", fontWeight: 500 }}>{row.label}</div>
-                  <div style={{ fontSize: 13, color: "rgba(200,190,255,0.55)" }}>{row.before}</div>
+                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none", background: "rgba(255,255,255,0.06)" }}>
+                  <div style={{ fontSize: 13, color: "rgba(220,215,255,0.6)", fontWeight: 500 }}>{row.label}</div>
+                  <div style={{ fontSize: 13, color: "rgba(220,215,255,0.8)" }}>{row.before}</div>
                 </div>
               ))}
             </div>
 
             {/* voicesurvey table — brighter */}
-            <div style={{ borderRadius: 12, border: "1px solid rgba(110,75,255,0.4)", overflow: "hidden" }}>
-              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(110,75,255,0.3)", background: "rgba(110,75,255,0.18)", display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.purpleLight, textTransform: "uppercase", letterSpacing: "0.08em" }}>voicesurvey</div>
-                <span style={{ fontSize: 10, background: "rgba(110,75,255,0.35)", color: C.purpleLight, padding: "2px 8px", borderRadius: 4 }}>Recommended</span>
+            <div style={{ borderRadius: 12, border: "1px solid rgba(110,75,255,0.6)", overflow: "hidden" }}>
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(110,75,255,0.4)", background: "rgba(110,75,255,0.35)", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: "0.08em" }}>voicesurvey</div>
+                <span style={{ fontSize: 10, background: "rgba(255,255,255,0.2)", color: "#fff", padding: "2px 8px", borderRadius: 4 }}>Recommended</span>
               </div>
               {rows.map((row, i) => (
-                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(110,75,255,0.15)" : "none", background: "rgba(110,75,255,0.09)" }}>
-                  <div style={{ fontSize: 13, color: "rgba(200,190,255,0.55)", fontWeight: 500 }}>{row.label}</div>
+                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(110,75,255,0.2)" : "none", background: "rgba(110,75,255,0.18)" }}>
+                  <div style={{ fontSize: 13, color: "rgba(220,210,255,0.7)", fontWeight: 500 }}>{row.label}</div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{row.after}</div>
                 </div>
               ))}
