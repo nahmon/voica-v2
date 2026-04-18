@@ -1,0 +1,71 @@
+/* ── Design System — Voice Survey ── */
+:root {
+  --primary:     #6E4BFF;
+  --primary-ink: #5B36F0;
+  --primary-bg:  rgba(110,75,255,.10);
+  --primary-bd:  rgba(110,75,255,.22);
+
+  --surface:        #FBFAFF;
+  --surface-1:      #FFFFFF;
+  --surface-2:      #F4F1FE;
+  --surface-hi:     #ECE6FD;
+  --surface-variant:#F7F5FF;
+
+  --on-surface:      #1B1140;
+  --on-surface-2:    #5B5478;
+  --on-surface-3:    #8B85A6;
+
+  --border:   #ECE7FA;
+  --border-2: #DCD3F5;
+  --focus:    rgba(110,75,255,.30);
+
+  --radius: 8px;
+  --radius-sm: 6px;
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
+
+/* ── Landing light theme (applied to LandingScreen wrapper) ── */
+.landing-light {
+  background: #FBFAFF;
+  background-image:
+    radial-gradient(900px 500px at 90% -10%, rgba(110,75,255,.10), transparent 60%),
+    radial-gradient(700px 400px at -10% 30%, rgba(168,140,255,.12), transparent 60%);
+  color: #1B1140;
+  min-height: 100vh;
+}
+
+/* Nav override inside landing-light */
+.landing-light nav {
+  background: rgba(255,255,255,.78) !important;
+  border-bottom: 1px solid #ECE7FA !important;
+  backdrop-filter: saturate(180%) blur(12px) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(12px) !important;
+}
+
+/* Card subtle shadow inside landing-light */
+.landing-light .vs-card {
+  background: #fff;
+  border-color: #ECE7FA;
+  box-shadow: 0 1px 0 rgba(27,17,64,.02), 0 12px 32px -16px rgba(110,75,255,.18);
+}
+
+/* stats / comparison sections stay white */
+.landing-light section {
+  background: transparent;
+}
+
+/* dark footer band stays dark */
+.landing-light footer {
+  background: #060f1f !important;
+}
+
+/* scroll reveal utility */
+.reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .5s var(--ease), transform .5s var(--ease);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}

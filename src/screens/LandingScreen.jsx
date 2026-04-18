@@ -243,7 +243,7 @@ export default function LandingScreen({ go, user, logout }) {
   }, []);
 
   return (
-    <div style={{ fontFamily: F, fontFeatureSettings: '"ss01"' }}>
+    <div className="landing-light" style={{ fontFamily: F, fontFeatureSettings: '"ss01"' }}>
       <style>{GLOBAL_STYLES}</style>
       <GlobalNav go={go} activeTab="landing" variant={user ? "app" : "public"} isMobile={isMobile} user={user} logout={logout} />
 

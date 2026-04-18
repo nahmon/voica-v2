@@ -1,8 +1,8 @@
 // ─── Design Tokens ───
 export const C = {
-  purple: "#533afd", purpleHover: "#4434d4", purpleDeep: "#2e2b8c",
-  purpleLight: "#b9b9f9", purpleBg: "rgba(83,58,253,0.05)",
-  navy: "#061b31", label: "#273951", body: "#64748d",
+  purple: "#6E4BFF", purpleHover: "#5B36F0", purpleDeep: "#3d2ab0",
+  purpleLight: "#c4b5fd", purpleBg: "rgba(110,75,255,0.07)",
+  navy: "#1B1140", label: "#3d3560", body: "#5B5478",
   white: "#ffffff", brandDark: "#1c1e54", border: "#e5edf5",
   success: "#15be53", successText: "#108c3d",
   successBg: "rgba(21,190,83,0.18)", successBorder: "rgba(21,190,83,0.4)",
