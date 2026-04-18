@@ -191,6 +191,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
               status={applyState[job.id] || "none"}
               isRecommended={job._matchScore >= MATCH_THRESHOLD}
               isMobile={isMobile}
+              isKo={isKo}
               onApply={() => { setApplyState(prev => ({ ...prev, [job.id]: "applied" })); handleView(job.id); }}
               onView={() => handleView(job.id)}
               onCycleDemo={() => {
@@ -219,7 +220,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
                   <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{job.title}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: C.purple }}>{job.reward}</span>
-                    <MatchBadge score={job._matchScore} />
+                    <MatchBadge score={job._matchScore} isKo={isKo} />
                   </div>
                 </div>
               ))}
@@ -232,7 +233,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
   );
 }
 
-function MatchBadge({ score }) {
+function MatchBadge({ score, isKo }) {
   const pct = Math.min(100, Math.round((score / 8) * 100));
   let color, bg;
   if (pct >= 70) { color = "#15803d"; bg = "rgba(21,190,83,0.1)"; }
@@ -240,12 +241,12 @@ function MatchBadge({ score }) {
   else { color = "#64748d"; bg = "rgba(100,116,141,0.08)"; }
   return (
     <span style={{ fontSize: 11, fontWeight: 600, color, background: bg, padding: "2px 8px", borderRadius: 4, flexShrink: 0 }}>
-      {pct}% match
+      {isKo ? `${pct}% 일치` : `${pct}% match`}
     </span>
   );
 }
 
-function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycleDemo, go }) {
+function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, onCycleDemo, go }) {
   const [expanded, setExpanded] = useState(true);
   const remaining = job.total - job.filled;
   const fillPct = Math.round((job.filled / job.total) * 100);
@@ -285,10 +286,10 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
             <span style={{ width: 3, height: 3, borderRadius: "50%", background: C.border, display: "inline-block" }} />
             <span style={{ fontSize: 11, color: C.body, background: "rgba(0,0,0,0.04)", padding: "2px 7px", borderRadius: 4 }}>{job.category}</span>
             {isRecommended && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: C.purple, background: `${C.purpleBg}`, padding: "2px 7px", borderRadius: 4 }}>✦ Matched</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: C.purple, background: `${C.purpleBg}`, padding: "2px 7px", borderRadius: 4 }}>{isKo ? "✦ 추천" : "✦ Matched"}</span>
             )}
             {isUrgent && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#dc2626", background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 4 }}>⚡ Closing Soon</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: "#dc2626", background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 4 }}>{isKo ? "⚡ 마감 임박" : "⚡ Closing Soon"}</span>
             )}
           </div>
 
@@ -309,7 +310,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
 
         {/* Match + fill row */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <MatchBadge score={job._matchScore} />
+          <MatchBadge score={job._matchScore} isKo={isKo} />
           <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{
               height: "100%", borderRadius: 2,
@@ -319,7 +320,9 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
             }} />
           </div>
           <span style={{ fontSize: 11, color: isUrgent ? "#dc2626" : C.body, fontWeight: isUrgent ? 600 : 400, whiteSpace: "nowrap" }}>
-            {isUrgent ? `⚡ ${remaining} left` : `${remaining} spots`}
+            {isUrgent
+              ? (isKo ? `⚡ ${remaining}자리 남음` : `⚡ ${remaining} left`)
+              : (isKo ? `${remaining}자리 남음` : `${remaining} spots`)}
           </span>
           <span style={{ fontSize: 11, color: C.body, whiteSpace: "nowrap" }}>~{job.deadline}</span>
         </div>
@@ -329,21 +332,23 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
           <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
             <div style={{ flex: 1, padding: "10px 14px", background: "rgba(22,163,74,0.07)", borderRadius: 8, border: "1px solid rgba(22,163,74,0.2)", display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#15803d" }}>Confirmed — you're in!</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#15803d" }}>{isKo ? "참여 확정됐어요!" : "Confirmed — you're in!"}</span>
             </div>
             <button onClick={() => go("consent")} style={{
               padding: "10px 20px", background: C.purple, color: "#fff",
               border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600,
               cursor: "pointer", fontFamily: F, whiteSpace: "nowrap",
             }}>
-              Start →
+              {isKo ? "시작하기 →" : "Start →"}
             </button>
           </div>
         ) : isApplied ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: C.purpleBg, borderRadius: 8, border: `1px solid ${C.purple}20` }}>
             <div style={{ width: 7, height: 7, borderRadius: "50%", background: C.purple, flexShrink: 0 }} />
             <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>
-              {status === "applied" ? "AI screening in progress…" : "Awaiting researcher confirmation"}
+              {status === "applied"
+                ? (isKo ? "AI가 지원서를 검토하고 있어요…" : "AI screening in progress…")
+                : (isKo ? "연구자 확인을 기다리고 있어요" : "Awaiting researcher confirmation")}
             </span>
           </div>
         ) : (
@@ -358,7 +363,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
             onMouseEnter={e => e.currentTarget.style.background = C.purpleHover}
             onMouseLeave={e => e.currentTarget.style.background = C.purple}
           >
-            Apply Now →
+            {isKo ? "지원하기 →" : "Apply Now →"}
           </button>
         )}
 
@@ -371,7 +376,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
             <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
               {job.targetProfile && (
                 <div style={{ flex: 1, minWidth: 140 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Looking for</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>{isKo ? "모집 대상" : "Looking for"}</div>
                   <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                     {[job.targetProfile.age, job.targetProfile.gender, job.targetProfile.region].map((v, i) => (
                       <span key={i} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(0,0,0,0.04)", color: C.navy, fontWeight: 500 }}>{v}</span>
@@ -383,7 +388,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
                 </div>
               )}
               <div style={{ flex: 1, minWidth: 140 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Requirements</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>{isKo ? "참여 조건" : "Requirements"}</div>
                 <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                   {job.conditions.map(c => (
                     <span key={c} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: C.purpleBg, color: C.purple, fontWeight: 500 }}>{c}</span>
@@ -397,7 +402,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
         {/* Collapse hint */}
         {!isApplied && (
           <div style={{ textAlign: "center", marginTop: 10 }}>
-            <span style={{ fontSize: 11, color: C.body, opacity: 0.5 }}>{expanded ? "▲ less" : "▼ details"}</span>
+            <span style={{ fontSize: 11, color: C.body, opacity: 0.5 }}>{expanded ? (isKo ? "▲ 접기" : "▲ less") : (isKo ? "▼ 자세히" : "▼ details")}</span>
           </div>
         )}
       </div>
