@@ -5,6 +5,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function PanelEntryScreen({ go }) {
   const isMobile = useIsMobile();
+  const [lang, setLang] = useState("ko");
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "", phone: "", region: "", gender: "", age: "",
@@ -67,7 +68,7 @@ export default function PanelEntryScreen({ go }) {
     );
   }
 
-  const navBar = <GlobalNav go={go} variant="sub" />;
+  const navBar = <GlobalNav go={go} variant="sub" lang={lang} />;
 
   if (step === 0) return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>

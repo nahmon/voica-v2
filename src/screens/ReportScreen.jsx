@@ -12,6 +12,7 @@ const SECTIONS = [
 
 export default function ReportScreen({ go, user, logout, interviewId }) {
   const isMobile = useIsMobile();
+  const [lang, setLang] = useState("ko");
   const { showToast } = useToast();
   const [interview, setInterview] = useState(null);
   const [sessions, setSessions] = useState([]);
@@ -198,7 +199,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
       `}</style>
 
       <div className="no-print">
-        <GlobalNav go={go} variant="app" user={user} logout={logout} />
+        <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
       </div>
 
       {/* Sub nav */}
@@ -520,7 +521,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
         </div>
       </main>
       <div className="no-print">
-        <Footer go={go} />
+        <Footer go={go} lang={lang} onLangChange={setLang} />
       </div>
     </div>
   );

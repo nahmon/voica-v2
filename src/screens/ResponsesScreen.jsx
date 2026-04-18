@@ -131,6 +131,7 @@ function StatsBar({ sessions, allResponses }) {
 }
 
 export default function ResponsesScreen({ go, user, logout, interviewId }) {
+  const [lang, setLang] = useState("ko");
   const [interview, setInterview] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -237,7 +238,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
       : "Interview in progress";
     return (
       <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg }}>
-        <GlobalNav go={go} variant="app" user={user} logout={logout} />
+        <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
         <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 16px", height: 48, display: "flex", alignItems: "center", gap: 10 }}>
           <button onClick={() => setSelectedSession(null)}
             style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: C.navy, padding: "0 4px", lineHeight: 1 }}>←</button>
@@ -263,7 +264,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   if (isMobile) {
     return (
       <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg }}>
-        <GlobalNav go={go} variant="app" user={user} logout={logout} />
+        <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
         <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 16px", height: 48, display: "flex", alignItems: "center", gap: 10 }}>
           <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← Dashboard</Btn>
           <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>

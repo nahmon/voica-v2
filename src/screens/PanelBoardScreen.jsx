@@ -30,6 +30,7 @@ function addRecentlyViewed(jobId) {
 }
 
 export default function PanelBoardScreen({ go, user, logout }) {
+  const [lang, setLang] = useState("ko");
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("All");
@@ -65,7 +66,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
 
   return (
     <div style={{ background: "#f5f6fa", minHeight: "100vh", fontFamily: F }}>
-      <GlobalNav go={go} activeTab="panel_board" variant={user?.user_metadata?.role === "researcher" ? "app" : "panel"} user={user} logout={logout} />
+      <GlobalNav go={go} activeTab="panel_board" variant={user?.user_metadata?.role === "researcher" ? "app" : "panel"} user={user} logout={logout} lang={lang} />
 
       {/* Hero */}
       <div style={{
@@ -215,7 +216,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
           </div>
         )}
       </div>
-      <Footer go={go} />
+      <Footer go={go} lang={lang} onLangChange={setLang} />
     </div>
   );
 }

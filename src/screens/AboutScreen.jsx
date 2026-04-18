@@ -1,13 +1,15 @@
+import { useState } from "react";
 import { C, F } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function AboutScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
+  const [lang, setLang] = useState("ko");
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
-      <GlobalNav go={go} variant={user ? "app" : "public"} user={user} logout={logout} />
+      <GlobalNav go={go} variant={user ? "app" : "public"} user={user} logout={logout} lang={lang} />
 
       {/* Hero */}
       <div style={{ background: C.navy, padding: isMobile ? "56px 24px 48px" : "80px 40px 72px", textAlign: "center" }}>
@@ -57,7 +59,7 @@ export default function AboutScreen({ go, user, logout }) {
         </section>
       </main>
 
-      <Footer go={go} />
+      <Footer go={go} lang={lang} onLangChange={setLang} />
     </div>
   );
 }

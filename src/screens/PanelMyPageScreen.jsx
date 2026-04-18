@@ -39,6 +39,7 @@ const STATUS_MAP = {
 };
 
 export default function PanelMyPageScreen({ go, user, logout }) {
+  const [lang, setLang] = useState("ko");
   const isMobile = useIsMobile();
   const [notifInterview, setNotifInterview] = useState(true);
   const [notifReward, setNotifReward] = useState(true);
@@ -87,7 +88,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
-      <GlobalNav go={go} variant="panel" user={user} logout={logout} />
+      <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
 
       <div style={{ maxWidth: 640, margin: "0 auto", padding: isMobile ? "20px 16px 48px" : "28px 24px 48px" }}>
 
@@ -360,7 +361,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
           <Btn variant="ghost" onClick={() => go("panel_board")}>Browse More Interviews</Btn>
         </div>
       </div>
-      <Footer go={go} />
+      <Footer go={go} lang={lang} onLangChange={setLang} />
     </div>
   );
 }

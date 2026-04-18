@@ -95,6 +95,7 @@ const FAQ_ITEMS = [
 
 export default function ConsentScreen({ go, user, logout, shareCode }) {
   const isMobile = useIsMobile();
+  const [lang, setLang] = useState("ko");
   const [step, setStep] = useState(0); // 0=Overview, 1=Consent, 2=Start
   const [agreed1, setAgreed1] = useState(false);
   const [agreed2, setAgreed2] = useState(false);
@@ -170,7 +171,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
   if (step === 0) {
     return (
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
-        <GlobalNav go={go} variant="panel" user={user} logout={logout} />
+        <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
         <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
           <div style={{ width: "100%", maxWidth: 540 }}>
             <StepIndicator current={0} />
@@ -217,7 +218,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
             </Btn>
           </div>
         </div>
-        <Footer go={go} />
+        <Footer go={go} lang={lang} onLangChange={setLang} />
       </div>
     );
   }
@@ -226,7 +227,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
   if (step === 1) {
     return (
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
-        <GlobalNav go={go} variant="panel" user={user} logout={logout} />
+        <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
         <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
           <div style={{ width: "100%", maxWidth: 540 }}>
             <StepIndicator current={1} />
@@ -303,7 +304,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
             </div>
           </div>
         </div>
-        <Footer go={go} />
+        <Footer go={go} lang={lang} onLangChange={setLang} />
       </div>
     );
   }
@@ -311,7 +312,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
   // Step 2: Start
   return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
-      <GlobalNav go={go} variant="panel" user={user} logout={logout} />
+      <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
         <div style={{ width: "100%", maxWidth: 540 }}>
           <StepIndicator current={2} />
@@ -353,7 +354,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
           </div>
         </div>
       </div>
-      <Footer go={go} />
+      <Footer go={go} lang={lang} onLangChange={setLang} />
     </div>
   );
 }

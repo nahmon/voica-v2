@@ -27,6 +27,7 @@ const STATUS_FILTERS = ["All", "In Progress", "Draft", "Completed"];
 
 export default function DashboardScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
+  const [lang, setLang] = useState("ko");
   const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("All");
@@ -128,7 +129,7 @@ export default function DashboardScreen({ go, user, logout }) {
           box-shadow: ${S.card};
         }
       `}</style>
-      <GlobalNav go={go} activeTab="dashboard" variant="app" logout={logout} isMobile={isMobile} user={user} />
+      <GlobalNav go={go} activeTab="dashboard" variant="app" logout={logout} isMobile={isMobile} user={user} lang={lang} />
 
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 16 }}>
@@ -280,7 +281,7 @@ export default function DashboardScreen({ go, user, logout }) {
           })}
         </div>
       </main>
-      <Footer go={go} />
+      <Footer go={go} lang={lang} onLangChange={setLang} />
     </div>
   );
 }

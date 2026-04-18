@@ -32,6 +32,7 @@ function InfoTooltip({ text }) {
 }
 
 export default function RecruiterAdminScreen({ go, user, logout }) {
+  const [lang, setLang] = useState("ko");
   const [filter, setFilter] = useState("All");
   const [selected, setSelected] = useState(new Set());
   const isMobile = useIsMobile();
@@ -48,7 +49,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F }}>
-      <GlobalNav go={go} variant="app" user={user} logout={logout} />
+      <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
       <div style={{ padding: "10px 24px", background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← Dashboard</Btn>
         <div style={{ display: "flex", gap: 8 }}>
@@ -190,7 +191,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
         </div>
         )}
       </main>
-      <Footer go={go} />
+      <Footer go={go} lang={lang} onLangChange={setLang} />
     </div>
   );
 }
