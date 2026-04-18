@@ -77,8 +77,8 @@ export default function PanelEntryScreen({ go }) {
         <div style={{ width: "100%", maxWidth: 520 }}>
           <StepBar />
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>Tell us a bit about yourself</div>
-            <div style={{ fontSize: 13, color: C.body }}>Used for reward delivery and interview matching</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>지금 패널로 참여하고, 리워드를 받아보세요</div>
+            <div style={{ fontSize: 13, color: C.body }}>참여자님에게 딱 맞는 추천 인터뷰 공고를 찾아왔습니다.</div>
           </div>
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "28px", boxShadow: S.standard, display: "flex", flexDirection: "column", gap: 22 }}>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
