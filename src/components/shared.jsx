@@ -72,7 +72,7 @@ export function Badge({ children, variant = "neutral", style: sx = {} }) {
     ai: { background: "rgba(0,113,227,0.08)", color: C.purple, border: "none" },
     success: { background: "rgba(29,125,58,0.08)", color: C.successText, border: "none" },
     negative: { background: "rgba(217,48,37,0.08)", color: C.ruby, border: "none" },
-    warning: { background: "rgba(0,0,0,0.06)", color: "rgba(0,0,0,0.56)", border: "none" },
+    warning: { background: "#fef3c7", color: "#92400e", border: "none" },
     dark: { background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", border: "none" },
   };
   return <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 5, fontSize: 12, fontWeight: 400, fontFamily: F, letterSpacing: "0.16px", whiteSpace: "nowrap", ...v[variant], ...sx }}>{children}</span>;
