@@ -318,7 +318,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                   <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>Respondent {originalIdx + 1}</div>
                   <div style={{ fontSize: 12, color: C.body }}>{dt} · {respCount} responses</div>
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: isCompleted ? C.successText : "#b45309", whiteSpace: "nowrap" }}>
+                <div style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 10, whiteSpace: "nowrap", background: isCompleted ? "rgba(21,190,83,0.12)" : "#fef3c7", color: isCompleted ? C.successText : "#92400e" }}>
                   {isCompleted ? "Completed" : "In progress"}
                 </div>
                 <span style={{ color: C.body, fontSize: 16 }}>›</span>
@@ -414,7 +414,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                       {originalIdx + 1}
                     </div>
                     <span style={{ flex: 1, fontSize: 12, color: isSelected ? C.purple : C.navy }}>Respondent {originalIdx + 1}</span>
-                    <span style={{ fontSize: 10, color: isCompleted ? C.successText : "#b45309" }}>{isCompleted ? "Done" : "Active"}</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 8, background: isCompleted ? "rgba(21,190,83,0.12)" : "#fef3c7", color: isCompleted ? C.successText : "#92400e" }}>{isCompleted ? "Done" : "Active"}</span>
                   </div>
                 );
               }
@@ -428,7 +428,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, color: isSelected ? C.purple : C.navy, fontWeight: isSelected ? 500 : 400 }}>Respondent {originalIdx + 1}</div>
-                      <div style={{ fontSize: 11, color: isCompleted ? C.successText : "#b45309" }}>{isCompleted ? "Completed" : "In progress"}</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 8, display: "inline-block", background: isCompleted ? "rgba(21,190,83,0.12)" : "#fef3c7", color: isCompleted ? C.successText : "#92400e" }}>{isCompleted ? "Completed" : "In progress"}</div>
                     </div>
                     <div style={{ fontSize: 10, color: C.body, textAlign: "right", flexShrink: 0 }}>
                       {respCount} responses
