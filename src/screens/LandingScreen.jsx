@@ -91,58 +91,65 @@ function CounterStat({ end, suffix, label, delay, color, labelColor }) {
 }
 
 
-/* ── Before vs After comparison ── */
+/* ── Comparison section ── */
 function BeforeAfterSection({ isMobile }) {
-  const col = (side, items, accent) => (
-    <div style={{
-      flex: 1,
-      borderRadius: 16,
-      padding: isMobile ? "24px 20px" : "32px 28px",
-      background: side === "after" ? `linear-gradient(135deg, ${C.purple} 0%, #2e2b8c 100%)` : C.white,
-      border: side === "after" ? "none" : `1px solid ${C.border}`,
-    }}>
-      <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: side === "after" ? "rgba(255,255,255,0.65)" : C.body, marginBottom: 16 }}>
-        {side === "before" ? "Traditional approach" : "✦ Voice Survey"}
-      </div>
-      {items.map(({ icon, bold, rest }) => (
-        <div key={bold} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-          <span style={{ fontSize: 20 }}>{icon}</span>
-          <span style={{ fontSize: isMobile ? 15 : 16, color: side === "after" ? C.white : C.navy, lineHeight: 1.4 }}>
-            <strong style={{ fontWeight: 700, color: side === "after" ? C.white : C.purple }}>{bold}</strong>{" "}{rest}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
+  const metrics = [
+    { value: "50×", label: "larger sample" },
+    { value: "1/40", label: "the cost" },
+    { value: "×144", label: "faster launch" },
+  ];
+  const rows = [
+    { label: "Timeline", before: "~2 weeks", after: "10 minutes to launch" },
+    { label: "Cost", before: "$1,500+", after: "$49" },
+    { label: "Sample", before: "10 participants", after: "500 parallel" },
+    { label: "Analysis", before: "Manual transcription", after: "Automated, by-theme" },
+    { label: "Recruiting", before: "Agency dependent", after: "Matched in-platform" },
+  ];
 
   return (
     <FadeInSection>
-      <section style={{ background: C.white, padding: isMobile ? "60px 20px" : "80px 24px" }}>
-        <div style={{ maxWidth: 800, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <Badge variant="purple" style={{ marginBottom: 12 }}>Comparison</Badge>
-            <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, color: C.navy, margin: "0 0 12px", fontFamily: F }}>
-              Old way vs <span style={{ color: C.purple }}>Voice Survey</span>
+      <section style={{ background: "transparent", padding: isMobile ? "60px 20px" : "80px 24px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          {/* header */}
+          <div style={{ marginBottom: 40 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.body, marginBottom: 10 }}>Comparison</div>
+            <h2 style={{ fontSize: isMobile ? 24 : 36, fontWeight: 700, color: C.navy, margin: "0 0 10px", fontFamily: F }}>
+              Traditional flow vs. <span style={{ color: C.purple }}>voicesurvey</span>
             </h2>
-            <p style={{ fontSize: 15, color: C.body, margin: 0 }}>Hear from your customers<br />accurately and fast</p>
+            <p style={{ fontSize: 15, color: C.body, margin: 0 }}>Same research, at one-tenth the cost and ten times the sample.</p>
           </div>
 
-          <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexDirection: isMobile ? "column" : "row", alignItems: "stretch" }}>
-            {col("before", [
-              { icon: "⏳", bold: "2 weeks", rest: "to complete" },
-              { icon: "💸", bold: "$1,500+", rest: "cost" },
-              { icon: "👤", bold: "10 people", rest: "interviewed" },
-            ])}
+          {/* metric cards */}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
+            {metrics.map(m => (
+              <div key={m.value} style={{ background: "#fff", border: `1px solid ${C.border}`, borderRadius: 12, padding: isMobile ? "20px 18px" : "28px 24px" }}>
+                <div style={{ fontSize: isMobile ? 36 : 48, fontWeight: 700, color: C.purple, lineHeight: 1, fontFamily: F }}>{m.value}</div>
+                <div style={{ fontSize: 14, color: C.body, marginTop: 10 }}>{m.label}</div>
+              </div>
+            ))}
+          </div>
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: C.body, flexShrink: 0 }}>
-              {isMobile ? "↓" : "→"}
+          {/* comparison table */}
+          <div style={{ background: "#fff", border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "80px 1fr 28px 1fr" : "160px 1fr 36px 1fr", padding: "12px 20px", borderBottom: `1px solid ${C.border}`, background: "#fafbff", gap: 12, alignItems: "center" }}>
+              <div />
+              <div style={{ fontSize: 12, color: C.body, fontWeight: 500 }}>Traditional</div>
+              <div />
+              <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, display: "flex", alignItems: "center", gap: 6 }}>
+                voicesurvey
+                <span style={{ fontSize: 10, background: C.purpleBg, color: C.purple, padding: "2px 7px", borderRadius: 4 }}>Recommended</span>
+              </div>
             </div>
-
-            {col("after", [
-              { icon: "⚡", bold: "10 minutes", rest: "to complete" },
-              { icon: "💡", bold: "$49", rest: "cost" },
-              { icon: "🎙️", bold: "500 people", rest: "interviewed simultaneously" },
-            ])}
+            {rows.map((row, i) => (
+              <div key={row.label} style={{ display: "grid", gridTemplateColumns: isMobile ? "80px 1fr 28px 1fr" : "160px 1fr 36px 1fr", padding: isMobile ? "14px 20px" : "16px 20px", borderBottom: i < rows.length - 1 ? `1px solid ${C.border}` : "none", alignItems: "center", gap: 12 }}>
+                <div style={{ fontSize: 13, color: C.body }}>{row.label}</div>
+                <div style={{ fontSize: 13, color: C.body, opacity: 0.55, textDecoration: "line-through" }}>{row.before}</div>
+                <div style={{ width: 26, height: 26, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.purpleLight}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: 11, color: C.purple }}>→</span>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{row.after}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -316,7 +323,7 @@ export default function LandingScreen({ go, user, logout }) {
             </div>
           </div>
 
-          {/* ── Right: interview mockup ── */}
+          {/* ── Right: chat-style interview mockup ── */}
           {!isMobile && (
             <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
               <div style={{
@@ -325,7 +332,7 @@ export default function LandingScreen({ go, user, logout }) {
                 boxShadow: `0 24px 64px -12px rgba(110,75,255,0.18), 0 4px 16px -4px rgba(0,0,0,0.08)`,
                 overflow: "hidden", fontFamily: F,
               }}>
-                {/* mockup header */}
+                {/* header */}
                 <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fafbff" }}>
                   <span style={{ fontSize: 12, color: C.body, fontWeight: 500 }}>interview / vs-b2n</span>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, color: C.successText, fontWeight: 600 }}>
@@ -333,39 +340,29 @@ export default function LandingScreen({ go, user, logout }) {
                     live
                   </span>
                 </div>
-                {/* progress */}
-                <div style={{ padding: "16px 20px 0" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: C.purple, letterSpacing: "0.08em" }}>QUESTION 3 OF 14</span>
-                    <span style={{ fontSize: 11, color: C.body }}>≈ 6 min left</span>
+                {/* chat area */}
+                <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 14, minHeight: 230 }}>
+                  {/* AI question */}
+                  <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: `rgba(110,75,255,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width={14} height={14} viewBox="0 0 20 20" fill="none" stroke={C.purple} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="1" width="6" height="11" rx="3"/><path d="M3.5 10a6.5 6.5 0 0013 0"/><line x1="10" y1="16.5" x2="10" y2="19"/><line x1="7" y1="19" x2="13" y2="19"/></svg>
+                    </div>
+                    <div style={{ background: "#f4f1fe", borderRadius: "4px 12px 12px 12px", padding: "11px 14px", fontSize: 14, color: C.navy, lineHeight: 1.5, maxWidth: 310 }}>
+                      What part of running research feels heaviest right now?
+                    </div>
                   </div>
-                  <div style={{ height: 3, background: C.border, borderRadius: 2 }}>
-                    <div style={{ width: "21%", height: "100%", background: C.purple, borderRadius: 2 }} />
+                  {/* User response */}
+                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-start", gap: 10 }}>
+                    <div style={{ background: C.purple, borderRadius: "12px 4px 12px 12px", padding: "11px 14px", fontSize: 14, color: "#fff", lineHeight: 1.5, maxWidth: 310 }}>
+                      Honestly — recruiting. We burn two weeks finding ten people, and by then the question has already moved on.
+                    </div>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.purpleLight}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: C.purple, flexShrink: 0 }}>U</div>
                   </div>
-                </div>
-                {/* question */}
-                <div style={{ padding: "20px 20px 16px", display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: `rgba(110,75,255,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width={14} height={14} viewBox="0 0 20 20" fill="none" stroke={C.purple} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="1" width="6" height="11" rx="3"/><path d="M3.5 10a6.5 6.5 0 0013 0"/><line x1="10" y1="16.5" x2="10" y2="19"/><line x1="7" y1="19" x2="13" y2="19"/></svg>
-                  </div>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: C.navy, margin: 0, lineHeight: 1.45 }}>Biggest friction in your current research flow?</p>
-                </div>
-                {/* options */}
-                <div style={{ padding: "0 20px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
-                  {["Recruiting time & cost", "Designing questions", "Analyzing transcripts", "Measuring business impact"].map((opt, i) => (
-                    <div key={opt} style={{
-                      padding: "11px 14px", borderRadius: 8,
-                      border: `1.5px solid ${i === 2 ? C.purple : C.border}`,
-                      background: i === 2 ? `rgba(110,75,255,0.06)` : "#fff",
-                      fontSize: 13, color: i === 2 ? C.purple : C.navy, fontWeight: i === 2 ? 600 : 400,
-                      cursor: "pointer",
-                    }}>{opt}</div>
-                  ))}
                 </div>
                 {/* footer */}
-                <div style={{ padding: "12px 20px", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fafbff" }}>
-                  <span style={{ fontSize: 11, color: C.body }}>🔒 encrypted end-to-end</span>
-                  <button style={{ padding: "8px 18px", borderRadius: 8, background: C.purple, border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fafbff" }}>
+                  <span style={{ fontSize: 11, color: C.body }}>🔒 encrypted · end-to-end</span>
+                  <button style={{ padding: "8px 18px", borderRadius: 8, background: C.purple, border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                     Continue →
                   </button>
                 </div>
@@ -377,24 +374,36 @@ export default function LandingScreen({ go, user, logout }) {
 
       {/* ── Stats ── */}
       <FadeInSection>
-        <section style={{ background: "#fff", borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "40px 20px" : "52px 24px" }}>
-          <div style={{ maxWidth: 800, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)" }}>
-            {[
-              { end: 12400, suffix: "+", label: "Registered panelists", color: C.purple, delay: 0 },
-              { end: 4200, suffix: "", label: "Interviews completed this month", color: C.navy, delay: 100 },
-              { end: 94, suffix: "%", label: "AI analysis accuracy", color: C.successText, delay: 200 },
-              { end: 8, suffix: " min", label: "Average interview length", color: C.ruby, delay: 300 },
-            ].map(({ label, ...stat }, i) => (
-              <div key={label} style={{
-                textAlign: "center",
-                padding: isMobile ? "20px 12px" : "24px 20px",
-                fontSize: isMobile ? 26 : 34,
-                borderRight: (isMobile ? i % 2 === 0 : i < 3) ? `1px solid ${C.border}` : "none",
-                borderBottom: (isMobile && i < 2) ? `1px solid ${C.border}` : "none",
-              }}>
-                <CounterStat {...stat} label={label} labelColor="rgba(10,11,13,0.56)" />
+        <section style={{ background: "rgba(110,75,255,0.04)", borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "48px 20px" : "64px 24px" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 40, flexWrap: "wrap", gap: 12 }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 8 }}>Live Numbers</div>
+                <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: C.navy, margin: 0, fontFamily: F }}>What's happening on the platform right now</h2>
               </div>
-            ))}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.25)", fontSize: 12, fontWeight: 600, color: C.successText }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
+                live
+              </span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 0 }}>
+              {[
+                { end: 12400, suffix: "+", label: "Registered panelists", color: C.purple, delay: 0 },
+                { end: 4200, suffix: "", label: "Interviews completed this month", color: C.purple, delay: 100 },
+                { end: 94, suffix: "%", label: "AI analysis accuracy", color: C.purple, delay: 200 },
+                { end: 8, suffix: " min", label: "Average interview length", color: C.purple, delay: 300 },
+              ].map(({ label, ...stat }, i) => (
+                <div key={label} style={{
+                  textAlign: "left",
+                  padding: isMobile ? "20px 12px" : "24px 32px",
+                  fontSize: isMobile ? 32 : 44,
+                  borderRight: (isMobile ? i % 2 === 0 : i < 3) ? `1px solid ${C.border}` : "none",
+                  borderBottom: (isMobile && i < 2) ? `1px solid ${C.border}` : "none",
+                }}>
+                  <CounterStat {...stat} label={label} labelColor={C.body} />
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </FadeInSection>
