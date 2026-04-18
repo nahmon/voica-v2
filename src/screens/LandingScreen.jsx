@@ -143,7 +143,7 @@ function AnimatedChatMockup() {
       </div>
 
       {/* Chat area */}
-      <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 14, minHeight: 220, position: "relative" }}>
+      <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 14, height: 240, position: "relative", overflow: "hidden" }}>
         {/* AI bubble */}
         <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(110,75,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
