@@ -13,23 +13,25 @@ export default function PricingScreen({ go, user, logout }) {
   const proYearlyMonthly = Math.round(proMonthly * 0.8);
   const proYearlyTotal = proYearlyMonthly * 12;
   const proKrwMonthly = 199000;
-  const proKrwYearlyMonthly = Math.round(proKrwMonthly * 0.8);
+  const proKrwYearlyMonthly = 159000;
   const proKrwYearlyTotal = proKrwYearlyMonthly * 12;
   const proDisplayPrice = isKo
-    ? (billing === "yearly" ? `₩${(proKrwYearlyMonthly / 1000).toFixed(0)}만원/월` : `₩${(proKrwMonthly / 1000).toFixed(0)}만원/월`)
+    ? (billing === "yearly"
+        ? `₩${proKrwYearlyMonthly.toLocaleString("ko-KR")}/월`
+        : `₩${proKrwMonthly.toLocaleString("ko-KR")}/월`)
     : (billing === "yearly" ? `$${proYearlyMonthly}/mo` : `$${proMonthly}/mo`);
   const proDisplaySub = billing === "yearly"
-    ? (isKo ? `연 ₩${(proKrwYearlyTotal).toLocaleString("ko-KR")} 결제 · 20% 절약` : `$${proYearlyTotal} billed annually · save 20%`)
+    ? (isKo ? `연 ₩${proKrwYearlyTotal.toLocaleString("ko-KR")} 결제 · 20% 절약` : `$${proYearlyTotal} billed annually · save 20%`)
     : (isKo ? "월간 결제 · 언제든 자유롭게 취소" : "Billed monthly · cancel anytime");
 
   const proFeatures = isKo ? [
     "월 500개 응답 포함 (초과 시 응답당 ₩660)",
-    "AI 심층 분석 + 주제 드릴다운",
+    "AI 심층 분석 · 주제 드릴다운",
     "대표 인용문 자동 추출",
-    "크로스탭 분석 및 세그먼트 비교",
+    "크로스탭 분석 · 세그먼트 비교",
     "CSV / PDF 내보내기",
     "팀원 최대 5명",
-    "1년 데이터 보관",
+    "데이터 1년 보관",
   ] : [
     "500 responses/mo included (then $0.49 per response)",
     "AI deep analysis + theme drill-down",
