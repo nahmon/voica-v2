@@ -1,28 +1,36 @@
 import { useState } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
-import { FAQ_DATA } from "../lib/mockData.js";
+import { FAQ_DATA, FAQ_DATA_KO } from "../lib/mockData.js";
 
 export default function FAQScreen({ go, user, logout }) {
-  const [openIdx, setOpenIdx] = useState(null); // "catIdx-itemIdx"
+  const [openIdx, setOpenIdx] = useState(null);
+  const [lang, setLang] = useState("ko");
+  const isKo = lang === "ko";
+  const data = isKo ? FAQ_DATA_KO : FAQ_DATA;
 
   const toggle = (key) => setOpenIdx(prev => prev === key ? null : key);
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
-      <GlobalNav go={go} activeTab="faq" variant={user ? "app" : "public"} user={user} logout={logout} />
+      <GlobalNav go={go} activeTab="faq" variant={user ? "app" : "public"} user={user} logout={logout} lang={lang} />
 
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
         <div style={{ width: "100%", maxWidth: 640 }}>
-          {/* Title */}
           <div style={{ marginBottom: 32 }}>
-            <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>Frequently Asked Questions</div>
-            <div style={{ fontSize: 14, color: C.body }}>Can't find what you're looking for? <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 14, padding: 0, textDecoration: "underline" }}>Contact support</button></div>
+            <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>
+              {isKo ? "자주 묻는 질문" : "Frequently Asked Questions"}
+            </div>
+            <div style={{ fontSize: 14, color: C.body }}>
+              {isKo ? "찾는 내용이 없으세요? " : "Can't find what you're looking for? "}
+              <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 14, padding: 0, textDecoration: "underline" }}>
+                {isKo ? "고객 지원 문의" : "Contact support"}
+              </button>
+            </div>
           </div>
 
-          {/* FAQ list */}
           <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-            {FAQ_DATA.map((section, ci) => (
+            {data.map((section, ci) => (
               <div key={ci}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: C.purple, letterSpacing: 0.2, marginBottom: 10, textTransform: "uppercase" }}>{section.category}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 1, borderRadius: 10, overflow: "hidden", border: `1px solid ${C.border}` }}>
@@ -40,7 +48,7 @@ export default function FAQScreen({ go, user, logout }) {
                           </span>
                         </button>
                         {open && (
-                          <div style={{ padding: "0 20px 18px 20px", fontSize: 13, color: C.body, lineHeight: 1.8, borderTop: `1px solid ${C.purpleBg}`, paddingTop: 14, background: C.purpleBg }}>
+                          <div style={{ padding: "0 20px 18px 20px", fontSize: 13, color: C.body, lineHeight: 1.8, borderTop: `1px solid ${C.purpleBg}`, paddingTop: 14, background: C.purpleBg, whiteSpace: "pre-line" }}>
                             {item.a}
                           </div>
                         )}
@@ -52,15 +60,18 @@ export default function FAQScreen({ go, user, logout }) {
             ))}
           </div>
 
-          {/* CTA */}
           <div style={{ marginTop: 40, background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "24px 24px", textAlign: "center" }}>
-            <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 6 }}>Still have questions?</div>
-            <div style={{ fontSize: 13, color: C.body, marginBottom: 18 }}>Send us a message and we'll get back to you within 1–2 business days.</div>
-            <Btn onClick={() => go("support")}>Contact support</Btn>
+            <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 6 }}>
+              {isKo ? "아직 궁금한 점이 있어요?" : "Still have questions?"}
+            </div>
+            <div style={{ fontSize: 13, color: C.body, marginBottom: 18 }}>
+              {isKo ? "메시지를 보내주시면 1~2 영업일 내에 답변드려요." : "Send us a message and we'll get back to you within 1–2 business days."}
+            </div>
+            <Btn onClick={() => go("support")}>{isKo ? "고객 지원 문의" : "Contact support"}</Btn>
           </div>
         </div>
       </div>
-      <Footer go={go} />
+      <Footer go={go} lang={lang} onLangChange={setLang} />
     </div>
   );
 }

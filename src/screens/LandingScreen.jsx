@@ -82,15 +82,15 @@ const TRANSLATIONS = {
     },
   },
   ko: {
-    badge: "✦ AI가 인터뷰하고. AI가 분석합니다.",
+    badge: "✦ AI가 인터뷰하고, AI가 분석해요.",
     hero: {
       messages: [
         { line1: "비싸고 오래 걸리는 사용자 조사,", line2: "AI로 수백 명을 한 번에" },
         { line0: "고객의 목소리를", line1: "직접 들으세요,", line2: "정확하고\u00A0빠르게" },
       ],
       fromInterview: { line1: "AI 인터뷰는 어떠셨나요?", line2: "AI로 수백 명과 인터뷰하세요" },
-      subtitleDesktop: <>질문만 작성하면 AI가 수백 명의 패널리스트와 동시에 인터뷰를 진행합니다.<br />주제 분석, 감성 태깅, 인사이트 리포트가 자동으로 생성됩니다.</>,
-      subtitleMobile: <>질문만 작성하면 AI가 나머지를 처리합니다.<br />분석, 감성, 리포트 모두 자동화됩니다.</>,
+      subtitleDesktop: <>질문만 작성하면 AI가 수백 명의 패널리스트와 동시에 인터뷰를 진행합니다.<br />주제 분석, 감성 태깅, 인사이트 리포트까지 AI가 알아서 만들어줘요.</>,
+      subtitleMobile: <>질문만 작성하면 AI가 나머지를 처리합니다.<br />분석, 감성, 리포트 모두 AI가 자동으로 처리해요.</>,
       cta1: "연구자 / 비즈니스 →",
       cta2: "패널리스트로 참여",
       liveCounter: (n) => <><strong style={{ fontWeight: 600, color: C.purple }}>지금 {n}명</strong>이 인터뷰 중입니다</>,
@@ -128,7 +128,7 @@ const TRANSLATIONS = {
     cta: {
       badge: "지금 시작하기",
       title: "무료로 시작하세요",
-      subtitleDesktop: <>신용카드 없이 바로 시작할 수 있습니다.<br />첫 번째 인터뷰 프로젝트는 완전 무료입니다.</>,
+      subtitleDesktop: <>신용카드 없이 바로 시작할 수 있어요.<br />첫 번째 인터뷰 프로젝트는 완전 무료예요.</>,
       subtitleMobile: "신용카드 불필요.",
       cta1: "연구자로 시작하기 →",
       cta2: "패널리스트로 참여",

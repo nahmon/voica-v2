@@ -12,7 +12,7 @@ function LogoMark({ size = 20, dark = false }) {
       }}>
         <div style={{ width: Math.round(size * 0.38), height: Math.round(size * 0.38), borderRadius: Math.round(size * 0.07), background: "#fff" }} />
       </div>
-      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: "-0.02em", color: dark ? "#ffffff" : "#0f172a", fontFamily: F }}>
+      <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.03em", color: dark ? "#ffffff" : "#0f172a", fontFamily: F }}>
         voicesurvey
       </span>
     </div>
@@ -154,7 +154,7 @@ export function BackBtn({ onClick, label = "Home", dark = false }) {
 
 // ─── Global Navigation Bar ───
 // variant: "public" (landing/pricing/faq/support), "app" (dashboard/editor/report/recruiter), "panel" (board/mypage/consent), "sub" (login/panel_entry)
-export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile: isMobileProp, user }) {
+export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile: isMobileProp, user, lang = "en" }) {
   const isMobileHook = useIsMobile();
   const isMobile = isMobileProp !== undefined ? isMobileProp : isMobileHook;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -179,26 +179,27 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
       });
   }, [variant, user?.id]);
 
+  const isKo = lang === "ko";
   const navLinks =
     variant === "app"
-      ? [["Dashboard", "dashboard"], ["Pricing", "pricing"], ["FAQ", "faq"], ["Support", "support"]]
+      ? [[isKo ? "대시보드" : "Dashboard", "dashboard"], [isKo ? "요금제" : "Pricing", "pricing"], ["FAQ", "faq"], [isKo ? "고객 지원" : "Support", "support"]]
       : variant === "panel"
-      ? [["Open Interviews", "panel_board"], ["My Interviews", "panel_mypage"], ["FAQ", "faq"], ["Support", "support"]]
-      : [["About", "about"], ["Panelist Board", "panel_board"], ["Pricing", "pricing"], ["FAQ", "faq"], ["Support", "support"]];
+      ? [[isKo ? "인터뷰 찾기" : "Open Interviews", "panel_board"], [isKo ? "나의 인터뷰" : "My Interviews", "panel_mypage"], ["FAQ", "faq"], [isKo ? "고객 지원" : "Support", "support"]]
+      : [[isKo ? "소개" : "About", "about"], [isKo ? "패널 보드" : "Panelist Board", "panel_board"], [isKo ? "요금제" : "Pricing", "pricing"], ["FAQ", "faq"], [isKo ? "고객 지원" : "Support", "support"]];
 
   const homeTarget = "landing";
 
   return (
     <>
-      <nav style={{ position: "sticky", top: 0, zIndex: 100, background: variant === "app" ? "rgba(11,15,28,0.96)" : "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: variant === "app" ? "1px solid rgba(255,255,255,0.08)" : `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
+      <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "stretch", justifyContent: "space-between", height: 56, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go(homeTarget)}>
-            <LogoMark dark={variant === "app"} />
+            <LogoMark dark={false} />
           </div>
           {!isMobile && (
             <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, transform: "translateX(-50%)", display: "flex", alignItems: "stretch" }}>
               {navLinks.map(([label, target]) => (
-                <NavTab key={label} label={label} active={activeTab === target} onClick={() => go(target)} dark={variant === "app"} />
+                <NavTab key={label} label={label} active={activeTab === target} onClick={() => go(target)} dark={false} />
               ))}
             </div>
           )}
@@ -206,10 +207,10 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             {variant === "app" && !isMobile && (
               <>
                 {hasInterviews !== null && (
-                  <Btn size="sm" onClick={() => go(hasInterviews ? "dashboard" : "editor")}>{hasInterviews ? "Dashboard" : "+ Start Interview"}</Btn>
+                  <Btn size="sm" onClick={() => go(hasInterviews ? "dashboard" : "editor")}>{hasInterviews ? (isKo ? "대시보드" : "Dashboard") : (isKo ? "+ 인터뷰 시작" : "+ Start Interview")}</Btn>
                 )}
-                {logout && <Btn variant="ghost" size="sm" onClick={logout}>Log Out</Btn>}
-                <div style={{ width: 1, height: 16, background: variant === "app" ? "rgba(255,255,255,0.12)" : C.border }} />
+                {logout && <Btn variant="ghost" size="sm" onClick={logout}>{isKo ? "로그아웃" : "Log Out"}</Btn>}
+                <div style={{ width: 1, height: 16, background: C.border }} />
                 {(() => {
                   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
                   const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "U";
@@ -218,24 +219,24 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                     ? <img src={avatarUrl} alt="profile" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover", border: `1px solid ${C.border}` }} onError={e => { e.currentTarget.style.display = "none"; }} />
                     : initials;
                 })()}
-                <div style={{ fontSize: 12, color: "rgba(200,205,230,0.8)", letterSpacing: "0.16px" }}>
+                <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>
                   {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || ""}
                 </div>
               </>
             )}
             {variant === "panel" && !isMobile && (
               <>
-                {logout && <Btn variant="ghost" size="sm" onClick={logout}>Log Out</Btn>}
+                {logout && <Btn variant="ghost" size="sm" onClick={logout}>{isKo ? "로그아웃" : "Log Out"}</Btn>}
               </>
             )}
             {(variant === "public" || variant === "sub") && !isMobile && (
               <>
-                <Btn variant="ghost" size="sm" style={{ border: "1px solid rgba(23,23,23,0.2)", borderRadius: 56 }} onClick={() => go("panel_entry")}>Join as Panelist</Btn>
-                <Btn size="sm" onClick={() => go("advertiser_login")}>Log In</Btn>
+                <Btn variant="ghost" size="sm" style={{ border: "1px solid rgba(23,23,23,0.2)", borderRadius: 56 }} onClick={() => go("panel_entry")}>{isKo ? "패널리스트 참여" : "Join as Panelist"}</Btn>
+                <Btn size="sm" onClick={() => go("advertiser_login")}>{isKo ? "로그인" : "Log In"}</Btn>
               </>
             )}
             {isMobile && (
-              <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", color: variant === "app" ? "rgba(200,205,230,0.8)" : C.navy, fontSize: 20, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
+              <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", color: C.navy, fontSize: 20, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
             )}
           </div>
         </div>
@@ -253,13 +254,13 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             <div style={{ flex: 1, overflowY: "auto", padding: "12px 0" }}>
               {variant === "app" ? (
                 <>
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>Researcher</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>{isKo ? "연구자" : "Researcher"}</div>
                   {[
-                    { label: "Dashboard", target: "dashboard", desc: "Manage active interviews" },
-                    { label: "Create Interview", target: "editor", desc: "Design a new interview" },
-                    { label: "Pricing", target: "pricing", desc: "Compare plans" },
-                    { label: "FAQ", target: "faq", desc: "Frequently asked questions" },
-                    { label: "Support", target: "support", desc: "Help & contact" },
+                    { label: isKo ? "대시보드" : "Dashboard", target: "dashboard", desc: isKo ? "진행 중인 인터뷰 관리" : "Manage active interviews" },
+                    { label: isKo ? "인터뷰 만들기" : "Create Interview", target: "editor", desc: isKo ? "새 인터뷰 설계" : "Design a new interview" },
+                    { label: isKo ? "요금제" : "Pricing", target: "pricing", desc: isKo ? "플랜 비교" : "Compare plans" },
+                    { label: "FAQ", target: "faq", desc: isKo ? "자주 묻는 질문" : "Frequently asked questions" },
+                    { label: isKo ? "고객 지원" : "Support", target: "support", desc: isKo ? "도움말 및 문의" : "Help & contact" },
                   ].map(item => (
                     <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
@@ -275,12 +276,12 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                 </>
               ) : variant === "panel" ? (
                 <>
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>Panelist</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>{isKo ? "패널리스트" : "Panelist"}</div>
                   {[
-                    { label: "Open Interviews", target: "panel_board", desc: "Browse open listings" },
-                    { label: "My Interviews", target: "panel_mypage", desc: "Applications & progress" },
-                    { label: "FAQ", target: "faq", desc: "Frequently asked questions" },
-                    { label: "Support", target: "support", desc: "Help & contact" },
+                    { label: isKo ? "인터뷰 찾기" : "Open Interviews", target: "panel_board", desc: isKo ? "공개 인터뷰 목록" : "Browse open listings" },
+                    { label: isKo ? "나의 인터뷰" : "My Interviews", target: "panel_mypage", desc: isKo ? "지원 현황 및 진행 상황" : "Applications & progress" },
+                    { label: "FAQ", target: "faq", desc: isKo ? "자주 묻는 질문" : "Frequently asked questions" },
+                    { label: isKo ? "고객 지원" : "Support", target: "support", desc: isKo ? "도움말 및 문의" : "Help & contact" },
                   ].map(item => (
                     <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
@@ -296,12 +297,12 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                 </>
               ) : (
                 <>
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>Product</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>{isKo ? "서비스" : "Product"}</div>
                   {[
-                    { label: "About", target: "about", desc: "What Voice Survey does" },
-                    { label: "Pricing", target: "pricing", desc: "Compare plans" },
-                    { label: "FAQ", target: "faq", desc: "Frequently asked questions" },
-                    { label: "Support", target: "support", desc: "Help & contact" },
+                    { label: isKo ? "소개" : "About", target: "about", desc: isKo ? "Voice Survey 소개" : "What Voice Survey does" },
+                    { label: isKo ? "요금제" : "Pricing", target: "pricing", desc: isKo ? "플랜 비교" : "Compare plans" },
+                    { label: "FAQ", target: "faq", desc: isKo ? "자주 묻는 질문" : "Frequently asked questions" },
+                    { label: isKo ? "고객 지원" : "Support", target: "support", desc: isKo ? "도움말 및 문의" : "Help & contact" },
                   ].map(item => (
                     <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
@@ -315,10 +316,10 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                     </div>
                   ))}
                   <div style={{ height: 1, background: C.border, margin: "8px 20px" }} />
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>Panelist</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>{isKo ? "패널리스트" : "Panelist"}</div>
                   {[
-                    { label: "Available Interviews", target: "panel_board", desc: "Browse open listings" },
-                    { label: "Register as Panelist", target: "panel_entry", desc: "Participate and earn rewards" },
+                    { label: isKo ? "인터뷰 찾기" : "Available Interviews", target: "panel_board", desc: isKo ? "공개 인터뷰 목록" : "Browse open listings" },
+                    { label: isKo ? "패널리스트 등록" : "Register as Panelist", target: "panel_entry", desc: isKo ? "참여하고 보상 받기" : "Participate and earn rewards" },
                   ].map(item => (
                     <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
@@ -336,11 +337,11 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             </div>
             <div style={{ padding: "16px 20px", paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))", borderTop: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
               {(variant === "app" || variant === "panel") && logout ? (
-                <Btn full size="md" variant="ghost" onClick={() => { logout(); setMenuOpen(false); }}>Log Out</Btn>
+                <Btn full size="md" variant="ghost" onClick={() => { logout(); setMenuOpen(false); }}>{isKo ? "로그아웃" : "Log Out"}</Btn>
               ) : (
                 <>
-                  <Btn full size="md" onClick={() => { go("advertiser_login"); setMenuOpen(false); }}>Log In / Sign Up</Btn>
-                  <Btn full variant="ghost" size="md" onClick={() => { go("panel_entry"); setMenuOpen(false); }}>Join as Panelist</Btn>
+                  <Btn full size="md" onClick={() => { go("advertiser_login"); setMenuOpen(false); }}>{isKo ? "로그인 / 회원가입" : "Log In / Sign Up"}</Btn>
+                  <Btn full variant="ghost" size="md" onClick={() => { go("panel_entry"); setMenuOpen(false); }}>{isKo ? "패널리스트 참여" : "Join as Panelist"}</Btn>
                 </>
               )}
             </div>
@@ -364,10 +365,23 @@ const VOC_LIST = [
   { quote: "Costs dropped 80% compared to an external research agency, and results came in twice as fast. Automatic theme clustering and sentiment analysis eliminated almost all manual analysis time.", name: "Owen M.", title: "Marketing Director", company: "**ang Growth Marketing Division" },
 ];
 
-export function VoCCarousel() {
+const VOC_LIST_KO = [
+  { quote: "솔직히 처음엔 반신반의했어요. AI가 인터뷰를 제대로 할 수 있을까 싶었는데, 결과물 보고 생각이 완전히 바뀌었어요. 인터뷰어 없으니까 오히려 응답이 더 솔직하더라고요.", name: "김민준", title: "마케팅팀장", company: "**전자 MX사업부", photo: "/profiles/male-1.png" },
+  { quote: "분기에 한 번 하던 사용성 테스트를 이제 매달 해요. 예전엔 섭외부터 진행까지 3주 걸렸는데, 지금은 필터 설정하고 이틀이면 리포트가 나와요.", name: "박지은", title: "UX 리서처", company: "**카카오 서비스디자인팀", photo: "/profiles/female-1.png" },
+  { quote: "출시 2주 전에 급하게 유저 의견이 필요했는데, 72시간 만에 200명 분석 리포트를 받았어요. 타이밍이 딱 맞아서 런칭 결정에 바로 반영했습니다.", name: "이승우", title: "프로덕트 매니저", company: "**라인 신규사업팀" },
+  { quote: "외부 대행사 맡기면 견적부터 두 달이에요. 보이스서베이는 당일 세팅하고 다음날 결과 보고 있었어요. 비용도 10분의 1도 안 됐고요.", name: "최유나", title: "브랜드 전략 매니저", company: "LG** 뷰티 마케팅팀", photo: "/profiles/female-2.png" },
+  { quote: "설문은 답하다가 지쳐서 대충 클릭하게 되는데, 음성 인터뷰는 그냥 대화하는 느낌이라 훨씬 편했어요. 포인트도 바로 적립되고요.", name: "정다현", title: "프리랜서 패널리스트", company: "개인 참여자", photo: "/profiles/female-3.png" },
+  { quote: "글로벌 진출 전에 국내 타깃 인터뷰가 필요했어요. 조건 필터 설정하니까 원하는 페르소나가 빠르게 모였고, 3영업일 만에 인사이트 정리된 리포트 받았습니다.", name: "강현석", title: "사업개발 총괄", company: "**s 신사업팀" },
+  { quote: "대행사 비용의 20%로 더 큰 표본을 뽑을 수 있다는 게 아직도 신기해요. 주제별로 자동 클러스터링이 돼서 나오니까 분석 시간도 확 줄었어요.", name: "오수빈", title: "서비스 기획자", company: "**모터스 디지털서비스팀", photo: "/profiles/female-4.png" },
+  { quote: "처음엔 정성조사를 AI가 할 수 있다는 게 믿기지 않았는데, 실제로 써보니 응답 깊이가 생각보다 훨씬 깊었어요. 팀에서 지금 정기적으로 활용하고 있어요.", name: "한지원", title: "마케팅 디렉터", company: "**앙 그로스마케팅팀" },
+  { quote: "동시에 500명 인터뷰가 가능하다는 건 기존 방식으론 상상도 못 했어요. 비용 대비 퀄리티가 너무 좋아서 이제 리서치 안 하는 게 더 이상하게 느껴져요.", name: "임채원", title: "제품 마케팅 매니저", company: "**에이버 마케팅실" },
+];
+
+export function VoCCarousel({ lang = "en" }) {
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
-  const total = VOC_LIST.length;
+  const list = lang === "ko" ? VOC_LIST_KO : VOC_LIST;
+  const total = list.length;
   const trackRef = useRef(null);
 
   useEffect(() => {
@@ -386,12 +400,12 @@ export function VoCCarousel() {
     <section style={{ background: C.bg, padding: "72px 0", overflow: "hidden" }}>
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <Badge variant="purple" style={{ marginBottom: 12 }}>Customer Reviews</Badge>
-          <h2 style={{ fontSize: 28, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>What our users are saying</h2>
+          <Badge variant="purple" style={{ marginBottom: 12 }}>{lang === "ko" ? "고객 리뷰" : "Customer Reviews"}</Badge>
+          <h2 style={{ fontSize: 28, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>{lang === "ko" ? "사용자들의 이야기" : "What our users are saying"}</h2>
         </div>
         <div style={{ overflow: "hidden" }} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
           <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
-            {VOC_LIST.map((v, i) => (
+            {list.map((v, i) => (
               <div key={i} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box" }}>
                 <div style={{ background: C.white, borderRadius: 16, padding: "36px 40px", border: `1px solid ${C.border}`, minHeight: 260, display: "flex", flexDirection: "column" }}>
                   <p style={{ margin: "0 0 24px", fontSize: 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px", flex: 1 }}>"{v.quote}"</p>
@@ -414,7 +428,7 @@ export function VoCCarousel() {
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 0, marginTop: 24 }}>
-          {VOC_LIST.map((_, i) => (
+          {list.map((_, i) => (
             <button key={i} onClick={() => setIdx(i)} aria-label={`Go to review ${i + 1}`}
               style={{ background: "none", border: "none", cursor: "pointer", padding: "10px 6px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <span style={{ display: "block", width: i === idx ? 18 : 6, height: 6, borderRadius: 3, background: i === idx ? C.purple : "rgba(23,23,23,0.3)", transition: "all 0.3s", flexShrink: 0 }} />
@@ -426,15 +440,26 @@ export function VoCCarousel() {
   );
 }
 
-export function HowItWorksCarousel() {
+export function HowItWorksCarousel({ lang = "en" }) {
   const isMobile = useIsMobile();
-  const researcherSteps = [
+  const isKo = lang === "ko";
+  const researcherSteps = isKo ? [
+    { icon: "pencil", step: "01", title: "질문 설계", desc: "인터뷰 목표와 질문 흐름을 설정하세요. AI가 자연스러운 대화 구조를 제안해드려요." },
+    { icon: "users", step: "02", title: "패널 모집", desc: "공고를 올려 적합한 패널을 모집하고, AI 매칭으로 최적의 참여자를 선발하세요." },
+    { icon: "sparkle", step: "03", title: "AI 인터뷰 진행", desc: "AI가 24시간 음성 인터뷰를 진행해요. 연구자가 개입하지 않아도 응답이 자동으로 모여요." },
+    { icon: "barchart", step: "04", title: "리포트 수령", desc: "주제 분석, 감성 분류, 인사이트 요약이 담긴 즉각적인 리포트를 받아보세요." },
+  ] : [
     { icon: "pencil", step: "01", title: "Design Questions", desc: "Set your interview goals and question flow. AI suggests a natural conversation structure." },
     { icon: "users", step: "02", title: "Recruit Panelists", desc: "Post a listing to recruit matching panelists and use AI matching to select the best fit." },
     { icon: "sparkle", step: "03", title: "AI Conducts Interviews", desc: "AI runs voice interviews 24/7. Responses are collected automatically — no researcher involvement needed." },
     { icon: "barchart", step: "04", title: "Receive Your Report", desc: "Get an instant report with theme analysis, sentiment classification, and insight summaries." },
   ];
-  const panelSteps = [
+  const panelSteps = isKo ? [
+    { icon: "search", step: "01", title: "공고 탐색", desc: "패널리스트 보드에서 관심 있는 인터뷰 기회를 찾아보세요." },
+    { icon: "check", step: "02", title: "지원 및 선발", desc: "조건을 확인하고 지원하세요. AI가 얼마나 잘 맞는지 평가해서 빠르게 선발해요." },
+    { icon: "mic", step: "03", title: "음성 인터뷰 참여", desc: "링크로 AI와 자연스럽게 대화하세요. 어디서든 참여할 수 있고, 평균 8분이면 끝나요." },
+    { icon: "gift", step: "04", title: "보상 수령", desc: "인터뷰 완료 후 포인트 보상이 즉시 지급돼요." },
+  ] : [
     { icon: "search", step: "01", title: "Browse Listings", desc: "Find interview opportunities that interest you on the panelist board." },
     { icon: "check", step: "02", title: "Apply & Get Selected", desc: "Review the criteria and apply. AI evaluates your fit and selects participants quickly." },
     { icon: "mic", step: "03", title: "Take the Voice Interview", desc: "Have a natural conversation with AI via a link. Any location, ~8 minutes on average." },
@@ -512,12 +537,16 @@ export function HowItWorksCarousel() {
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: isMobile ? 40 : 56 }}>
           <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", margin: "0 0 14px", lineHeight: 1.10, fontFamily: F }}>
-            {isMobile ? <>Hear your customers <span style={{ color: C.purple }}>accurately and fast</span></> : <>Hear your customers<br /><span style={{ color: C.purple }}>accurately and fast</span></>}
+            {isKo
+              ? (isMobile ? <>고객의 목소리를 <span style={{ color: C.purple }}>정확하고 빠르게</span></> : <>고객의 목소리를<br /><span style={{ color: C.purple }}>정확하고 빠르게 들으세요</span></>)
+              : (isMobile ? <>Hear your customers <span style={{ color: C.purple }}>accurately and fast</span></> : <>Hear your customers<br /><span style={{ color: C.purple }}>accurately and fast</span></>)}
           </h2>
-          <p style={{ fontSize: 16, color: "rgba(10,11,13,0.56)", margin: 0, letterSpacing: "0.16px", lineHeight: 1.47 }}>The interview platform that handles everything from start to finish</p>
+          <p style={{ fontSize: 16, color: "rgba(10,11,13,0.56)", margin: 0, letterSpacing: "0.16px", lineHeight: 1.47 }}>
+            {isKo ? "처음부터 끝까지 모든 것을 처리하는 인터뷰 플랫폼" : "The interview platform that handles everything from start to finish"}
+          </p>
         </div>
-        <Row steps={researcherSteps} title="Want to design and run interviews?" sub="Just write your questions — AI talks to thousands and delivers the report" scrollRef={rRef} />
-        <Row steps={panelSteps} title="Want to participate and earn rewards?" sub="Join a short voice interview and receive your points instantly" scrollRef={pRef} />
+        <Row steps={researcherSteps} title={isKo ? "인터뷰를 설계하고 진행하고 싶으신가요?" : "Want to design and run interviews?"} sub={isKo ? "질문만 작성하면 — AI가 수천 명과 대화하고 리포트를 전달합니다" : "Just write your questions — AI talks to thousands and delivers the report"} scrollRef={rRef} />
+        <Row steps={panelSteps} title={isKo ? "참여하고 보상을 받고 싶으신가요?" : "Want to participate and earn rewards?"} sub={isKo ? "짧은 음성 인터뷰에 참여하고 즉시 포인트를 받아보세요" : "Join a short voice interview and receive your points instantly"} scrollRef={pRef} />
       </div>
     </section>
   );
@@ -692,19 +721,23 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
 }
 
 // ─── Footer — shared across all pages ───
-export function Footer({ go }) {
+export function Footer({ go, lang = "en", onLangChange, tagline }) {
   const isMobile = useIsMobile();
+  const displayTagline = tagline || (lang === "ko" ? "AI 인터뷰. AI 분석." : "AI interviews. AI analyzes.");
+  const navLinks = lang === "ko"
+    ? [["소개", "about"], ["요금제", "pricing"], ["패널 보드", "panel_board"], ["지원", "support"], ["개인정보처리방침", "privacy"], ["이용약관", "terms"]]
+    : [["About", "about"], ["Pricing", "pricing"], ["Panelist Board", "panel_board"], ["Support", "support"], ["Privacy Policy", "privacy"], ["Terms of Service", "terms"]];
   return (
     <footer style={{ background: "#060f1f", padding: isMobile ? "40px 20px" : "48px 24px", borderTop: "1px solid rgba(255,255,255,0.08)", fontFamily: F }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: "flex-start", gap: 28, marginBottom: 28 }}>
           <div>
             <LogoMark dark />
-            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI interviews. AI analyzes.</div>
+            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>{displayTagline}</div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
-            {[["About", "about"], ["Pricing", "pricing"], ["Panelist Board", "panel_board"], ["Support", "support"], ["Privacy Policy", "privacy"], ["Terms of Service", "terms"]].map(([l, target]) => (
-              <button key={l} onClick={() => go(target)}
+            {navLinks.map(([l, target]) => (
+              <button key={target} onClick={() => go(target)}
                 style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", background: "none", border: "none", cursor: "pointer", padding: "10px 0", minHeight: 44, fontFamily: F, letterSpacing: "0.16px", display: "inline-flex", alignItems: "center" }}
                 onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.88)"}
                 onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.48)"}>{l}</button>
@@ -714,10 +747,12 @@ export function Footer({ go }) {
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.16px" }}>Copyright © {new Date().getFullYear()} Voice Survey Inc. All rights reserved.</div>
           <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "2px" }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.9)", background: "rgba(255,255,255,0.12)", borderRadius: 6, padding: "4px 10px", letterSpacing: "0.02em" }}>ENG</span>
-            <a href="https://voica-nv3572kdi-20morn-6473s-projects.vercel.app" style={{ fontSize: 12, fontWeight: 400, color: "rgba(255,255,255,0.4)", padding: "4px 10px", borderRadius: 6, textDecoration: "none", letterSpacing: "0.02em", transition: "color 0.15s" }}
-              onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.8)"}
-              onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.4)"}>한국어</a>
+            {[["ENG", "en"], ["한국어", "ko"]].map(([label, code]) => {
+              const isActive = lang === code;
+              return onLangChange
+                ? <button key={code} onClick={() => onLangChange(code)} style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)", background: isActive ? "rgba(255,255,255,0.12)" : "transparent", borderRadius: 6, padding: "4px 10px", letterSpacing: "0.02em", border: "none", cursor: "pointer", fontFamily: F, transition: "color 0.15s" }}>{label}</button>
+                : <span key={code} style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)", background: isActive ? "rgba(255,255,255,0.12)" : "transparent", borderRadius: 6, padding: "4px 10px", letterSpacing: "0.02em" }}>{label}</span>;
+            })}
           </div>
         </div>
       </div>
