@@ -7,8 +7,11 @@ function LogoMark({ size = 20, dark = false }) {
       <div style={{
         width: size, height: size, borderRadius: Math.round(size * 0.22),
         background: C.purple,
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
         flexShrink: 0,
-      }} />
+      }}>
+        <div style={{ width: Math.round(size * 0.38), height: Math.round(size * 0.38), borderRadius: Math.round(size * 0.07), background: "#fff" }} />
+      </div>
       <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: "-0.02em", color: dark ? "rgba(255,255,255,0.9)" : C.navy, fontFamily: F }}>
         voicesurvey
       </span>
