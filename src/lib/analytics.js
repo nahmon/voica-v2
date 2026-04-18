@@ -10,7 +10,7 @@ import { supabase } from "../supabase.js";
  *   interview_q_started      - a question became active (q_index = 0-based)
  *   interview_q_answered     - a question answer was submitted
  *   interview_completed      - all questions answered
- *   interview_abandoned      - user clicked 나가기 mid-interview
+ *   interview_abandoned      - user clicked exit mid-interview
  */
 export async function track(eventName, { shareCode, sessionId, qIndex, ...rest } = {}) {
   try {

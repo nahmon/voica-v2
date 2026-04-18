@@ -9,168 +9,167 @@ export default function TermsScreen({ go, user, logout }) {
       <GlobalNav go={go} variant={user ? "app" : "sub"} user={user} logout={logout} />
       <main style={{ maxWidth: 800, margin: "0 auto", padding: "48px 24px 80px" }}>
         <div style={{ marginBottom: 32 }}>
-          <Btn variant="ghost" size="sm" onClick={() => go(user ? "dashboard" : "landing")}>← 돌아가기</Btn>
+          <Btn variant="ghost" size="sm" onClick={() => go(user ? "dashboard" : "landing")}>← Back</Btn>
         </div>
 
         <div style={{ background: C.white, borderRadius: 16, padding: isMobile ? "24px 20px" : "40px 48px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: C.navy, marginBottom: 6 }}>서비스 이용약관</h1>
-          <p style={{ fontSize: 13, color: C.body, marginBottom: 40 }}>시행일: 2026년 4월 11일 · 최종 개정일: 2026년 4월 11일</p>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Terms of Service</h1>
+          <p style={{ fontSize: 13, color: C.body, marginBottom: 40 }}>Effective Date: April 11, 2026 · Last Updated: April 11, 2026</p>
 
-          <Section title="제1조 (목적)">
-            이 약관은 Voice Survey Inc.(이하 "회사")이 운영하는 AI 보이스 인터뷰 플랫폼 Voice Survey(이하 "서비스")의 이용에 관한 조건 및 절차, 회사와 이용자의 권리·의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+          <Section title="Article 1 (Purpose)">
+            These Terms of Service govern the conditions, procedures, and rights and responsibilities of Voice Survey Inc. (the "Company") and its users with respect to the AI-powered voice interview platform Voice Survey (the "Service"), and any other matters necessary for the use of the Service.
           </Section>
 
-          <Section title="제2조 (용어의 정의)">
+          <Section title="Article 2 (Definitions)">
             <ol>
-              <li>"서비스"란 회사가 제공하는 AI 기반 음성 인터뷰 설계·진행·분석 플랫폼 및 이에 부수하는 일체의 서비스를 말합니다.</li>
-              <li>"리서처"란 서비스에 가입하여 인터뷰를 설계하고 결과를 분석하는 기업 또는 개인 사용자를 말합니다.</li>
-              <li>"패널"이란 서비스를 통해 음성 인터뷰에 참여하는 응답자를 말합니다.</li>
-              <li>"인터뷰"란 리서처가 설계한 질문 세트와 AI가 진행하는 음성 대화를 통해 패널의 의견을 수집하는 과정을 말합니다.</li>
-              <li>"콘텐츠"란 이용자가 서비스를 통해 게시·등록·제공하는 텍스트, 음성, 이미지, 데이터 등 일체의 정보를 말합니다.</li>
+              <li>"Service" means the AI-based voice interview design, facilitation, and analysis platform provided by the Company, along with all related services.</li>
+              <li>"Researcher" means a business or individual user who signs up for the Service to design interviews and analyze results.</li>
+              <li>"Panelist" means a respondent who participates in voice interviews through the Service.</li>
+              <li>"Interview" means the process of collecting Panelist opinions through a set of questions designed by a Researcher and an AI-facilitated voice conversation.</li>
+              <li>"Content" means all information, including text, audio, images, and data, that users post, register, or provide through the Service.</li>
             </ol>
           </Section>
 
-          <Section title="제3조 (약관의 효력 및 변경)">
+          <Section title="Article 3 (Effectiveness and Amendment of Terms)">
             <ol>
-              <li>이 약관은 서비스 화면에 게시하거나 기타 방법으로 공지함으로써 효력이 발생합니다.</li>
-              <li>회사는 「약관의 규제에 관한 법률」, 「전자상거래 등에서의 소비자보호에 관한 법률」, 「정보통신망 이용촉진 및 정보보호에 관한 법률」 등 관련 법령에 위반하지 않는 범위 내에서 이 약관을 변경할 수 있습니다.</li>
-              <li>회사가 약관을 변경하는 경우에는 적용일자 및 변경 사유를 명시하여 현행 약관과 함께 서비스 화면에 그 적용일자 7일 전부터 공지합니다. 다만 이용자에게 불리한 변경의 경우에는 적용일자 30일 전부터 공지하며, 이메일 등으로 개별 통지합니다.</li>
-              <li>이용자가 변경된 약관에 동의하지 않는 경우 서비스 이용을 중단하고 회원 탈퇴를 요청할 수 있습니다. 변경 약관의 적용일 이후에도 계속 서비스를 이용하는 경우 변경 약관에 동의한 것으로 간주합니다.</li>
+              <li>These Terms become effective upon being posted on the Service interface or otherwise communicated to users.</li>
+              <li>The Company may amend these Terms to the extent permitted by applicable law, including consumer protection and information security regulations.</li>
+              <li>When amending these Terms, the Company will post a notice stating the effective date and reason for the amendment at least 7 days in advance. For changes that are materially unfavorable to users, at least 30 days' advance notice will be given, including individual notification by email.</li>
+              <li>If a user does not agree to the amended Terms, the user may discontinue use and request account deletion. Continued use of the Service after the effective date of the amended Terms constitutes acceptance of the changes.</li>
             </ol>
           </Section>
 
-          <Section title="제4조 (서비스 이용계약의 성립)">
+          <Section title="Article 4 (Formation of Service Agreement)">
             <ol>
-              <li>서비스 이용계약은 이용 희망자가 이 약관에 동의하고 회원가입을 신청한 후 회사가 이를 승낙함으로써 성립합니다.</li>
-              <li>회사는 다음 각 호에 해당하는 경우 가입 신청을 승낙하지 않을 수 있습니다.
+              <li>A Service agreement is formed when a prospective user agrees to these Terms, submits a registration application, and the Company accepts it.</li>
+              <li>The Company may decline a registration application in the following cases:
                 <ul>
-                  <li>실명이 아니거나 타인의 명의를 이용한 경우</li>
-                  <li>허위 정보를 기재하거나 회사가 요구하는 정보를 제공하지 않은 경우</li>
-                  <li>이전에 이용약관 위반으로 이용자 자격이 정지 또는 상실된 경우</li>
-                  <li>만 14세 미만인 자가 법정대리인의 동의 없이 신청한 경우</li>
-                  <li>기타 회사가 정한 이용 신청 요건을 충족하지 않은 경우</li>
+                  <li>The applicant uses a false name or another person's identity</li>
+                  <li>The applicant provides false information or fails to provide required information</li>
+                  <li>The applicant's account was previously suspended or terminated for violation of these Terms</li>
+                  <li>The applicant is under 14 years of age without consent from a legal guardian</li>
+                  <li>The applicant does not meet other registration requirements set by the Company</li>
                 </ul>
               </li>
             </ol>
           </Section>
 
-          <Section title="제5조 (서비스의 제공 및 변경)">
+          <Section title="Article 5 (Provision and Modification of Service)">
             <ol>
-              <li>회사는 이용자에게 다음과 같은 서비스를 제공합니다.
+              <li>The Company provides users with the following services:
                 <ul>
-                  <li>AI 음성 인터뷰 설계 및 생성 서비스</li>
-                  <li>패널 모집 및 인터뷰 진행 서비스</li>
-                  <li>음성 녹취·전사 및 AI 분석 리포트 생성 서비스</li>
-                  <li>기타 회사가 추가 개발하거나 제휴 계약을 통해 이용자에게 제공하는 서비스</li>
+                  <li>AI voice interview design and creation</li>
+                  <li>Panelist recruitment and interview facilitation</li>
+                  <li>Audio recording, transcription, and AI-generated analysis reports</li>
+                  <li>Other services developed or provided through partnerships by the Company</li>
                 </ul>
               </li>
-              <li>회사는 서비스의 내용, 이용 방법, 이용 시간에 대하여 변경이 있는 경우에는 변경 사유 및 변경 내용, 제공일자 등을 공지사항을 통해 사전에 공지합니다.</li>
-              <li>회사는 서비스의 제공을 일시적으로 중단할 수 있으며, 이 경우 사전 또는 사후에 이용자에게 통지합니다.</li>
+              <li>If there are changes to the content, method, or availability of the Service, the Company will post advance notice through announcements.</li>
+              <li>The Company may temporarily suspend the Service and will notify users before or after such suspension.</li>
             </ol>
           </Section>
 
-          <Section title="제6조 (이용자의 의무)">
+          <Section title="Article 6 (User Obligations)">
             <ol>
-              <li>이용자는 다음 각 호의 행위를 하여서는 안 됩니다.
+              <li>Users must not engage in any of the following:
                 <ul>
-                  <li>회원가입 신청 또는 변경 시 허위 내용을 등록하는 행위</li>
-                  <li>타인의 정보 도용 행위</li>
-                  <li>회사가 게시한 정보의 변경 행위</li>
-                  <li>회사가 정한 정보 이외의 정보(컴퓨터 프로그램 등)의 송신 또는 게시 행위</li>
-                  <li>회사와 기타 제3자의 저작권 등 지적재산권을 침해하는 행위</li>
-                  <li>회사와 기타 제3자의 명예를 손상시키거나 업무를 방해하는 행위</li>
-                  <li>외설 또는 폭력적인 메시지, 화상, 음성, 기타 공서양속에 반하는 정보를 서비스에 공개 또는 게시하는 행위</li>
-                  <li>서비스를 이용하여 얻은 정보를 회사의 사전 승낙 없이 복제, 유통, 장려하거나 상업적으로 이용하는 행위</li>
-                  <li>서비스의 안정적 운영을 방해할 수 있는 정보를 전송하거나 수신 거부 광고성 정보를 전송하는 행위</li>
-                  <li>기타 불법적이거나 부당한 행위</li>
+                  <li>Registering false information during sign-up or profile updates</li>
+                  <li>Misappropriating another person's identity or information</li>
+                  <li>Altering information posted by the Company</li>
+                  <li>Transmitting or posting unauthorized information (e.g., computer programs) not specified by the Company</li>
+                  <li>Infringing on the intellectual property rights of the Company or third parties</li>
+                  <li>Damaging the reputation of or interfering with the operations of the Company or third parties</li>
+                  <li>Publishing or posting obscene, violent, or otherwise objectionable content through the Service</li>
+                  <li>Reproducing, distributing, or commercially exploiting information obtained through the Service without the Company's prior consent</li>
+                  <li>Transmitting information that could destabilize Service operations, or sending unsolicited commercial messages</li>
+                  <li>Any other illegal or improper conduct</li>
                 </ul>
               </li>
-              <li>이용자는 관계 법령, 이 약관의 규정, 이용 안내 및 서비스와 관련하여 공지한 주의사항, 회사가 통지하는 사항 등을 준수하여야 하며, 기타 회사의 업무에 방해되는 행위를 하여서는 안 됩니다.</li>
+              <li>Users must comply with applicable laws, these Terms, usage guidelines, notices, and other communications from the Company, and must not interfere with the Company's operations.</li>
             </ol>
           </Section>
 
-          <Section title="제7조 (지적재산권)">
+          <Section title="Article 7 (Intellectual Property)">
             <ol>
-              <li>서비스와 관련된 저작권 및 지적재산권은 회사에 귀속됩니다. 단, 이용자가 직접 생성한 콘텐츠(인터뷰 질문, 음성 응답, 리포트 등)의 저작권은 해당 이용자에게 귀속됩니다.</li>
-              <li>이용자는 서비스를 이용하여 얻은 정보를 회사의 사전 승낙 없이 복제, 전송, 출판, 배포, 방송 기타 방법에 의하여 영리 목적으로 이용하거나 제3자에게 이용하게 하여서는 안 됩니다.</li>
-              <li>이용자가 서비스에 게시한 콘텐츠에 대하여 회사는 서비스 운영, 개선 및 홍보 목적으로 이를 사용할 수 있으며, 이 경우 이용자의 개인정보는 포함하지 않습니다.</li>
+              <li>Copyrights and intellectual property related to the Service belong to the Company. However, copyrights to content created directly by users (such as interview questions, audio responses, and reports) belong to those users.</li>
+              <li>Users may not reproduce, transmit, publish, distribute, broadcast, or otherwise use for commercial purposes any information obtained through the Service without the Company's prior consent, nor may they enable third parties to do so.</li>
+              <li>The Company may use user-posted content for Service operation, improvement, and promotion purposes, without including any personal information of the user.</li>
             </ol>
           </Section>
 
-          <Section title="제8조 (음성 데이터의 처리)">
+          <Section title="Article 8 (Processing of Audio Data)">
             <ol>
-              <li>회사는 인터뷰 진행 과정에서 수집되는 패널의 음성 데이터를 다음 목적으로만 처리합니다.
+              <li>The Company processes audio data collected from Panelists during interviews solely for the following purposes:
                 <ul>
-                  <li>음성 텍스트 변환(STT) 및 전사 서비스 제공</li>
-                  <li>AI 분석 리포트 생성</li>
-                  <li>리서처의 응답 검토 기능 제공</li>
+                  <li>Speech-to-text (STT) transcription services</li>
+                  <li>AI-generated analysis report creation</li>
+                  <li>Providing Researchers with response review functionality</li>
                 </ul>
               </li>
-              <li>음성 데이터는 암호화되어 Supabase Storage에 저장되며, 보유 기간은 인터뷰 완료일로부터 1년입니다. 이후 자동 파기됩니다.</li>
-              <li>회사는 법령에서 정한 경우를 제외하고 음성 데이터를 제3자에게 제공하지 않습니다.</li>
+              <li>Audio data is encrypted and stored in Supabase Storage. The retention period is one year from the date the interview is completed, after which it is automatically deleted.</li>
+              <li>The Company does not share audio data with third parties except as required by law.</li>
             </ol>
           </Section>
 
-          <Section title="제9조 (서비스의 중단)">
+          <Section title="Article 9 (Service Interruption)">
             <ol>
-              <li>회사는 컴퓨터 등 정보통신설비의 보수 점검·교체 및 고장, 통신의 두절 등의 사유가 발생한 경우에는 서비스의 제공을 일시적으로 중단할 수 있습니다.</li>
-              <li>회사는 제1항의 사유로 서비스의 제공이 일시적으로 중단됨으로 인하여 이용자 또는 제3자가 입은 손해에 대하여 배상합니다. 단, 회사에 고의 또는 과실이 없는 경우에는 그러하지 않습니다.</li>
+              <li>The Company may temporarily suspend the Service due to maintenance, replacement, or failure of information and communications equipment, or disruption of communications.</li>
+              <li>The Company will compensate users or third parties for damages caused by such temporary suspension. However, the Company is not liable where the suspension was not due to the Company's intent or negligence.</li>
             </ol>
           </Section>
 
-          <Section title="제10조 (회원 탈퇴 및 자격 상실)">
+          <Section title="Article 10 (Account Termination and Suspension)">
             <ol>
-              <li>이용자는 언제든지 서비스 내 계정 설정 메뉴를 통해 탈퇴를 요청할 수 있으며, 회사는 이를 즉시 처리합니다.</li>
-              <li>이용자가 다음 각 호의 사유에 해당하는 경우, 회사는 서비스 이용을 제한하거나 이용자 자격을 상실시킬 수 있습니다.
+              <li>Users may request account deletion at any time through the account settings menu, and the Company will process such requests immediately.</li>
+              <li>The Company may restrict Service access or revoke user status in the following cases:
                 <ul>
-                  <li>가입 신청 시 허위 내용을 등록한 경우</li>
-                  <li>타인의 서비스 이용을 방해하거나 그 정보를 도용하는 등 전자상거래 질서를 위협하는 경우</li>
-                  <li>서비스를 이용하여 법령 또는 이 약관이 금지하거나 공서양속에 반하는 행위를 하는 경우</li>
+                  <li>The user registered false information during sign-up</li>
+                  <li>The user interferes with other users' access to the Service or misappropriates their information</li>
+                  <li>The user engages in conduct that violates applicable law, these Terms, or public order and morals</li>
                 </ul>
               </li>
             </ol>
           </Section>
 
-          <Section title="제11조 (손해배상)">
+          <Section title="Article 11 (Damages)">
             <ol>
-              <li>회사는 서비스 이용과 관련하여 회사의 고의 또는 과실로 인하여 이용자에게 손해가 발생한 경우 그 손해를 배상합니다.</li>
-              <li>회사가 배상하여야 할 손해의 범위는 통상손해로 한정되며, 이용자의 특별한 사정으로 인한 손해는 회사가 그 사정을 알았거나 알 수 있었을 때에 한하여 배상합니다.</li>
-              <li>이용자가 이 약관의 규정을 위반하여 회사에 손해가 발생한 경우, 이용자는 회사에 발생한 손해를 배상하여야 합니다.</li>
+              <li>The Company will compensate users for damages caused by the Company's intentional or negligent acts in connection with the Service.</li>
+              <li>The Company's liability for damages is limited to direct and foreseeable damages. Liability for damages arising from the user's special circumstances exists only where the Company knew or should have known of such circumstances.</li>
+              <li>If a user's violation of these Terms causes damage to the Company, the user shall compensate the Company for such damage.</li>
             </ol>
           </Section>
 
-          <Section title="제12조 (면책조항)">
+          <Section title="Article 12 (Disclaimer)">
             <ol>
-              <li>회사는 천재지변 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다.</li>
-              <li>회사는 이용자의 귀책사유로 인한 서비스 이용의 장애에 대하여는 책임을 지지 않습니다.</li>
-              <li>회사는 이용자가 서비스를 이용하여 기대하는 수익을 상실한 것에 대하여, 회사의 고의 또는 과실이 없는 경우에는 책임을 지지 않습니다.</li>
-              <li>회사는 이용자가 게재한 정보, 자료, 사실의 신뢰도, 정확성 등 내용에 관하여는 책임을 지지 않습니다.</li>
+              <li>The Company is not liable for failure to provide the Service due to force majeure events, including natural disasters or other circumstances beyond its control.</li>
+              <li>The Company is not liable for Service disruptions caused by the user's own fault.</li>
+              <li>The Company is not liable for lost expected revenue resulting from the user's use of the Service, unless caused by the Company's intent or negligence.</li>
+              <li>The Company is not liable for the reliability or accuracy of information, materials, or facts posted by users.</li>
             </ol>
           </Section>
 
-          <Section title="제13조 (분쟁해결)">
+          <Section title="Article 13 (Dispute Resolution)">
             <ol>
-              <li>회사는 이용자가 제기하는 정당한 의견이나 불만을 반영하고 그 피해를 보상 처리하기 위하여 피해보상처리기구를 설치·운영합니다.</li>
-              <li>회사는 이용자로부터 제출되는 불만사항 및 의견은 우선적으로 그 사항을 처리합니다. 다만 신속한 처리가 곤란한 경우에는 이용자에게 그 사유와 처리 일정을 즉시 통보합니다.</li>
-              <li>회사와 이용자 간에 발생한 전자상거래 분쟁과 관련하여 이용자의 피해구제 신청이 있는 경우에는 공정거래위원회 또는 시·도지사가 의뢰하는 분쟁조정기관의 조정에 따를 수 있습니다.</li>
+              <li>The Company maintains a dispute resolution process to address legitimate complaints and grievances raised by users.</li>
+              <li>The Company prioritizes complaints and feedback submitted by users. If prompt resolution is not possible, the Company will immediately notify the user of the reason and expected timeline.</li>
+              <li>In cases of user-requested dispute resolution, the Company may cooperate with applicable mediation bodies or consumer protection authorities.</li>
             </ol>
           </Section>
 
-          <Section title="제14조 (재판권 및 준거법)">
+          <Section title="Article 14 (Governing Law and Jurisdiction)">
             <ol>
-              <li>회사와 이용자 간에 발생한 서비스 이용에 관한 분쟁에 대하여는 대한민국 법을 준거법으로 합니다.</li>
-              <li>회사와 이용자 간에 발생한 분쟁에 관한 소송은 「민사소송법」상의 관할 법원에 제소합니다. 제1심 전속 합의 관할 법원은 서울중앙지방법원으로 합니다.</li>
+              <li>These Terms and any disputes arising from use of the Service shall be governed by the laws of the State of Delaware, United States.</li>
+              <li>Any disputes that cannot be resolved through the Company's dispute resolution process shall be subject to binding arbitration or the exclusive jurisdiction of the courts located in Delaware, United States.</li>
             </ol>
           </Section>
 
           <div style={{ marginTop: 40, paddingTop: 24, borderTop: `1px solid ${C.border}`, fontSize: 12, color: C.body, lineHeight: 1.8 }}>
             <strong style={{ color: C.navy }}>Voice Survey Inc.</strong><br />
-            사업자등록번호: 사업자등록 진행 중<br />
-            통신판매업 신고번호: 신고 진행 중<br />
-            이메일: voica.support@gmail.com<br />
-            <span style={{ fontSize: 11, color: "#aaa" }}>※ 사업자 정보는 등록 완료 즉시 업데이트됩니다.</span><br />
+            Business Registration: Pending<br />
+            Email: voica.support@gmail.com<br />
+            <span style={{ fontSize: 11, color: "#aaa" }}>※ Business information will be updated upon registration completion.</span><br />
             <br />
-            본 약관은 2026년 4월 11일부터 시행됩니다.
+            These Terms of Service are effective as of April 11, 2026.
           </div>
         </div>
       </main>

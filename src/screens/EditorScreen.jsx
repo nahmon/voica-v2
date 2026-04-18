@@ -9,29 +9,29 @@ import { TEMPLATES, templateToQuestions } from "../lib/templates.js";
 function newQ(type = "voice") {
   const id = Math.random().toString(36).slice(2, 10);
   if (type === "multiple_choice") return { id, type, content: "", options: ["", "", ""] };
-  if (type === "likert") return { id, type, content: "", options: { min: 1, max: 5, labels: ["매우 아니다", "아니다", "보통", "그렇다", "매우 그렇다"] } };
+  if (type === "likert") return { id, type, content: "", options: { min: 1, max: 5, labels: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"] } };
   return { id, type, content: "" };
 }
 
 function mkId() { return Math.random().toString(36).slice(2, 10); }
 
 const VOICA_SURVEY_TEMPLATE = {
-  title: "Voice Survey 사용자 만족도 조사 — 리서처/마케터 대상",
+  title: "Voice Survey User Satisfaction Study — Researchers & Marketers",
   questions: [
-    { id: mkId(), type: "multiple_choice", content: "현재 주요 업무를 가장 잘 나타내는 것은 무엇인가요?", options: ["UX 리서처 / 디자인 리서처", "마케터 / 브랜드 매니저", "프로덕트 매니저", "사업개발 / 전략기획", "기타"] },
-    { id: mkId(), type: "multiple_choice", content: "사용자/고객 조사를 얼마나 자주 직접 수행하시나요?", options: ["거의 매주", "월 1~2회", "분기 1회", "필요할 때만 (연 2회 이하)"] },
-    { id: mkId(), type: "voice", content: "현재 사용자 인터뷰나 설문조사를 진행할 때 어떤 방식과 툴을 주로 쓰시나요? 섭외부터 분석까지 어떻게 하시는지 전체 흐름을 설명해 주세요." },
-    { id: mkId(), type: "voice", content: "그 과정에서 가장 시간이 많이 걸리거나 스트레스를 받는 단계는 어디인가요? 최근에 실제로 힘들었던 상황이 있다면 구체적으로 말씀해 주세요." },
-    { id: mkId(), type: "multiple_choice", content: "사용자 인터뷰 1회 프로젝트 기준 평균 총 비용은 얼마인가요? (참여자 섭외 + 진행 + 분석 인건비 포함)", options: ["50만원 미만", "50~200만원", "200~500만원", "500만원 이상", "외부 에이전시에 아웃소싱"] },
-    { id: mkId(), type: "multiple_choice", content: "연간 사용자 리서치에 쓰는 총 예산 규모는 어느 정도인가요? (인건비 제외 순수 리서치 비용)", options: ["500만원 미만", "500만~2,000만원", "2,000만~5,000만원", "5,000만원 이상"] },
-    { id: mkId(), type: "multiple_choice", content: "인터뷰 1건 완료까지 평균 소요 시간은?", options: ["1~2일 이내", "3~7일", "2주 이상", "한 달 이상"] },
-    { id: mkId(), type: "multiple_choice", content: "다음 중 가장 번거로운 단계는 무엇인가요?", options: ["참여자 섭외 및 일정 조율", "인터뷰 진행 자체", "녹취 정리 및 전사", "인사이트 분석 및 보고서 작성"] },
-    { id: mkId(), type: "voice", content: "AI가 수백 명과 동시에 음성 인터뷰를 진행하고, 10분 안에 분석 리포트가 나온다면 — 지금 하시는 리서치 방식과 비교해서 어떤 생각이 드시나요? 솔직하게 말씀해 주세요." },
-    { id: mkId(), type: "voice", content: "이런 AI 인터뷰 방식에서 가장 걱정되는 점이나 믿기 어려운 부분이 있다면 무엇인가요?" },
-    { id: mkId(), type: "voice", content: "팀이나 조직에서 Voice Survey 같은 툴을 도입하려면 어떤 조건이 갖춰져야 할 것 같으세요? 예산, 보안, 데이터 품질 등 어떤 허들이 있을지 말씀해 주세요." },
-    { id: mkId(), type: "multiple_choice", content: "참여자 50명 기준 인터뷰 1회 프로젝트 (AI 진행 + 분석 리포트 포함) 적정 비용은?", options: ["5만원 미만", "5~15만원", "15~30만원", "30~50만원", "50만원 이상도 가치 있다"] },
-    { id: mkId(), type: "multiple_choice", content: "선호하는 요금 방식은 무엇인가요?", options: ["무료 플랜으로 먼저 체험", "월 구독 (예측 가능한 비용)", "연간 계약 (할인 중심)", "팀/기업 단위 계약"] },
-    { id: mkId(), type: "voice", content: "마지막으로, 리서치 업무에서 Voice Survey가 딱 한 가지만 해결해 준다면 어떤 문제를 해결해 주길 바라시나요?" },
+    { id: mkId(), type: "multiple_choice", content: "Which best describes your primary role?", options: ["UX Researcher / Design Researcher", "Marketer / Brand Manager", "Product Manager", "Business Development / Strategy", "Other"] },
+    { id: mkId(), type: "multiple_choice", content: "How often do you personally conduct user or customer research?", options: ["Almost every week", "1–2 times a month", "Once a quarter", "Only when needed (2 or fewer times a year)"] },
+    { id: mkId(), type: "voice", content: "Walk me through how you currently conduct user interviews or surveys — what tools and methods do you use, from recruiting participants all the way through to analysis?" },
+    { id: mkId(), type: "voice", content: "Which stage takes the most time or causes the most stress? If you've had a particularly frustrating experience recently, please share the details." },
+    { id: mkId(), type: "multiple_choice", content: "What is the average total cost for a single user interview project? (Including participant recruiting, facilitation, and analysis)", options: ["Under $500", "$500–$2,000", "$2,000–$5,000", "$5,000+", "Outsourced to an external agency"] },
+    { id: mkId(), type: "multiple_choice", content: "What is your approximate annual budget for user research? (Excluding internal labor costs)", options: ["Under $5,000", "$5,000–$20,000", "$20,000–$50,000", "$50,000+"] },
+    { id: mkId(), type: "multiple_choice", content: "On average, how long does it take to complete a single interview project?", options: ["1–2 days", "3–7 days", "2+ weeks", "1+ month"] },
+    { id: mkId(), type: "multiple_choice", content: "Which of these stages is the most burdensome?", options: ["Recruiting participants and scheduling", "Conducting the interview itself", "Transcription and note-taking", "Insight analysis and report writing"] },
+    { id: mkId(), type: "voice", content: "If AI could conduct voice interviews with hundreds of participants simultaneously and deliver an analysis report in under 10 minutes — how does that compare to how you research today? Be honest." },
+    { id: mkId(), type: "voice", content: "What concerns or doubts do you have about this kind of AI-driven interview approach?" },
+    { id: mkId(), type: "voice", content: "What conditions would need to be in place for your team or organization to adopt a tool like Voice Survey? Think about budget, security, data quality — what are the hurdles?" },
+    { id: mkId(), type: "multiple_choice", content: "For a 50-participant interview project (AI-conducted + analysis report included), what would be a reasonable price?", options: ["Under $50", "$50–$150", "$150–$300", "$300–$500", "$500+ is worth it"] },
+    { id: mkId(), type: "multiple_choice", content: "What pricing model do you prefer?", options: ["Free plan to try first", "Monthly subscription (predictable cost)", "Annual contract (discount-focused)", "Team / enterprise contract"] },
+    { id: mkId(), type: "voice", content: "Finally, if Voice Survey could solve just one problem in your research workflow, what would you want that to be?" },
   ],
 };
 
@@ -40,9 +40,9 @@ const MAX_Q_CHARS = 200;
 
 // Question type definitions with icons and descriptions
 const Q_TYPES = [
-  { type: "voice",           icon: "🎙", label: "음성 답변",  desc: "참여자가 음성으로 자유롭게 답변합니다" },
-  { type: "multiple_choice", icon: "☑",  label: "객관식",    desc: "미리 정해진 보기 중 하나를 선택합니다" },
-  { type: "likert",          icon: "📊", label: "평점",       desc: "1~5점 척도로 평가합니다" },
+  { type: "voice",           icon: "🎙", label: "Voice Answer",      desc: "Participants respond freely by voice" },
+  { type: "multiple_choice", icon: "☑",  label: "Multiple Choice",   desc: "Select one option from a predefined list" },
+  { type: "likert",          icon: "📊", label: "Rating Scale",      desc: "Rate on a 1–5 scale" },
 ];
 
 export default function EditorScreen({ go, user, logout, interviewId }) {
@@ -87,15 +87,15 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         body: JSON.stringify({ prompt: aiPrompt.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "생성 실패");
+      if (!res.ok) throw new Error(data.error || "Generation failed");
       const generated = data.questions.map(q => ({ ...q, id: mkId() }));
       setQuestions(generated);
       setSelectedIdx(0);
       setShowAiModal(false);
       setAiPrompt("");
-      showToast("AI가 질문 초안을 생성했습니다 ✓", "success");
+      showToast("AI draft questions generated ✓", "success");
     } catch (e) {
-      showToast(e.message || "AI 생성에 실패했습니다", "error");
+      showToast(e.message || "AI generation failed", "error");
     } finally {
       setAiGenerating(false);
     }
@@ -156,7 +156,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
   const loadTemplate = () => {
     const hasContent = title.trim() || questions.some(q => q.content.trim());
-    if (hasContent && !window.confirm("현재 작성 중인 내용이 모두 사라집니다. 템플릿으로 교체할까요?")) return;
+    if (hasContent && !window.confirm("This will replace your current content with the template. Continue?")) return;
     setTitle(VOICA_SURVEY_TEMPLATE.title);
     setQuestions(VOICA_SURVEY_TEMPLATE.questions.map(q => ({ ...q, id: mkId() })));
     setSelectedIdx(0);
@@ -177,14 +177,14 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       <div style={{ background: "linear-gradient(135deg,rgba(83,58,253,0.06),rgba(249,107,238,0.06))", border: `1.5px solid rgba(83,58,253,0.18)`, borderRadius: 14, padding: "16px 18px", marginBottom: 18 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
           <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✦</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>AI로 질문 초안 만들기</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>Generate a draft with AI</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <input
             value={aiPrompt}
             onChange={e => setAiPrompt(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") { setShowAiModal(true); } }}
-            placeholder="인터뷰 목적을 입력하세요 — 예: 20대 앱 사용자 불편함 파악"
+            placeholder="Describe your interview goal — e.g. Understand pain points of 20-something app users"
             style={{ flex: 1, padding: "9px 12px", borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, outline: "none", minWidth: 0 }}
             onFocus={e => e.target.style.borderColor = C.purple}
             onBlur={e => e.target.style.borderColor = C.border}
@@ -193,17 +193,17 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             onClick={() => setShowAiModal(true)}
             style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#533afd,#f96bee)", color: C.white, fontSize: 13, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap" }}
           >
-            초안 생성
+            Generate Draft
           </button>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>템플릿으로 시작하기</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>Start from a template</div>
         <button
           onClick={() => applyTemplate({ title: "", questions: [] }) || setTitle("") || setQuestions([newQ("voice")])}
           style={{ background: "none", border: "none", fontSize: 12, color: C.body, cursor: "pointer", padding: 0, textDecoration: "underline" }}
         >
-          처음부터 작성
+          Start from scratch
         </button>
       </div>
       <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
@@ -216,7 +216,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               onClick={() => applyTemplate(tpl)}
               style={{ marginTop: 4, padding: "6px 0", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 12, fontWeight: 500, fontFamily: F, cursor: "pointer" }}
             >
-              사용하기
+              Use Template
             </button>
           </div>
         ))}
@@ -286,7 +286,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "저장 실패");
+      if (!res.ok) throw new Error(data.error || "Save failed");
       setShareCode(data.share_code);
       // Mark as saved
       setSavedTitle(title);
@@ -296,20 +296,20 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         track("interview_published", { shareCode: data.share_code, questionCount: questions.length });
         setShowShareOverlay(true); // only for new interviews
       } else {
-        showToast("저장됐습니다 ✓", "success");
+        showToast("Saved ✓", "success");
       }
       if (!editingId && data.interview?.id) setEditingId(data.interview.id);
       localStorage.removeItem(DRAFT_KEY);
     } catch (e) {
-      showToast(e.message || "저장에 실패했습니다. 다시 시도해 주세요.", "error");
+      showToast(e.message || "Failed to save. Please try again.", "error");
     } finally {
       setSaving(false);
     }
   };
 
   const handleSave = () => {
-    if (!title.trim()) { showToast("인터뷰 제목을 입력해 주세요", "error"); return; }
-    if (questions.some(q => !q.content.trim())) { showToast("모든 질문 텍스트를 입력해 주세요", "error"); return; }
+    if (!title.trim()) { showToast("Please enter an interview title", "error"); return; }
+    if (questions.some(q => !q.content.trim())) { showToast("Please fill in all question text", "error"); return; }
     if (questions.length < 10) { setShowIncompleteWarn(true); return; }
     doSave();
   };
@@ -330,7 +330,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "평점" };
+  const typeLabel = { voice: "Voice", multiple_choice: "Multiple Choice", likert: "Rating" };
   const typeVariant = { voice: "purple", multiple_choice: "success", likert: "warning" };
 
   // ─── Overlays (share success + incomplete warning) ───
@@ -342,28 +342,28 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(21,190,83,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
           {Ic.CheckCircle({ s: 28, c: C.success })}
         </div>
-        <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 8 }}>링크가 생성됐습니다</div>
+        <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 8 }}>Your link is ready</div>
         <div style={{ fontSize: 13, color: C.body, marginBottom: 24, lineHeight: 1.6 }}>
-          아래 링크를 참여자에게 공유하세요.<br />로그인 없이 바로 참여할 수 있습니다.
+          Share the link below with your participants.<br />No login required to join.
         </div>
         <div style={{ background: C.bg, borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, marginBottom: 20, border: `1px solid ${C.border}` }}>
           <span style={{ flex: 1, fontSize: 13, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
-          <Btn size="sm" onClick={handleCopy}>{copied ? "복사됨 ✓" : "복사"}</Btn>
+          <Btn size="sm" onClick={handleCopy}>{copied ? "Copied ✓" : "Copy"}</Btn>
         </div>
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 12, color: C.body, marginBottom: 10 }}>📱 QR 코드로 공유</div>
+          <div style={{ fontSize: 12, color: C.body, marginBottom: 10 }}>📱 Share via QR code</div>
           <img
             src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`}
-            alt="QR 코드"
+            alt="QR Code"
             style={{ width: 180, height: 180, borderRadius: 12, border: `1px solid ${C.border}` }}
           />
           <div style={{ marginTop: 10 }}>
-            <Btn size="sm" variant="ghost" onClick={() => window.open(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`, "_blank")}>QR 코드 저장</Btn>
+            <Btn size="sm" variant="ghost" onClick={() => window.open(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`, "_blank")}>Save QR Code</Btn>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn full variant="ghost" onClick={() => setShowShareOverlay(false)}>계속 편집</Btn>
-          <Btn full onClick={() => go("dashboard")}>대시보드로 이동</Btn>
+          <Btn full variant="ghost" onClick={() => setShowShareOverlay(false)}>Keep Editing</Btn>
+          <Btn full onClick={() => go("dashboard")}>Go to Dashboard</Btn>
         </div>
       </div>
     </div>
@@ -373,16 +373,16 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ background: C.white, borderRadius: 16, padding: "32px 32px 28px", maxWidth: 400, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.18) 0px 30px 60px -12px" }}>
         <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 22 }}>✏️</div>
-        <div style={{ fontSize: 18, fontWeight: 600, color: C.navy, marginBottom: 8 }}>아직 인터뷰가 완성되지 않았습니다</div>
+        <div style={{ fontSize: 18, fontWeight: 600, color: C.navy, marginBottom: 8 }}>Interview isn't complete yet</div>
         <div style={{ fontSize: 13, color: C.body, marginBottom: 6, lineHeight: 1.65 }}>
-          현재 질문이 <strong style={{ color: C.navy }}>{questions.length}개</strong>입니다.
+          You currently have <strong style={{ color: C.navy }}>{questions.length} question{questions.length !== 1 ? "s" : ""}</strong>.
         </div>
         <div style={{ fontSize: 13, color: C.body, marginBottom: 28, lineHeight: 1.65 }}>
-          충분한 인사이트를 얻으려면 10개 이상의 질문을 권장합니다. 계속 작성하시겠어요?
+          We recommend at least 10 questions to get meaningful insights. Would you like to keep writing?
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn full variant="ghost" onClick={() => setShowIncompleteWarn(false)}>계속 작성</Btn>
-          <Btn full onClick={doSave} style={{ background: "#f59e0b", border: "none" }}>그래도 생성하기</Btn>
+          <Btn full variant="ghost" onClick={() => setShowIncompleteWarn(false)}>Keep Writing</Btn>
+          <Btn full onClick={doSave} style={{ background: "#f59e0b", border: "none" }}>Publish Anyway</Btn>
         </div>
       </div>
     </div>
@@ -394,15 +394,15 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       <div style={{ background: C.white, borderRadius: 20, padding: "36px 32px 28px", maxWidth: 480, width: "100%", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>AI 질문 초안 생성</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>Generate AI Draft Questions</div>
         </div>
         <div style={{ fontSize: 13, color: C.body, marginBottom: 20, lineHeight: 1.6 }}>
-          인터뷰 목적을 간단히 설명하면 AI가 10~12개 질문을 생성합니다.
+          Briefly describe your interview goal and AI will generate 10–12 questions.
         </div>
         <textarea
           value={aiPrompt}
           onChange={e => setAiPrompt(e.target.value)}
-          placeholder="예: MZ세대 앱 사용자들의 결제 경험과 불편함 파악. 핀테크 스타트업 UX 개선용."
+          placeholder="e.g. Understand payment experience and pain points of Gen Z app users. For a fintech startup's UX improvement."
           rows={4}
           autoFocus
           onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generateWithAI(); }}
@@ -410,11 +410,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           onFocus={e => e.target.style.borderColor = C.purple}
           onBlur={e => e.target.style.borderColor = C.border}
         />
-        <div style={{ fontSize: 11, color: C.body, textAlign: "right", marginBottom: 20, marginTop: 4 }}>{aiPrompt.length}/600자 · ⌘Enter로 생성</div>
+        <div style={{ fontSize: 11, color: C.body, textAlign: "right", marginBottom: 20, marginTop: 4 }}>{aiPrompt.length}/600 chars · ⌘Enter to generate</div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn full variant="ghost" onClick={() => setShowAiModal(false)} disabled={aiGenerating}>취소</Btn>
+          <Btn full variant="ghost" onClick={() => setShowAiModal(false)} disabled={aiGenerating}>Cancel</Btn>
           <Btn full onClick={generateWithAI} disabled={aiGenerating || !aiPrompt.trim()}>
-            {aiGenerating ? "생성 중…" : "✦ 초안 생성하기"}
+            {aiGenerating ? "Generating…" : "✦ Generate Draft"}
           </Btn>
         </div>
       </div>
@@ -424,39 +424,39 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   // ─── Top nav bar ───
   const NavBar = (
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
-      <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
+      <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← Dashboard</Btn>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        {logout && <Btn variant="ghost" size="sm" onClick={logout} style={{ fontSize: 12, color: C.body }}>로그아웃</Btn>}
+        {logout && <Btn variant="ghost" size="sm" onClick={logout} style={{ fontSize: 12, color: C.body }}>Sign Out</Btn>}
         {/* Unsaved changes indicator */}
         {editingId && hasUnsaved && (
           <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#f59e0b", fontWeight: 500 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
-            저장되지 않은 변경사항
+            Unsaved changes
           </span>
         )}
-        {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시저장됨 ✓</span>}
+        {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>Draft saved ✓</span>}
         <span style={{ fontSize: 11, color: questions.length >= 10 ? C.success : "rgba(180,120,0,0.85)", fontWeight: 500 }}>
-          질문 {questions.length}{questions.length < 10 ? ` / 10 권장` : ` ✓`}
+          {questions.length} question{questions.length !== 1 ? "s" : ""}{questions.length < 10 ? ` / 10 recommended` : ` ✓`}
         </span>
-        <Btn size="sm" onClick={() => setShowAiModal(true)} style={{ background: "linear-gradient(135deg,#533afd,#f96bee)", border: "none", color: C.white, fontWeight: 600 }}>✦ AI 초안</Btn>
+        <Btn size="sm" onClick={() => setShowAiModal(true)} style={{ background: "linear-gradient(135deg,#533afd,#f96bee)", border: "none", color: C.white, fontWeight: 600 }}>✦ AI Draft</Btn>
         <div style={{ position: "relative" }}>
-          <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>템플릿</Btn>
+          <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>Templates</Btn>
           {templateOpen && (
             <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 4, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 100, minWidth: 220 }}>
-              <div style={{ padding: "8px 14px 4px", fontSize: 10, color: C.body, fontWeight: 600, letterSpacing: 0.5 }}>템플릿 불러오기</div>
+              <div style={{ padding: "8px 14px 4px", fontSize: 10, color: C.body, fontWeight: 600, letterSpacing: 0.5 }}>Load a template</div>
               <div onClick={loadTemplate}
                 style={{ padding: "10px 14px", fontSize: 13, color: C.navy, cursor: "pointer", borderTop: `1px solid ${C.border}` }}
                 onMouseEnter={e => e.currentTarget.style.background = C.bg}
                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                <div style={{ fontWeight: 500 }}>Voice Survey 사용자 만족도 조사</div>
-                <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>음성 7개 + 객관식 7개 · 14문항</div>
+                <div style={{ fontWeight: 500 }}>Voice Survey User Satisfaction Study</div>
+                <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>7 voice + 7 multiple choice · 14 questions</div>
               </div>
             </div>
           )}
         </div>
         {shareCode && (
           <Btn variant="ghost" size="sm" onClick={handleCopy}>
-            {copied ? "복사됨 ✓" : "링크 복사"}
+            {copied ? "Copied ✓" : "Copy Link"}
           </Btn>
         )}
         {/* Save button with ⌘S tooltip */}
@@ -464,11 +464,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           onMouseEnter={() => setShowSaveTooltip(true)}
           onMouseLeave={() => setShowSaveTooltip(false)}>
           <Btn size="sm" onClick={handleSave} disabled={saving}>
-            {saving ? "저장 중…" : editingId ? "저장" : "링크 생성 →"}
+            {saving ? "Saving…" : editingId ? "Save" : "Create Link →"}
           </Btn>
           {showSaveTooltip && (
             <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: C.navy, color: C.white, fontSize: 11, padding: "4px 8px", borderRadius: 6, whiteSpace: "nowrap", zIndex: 200, pointerEvents: "none" }}>
-              ⌘S로 저장
+              ⌘S to save
             </div>
           )}
         </div>
@@ -478,9 +478,9 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
   const ShareLinkBar = shareCode && editingId && (
     <div style={{ background: "rgba(83,58,253,0.06)", borderBottom: `1px solid rgba(83,58,253,0.15)`, padding: "8px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-      <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>공유 링크</span>
+      <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>Share Link</span>
       <span style={{ flex: 1, fontSize: 12, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
-      <Btn size="sm" variant="ghost" onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px" }}>{copied ? "복사됨 ✓" : "복사"}</Btn>
+      <Btn size="sm" variant="ghost" onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px" }}>{copied ? "Copied ✓" : "Copy"}</Btn>
     </div>
   );
 
@@ -497,13 +497,13 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         <input
           value={title}
           onChange={e => setTitle(e.target.value)}
-          placeholder="인터뷰 제목을 입력하세요"
+          placeholder="Enter interview title"
           style={{ width: "100%", border: "none", outline: "none", fontSize: 18, fontFamily: F, fontWeight: 600, color: C.navy, background: "transparent", boxSizing: "border-box" }}
         />
         <input
           value={incentive}
           onChange={e => setIncentive(e.target.value)}
-          placeholder="참여 보상 (선택) — 예: 스타벅스 기프티콘 5,000원"
+          placeholder="Participation reward (optional) — e.g. $5 Amazon gift card"
           style={{ width: "100%", border: "none", outline: "none", fontSize: 13, fontFamily: F, color: C.body, background: "transparent", boxSizing: "border-box", marginTop: 6 }}
         />
       </div>
@@ -555,8 +555,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         {/* Left: question list */}
         <div style={{ width: 260, borderRight: `1px solid ${C.border}`, background: C.white, display: "flex", flexDirection: "column", flexShrink: 0 }}>
           <div style={{ padding: "12px 14px", borderBottom: `1px solid ${C.border}`, position: "relative" }}>
-            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>질문 목록 ({questions.length}개)</div>
-            <Btn size="sm" full onClick={() => setAddTypeOpen(v => !v)}>+ 질문 추가</Btn>
+            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>Questions ({questions.length})</div>
+            <Btn size="sm" full onClick={() => setAddTypeOpen(v => !v)}>+ Add Question</Btn>
             {addTypeOpen && (
               <div style={{ position: "absolute", top: "100%", left: 14, right: 14, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 10 }}>
                 {Q_TYPES.map(({ type, icon, label, desc }) => (
@@ -604,12 +604,12 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
                   <Badge variant={selectedIdx === i ? typeVariant[qq.type] : "neutral"} style={{ fontSize: 10 }}>{typeLabel[qq.type]}</Badge>
                   <div style={{ marginLeft: "auto", display: "flex", gap: 2 }}>
                     {/* Duplicate button */}
-                    <button onClick={e => duplicateQ(i, e)} title="복제" style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px", opacity: 0.6 }}>⧉</button>
+                    <button onClick={e => duplicateQ(i, e)} title="Duplicate" style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px", opacity: 0.6 }}>⧉</button>
                     <button onClick={e => { e.stopPropagation(); removeQ(i); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px" }}>✕</button>
                   </div>
                 </div>
                 <div style={{ fontSize: 12, color: selectedIdx === i ? C.navy : C.body, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                  {qq.content || <span style={{ color: C.border }}>질문 텍스트 없음</span>}
+                  {qq.content || <span style={{ color: C.border }}>No question text</span>}
                 </div>
               </div>
             ))}
@@ -621,11 +621,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
           {/* Title input — prominent, top of canvas */}
           <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "20px 40px 16px" }}>
-            <div style={{ fontSize: 11, color: C.body, marginBottom: 6, letterSpacing: 0.5 }}>인터뷰 제목</div>
+            <div style={{ fontSize: 11, color: C.body, marginBottom: 6, letterSpacing: 0.5 }}>Interview Title</div>
             <input
               value={title}
               onChange={e => setTitle(e.target.value)}
-              placeholder="예: 신제품 사용성 인터뷰 — 2026 Q2"
+              placeholder="e.g. New Product Usability Interview — 2026 Q2"
               style={{
                 width: "100%",
                 border: "none",
@@ -644,11 +644,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               onBlur={e => e.target.style.borderBottomColor = title ? C.purple : C.border}
             />
             <div style={{ marginTop: 14 }}>
-              <div style={{ fontSize: 11, color: C.body, marginBottom: 4, letterSpacing: 0.5 }}>참여 보상 (선택)</div>
+              <div style={{ fontSize: 11, color: C.body, marginBottom: 4, letterSpacing: 0.5 }}>Participation Reward (optional)</div>
               <input
                 value={incentive}
                 onChange={e => setIncentive(e.target.value)}
-                placeholder="예: 스타벅스 기프티콘 5,000원"
+                placeholder="e.g. $5 Starbucks gift card"
                 style={{ width: "100%", border: "none", borderBottom: `1px solid ${incentive ? C.purple : C.border}`, outline: "none", fontSize: 14, fontFamily: F, color: C.navy, background: "transparent", paddingBottom: 4, boxSizing: "border-box", transition: "border-color 0.15s" }}
                 onFocus={e => e.target.style.borderBottomColor = C.purple}
                 onBlur={e => e.target.style.borderBottomColor = incentive ? C.purple : C.border}
@@ -658,11 +658,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
           {/* Preview card */}
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 40px", gap: 12 }}>
-            <div style={{ fontSize: 11, color: C.body, letterSpacing: 0.3 }}>참여자에게 보이는 화면 — 직접 클릭해서 편집하세요</div>
+            <div style={{ fontSize: 11, color: C.body, letterSpacing: 0.3 }}>Participant view — click to edit directly</div>
             <PreviewCard q={q} idx={selectedIdx} total={questions.length} updateQ={updateQ} />
             {/* Character count */}
             <div style={{ fontSize: 11, color: (q?.content?.length ?? 0) > MAX_Q_CHARS ? C.ruby : C.body, alignSelf: "flex-end", marginRight: 0 }}>
-              {q?.content?.length ?? 0}/{MAX_Q_CHARS}자
+              {q?.content?.length ?? 0}/{MAX_Q_CHARS} chars
             </div>
           </div>
         </div>
@@ -685,7 +685,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
       <div style={{ position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
           <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>✦</div>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>AI 인터뷰어 · Voice Survey</span>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>AI Interviewer · Voice Survey</span>
           <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,0.25)" }}>Q{idx + 1}/{total}</span>
         </div>
 
@@ -694,7 +694,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
           <textarea
             value={q?.content ?? ""}
             onChange={e => updateQ(idx, { content: e.target.value })}
-            placeholder="질문 텍스트를 입력하세요"
+            placeholder="Enter question text"
             rows={3}
             style={{ width: "100%", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.2)", outline: "none", resize: "none", fontSize: 15, fontWeight: 400, color: "white", lineHeight: 1.65, letterSpacing: "-0.3px", fontFamily: F, marginBottom: 20, padding: "0 0 6px", boxSizing: "border-box", caretColor: "rgba(185,185,249,0.9)" }}
             onFocus={e => e.target.style.borderBottomColor = "rgba(185,185,249,0.7)"}
@@ -702,7 +702,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
           />
         ) : (
           <p style={{ fontSize: 15, fontWeight: 400, color: "white", lineHeight: 1.65, letterSpacing: -0.3, margin: "0 0 20px" }}>
-            {q?.content || <span style={{ opacity: 0.3 }}>질문 텍스트를 입력하세요</span>}
+            {q?.content || <span style={{ opacity: 0.3 }}>Enter question text</span>}
           </p>
         )}
 
@@ -711,7 +711,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
             <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(26,115,232,0.25)", border: "1px solid rgba(26,115,232,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {Ic.Mic({ s: 18, c: "#b9b9f9" })}
             </div>
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>버튼을 눌러 답변해 주세요</span>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Press the button to respond</span>
           </div>
         )}
 
@@ -722,13 +722,13 @@ function PreviewCard({ q, idx, total, updateQ }) {
                 key={i}
                 value={opt}
                 onChange={e => { const next = [...q.options]; next[i] = e.target.value; updateQ(idx, { options: next }); }}
-                placeholder={`보기 ${i + 1}`}
+                placeholder={`Option ${i + 1}`}
                 style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", fontSize: 13, color: "rgba(255,255,255,0.85)", fontFamily: F, outline: "none", width: "100%", boxSizing: "border-box", caretColor: "rgba(185,185,249,0.9)" }}
                 onFocus={e => e.target.style.borderColor = "rgba(185,185,249,0.5)"}
                 onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.15)"}
               />
             ) : (
-              <div key={i} style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{opt || `보기 ${i + 1}`}</div>
+              <div key={i} style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{opt || `Option ${i + 1}`}</div>
             ))}
           </div>
         )}
@@ -752,15 +752,15 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
 
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>질문 설정</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>Question Settings</div>
 
       {/* Type selector with icons and descriptions */}
       <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 8 }}>질문 유형</label>
+        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 8 }}>Question Type</label>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {Q_TYPES.map(({ type, icon, label, desc }) => (
             <div key={type}
-              onClick={() => updateQ(idx, { type, options: type === "multiple_choice" ? ["", "", ""] : type === "likert" ? { min: 1, max: 5, labels: ["매우 아니다", "아니다", "보통", "그렇다", "매우 그렇다"] } : undefined })}
+              onClick={() => updateQ(idx, { type, options: type === "multiple_choice" ? ["", "", ""] : type === "likert" ? { min: 1, max: 5, labels: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"] } : undefined })}
               style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${q.type === type ? C.purple : C.border}`, background: q.type === type ? C.purpleBg : "transparent", cursor: "pointer", transition: "all 0.1s" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
                 <span style={{ fontSize: 14 }}>{icon}</span>
@@ -773,27 +773,27 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
       </div>
 
       <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>질문 텍스트</label>
+        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>Question Text</label>
         <textarea
           value={q.content}
           onChange={e => updateQ(idx, { content: e.target.value })}
           rows={4}
-          placeholder="질문을 입력하세요"
+          placeholder="Enter your question"
           style={{ width: "100%", padding: "8px 10px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.5 }}
         />
         <div style={{ fontSize: 10, color: (q.content?.length ?? 0) > 200 ? C.ruby : C.body, textAlign: "right", marginTop: 3 }}>
-          {q.content?.length ?? 0}/200자
+          {q.content?.length ?? 0}/200 chars
         </div>
       </div>
       {q.type === "multiple_choice" && Array.isArray(q.options) && (
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>보기 목록</label>
+          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>Options</label>
           {q.options.map((opt, i) => (
             <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6 }}>
               <input
                 value={opt}
                 onChange={e => { const next = [...q.options]; next[i] = e.target.value; updateQ(idx, { options: next }); }}
-                placeholder={`보기 ${i + 1}`}
+                placeholder={`Option ${i + 1}`}
                 style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }}
               />
               {q.options.length > 2 && (
@@ -802,13 +802,13 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
             </div>
           ))}
           {q.options.length < 6 && (
-            <button onClick={() => updateQ(idx, { options: [...q.options, ""] })} style={{ fontSize: 12, color: C.purple, background: "none", border: "none", cursor: "pointer", padding: 0 }}>+ 보기 추가</button>
+            <button onClick={() => updateQ(idx, { options: [...q.options, ""] })} style={{ fontSize: 12, color: C.purple, background: "none", border: "none", cursor: "pointer", padding: 0 }}>+ Add Option</button>
           )}
         </div>
       )}
       {q.type === "likert" && (
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>척도 범위</label>
+          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>Scale Range</label>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input type="number" value={q.options?.min ?? 1} min={1} max={4}
               onChange={e => updateQ(idx, { options: { ...q.options, min: Number(e.target.value) } })}

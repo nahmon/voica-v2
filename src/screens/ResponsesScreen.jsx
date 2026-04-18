@@ -15,15 +15,15 @@ function FunnelCard({ funnel, compact }) {
 
   const pct = (n) => opened > 0 ? Math.round(n / opened * 100) : 0;
   const steps = [
-    { label: "링크 접속",  count: opened,    color: C.purple,   bg: C.purpleBg },
-    { label: "정보 입력",  count: started,   color: "#1a73e8",  bg: "rgba(26,115,232,0.08)" },
-    { label: "완료",       count: completed, color: C.success,  bg: C.successBg },
+    { label: "Link opened",   count: opened,    color: C.purple,   bg: C.purpleBg },
+    { label: "Info submitted", count: started,   color: "#1a73e8",  bg: "rgba(26,115,232,0.08)" },
+    { label: "Completed",      count: completed, color: C.success,  bg: C.successBg },
   ];
 
   if (compact) {
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderBottom: `1px solid ${C.border}`, background: C.white, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.5, marginRight: 4 }}>참여 깔때기</span>
+        <span style={{ fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.5, marginRight: 4 }}>Participation funnel</span>
         {steps.map((s, i) => (
           <span key={s.label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
             {i > 0 && <span style={{ color: C.border, fontSize: 10 }}>›</span>}
@@ -33,14 +33,14 @@ function FunnelCard({ funnel, compact }) {
             </span>
           </span>
         ))}
-        {abandoned > 0 && <span style={{ fontSize: 10, color: "#b45309", marginLeft: 4, padding: "2px 6px", borderRadius: 4, background: "rgba(180,83,9,0.08)" }}>이탈 {abandoned}명</span>}
+        {abandoned > 0 && <span style={{ fontSize: 10, color: "#b45309", marginLeft: 4, padding: "2px 6px", borderRadius: 4, background: "rgba(180,83,9,0.08)" }}>Abandoned {abandoned}</span>}
       </div>
     );
   }
 
   return (
     <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "16px 18px", marginBottom: 14 }}>
-      <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, marginBottom: 14 }}>참여 깔때기</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, marginBottom: 14 }}>Participation funnel</div>
       {steps.map((step, i) => {
         const p = pct(step.count);
         return (
@@ -51,7 +51,7 @@ function FunnelCard({ funnel, compact }) {
                 <span style={{ color: C.body }}>{step.label}</span>
               </div>
               <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                <span style={{ fontWeight: 700, color: step.color, fontSize: 14 }}>{step.count}명</span>
+                <span style={{ fontWeight: 700, color: step.color, fontSize: 14 }}>{step.count}</span>
                 <span style={{ fontSize: 11, color: C.body, background: step.bg, padding: "1px 6px", borderRadius: 4 }}>{p}%</span>
               </div>
             </div>
@@ -70,7 +70,7 @@ function FunnelCard({ funnel, compact }) {
       {abandoned > 0 && (
         <div style={{ marginTop: 8, padding: "6px 10px", background: "rgba(180,83,9,0.06)", borderRadius: 6, display: "flex", alignItems: "center", gap: 6 }}>
           {Ic.Warning({ s: 13, c: "#b45309" })}
-          <span style={{ fontSize: 11, color: "#b45309" }}>이탈 {abandoned}명 ({pct(abandoned)}%)</span>
+          <span style={{ fontSize: 11, color: "#b45309" }}>Abandoned {abandoned} ({pct(abandoned)}%)</span>
         </div>
       )}
     </div>
@@ -79,24 +79,24 @@ function FunnelCard({ funnel, compact }) {
 
 // ── CSV export ────────────────────────────────────────────────────────────────
 function buildCsv(sessions, questions, allResponses) {
-  const headers = ["응답자", "상태", "시작 시간", "완료 시간", ...questions.map((q, i) => `Q${i + 1}: ${q.content}`)];
+  const headers = ["Respondent", "Status", "Started at", "Completed at", ...questions.map((q, i) => `Q${i + 1}: ${q.content}`)];
   const rows = sessions.map((s, si) => {
-    const statusLabel = s.status === "completed" ? "완료" : "진행 중";
-    const started = s.started_at ? new Date(s.started_at).toLocaleString("ko-KR") : "";
-    const completed = s.completed_at ? new Date(s.completed_at).toLocaleString("ko-KR") : "";
+    const statusLabel = s.status === "completed" ? "Completed" : "In progress";
+    const started = s.started_at ? new Date(s.started_at).toLocaleString("en-US") : "";
+    const completed = s.completed_at ? new Date(s.completed_at).toLocaleString("en-US") : "";
     const answers = questions.map(q => {
       const r = allResponses.find(r => r.session_id === s.id && r.question_id === q.id);
       if (!r) return "";
-      if (q.type === "voice") return r.transcript ?? "(음성 응답)";
+      if (q.type === "voice") return r.transcript ?? "(voice response)";
       if (Array.isArray(r.value)) return r.value.join("; ");
       return String(r.value ?? "");
     });
-    return [`응답자 ${si + 1}`, statusLabel, started, completed, ...answers];
+    return [`Respondent ${si + 1}`, statusLabel, started, completed, ...answers];
   });
 
   const escape = (v) => `"${String(v).replace(/"/g, '""')}"`;
   const lines = [headers, ...rows].map(row => row.map(escape).join(","));
-  return "\uFEFF" + lines.join("\n"); // BOM for Excel Korean
+  return "\uFEFF" + lines.join("\n"); // BOM for Excel
 }
 
 // ── Stats bar ─────────────────────────────────────────────────────────────────
@@ -112,10 +112,10 @@ function StatsBar({ sessions, allResponses }) {
   const avgMin = avgMs !== null ? Math.round(avgMs / 60000) : null;
 
   const items = [
-    { label: "전체", value: total, color: C.navy },
-    { label: "완료", value: completed, color: C.success },
-    { label: "진행 중", value: inProgress, color: "#b45309" },
-    ...(avgMin !== null ? [{ label: "평균 완료", value: `${avgMin}분`, color: "#1a73e8" }] : []),
+    { label: "Total", value: total, color: C.navy },
+    { label: "Completed", value: completed, color: C.success },
+    { label: "In progress", value: inProgress, color: "#b45309" },
+    ...(avgMin !== null ? [{ label: "Avg. time", value: `${avgMin} min`, color: "#1a73e8" }] : []),
   ];
 
   return (
@@ -187,7 +187,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   }, [interviewId]);
 
   const handleExportCsv = () => {
-    if (sessions.length === 0) { showToast("내보낼 응답이 없어요", "error"); return; }
+    if (sessions.length === 0) { showToast("No responses to export", "error"); return; }
     const csv = buildCsv(sessions, questions, allResponses);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -196,7 +196,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
     a.download = `${interview?.title ?? "responses"}_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast("CSV 파일이 다운로드됩니다", "success");
+    showToast("CSV file downloaded", "success");
   };
 
   const filteredSessions = sessions.filter(s => {
@@ -233,8 +233,8 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
   if (isMobile && selectedSession) {
     const sessionIdx = sessions.indexOf(selectedSession) + 1;
     const dt = selectedSession.completed_at
-      ? new Date(selectedSession.completed_at).toLocaleString("ko-KR")
-      : "인터뷰 진행 중";
+      ? new Date(selectedSession.completed_at).toLocaleString("en-US")
+      : "Interview in progress";
     return (
       <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg }}>
         <GlobalNav go={go} variant="app" user={user} logout={logout} />
@@ -242,12 +242,12 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           <button onClick={() => setSelectedSession(null)}
             style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: C.navy, padding: "0 4px", lineHeight: 1 }}>←</button>
           <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            응답자 {sessionIdx}
+            Respondent {sessionIdx}
           </div>
-          <Btn size="sm" onClick={() => go("report", interviewId)}>리포트</Btn>
+          <Btn size="sm" onClick={() => go("report", interviewId)}>Report</Btn>
         </div>
         <div style={{ padding: "16px" }}>
-          <div style={{ marginBottom: 16, fontSize: 12, color: C.body }}>{dt} · {responses.length}개 응답</div>
+          <div style={{ marginBottom: 16, fontSize: 12, color: C.body }}>{dt} · {responses.length} responses</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {questions.map((q, qi) => {
               const r = responses.find(r => r.question_id === q.id);
@@ -265,11 +265,11 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
       <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg }}>
         <GlobalNav go={go} variant="app" user={user} logout={logout} />
         <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 16px", height: 48, display: "flex", alignItems: "center", gap: 10 }}>
-          <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
+          <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← Dashboard</Btn>
           <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {interview?.title ?? "인터뷰"}
+            {interview?.title ?? "Interview"}
           </div>
-          <div style={{ fontSize: 12, color: C.body, whiteSpace: "nowrap" }}>완료 {completedCount}명</div>
+          <div style={{ fontSize: 12, color: C.body, whiteSpace: "nowrap" }}>{completedCount} completed</div>
         </div>
         <div style={{ padding: "12px 16px" }}>
           <StatsBar sessions={sessions} allResponses={allResponses} />
@@ -279,22 +279,22 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12, flexWrap: "wrap" }}>
             <FilterTabs value={filterStatus} onChange={setFilterStatus} />
             <button onClick={handleExportCsv} style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 6, border: `1px solid ${C.border}`, background: C.white, fontSize: 11, color: C.purple, fontFamily: F, cursor: "pointer", fontWeight: 500 }}>
-              {Ic.BarChart({ s: 12, c: C.purple })} CSV 내보내기
+              {Ic.BarChart({ s: 12, c: C.purple })} Export CSV
             </button>
           </div>
 
           <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 10, letterSpacing: 0.5 }}>
-            응답자 목록 ({filteredSessions.length})
+            Respondents ({filteredSessions.length})
           </div>
           {sessions.length === 0 ? (
             <div style={{ textAlign: "center", padding: "56px 20px" }}>
               <div style={{ fontSize: 40, marginBottom: 14 }}>🎙️</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 6 }}>아직 응답이 없어요</div>
-              <div style={{ fontSize: 13, color: C.body, marginBottom: interview?.share_code ? 20 : 0 }}>인터뷰 링크를 공유하면 패널이 참여해요</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 6 }}>No responses yet</div>
+              <div style={{ fontSize: 13, color: C.body, marginBottom: interview?.share_code ? 20 : 0 }}>Share the interview link to start collecting responses</div>
               {interview?.share_code && (
                 <button onClick={() => { navigator.clipboard.writeText(`${location.origin}/i/${interview.share_code}`); }}
                   style={{ padding: "8px 18px", borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, fontSize: 13, color: C.purple, fontFamily: F, cursor: "pointer", fontWeight: 500 }}>
-                  🔗 링크 복사
+                  🔗 Copy link
                 </button>
               )}
             </div>
@@ -302,8 +302,8 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
             const isCompleted = s.status === "completed";
             const originalIdx = sessions.indexOf(s);
             const dt = s.completed_at
-              ? new Date(s.completed_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
-              : "진행 중";
+              ? new Date(s.completed_at).toLocaleString("en-US", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+              : "In progress";
             const respCount = allResponses.filter(r => r.session_id === s.id).length;
             return (
               <div key={s.id} onClick={() => setSelectedSession(s)}
@@ -312,11 +312,11 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                   {originalIdx + 1}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>응답자 {originalIdx + 1}</div>
-                  <div style={{ fontSize: 12, color: C.body }}>{dt} · {respCount}개 응답</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>Respondent {originalIdx + 1}</div>
+                  <div style={{ fontSize: 12, color: C.body }}>{dt} · {respCount} responses</div>
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 600, color: isCompleted ? C.successText : "#b45309", whiteSpace: "nowrap" }}>
-                  {isCompleted ? "완료" : "진행 중"}
+                  {isCompleted ? "Completed" : "In progress"}
                 </div>
                 <span style={{ color: C.body, fontSize: 16 }}>›</span>
               </div>
@@ -334,18 +334,18 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
 
       {/* Sub-header */}
       <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 24px", height: 48, display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
+        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← Dashboard</Btn>
         <div style={{ width: 1, height: 16, background: C.border }} />
         <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {interview?.title ?? "인터뷰"}
+          {interview?.title ?? "Interview"}
         </div>
         <div style={{ fontSize: 12, color: C.body, whiteSpace: "nowrap" }}>
-          완료 {completedCount}명
+          {completedCount} completed
         </div>
         <button onClick={handleExportCsv} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 6, border: `1px solid ${C.border}`, background: C.white, fontSize: 12, color: C.purple, fontFamily: F, cursor: "pointer", fontWeight: 500 }}>
-          {Ic.BarChart({ s: 13, c: C.purple })} CSV 내보내기
+          {Ic.BarChart({ s: 13, c: C.purple })} Export CSV
         </button>
-        <Btn size="sm" onClick={() => go("report", interviewId)}>리포트 보기</Btn>
+        <Btn size="sm" onClick={() => go("report", interviewId)}>View report</Btn>
       </div>
 
       <FunnelCard funnel={funnel} compact />
@@ -363,7 +363,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
               <FilterTabs value={filterStatus} onChange={setFilterStatus} small />
               <button
                 onClick={() => setViewMode(v => v === "expanded" ? "compact" : "expanded")}
-                title={viewMode === "expanded" ? "컴팩트 보기" : "확장 보기"}
+                title={viewMode === "expanded" ? "Compact view" : "Expanded view"}
                 style={{ marginLeft: "auto", padding: "4px 8px", borderRadius: 5, border: `1px solid ${C.border}`, background: viewMode === "compact" ? C.purpleBg : C.white, cursor: "pointer", display: "flex", alignItems: "center", color: viewMode === "compact" ? C.purple : C.body }}>
                 {viewMode === "compact"
                   ? Ic.BarChart({ s: 13, c: C.purple })
@@ -373,19 +373,19 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           </div>
 
           <div style={{ padding: "6px 12px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.5 }}>
-            응답자 목록 ({filteredSessions.length})
+            Respondents ({filteredSessions.length})
           </div>
 
           <div style={{ flex: 1, overflowY: "auto" }}>
             {sessions.length === 0 ? (
               <div style={{ textAlign: "center", padding: "48px 16px" }}>
                 <div style={{ fontSize: 36, marginBottom: 12 }}>🎙️</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 6 }}>아직 응답이 없어요</div>
-                <div style={{ fontSize: 12, color: C.body, marginBottom: interview?.share_code ? 16 : 0 }}>인터뷰 링크를 공유하면 패널이 참여해요</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 6 }}>No responses yet</div>
+                <div style={{ fontSize: 12, color: C.body, marginBottom: interview?.share_code ? 16 : 0 }}>Share the interview link to start collecting responses</div>
                 {interview?.share_code && (
                   <button onClick={() => navigator.clipboard.writeText(`${location.origin}/i/${interview.share_code}`)}
                     style={{ padding: "7px 16px", borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, fontSize: 12, color: C.purple, fontFamily: F, cursor: "pointer" }}>
-                    🔗 링크 복사
+                    🔗 Copy link
                   </button>
                 )}
               </div>
@@ -394,8 +394,8 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
               const isSelected = selectedSession?.id === s.id;
               const isCompleted = s.status === "completed";
               const dt = s.completed_at
-                ? new Date(s.completed_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
-                : "진행 중";
+                ? new Date(s.completed_at).toLocaleString("en-US", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+                : "In progress";
               const respCount = allResponses.filter(r => r.session_id === s.id).length;
               const durMin = s.completed_at && s.started_at
                 ? Math.round((new Date(s.completed_at) - new Date(s.started_at)) / 60000)
@@ -408,8 +408,8 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                     <div style={{ width: 20, height: 20, borderRadius: "50%", background: isCompleted ? "rgba(21,190,83,0.12)" : "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600, color: isCompleted ? C.successText : "#92650a", flexShrink: 0 }}>
                       {originalIdx + 1}
                     </div>
-                    <span style={{ flex: 1, fontSize: 12, color: isSelected ? C.purple : C.navy }}>응답자 {originalIdx + 1}</span>
-                    <span style={{ fontSize: 10, color: isCompleted ? C.successText : "#b45309" }}>{isCompleted ? "완료" : "진행"}</span>
+                    <span style={{ flex: 1, fontSize: 12, color: isSelected ? C.purple : C.navy }}>Respondent {originalIdx + 1}</span>
+                    <span style={{ fontSize: 10, color: isCompleted ? C.successText : "#b45309" }}>{isCompleted ? "Done" : "Active"}</span>
                   </div>
                 );
               }
@@ -422,12 +422,12 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                       {originalIdx + 1}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, color: isSelected ? C.purple : C.navy, fontWeight: isSelected ? 500 : 400 }}>응답자 {originalIdx + 1}</div>
-                      <div style={{ fontSize: 11, color: isCompleted ? C.successText : "#b45309" }}>{isCompleted ? "완료" : "진행 중"}</div>
+                      <div style={{ fontSize: 13, color: isSelected ? C.purple : C.navy, fontWeight: isSelected ? 500 : 400 }}>Respondent {originalIdx + 1}</div>
+                      <div style={{ fontSize: 11, color: isCompleted ? C.successText : "#b45309" }}>{isCompleted ? "Completed" : "In progress"}</div>
                     </div>
                     <div style={{ fontSize: 10, color: C.body, textAlign: "right", flexShrink: 0 }}>
-                      {respCount}개
-                      {durMin !== null && <div style={{ fontSize: 10, color: C.body }}>{durMin}분</div>}
+                      {respCount} responses
+                      {durMin !== null && <div style={{ fontSize: 10, color: C.body }}>{durMin} min</div>}
                     </div>
                   </div>
                   <div style={{ fontSize: 11, color: C.body, paddingLeft: 34 }}>{dt}</div>
@@ -443,8 +443,8 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
           {clipView ? (
             <div style={{ maxWidth: 720 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <div style={{ fontSize: 15, fontWeight: 500, color: C.navy }}>🎙 음성 클립 모아보기</div>
-                <button onClick={() => setClipView(false)} style={{ fontSize: 12, padding: "5px 12px", borderRadius: 6, border: `1px solid ${C.border}`, background: "transparent", color: C.body, cursor: "pointer", fontFamily: F }}>← 응답별 보기</button>
+                <div style={{ fontSize: 15, fontWeight: 500, color: C.navy }}>🎙 All voice clips</div>
+                <button onClick={() => setClipView(false)} style={{ fontSize: 12, padding: "5px 12px", borderRadius: 6, border: `1px solid ${C.border}`, background: "transparent", color: C.body, cursor: "pointer", fontFamily: F }}>← Back to responses</button>
               </div>
               {questions.filter(q => q.type === "voice").map(q => {
                 const clips = allResponses.filter(r => r.question_id === q.id && r.audio_url);
@@ -453,7 +453,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                   <div key={q.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, marginBottom: 16, overflow: "hidden" }}>
                     <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}`, background: C.bg }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: C.navy }}>Q{questions.indexOf(q) + 1}. {q.content}</div>
-                      <div style={{ fontSize: 11, color: C.body, marginTop: 3 }}>음성 클립 {clips.length}개</div>
+                      <div style={{ fontSize: 11, color: C.body, marginTop: 3 }}>{clips.length} voice clip{clips.length !== 1 ? "s" : ""}</div>
                     </div>
                     <div style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 16 }}>
                       {clips.map((r, idx) => {
@@ -461,7 +461,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                         const sessNum = sessions.indexOf(sess) + 1;
                         return (
                           <div key={r.id} style={{ borderBottom: idx < clips.length - 1 ? `1px solid ${C.border}` : "none", paddingBottom: idx < clips.length - 1 ? 16 : 0 }}>
-                            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>응답자 {sessNum} · {sess?.respondent?.name || "익명"}</div>
+                            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>Respondent {sessNum} · {sess?.respondent?.name || "Anonymous"}</div>
                             <VoicePlayer audioUrl={r.audio_url} transcript={r.transcript} />
                           </div>
                         );
@@ -471,14 +471,14 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                 );
               })}
               {questions.filter(q => q.type === "voice" && allResponses.some(r => r.question_id === q.id && r.audio_url)).length === 0 && (
-                <div style={{ textAlign: "center", color: C.body, fontSize: 13, padding: "40px 0" }}>아직 음성 클립이 없습니다</div>
+                <div style={{ textAlign: "center", color: C.body, fontSize: 13, padding: "40px 0" }}>No voice clips yet</div>
               )}
             </div>
           ) : !selectedSession ? (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: 16 }}>
-              <div style={{ color: C.body, fontSize: 14 }}>왼쪽에서 응답자를 선택해요</div>
+              <div style={{ color: C.body, fontSize: 14 }}>Select a respondent from the left</div>
               {allResponses.some(r => r.audio_url) && (
-                <button onClick={() => setClipView(true)} style={{ fontSize: 12, padding: "7px 16px", borderRadius: 8, border: `1px solid ${C.purple}`, background: C.purpleBg, color: C.purple, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>🎙 음성 클립 모아보기</button>
+                <button onClick={() => setClipView(true)} style={{ fontSize: 12, padding: "7px 16px", borderRadius: 8, border: `1px solid ${C.purple}`, background: C.purpleBg, color: C.purple, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>🎙 View all voice clips</button>
               )}
             </div>
           ) : (
@@ -487,18 +487,18 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 600, color: C.navy, marginBottom: 4 }}>
-                      응답자 {sessions.indexOf(selectedSession) + 1}
+                      Respondent {sessions.indexOf(selectedSession) + 1}
                     </div>
                     <div style={{ fontSize: 12, color: C.body }}>
                       {selectedSession.completed_at
-                        ? `완료 · ${new Date(selectedSession.completed_at).toLocaleString("ko-KR")}`
-                        : "인터뷰 진행 중"
+                        ? `Completed · ${new Date(selectedSession.completed_at).toLocaleString("en-US")}`
+                        : "Interview in progress"
                       }
-                      {" · "}{responses.length}개 응답
+                      {" · "}{responses.length} responses
                     </div>
                   </div>
                   {allResponses.some(r => r.audio_url) && (
-                    <button onClick={() => setClipView(true)} style={{ fontSize: 11, padding: "5px 12px", borderRadius: 6, border: `1px solid ${C.purple}`, background: C.purpleBg, color: C.purple, cursor: "pointer", fontFamily: F }}>🎙 음성 클립 모아보기</button>
+                    <button onClick={() => setClipView(true)} style={{ fontSize: 11, padding: "5px 12px", borderRadius: 6, border: `1px solid ${C.purple}`, background: C.purpleBg, color: C.purple, cursor: "pointer", fontFamily: F }}>🎙 View all voice clips</button>
                   )}
                 </div>
               </div>
@@ -520,9 +520,9 @@ export default function ResponsesScreen({ go, user, logout, interviewId }) {
 // ── Filter tabs ───────────────────────────────────────────────────────────────
 function FilterTabs({ value, onChange, small }) {
   const options = [
-    { v: "all", label: "전체" },
-    { v: "completed", label: "완료" },
-    { v: "in_progress", label: "진행 중" },
+    { v: "all", label: "All" },
+    { v: "completed", label: "Completed" },
+    { v: "in_progress", label: "In progress" },
   ];
   return (
     <div style={{ display: "flex", gap: 2, background: C.bg, padding: 2, borderRadius: 7, border: `1px solid ${C.border}` }}>
@@ -537,7 +537,7 @@ function FilterTabs({ value, onChange, small }) {
 
 // ── Q&A card ──────────────────────────────────────────────────────────────────
 function QuestionAnswer({ question, response, index }) {
-  const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "평점" };
+  const typeLabel = { voice: "Voice", multiple_choice: "Multiple choice", likert: "Rating" };
   const typeIcon = {
     voice: Ic.Mic,
     multiple_choice: Ic.Check,
@@ -567,7 +567,7 @@ function QuestionAnswer({ question, response, index }) {
       </div>
       <div style={{ padding: "14px 18px" }}>
         {!response ? (
-          <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>응답 없음</div>
+          <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>No response</div>
         ) : question.type === "voice" ? (
           <VoiceAnswer response={response} />
         ) : question.type === "multiple_choice" ? (

@@ -6,9 +6,9 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const APPLY_STEPS = ["none", "applied", "ai_screening", "confirmed"];
 const SORT_OPTIONS = [
-  { key: "추천순", label: "추천순" },
-  { key: "최신순", label: "최신순" },
-  { key: "리워드순", label: "리워드순" },
+  { key: "recommended", label: "Recommended" },
+  { key: "newest", label: "Newest" },
+  { key: "reward", label: "Highest Reward" },
 ];
 
 function parseReward(r) {
@@ -30,7 +30,7 @@ function MatchBadge({ score }) {
     <span style={{
       fontSize: 11, fontWeight: 600, color, background: bg,
       padding: "2px 8px", borderRadius: 4, flexShrink: 0,
-    }}>매칭 {pct}%</span>
+    }}>{pct}% Match</span>
   );
 }
 
@@ -49,11 +49,11 @@ function addRecentlyViewed(jobId) {
 export default function PanelBoardScreen({ go, user, logout }) {
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
-  const [catFilter, setCatFilter] = useState("전체");
-  const [sortKey, setSortKey] = useState("추천순");
+  const [catFilter, setCatFilter] = useState("All");
+  const [sortKey, setSortKey] = useState("recommended");
   const [applyState, setApplyState] = useState({});
   const [recentIds, setRecentIds] = useState(getRecentlyViewed);
-  const categories = ["전체", "추천", "전문가", "테크", "뷰티", "미디어", "식품", "금융", "교육"];
+  const categories = ["All", "Recommended", "Expert", "Tech", "Beauty", "Media", "Food", "Finance", "Education"];
   const profile = MOCK_PANEL_PROFILE;
 
   const jobsWithScore = PANEL_JOBS.map(j => ({ ...j, _matchScore: getMatchScore(j, profile) }));
@@ -61,14 +61,14 @@ export default function PanelBoardScreen({ go, user, logout }) {
 
   const filtered = jobsWithScore
     .filter(j =>
-      (catFilter === "전체" || catFilter === "추천" || j.category === catFilter) &&
+      (catFilter === "All" || catFilter === "Recommended" || j.category === catFilter) &&
       (search === "" || j.title.includes(search) || j.company.includes(search))
     )
-    .filter(j => catFilter === "추천" ? j._matchScore >= MATCH_THRESHOLD : true)
+    .filter(j => catFilter === "Recommended" ? j._matchScore >= MATCH_THRESHOLD : true)
     .sort((a, b) => {
-      if (sortKey === "최신순") return a.id - b.id; // mock: lower id = older, invert
-      if (sortKey === "리워드순") return parseReward(b.reward) - parseReward(a.reward);
-      // 추천순 (default)
+      if (sortKey === "newest") return a.id - b.id; // mock: lower id = older, invert
+      if (sortKey === "reward") return parseReward(b.reward) - parseReward(a.reward);
+      // recommended (default)
       return b._matchScore - a._matchScore;
     });
 
@@ -92,16 +92,16 @@ export default function PanelBoardScreen({ go, user, logout }) {
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", display: "inline-block" }} />
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>지금 {filtered.length}개 모집 중</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>{filtered.length} interviews open now</span>
           </div>
           <div style={{ fontSize: isMobile ? 20 : 26, fontWeight: 700, color: C.white, marginBottom: 16, lineHeight: 1.3 }}>
-            인터뷰 참여하고 리워드 받기
+            Join an interview and earn rewards
           </div>
           <div style={{ position: "relative" }}>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="주제 또는 기업명 검색"
+              placeholder="Search by topic or company"
               style={{
                 width: "100%", padding: "11px 40px 11px 14px",
                 borderRadius: 8, border: "none",
@@ -132,7 +132,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
                   color: active ? "#fff" : C.body,
                   fontWeight: active ? 600 : 400,
                 }}>
-                {c === "추천" ? `✦ 추천 ${recommendedCount}` : c}
+                {c === "Recommended" ? `✦ Recommended ${recommendedCount}` : c}
               </button>
             );
           })}
@@ -140,7 +140,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
 
         {/* Sort toggle */}
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
-          <span style={{ fontSize: 12, color: C.body, flexShrink: 0 }}>정렬:</span>
+          <span style={{ fontSize: 12, color: C.body, flexShrink: 0 }}>Sort:</span>
           {SORT_OPTIONS.map(opt => {
             const active = sortKey === opt.key;
             return (
@@ -183,10 +183,10 @@ export default function PanelBoardScreen({ go, user, logout }) {
           ))}
         </div>
 
-        {/* 최근 본 공고 */}
+        {/* Recently viewed */}
         {recentJobs.length > 0 && (
           <div style={{ marginTop: 40 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 12 }}>최근 본 공고</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 12 }}>Recently Viewed</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {recentJobs.map(job => (
                 <div key={job.id} style={{
@@ -254,13 +254,13 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
               <span style={{
                 fontSize: 11, fontWeight: 600, color: "#dc2626",
                 background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 4,
-              }}>마감임박</span>
+              }}>Closing Soon</span>
             )}
             {isRecommended && (
               <span style={{
                 fontSize: 11, fontWeight: 600, color: C.purple,
                 background: "rgba(108,63,219,0.08)", padding: "2px 7px", borderRadius: 4,
-              }}>✦ 추천</span>
+              }}>✦ Recommended</span>
             )}
             <MatchBadge score={job._matchScore} />
           </div>
@@ -283,7 +283,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
             <span style={{ fontSize: 11, color: isUrgent ? "#dc2626" : C.body }}>
-              {isUrgent ? `⚡ 남은 자리 ${remaining}명` : `남은 자리 ${remaining}명`}
+              {isUrgent ? `⚡ ${remaining} spots left` : `${remaining} spots left`}
             </span>
             <span style={{ fontSize: 11, color: C.body }}>~{job.deadline}</span>
           </div>
@@ -302,18 +302,18 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
           <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
             <div style={{ flex: 1, padding: "9px 14px", background: "rgba(22,163,74,0.08)", borderRadius: 8, display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#15803d" }}>참여 확정</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#15803d" }}>Confirmed</span>
             </div>
             <button onClick={() => go("consent")}
               style={{ padding: "9px 18px", background: C.purple, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: F }}>
-              인터뷰 시작할게요
+              Start Interview
             </button>
           </div>
         ) : isApplied ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", background: "rgba(108,63,219,0.07)", borderRadius: 8 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.purple, flexShrink: 0 }} />
             <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>
-              {status === "applied" ? "AI 적합성 검토 중이에요" : "리서처 최종 검토를 기다리고 있어요"}
+              {status === "applied" ? "Under AI screening review" : "Awaiting final Researcher confirmation"}
             </span>
           </div>
         ) : (
@@ -325,7 +325,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
               background: C.purple, color: "#fff",
               fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F,
             }}>
-            지원할게요
+            Apply Now
           </button>
         )}
 
@@ -337,7 +337,7 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
             )}
             {job.targetProfile && (
               <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 6, letterSpacing: 0.5 }}>찾는 패널</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 6, letterSpacing: 0.5 }}>Looking For</div>
                 <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 6 }}>
                   {[job.targetProfile.age, job.targetProfile.gender, job.targetProfile.region].map((v, i) => (
                     <span key={i} style={{ fontSize: 12, padding: "3px 9px", borderRadius: 5, background: C.bg, color: C.navy }}>{v}</span>
@@ -347,12 +347,12 @@ function JobCard({ job, status, isRecommended, isMobile, onApply, onView, onCycl
                   <div style={{ fontSize: 12, color: C.body, lineHeight: 1.7 }}>{job.targetProfile.lifestyle}</div>
                 )}
                 {job.targetProfile.exclude && (
-                  <div style={{ marginTop: 4, fontSize: 11, color: C.body }}>제외: {job.targetProfile.exclude}</div>
+                  <div style={{ marginTop: 4, fontSize: 11, color: C.body }}>Excluded: {job.targetProfile.exclude}</div>
                 )}
               </div>
             )}
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 6, letterSpacing: 0.5 }}>참여 조건</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 6, letterSpacing: 0.5 }}>Requirements</div>
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                 {job.conditions.map(c => (
                   <span key={c} style={{ fontSize: 12, padding: "3px 9px", borderRadius: 5, background: C.bg, color: C.navy }}>{c}</span>

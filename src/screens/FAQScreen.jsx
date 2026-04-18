@@ -16,8 +16,8 @@ export default function FAQScreen({ go, user, logout }) {
         <div style={{ width: "100%", maxWidth: 640 }}>
           {/* Title */}
           <div style={{ marginBottom: 32 }}>
-            <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>자주 묻는 질문</div>
-            <div style={{ fontSize: 14, color: C.body }}>찾으시는 답변이 없으면 <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 14, padding: 0, textDecoration: "underline" }}>1:1 문의</button>를 이용해 주세요.</div>
+            <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>Frequently Asked Questions</div>
+            <div style={{ fontSize: 14, color: C.body }}>Can't find what you're looking for? <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 14, padding: 0, textDecoration: "underline" }}>Contact support</button></div>
           </div>
 
           {/* FAQ list */}
@@ -54,9 +54,9 @@ export default function FAQScreen({ go, user, logout }) {
 
           {/* CTA */}
           <div style={{ marginTop: 40, background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "24px 24px", textAlign: "center" }}>
-            <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 6 }}>원하는 답변을 찾지 못하셨나요?</div>
-            <div style={{ fontSize: 13, color: C.body, marginBottom: 18 }}>1:1 문의를 남겨주시면 영업일 1~2일 내에 답변 드립니다.</div>
-            <Btn onClick={() => go("support")}>1:1 문의하기</Btn>
+            <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 6 }}>Still have questions?</div>
+            <div style={{ fontSize: 13, color: C.body, marginBottom: 18 }}>Send us a message and we'll get back to you within 1–2 business days.</div>
+            <Btn onClick={() => go("support")}>Contact support</Btn>
           </div>
         </div>
       </div>

@@ -119,7 +119,7 @@ export function Divider({ label }) {
   );
 }
 
-export function BackBtn({ onClick, label = "홈으로", dark = false }) {
+export function BackBtn({ onClick, label = "Home", dark = false }) {
   const [hov, setHov] = useState(false);
   return (
     <button onClick={onClick}
@@ -160,10 +160,10 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
 
   const navLinks =
     variant === "app"
-      ? [["대시보드", "dashboard"], ["요금제", "pricing"], ["FAQ", "faq"], ["고객센터", "support"]]
+      ? [["Dashboard", "dashboard"], ["Pricing", "pricing"], ["FAQ", "faq"], ["Support", "support"]]
       : variant === "panel"
-      ? [["인터뷰 모집", "panel_board"], ["내 인터뷰", "panel_mypage"], ["FAQ", "faq"], ["고객센터", "support"]]
-      : [["서비스 소개", "about"], ["패널 모집 보드", "panel_board"], ["요금제", "pricing"], ["FAQ", "faq"], ["고객센터", "support"]];
+      ? [["Open Interviews", "panel_board"], ["My Interviews", "panel_mypage"], ["FAQ", "faq"], ["Support", "support"]]
+      : [["About", "about"], ["Panelist Board", "panel_board"], ["Pricing", "pricing"], ["FAQ", "faq"], ["Support", "support"]];
 
   const homeTarget = "landing";
 
@@ -185,9 +185,9 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             {variant === "app" && !isMobile && (
               <>
                 {hasInterviews !== null && (
-                  <Btn size="sm" onClick={() => go(hasInterviews ? "dashboard" : "editor")}>{hasInterviews ? "대시보드" : "+ 인터뷰 시작하기"}</Btn>
+                  <Btn size="sm" onClick={() => go(hasInterviews ? "dashboard" : "editor")}>{hasInterviews ? "Dashboard" : "+ Start Interview"}</Btn>
                 )}
-                {logout && <Btn variant="ghost" size="sm" onClick={logout}>로그아웃</Btn>}
+                {logout && <Btn variant="ghost" size="sm" onClick={logout}>Log Out</Btn>}
                 <div style={{ width: 1, height: 16, background: C.border }} />
                 {(() => {
                   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
@@ -204,13 +204,13 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             )}
             {variant === "panel" && !isMobile && (
               <>
-                {logout && <Btn variant="ghost" size="sm" onClick={logout}>로그아웃</Btn>}
+                {logout && <Btn variant="ghost" size="sm" onClick={logout}>Log Out</Btn>}
               </>
             )}
             {(variant === "public" || variant === "sub") && !isMobile && (
               <>
-                <Btn variant="ghost" size="sm" style={{ border: "1px solid rgba(23,23,23,0.2)", borderRadius: 56 }} onClick={() => go("panel_entry")}>패널 등록하기</Btn>
-                <Btn size="sm" onClick={() => go("advertiser_login")}>로그인</Btn>
+                <Btn variant="ghost" size="sm" style={{ border: "1px solid rgba(23,23,23,0.2)", borderRadius: 56 }} onClick={() => go("panel_entry")}>Join as Panelist</Btn>
+                <Btn size="sm" onClick={() => go("advertiser_login")}>Log In</Btn>
               </>
             )}
             {isMobile && (
@@ -232,13 +232,13 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             <div style={{ flex: 1, overflowY: "auto", padding: "12px 0" }}>
               {variant === "app" ? (
                 <>
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>리서처</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>Researcher</div>
                   {[
-                    { label: "대시보드", target: "dashboard", desc: "진행 중인 인터뷰 관리" },
-                    { label: "인터뷰 만들기", target: "editor", desc: "새 인터뷰 설계" },
-                    { label: "요금제", target: "pricing", desc: "플랜별 기능 비교" },
-                    { label: "FAQ", target: "faq", desc: "자주 묻는 질문" },
-                    { label: "고객센터", target: "support", desc: "문의 및 도움말" },
+                    { label: "Dashboard", target: "dashboard", desc: "Manage active interviews" },
+                    { label: "Create Interview", target: "editor", desc: "Design a new interview" },
+                    { label: "Pricing", target: "pricing", desc: "Compare plans" },
+                    { label: "FAQ", target: "faq", desc: "Frequently asked questions" },
+                    { label: "Support", target: "support", desc: "Help & contact" },
                   ].map(item => (
                     <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
@@ -254,12 +254,12 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                 </>
               ) : variant === "panel" ? (
                 <>
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>패널</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>Panelist</div>
                   {[
-                    { label: "인터뷰 모집", target: "panel_board", desc: "모집 중인 공고 보기" },
-                    { label: "내 인터뷰", target: "panel_mypage", desc: "신청·진행 현황" },
-                    { label: "FAQ", target: "faq", desc: "자주 묻는 질문" },
-                    { label: "고객센터", target: "support", desc: "문의 및 도움말" },
+                    { label: "Open Interviews", target: "panel_board", desc: "Browse open listings" },
+                    { label: "My Interviews", target: "panel_mypage", desc: "Applications & progress" },
+                    { label: "FAQ", target: "faq", desc: "Frequently asked questions" },
+                    { label: "Support", target: "support", desc: "Help & contact" },
                   ].map(item => (
                     <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
@@ -275,12 +275,12 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                 </>
               ) : (
                 <>
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>서비스</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>Product</div>
                   {[
-                    { label: "서비스 소개", target: "about", desc: "Voice Survey가 하는 일" },
-                    { label: "요금제", target: "pricing", desc: "플랜별 기능 비교" },
-                    { label: "FAQ", target: "faq", desc: "자주 묻는 질문" },
-                    { label: "고객센터", target: "support", desc: "문의 및 도움말" },
+                    { label: "About", target: "about", desc: "What Voice Survey does" },
+                    { label: "Pricing", target: "pricing", desc: "Compare plans" },
+                    { label: "FAQ", target: "faq", desc: "Frequently asked questions" },
+                    { label: "Support", target: "support", desc: "Help & contact" },
                   ].map(item => (
                     <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
@@ -294,10 +294,10 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                     </div>
                   ))}
                   <div style={{ height: 1, background: C.border, margin: "8px 20px" }} />
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>패널 참여</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>Panelist</div>
                   {[
-                    { label: "참여 가능한 인터뷰", target: "panel_board", desc: "모집 중인 공고 보기" },
-                    { label: "패널 등록하기", target: "panel_entry", desc: "리워드 받고 인터뷰 참여" },
+                    { label: "Available Interviews", target: "panel_board", desc: "Browse open listings" },
+                    { label: "Register as Panelist", target: "panel_entry", desc: "Participate and earn rewards" },
                   ].map(item => (
                     <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
@@ -315,11 +315,11 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             </div>
             <div style={{ padding: "16px 20px", paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))", borderTop: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
               {(variant === "app" || variant === "panel") && logout ? (
-                <Btn full size="md" variant="ghost" onClick={() => { logout(); setMenuOpen(false); }}>로그아웃</Btn>
+                <Btn full size="md" variant="ghost" onClick={() => { logout(); setMenuOpen(false); }}>Log Out</Btn>
               ) : (
                 <>
-                  <Btn full size="md" onClick={() => { go("advertiser_login"); setMenuOpen(false); }}>로그인 / 회원가입</Btn>
-                  <Btn full variant="ghost" size="md" onClick={() => { go("panel_entry"); setMenuOpen(false); }}>패널로 참여하기</Btn>
+                  <Btn full size="md" onClick={() => { go("advertiser_login"); setMenuOpen(false); }}>Log In / Sign Up</Btn>
+                  <Btn full variant="ghost" size="md" onClick={() => { go("panel_entry"); setMenuOpen(false); }}>Join as Panelist</Btn>
                 </>
               )}
             </div>
@@ -332,15 +332,15 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
 
 // ─── VoC Carousel ───
 const VOC_LIST = [
-  { quote: "평소 사용자 인터뷰 하나 진행하려면 섭외부터 일정 조율까지 최소 일주일이 걸렸는데, Voice Survey로 하루 만에 100명 인터뷰 결과를 받았습니다. 리포트 퀄리티도 기대 이상이었어요.", name: "이강인", title: "과장", company: "**전자 MX사업부 마케팅팀", photo: "/profiles/male-1.png" },
-  { quote: "기존엔 FGI 한 번 진행하면 진행비만 수백만 원이었어요. Voice Survey는 비용도 10분의 1 수준이고, 결과물은 훨씬 빠르게 나오더라고요. 이제 정성 리서치 방식이 완전히 바뀔 것 같습니다.", name: "김지수", title: "브랜드 매니저", company: "LG**건강 브랜드전략팀", photo: "/profiles/female-1.png" },
-  { quote: "신제품 론칭 전 2주 안에 소비자 반응을 확인해야 했는데, Voice Survey 덕분에 3일 만에 200명 인터뷰 분석 결과를 받을 수 있었습니다. 의사결정 속도가 완전히 달라졌어요.", name: "박성현", title: "PM", company: "**카오 서비스기획팀" },
-  { quote: "500명 동시 인터뷰를 5만원에 진행했습니다. 품질도 전통 방식과 다르지 않았고 AI 리포트가 특히 탁월했어요.", name: "박현우", title: "제품 마케팅 매니저", company: "**이버 마케팅팀" },
-  { quote: "AI가 인터뷰를 직접 진행한다는 게 처음엔 반신반의했는데, 실제 녹취록을 보니 사용자가 자연스럽게 속마음을 털어놓더라고요. 면접관 눈치 없이 솔직한 답변이 많이 나왔습니다.", name: "최예린", title: "UX 리서처", company: "**이버 UX리서치실", photo: "/profiles/female-2.png" },
-  { quote: "패널 참여가 정말 쉽고 리워드도 바로 들어왔어요. 보이스 인터뷰라 더 자연스럽게 의견을 말할 수 있었습니다.", name: "이서연", title: "프리랜서 패널", company: "개인 참여자" },
-  { quote: "글로벌 시장 진출 전 국내 타깃 유저 인터뷰가 필요했어요. 지역·연령·직군 조건 설정하니까 딱 맞는 패널이 빠르게 모였고, 리포트까지 영업일 3일 안에 나왔습니다.", name: "정우진", title: "사업개발 팀장", company: "**스 신사업팀", photo: "/profiles/male-2.png" },
-  { quote: "분기마다 진행하던 사용성 테스트를 이제 매달 할 수 있게 됐어요. 비용과 시간 장벽이 낮아지니 리서치를 훨씬 자주 의사결정에 활용하게 됐습니다.", name: "한소희", title: "서비스 기획자", company: "**자동차 Connected Car팀", photo: "/profiles/female-3.png" },
-  { quote: "외부 리서치 에이전시 대비 비용은 80% 절감되고, 결과물은 2배 빠르게 나왔습니다. 특히 테마 분류와 감성 분석이 자동으로 되니 별도 분석 시간이 거의 필요 없었어요.", name: "오민준", title: "마케팅 이사", company: "**팡 그로스마케팅본부" },
+  { quote: "Recruiting participants and coordinating schedules used to take at least a week for a single user interview. With Voice Survey, I had results from 100 interviews in a single day — and the report quality exceeded my expectations.", name: "James K.", title: "Senior Manager", company: "**Electronics MX Marketing Team", photo: "/profiles/male-1.png" },
+  { quote: "Running one focus group used to cost hundreds of thousands of dollars. Voice Survey is a fraction of the cost and delivers results far faster. I think qualitative research will never be the same.", name: "Jennifer K.", title: "Brand Manager", company: "LG** Health Brand Strategy Team", photo: "/profiles/female-1.png" },
+  { quote: "We needed consumer reactions within two weeks before a product launch. Voice Survey gave us analysis from 200 interviews in just three days. Our decision-making speed has completely changed.", name: "Patrick S.", title: "PM", company: "**kao Product Planning Team" },
+  { quote: "We ran 500 simultaneous interviews for a fraction of what an agency would charge. The quality was on par with traditional methods and the AI report was outstanding.", name: "Paul H.", title: "Product Marketing Manager", company: "**aver Marketing Team" },
+  { quote: "I was skeptical that AI could conduct real interviews, but when I read the transcripts, users were opening up naturally. Without a human interviewer watching them, the answers were far more candid.", name: "Christine Y.", title: "UX Researcher", company: "**aver UX Research Lab", photo: "/profiles/female-2.png" },
+  { quote: "Participating as a panelist was incredibly easy and the reward arrived immediately. A voice interview felt much more natural than filling out a survey form.", name: "Sarah L.", title: "Freelance Panelist", company: "Individual Participant" },
+  { quote: "Before our global expansion, we needed to interview target users domestically. After setting our demographic filters, the right panelists were assembled quickly and we had the report within three business days.", name: "Justin C.", title: "Head of Business Development", company: "**s New Business Team", photo: "/profiles/male-2.png" },
+  { quote: "Usability tests we used to run quarterly are now a monthly practice. Lower cost and time barriers mean we actually use research data in decision-making far more often.", name: "Hannah S.", title: "Service Planner", company: "**Motors Connected Car Team", photo: "/profiles/female-3.png" },
+  { quote: "Costs dropped 80% compared to an external research agency, and results came in twice as fast. Automatic theme clustering and sentiment analysis eliminated almost all manual analysis time.", name: "Owen M.", title: "Marketing Director", company: "**ang Growth Marketing Division" },
 ];
 
 export function VoCCarousel() {
@@ -365,8 +365,8 @@ export function VoCCarousel() {
     <section style={{ background: C.bg, padding: "72px 0", overflow: "hidden" }}>
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <Badge variant="purple" style={{ marginBottom: 12 }}>고객 후기</Badge>
-          <h2 style={{ fontSize: 28, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>실제 사용자들의 리뷰</h2>
+          <Badge variant="purple" style={{ marginBottom: 12 }}>Customer Reviews</Badge>
+          <h2 style={{ fontSize: 28, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>What our users are saying</h2>
         </div>
         <div style={{ overflow: "hidden" }} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
           <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
@@ -394,7 +394,7 @@ export function VoCCarousel() {
         </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 0, marginTop: 24 }}>
           {VOC_LIST.map((_, i) => (
-            <button key={i} onClick={() => setIdx(i)} aria-label={`후기 ${i + 1}번으로 이동`}
+            <button key={i} onClick={() => setIdx(i)} aria-label={`Go to review ${i + 1}`}
               style={{ background: "none", border: "none", cursor: "pointer", padding: "10px 6px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <span style={{ display: "block", width: i === idx ? 18 : 6, height: 6, borderRadius: 3, background: i === idx ? C.purple : "rgba(23,23,23,0.3)", transition: "all 0.3s", flexShrink: 0 }} />
             </button>
@@ -408,16 +408,16 @@ export function VoCCarousel() {
 export function HowItWorksCarousel() {
   const isMobile = useIsMobile();
   const researcherSteps = [
-    { icon: "pencil", step: "01", title: "질문 설계", desc: "인터뷰 목적과 질문 흐름을 설정합니다. AI가 자연스러운 대화 구조를 제안해 줍니다." },
-    { icon: "users", step: "02", title: "패널 모집", desc: "조건에 맞는 패널을 공고로 모집하고 AI 매칭으로 적합한 참여자를 선정합니다." },
-    { icon: "sparkle", step: "03", title: "AI 인터뷰 자동 진행", desc: "AI가 24시간 보이스 인터뷰를 진행합니다. 리서처 개입 없이 자동 수집됩니다." },
-    { icon: "barchart", step: "04", title: "리포트 수령", desc: "테마 분석 · 감성 분류 · 인사이트 요약이 담긴 리포트를 즉시 받아보세요." },
+    { icon: "pencil", step: "01", title: "Design Questions", desc: "Set your interview goals and question flow. AI suggests a natural conversation structure." },
+    { icon: "users", step: "02", title: "Recruit Panelists", desc: "Post a listing to recruit matching panelists and use AI matching to select the best fit." },
+    { icon: "sparkle", step: "03", title: "AI Conducts Interviews", desc: "AI runs voice interviews 24/7. Responses are collected automatically — no researcher involvement needed." },
+    { icon: "barchart", step: "04", title: "Receive Your Report", desc: "Get an instant report with theme analysis, sentiment classification, and insight summaries." },
   ];
   const panelSteps = [
-    { icon: "search", step: "01", title: "모집 공고 탐색", desc: "패널 모집 보드에서 관심 있는 인터뷰 기회를 찾아보세요." },
-    { icon: "check", step: "02", title: "신청 & 선정", desc: "조건을 확인하고 신청합니다. AI가 적합성을 평가해 빠르게 선정합니다." },
-    { icon: "mic", step: "03", title: "보이스 인터뷰 참여", desc: "링크를 통해 AI와 자연스럽게 대화합니다. 장소 무관, 평균 8분 소요." },
-    { icon: "gift", step: "04", title: "리워드 수령", desc: "인터뷰 완료 후 포인트 리워드가 즉시 지급됩니다." },
+    { icon: "search", step: "01", title: "Browse Listings", desc: "Find interview opportunities that interest you on the panelist board." },
+    { icon: "check", step: "02", title: "Apply & Get Selected", desc: "Review the criteria and apply. AI evaluates your fit and selects participants quickly." },
+    { icon: "mic", step: "03", title: "Take the Voice Interview", desc: "Have a natural conversation with AI via a link. Any location, ~8 minutes on average." },
+    { icon: "gift", step: "04", title: "Receive Your Reward", desc: "Your point reward is issued instantly after completing the interview." },
   ];
 
   function Row({ steps, title, sub, scrollRef }) {
@@ -491,12 +491,12 @@ export function HowItWorksCarousel() {
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: isMobile ? 40 : 56 }}>
           <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", margin: "0 0 14px", lineHeight: 1.10, fontFamily: F }}>
-            {isMobile ? <>소비자의 목소리를 <span style={{ color: C.purple }}>정확하고 빠르게</span></> : <>소비자의 목소리를<br /><span style={{ color: C.purple }}>정확하고 빠르게</span> 들어보세요</>}
+            {isMobile ? <>Hear your customers <span style={{ color: C.purple }}>accurately and fast</span></> : <>Hear your customers<br /><span style={{ color: C.purple }}>accurately and fast</span></>}
           </h2>
-          <p style={{ fontSize: 16, color: "rgba(10,11,13,0.56)", margin: 0, letterSpacing: "0.16px", lineHeight: 1.47 }}>처음부터 끝까지 알아서 되는 인터뷰 플랫폼</p>
+          <p style={{ fontSize: 16, color: "rgba(10,11,13,0.56)", margin: 0, letterSpacing: "0.16px", lineHeight: 1.47 }}>The interview platform that handles everything from start to finish</p>
         </div>
-        <Row steps={researcherSteps} title="인터뷰를 설계하고 싶다면" sub="질문만 만들면 AI가 수천 명과 대화하고 리포트를 드립니다" scrollRef={rRef} />
-        <Row steps={panelSteps} title="인터뷰 참여하고 리워드 받고 싶다면" sub="짧은 보이스 인터뷰로 참여하고 즉시 포인트를 받으세요" scrollRef={pRef} />
+        <Row steps={researcherSteps} title="Want to design and run interviews?" sub="Just write your questions — AI talks to thousands and delivers the report" scrollRef={rRef} />
+        <Row steps={panelSteps} title="Want to participate and earn rewards?" sub="Join a short voice interview and receive your points instantly" scrollRef={pRef} />
       </div>
     </section>
   );
@@ -524,21 +524,21 @@ export function MockAppScreen({ screenType }) {
     ),
     signup: (
       <div style={{ width: "100%", height: "100%", background: "#fff", borderRadius: 16, padding: "20px 16px", boxSizing: "border-box" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", marginBottom: 16 }}>회원가입</div>
-        {["이름", "이메일", "비밀번호"].map(f => (
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", marginBottom: 16 }}>Sign Up</div>
+        {["Name", "Email", "Password"].map(f => (
           <div key={f} style={{ height: 32, borderRadius: 6, border: "1px solid #dadce0", marginBottom: 8, padding: "0 10px", display: "flex", alignItems: "center" }}>
             <span style={{ fontSize: 10, color: "#aab" }}>{f}</span>
           </div>
         ))}
         <div style={{ height: 32, borderRadius: 6, background: "#1a73e8", display: "flex", alignItems: "center", justifyContent: "center", marginTop: 12 }}>
-          <span style={{ fontSize: 11, color: "#fff", fontWeight: 600 }}>가입하기</span>
+          <span style={{ fontSize: 11, color: "#fff", fontWeight: 600 }}>Create Account</span>
         </div>
       </div>
     ),
     home: (
       <div style={{ width: "100%", height: "100%", background: "#ffffff", borderRadius: 16, padding: "14px 12px", boxSizing: "border-box" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f" }}>홈</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f" }}>Home</span>
           <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(0,0,0,0.1)" }} />
         </div>
         {[0.7, 0.5, 0.85].map((w, i) => (
@@ -551,9 +551,9 @@ export function MockAppScreen({ screenType }) {
     ),
     dashboard: (
       <div style={{ width: "100%", height: "100%", background: "#ffffff", borderRadius: 16, padding: "14px 12px", boxSizing: "border-box" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f", marginBottom: 10 }}>대시보드</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f", marginBottom: 10 }}>Dashboard</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 8 }}>
-          {[["#1a73e8", "38%"], ["#1e8e3e", "신규"], ["#ea2261", "↓12%"], ["#f59e0b", "94%"]].map(([c, v], i) => (
+          {[["#1a73e8", "38%"], ["#1e8e3e", "New"], ["#ea2261", "↓12%"], ["#f59e0b", "94%"]].map(([c, v], i) => (
             <div key={i} style={{ height: 40, borderRadius: 6, background: "#fff", border: "1px solid #dadce0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: c }}>{v}</span>
             </div>
@@ -579,10 +579,10 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
   const price = plan.price[billing];
 
   const methods = [
-    { id: "naverpay",  label: "네이버페이",           color: "#03C75A", hint: "네이버 앱으로 연결됩니다...",  icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z"/></svg> },
+    { id: "naverpay",  label: "Naver Pay",           color: "#03C75A", hint: "Redirecting to Naver app...",  icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z"/></svg> },
 
-    { id: "kakaopay",  label: "카카오페이",           color: "#FEE500", hint: "카카오 앱으로 연결됩니다...", icon: <span style={{ fontSize: 11, fontWeight: 800, color: "#191919" }}>kakao pay</span> },
-    { id: "stripe",    label: "신용/체크카드 (Stripe)", color: "#635bff", hint: null, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg> },
+    { id: "kakaopay",  label: "Kakao Pay",           color: "#FEE500", hint: "Redirecting to Kakao app...", icon: <span style={{ fontSize: 11, fontWeight: 800, color: "#191919" }}>kakao pay</span> },
+    { id: "stripe",    label: "Credit / Debit Card (Stripe)", color: "#635bff", hint: null, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg> },
   ];
 
   const selectedMethod = methods.find(m => m.id === method);
@@ -601,25 +601,25 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
         {done ? (
           <div style={{ textAlign: "center", padding: "16px 0" }}>
             <div style={{ width: 56, height: 56, borderRadius: "50%", background: C.successBg, border: `1px solid ${C.successBorder}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 24 }}>✓</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>결제 완료!</div>
-            <div style={{ fontSize: 14, color: C.body, marginBottom: 4 }}>{plan.name} 플랜 · {billing === "annual" ? "연 결제" : "월 결제"}</div>
-            <div style={{ fontSize: 13, color: C.body, marginBottom: 4 }}>₩{price.toLocaleString()} 결제됨</div>
-            <div style={{ fontSize: 12, color: C.body, marginBottom: 24 }}>영수증이 이메일로 발송됩니다</div>
-            <Btn full onClick={() => { onClose(); onDone(); }}>대시보드로 이동</Btn>
+            <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Payment Complete!</div>
+            <div style={{ fontSize: 14, color: C.body, marginBottom: 4 }}>{plan.name} Plan · {billing === "annual" ? "Annual billing" : "Monthly billing"}</div>
+            <div style={{ fontSize: 13, color: C.body, marginBottom: 4 }}>${price.toLocaleString()} charged</div>
+            <div style={{ fontSize: 12, color: C.body, marginBottom: 24 }}>A receipt has been sent to your email</div>
+            <Btn full onClick={() => { onClose(); onDone(); }}>Go to Dashboard</Btn>
           </div>
         ) : (
           <>
             <div style={{ background: C.purpleBg, border: `1px solid ${C.purpleLight}`, borderRadius: 8, padding: "14px 16px", marginBottom: 24 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{plan.name} 플랜 · {billing === "annual" ? "연 결제" : "월 결제"}</div>
-                  <div style={{ fontSize: 12, color: C.body, marginTop: 3 }}>{plan.interviews ? `월 ${plan.interviews.toLocaleString()}건 슬롯` : "무제한 인터뷰"} · {plan.report} 리포트</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{plan.name} Plan · {billing === "annual" ? "Annual billing" : "Monthly billing"}</div>
+                  <div style={{ fontSize: 12, color: C.body, marginTop: 3 }}>{plan.interviews ? `${plan.interviews.toLocaleString()} slots/mo` : "Unlimited interviews"} · {plan.report} report</div>
                 </div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: C.purple, fontFeatureSettings: '"tnum"' }}>₩{price.toLocaleString()}</div>
               </div>
             </div>
 
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.label, marginBottom: 12 }}>결제 수단 선택</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.label, marginBottom: 12 }}>Select Payment Method</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
               {methods.map(m => (
                 <div key={m.id} onClick={() => setMethod(m.id)}
@@ -629,7 +629,7 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
                   </div>
                   <div style={{ flex: 1 }}>
                     <span style={{ fontSize: 14, color: C.navy, fontWeight: method === m.id ? 500 : 400 }}>{m.label}</span>
-                    <div style={{ fontSize: 10, color: C.body, marginTop: 1 }}>실제 결제 연동 전 테스트 모드</div>
+                    <div style={{ fontSize: 10, color: C.body, marginTop: 1 }}>Test mode — no real charge</div>
                   </div>
                   <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${method === m.id ? m.color : C.border}`, background: method === m.id ? m.color : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     {method === m.id && <span style={{ color: C.white, fontSize: 10 }}>✓</span>}
@@ -642,8 +642,8 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
               <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: `${selectedMethod.color}10`, border: `1px solid ${selectedMethod.color}30`, fontSize: 13, color: C.navy }}>
                 {selectedMethod.hint ? selectedMethod.hint : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ fontSize: 12, color: C.body, marginBottom: 2 }}>카드 정보 입력 (시뮬레이션)</div>
-                    <input placeholder="카드 번호 0000 0000 0000 0000" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, width: "100%", boxSizing: "border-box", cursor: "default" }} />
+                    <div style={{ fontSize: 12, color: C.body, marginBottom: 2 }}>Enter card details (simulation)</div>
+                    <input placeholder="Card number 0000 0000 0000 0000" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, width: "100%", boxSizing: "border-box", cursor: "default" }} />
                     <div style={{ display: "flex", gap: 8 }}>
                       <input placeholder="MM / YY" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, flex: 1, cursor: "default" }} />
                       <input placeholder="CVC" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, flex: 1, cursor: "default" }} />
@@ -654,14 +654,14 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
             )}
 
             <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginBottom: 8, padding: "6px 12px", background: "rgba(251,191,36,0.08)", borderRadius: 6, border: "1px solid rgba(251,191,36,0.2)" }}>
-              ⚠️ 현재 테스트 모드입니다. 실제 결제가 이루어지지 않습니다.
+              ⚠️ Test mode — no real charges will be made.
             </div>
 
             <Btn full size="lg" disabled={!method || processing} onClick={confirm}>
-              {processing ? "결제 처리 중..." : `₩${price.toLocaleString()} 결제하기`}
+              {processing ? "Processing..." : `Pay $${price.toLocaleString()}`}
             </Btn>
             <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 10 }}>
-              SSL 암호화 보안 결제 · 언제든 해지 가능
+              SSL encrypted · Cancel anytime
             </div>
           </>
         )}
@@ -670,7 +670,7 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
   );
 }
 
-// ─── Footer — 모든 페이지 하단 공통 ───
+// ─── Footer — shared across all pages ───
 export function Footer({ go }) {
   const isMobile = useIsMobile();
   return (
@@ -679,10 +679,10 @@ export function Footer({ go }) {
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: "flex-start", gap: 28, marginBottom: 28 }}>
           <div>
             <img src="/logo-voice-survey-footer.svg" alt="Voice Survey" style={{ height: 28 }} />
-            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI가 인터뷰하고, AI가 분석합니다</div>
+            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginTop: 8, letterSpacing: "0.16px", lineHeight: 1.5 }}>AI interviews. AI analyzes.</div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "12px 24px" : "8px 28px" }}>
-            {[["서비스 소개", "about"], ["요금제", "pricing"], ["패널 참여", "panel_board"], ["고객센터", "support"], ["개인정보처리방침", "privacy"], ["이용약관", "terms"]].map(([l, target]) => (
+            {[["About", "about"], ["Pricing", "pricing"], ["Panelist Board", "panel_board"], ["Support", "support"], ["Privacy Policy", "privacy"], ["Terms of Service", "terms"]].map(([l, target]) => (
               <button key={l} onClick={() => go(target)}
                 style={{ fontSize: 14, color: "rgba(255,255,255,0.48)", background: "none", border: "none", cursor: "pointer", padding: "10px 0", minHeight: 44, fontFamily: F, letterSpacing: "0.16px", display: "inline-flex", alignItems: "center" }}
                 onMouseEnter={e => e.currentTarget.style.color = "rgba(255,255,255,0.88)"}
@@ -698,7 +698,7 @@ export function Footer({ go }) {
   );
 }
 
-// ─── VoicePlayer — 공유 오디오 플레이어 (ResponsesScreen, ReportScreen 공용) ───
+// ─── VoicePlayer — shared audio player (used in ResponsesScreen and ReportScreen) ───
 export function VoicePlayer({ audioUrl, transcript }) {
   const audioRef = useRef(null);
   const [playing, setPlaying] = useState(false);
@@ -738,7 +738,7 @@ export function VoicePlayer({ audioUrl, transcript }) {
 
   const pct = duration ? Math.min((current / duration) * 100, 100) : 0;
 
-  if (!audioUrl && !transcript) return <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>녹음 없음</div>;
+  if (!audioUrl && !transcript) return <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>No recording</div>;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -779,7 +779,7 @@ export function VoicePlayer({ audioUrl, transcript }) {
           {audioUrl && (
             <button
               onClick={download}
-              title="다운로드"
+              title="Download"
               style={{ width: 30, height: 30, borderRadius: "50%", background: "transparent", border: `1px solid ${C.border}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: C.body, transition: "all 0.12s" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.color = C.purple; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.body; }}
@@ -791,7 +791,7 @@ export function VoicePlayer({ audioUrl, transcript }) {
       )}
       {transcript && (
         <div style={{ padding: "10px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${C.border}` }}>
-          <div style={{ fontSize: 10, color: C.body, fontWeight: 600, marginBottom: 6, letterSpacing: 0.4 }}>전사 텍스트</div>
+          <div style={{ fontSize: 10, color: C.body, fontWeight: 600, marginBottom: 6, letterSpacing: 0.4 }}>Transcript</div>
           <div style={{ fontSize: 13, color: C.navy, lineHeight: 1.75 }}>{transcript}</div>
         </div>
       )}

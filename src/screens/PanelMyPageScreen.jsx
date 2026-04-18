@@ -31,11 +31,11 @@ function DonutProgress({ pct, size = 72, stroke = 7, color = C.purple }) {
 }
 
 const STATUS_MAP = {
-  applied:      { label: "지원 완료",    color: C.body,        bg: C.bg,                        dot: C.body },
-  ai_screening: { label: "AI 검토 중",   color: "#92650a",     bg: "rgba(251,191,36,0.12)",     dot: "#f59e0b" },
-  in_progress:  { label: "진행 중",      color: "#d97706",     bg: "rgba(251,191,36,0.12)",     dot: "#f59e0b" },
-  confirmed:    { label: "참여 확정",    color: C.successText, bg: C.successBg,                 dot: C.success },
-  completed:    { label: "인터뷰 완료",  color: C.purple,      bg: C.purpleBg,                  dot: C.purple },
+  applied:      { label: "Applied",            color: C.body,        bg: C.bg,                        dot: C.body },
+  ai_screening: { label: "AI Review",          color: "#92650a",     bg: "rgba(251,191,36,0.12)",     dot: "#f59e0b" },
+  in_progress:  { label: "In Progress",        color: "#d97706",     bg: "rgba(251,191,36,0.12)",     dot: "#f59e0b" },
+  confirmed:    { label: "Confirmed",          color: C.successText, bg: C.successBg,                 dot: C.success },
+  completed:    { label: "Completed",          color: C.purple,      bg: C.purpleBg,                  dot: C.purple },
 };
 
 export default function PanelMyPageScreen({ go, user, logout }) {
@@ -52,10 +52,10 @@ export default function PanelMyPageScreen({ go, user, logout }) {
   const [withdrawStep, setWithdrawStep] = useState(null);
 
   const MY_INTERVIEWS = [
-    { id: 1, title: "앱 사용성 인터뷰 Q2",    company: "테크 스타트업 A", status: "completed",  reward: "3,000원",  date: "2026.04.05", rewardStatus: "지급 완료" },
-    { id: 2, title: "신제품 컨셉 테스트",      company: "대기업 B",        status: "confirmed",  reward: "5,000원",  date: "2026.04.09", rewardStatus: null },
-    { id: 3, title: "브랜드 인식 조사",        company: "글로벌 브랜드 C", status: "in_progress",reward: "4,000원",  date: "2026.04.08", rewardStatus: null, progress: "3/5 질문 완료" },
-    { id: 4, title: "금융 앱 UX 개선 인터뷰", company: "핀테크 D",        status: "applied",    reward: "8,000원",  date: "2026.04.10", rewardStatus: null },
+    { id: 1, title: "App Usability Interview Q2",       company: "Tech Startup A",   status: "completed",  reward: "$3.00",  date: "2026.04.05", rewardStatus: "Paid" },
+    { id: 2, title: "New Product Concept Test",         company: "Enterprise B",     status: "confirmed",  reward: "$5.00",  date: "2026.04.09", rewardStatus: null },
+    { id: 3, title: "Brand Perception Survey",          company: "Global Brand C",   status: "in_progress",reward: "$4.00",  date: "2026.04.08", rewardStatus: null, progress: "3/5 questions done" },
+    { id: 4, title: "Finance App UX Improvement Study", company: "Fintech D",        status: "applied",    reward: "$8.00",  date: "2026.04.10", rewardStatus: null },
   ];
 
   const warnings = 0;
@@ -96,19 +96,19 @@ export default function PanelMyPageScreen({ go, user, logout }) {
           {/* subtle glow */}
           <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: "rgba(99,102,241,0.15)", filter: "blur(40px)", pointerEvents: "none" }} />
 
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 4, letterSpacing: "0.08em", textTransform: "uppercase" }}>출금 가능</div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 4, letterSpacing: "0.08em", textTransform: "uppercase" }}>Available to Withdraw</div>
           <div style={{ fontSize: 36, fontWeight: 800, marginBottom: 2, letterSpacing: "-1px" }}>
-            {withdrawable.toLocaleString()}<span style={{ fontSize: 20, fontWeight: 600, marginLeft: 4 }}>원</span>
+            {withdrawable.toLocaleString()}<span style={{ fontSize: 20, fontWeight: 600, marginLeft: 4 }}>pts</span>
           </div>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 20 }}>
-            총 적립 {totalEarned.toLocaleString()}원 · 정산 대기 {pending.toLocaleString()}원
+            Total earned {totalEarned.toLocaleString()} · Pending {pending.toLocaleString()}
           </div>
 
           {/* Tier progress */}
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>우수 등급까지</span>
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", fontWeight: 600 }}>{totalEarned.toLocaleString()} / {tierGoal.toLocaleString()}원</span>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>Until Premium tier</span>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", fontWeight: 600 }}>{totalEarned.toLocaleString()} / {tierGoal.toLocaleString()}</span>
             </div>
             <div style={{ height: 5, background: "rgba(255,255,255,0.1)", borderRadius: 3, overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${tierPct}%`, borderRadius: 3, background: "linear-gradient(90deg, #a78bfa, #6366f1)", transition: "width 0.5s ease" }} />
@@ -120,34 +120,34 @@ export default function PanelMyPageScreen({ go, user, logout }) {
             <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(0,100,255,0.15)", borderRadius: 10, padding: "10px 14px", marginBottom: 12, border: "1px solid rgba(0,100,255,0.3)" }}>
               <TossIcon size={28} />
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>연결된 계좌</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Linked account</div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{tossPhone}</div>
               </div>
               <button onClick={() => { setTossSaved(false); setTossPhone(""); setShowTossSetup(true); }}
-                style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer", fontFamily: F }}>변경</button>
+                style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer", fontFamily: F }}>Change</button>
             </div>
           )}
 
           {/* Withdraw confirm step */}
           {withdrawStep === "confirm" && (
             <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 10, padding: "14px", marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 8 }}>출금 내용 확인</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 8 }}>Confirm Withdrawal</div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>출금 금액</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: C.white }}>{withdrawable.toLocaleString()}원</span>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>Amount</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: C.white }}>{withdrawable.toLocaleString()} pts</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>받는 토스</span>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>Send to Toss</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{tossPhone}</span>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => setWithdrawStep(null)}
                   style={{ flex: 1, padding: "10px 0", borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: F, fontSize: 13, cursor: "pointer" }}>
-                  취소
+                  Cancel
                 </button>
                 <button onClick={handleConfirmWithdraw}
                   style={{ flex: 2, padding: "10px 0", borderRadius: 8, border: "none", background: "#0064FF", color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
-                  출금 신청
+                  Confirm Withdrawal
                 </button>
               </div>
             </div>
@@ -157,8 +157,8 @@ export default function PanelMyPageScreen({ go, user, logout }) {
           {withdrawStep === "done" && (
             <div style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)", borderRadius: 10, padding: "14px", marginBottom: 12, textAlign: "center" }}>
               <div style={{ fontSize: 20, marginBottom: 4 }}>✓</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#4ade80", marginBottom: 4 }}>출금 신청 완료</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>1-2 영업일 내 토스로 입금돼요</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#4ade80", marginBottom: 4 }}>Withdrawal Requested</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Funds will be sent to your Toss account within 1–2 business days</div>
             </div>
           )}
 
@@ -177,15 +177,15 @@ export default function PanelMyPageScreen({ go, user, logout }) {
               {tossSaved ? (
                 <>
                   <TossIcon size={20} />
-                  토스로 {withdrawable.toLocaleString()}원 출금
+                  Withdraw {withdrawable.toLocaleString()} pts via Toss
                 </>
-              ) : "토스 연결하고 출금하기 →"}
+              ) : "Connect Toss to withdraw →"}
             </button>
           )}
 
           {!tossSaved && (
             <div style={{ marginTop: 8, fontSize: 11, color: "rgba(255,255,255,0.35)", textAlign: "center" }}>
-              토스 전화번호를 등록하면 바로 출금할 수 있어요
+              Register your Toss phone number to withdraw instantly
             </div>
           )}
         </div>
@@ -196,12 +196,12 @@ export default function PanelMyPageScreen({ go, user, logout }) {
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
               <TossIcon size={36} />
               <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>토스 연결</div>
-                <div style={{ fontSize: 12, color: C.body }}>리워드를 토스로 바로 받아요</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Connect Toss</div>
+                <div style={{ fontSize: 12, color: C.body }}>Receive rewards directly to your Toss account</div>
               </div>
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, color: C.body, marginBottom: 6, display: "block" }}>토스 전화번호</label>
+              <label style={{ fontSize: 12, color: C.body, marginBottom: 6, display: "block" }}>Toss Phone Number</label>
               <input
                 type="tel"
                 placeholder="010-0000-0000"
@@ -218,13 +218,13 @@ export default function PanelMyPageScreen({ go, user, logout }) {
                 }}
               />
               <div style={{ fontSize: 11, color: C.body, marginTop: 6 }}>
-                토스 앱에 등록된 번호로 입금돼요
+                Funds will be sent to the number registered in your Toss app
               </div>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => setShowTossSetup(false)}
                 style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontFamily: F, fontSize: 13, cursor: "pointer" }}>
-                나중에
+                Later
               </button>
               <button
                 onClick={() => { if (tossPhone.replace(/\D/g,"").length === 11) { setTossSaved(true); setShowTossSetup(false); } }}
@@ -236,7 +236,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
                   fontFamily: F, fontSize: 14, fontWeight: 700, cursor: tossPhone.replace(/\D/g,"").length === 11 ? "pointer" : "not-allowed",
                   transition: "background 0.15s",
                 }}>
-                연결하기
+                Connect
               </button>
             </div>
           </div>
@@ -247,16 +247,16 @@ export default function PanelMyPageScreen({ go, user, logout }) {
           <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "20px 24px", boxShadow: S.ambient }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: C.navy, marginBottom: 2 }}>내 활동</div>
-                <div style={{ fontSize: 12, color: C.body }}>참여 내역과 리워드를 확인해요</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: C.navy, marginBottom: 2 }}>My Activity</div>
+                <div style={{ fontSize: 12, color: C.body }}>Track your participation and rewards</div>
               </div>
-              <Btn variant="ghost" size="sm" onClick={() => go("panel_entry")}>프로필 수정</Btn>
+              <Btn variant="ghost" size="sm" onClick={() => go("panel_entry")}>Edit Profile</Btn>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               {[
-                { label: "총 참여",  value: "4건",    icon: Ic.Chat },
-                { label: "경고 횟수", value: "0회",    icon: Ic.Warning },
-                { label: "패널 등급", value: "일반",   icon: Ic.Star },
+                { label: "Total Interviews", value: "4",       icon: Ic.Chat },
+                { label: "Warnings",         value: "0",       icon: Ic.Warning },
+                { label: "Panelist Tier",    value: "Standard", icon: Ic.Star },
               ].map(s => (
                 <div key={s.label} style={{ background: C.bg, borderRadius: 8, padding: "12px 10px", textAlign: "center" }}>
                   <div style={{ marginBottom: 4, display: "flex", justifyContent: "center" }}>{s.icon({ s: 15, c: C.purple })}</div>
@@ -272,11 +272,11 @@ export default function PanelMyPageScreen({ go, user, logout }) {
               <DonutProgress pct={monthlyPct} size={80} stroke={8} color={C.purple} />
               <div style={{ position: "absolute", textAlign: "center" }}>
                 <div style={{ fontSize: 16, fontWeight: 700, color: C.navy }}>{monthlyDone}</div>
-                <div style={{ fontSize: 9, color: C.body }}>/ {monthlyGoal}건</div>
+                <div style={{ fontSize: 9, color: C.body }}>/ {monthlyGoal}</div>
               </div>
             </div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, marginTop: 10, textAlign: "center" }}>이번 달 목표</div>
-            <div style={{ fontSize: 11, color: C.body, marginTop: 2, textAlign: "center" }}>{monthlyDone}건 / {monthlyGoal}건</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, marginTop: 10, textAlign: "center" }}>Monthly Goal</div>
+            <div style={{ fontSize: 11, color: C.body, marginTop: 2, textAlign: "center" }}>{monthlyDone} / {monthlyGoal} interviews</div>
           </div>
         </div>
 
@@ -285,14 +285,14 @@ export default function PanelMyPageScreen({ go, user, logout }) {
           <div style={{ background: "rgba(234,34,97,0.05)", border: `1px solid rgba(234,34,97,0.2)`, borderRadius: 8, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "flex-start", gap: 10 }}>
             {Ic.Warning({ s: 16, c: C.ruby })}
             <div style={{ fontSize: 12, color: C.ruby, lineHeight: 1.6 }}>
-              <strong>경고 {warnings}회</strong> — 3회 이상이 되면 패널 자격이 정지돼요.
-              <span style={{ color: C.body }}> 이의신청은 <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 12, padding: 0, textDecoration: "underline" }}>고객센터</button>로 문의해 주세요.</span>
+              <strong>{warnings} Warning{warnings > 1 ? "s" : ""}</strong> — Panelist access will be suspended at 3 warnings.
+              <span style={{ color: C.body }}> To appeal, please contact <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 12, padding: 0, textDecoration: "underline" }}>Support</button>.</span>
             </div>
           </div>
         )}
 
         {/* ── Interview timeline ── */}
-        <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 12 }}>참여 내역</div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 12 }}>Participation History</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {MY_INTERVIEWS.map((intv, idx) => {
             const st = STATUS_MAP[intv.status];
@@ -317,11 +317,11 @@ export default function PanelMyPageScreen({ go, user, logout }) {
                       {intv.status === "in_progress" && (
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <span style={{ fontSize: 11, color: "#d97706" }}>{intv.progress}</span>
-                          <Btn size="sm" onClick={() => alert("리서처가 보낸 인터뷰 링크로 접속해 주세요")}>이어서 하기</Btn>
+                          <Btn size="sm" onClick={() => alert("Please use the interview link sent by the Researcher")}>Resume</Btn>
                         </div>
                       )}
                       {intv.status === "confirmed" && (
-                        <Btn size="sm" onClick={() => go("consent")}>인터뷰 시작할게요</Btn>
+                        <Btn size="sm" onClick={() => go("consent")}>Start Interview</Btn>
                       )}
                       {intv.status === "completed" && intv.rewardStatus && (
                         <span style={{ fontSize: 11, color: C.successText, background: C.successBg, padding: "3px 8px", borderRadius: 12 }}>{intv.rewardStatus}</span>
@@ -336,11 +336,11 @@ export default function PanelMyPageScreen({ go, user, logout }) {
 
         {/* ── Notification preferences ── */}
         <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "18px 20px", marginTop: 20, boxShadow: S.ambient }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 14 }}>알림 설정</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 14 }}>Notification Settings</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
-              { label: "새 인터뷰 알림",  desc: "매칭률 높은 신규 공고가 올라오면 알려드려요", value: notifInterview, set: setNotifInterview },
-              { label: "리워드 지급 알림", desc: "리워드 지급 완료 시 알림을 받아요",           value: notifReward,    set: setNotifReward },
+              { label: "New Interview Alerts",  desc: "Get notified when high-match interviews are posted", value: notifInterview, set: setNotifInterview },
+              { label: "Reward Payment Alerts", desc: "Get notified when a reward has been paid out",       value: notifReward,    set: setNotifReward },
             ].map(item => (
               <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <div>
@@ -357,7 +357,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
         </div>
 
         <div style={{ marginTop: 24, textAlign: "center" }}>
-          <Btn variant="ghost" onClick={() => go("panel_board")}>인터뷰 더 찾아보기</Btn>
+          <Btn variant="ghost" onClick={() => go("panel_board")}>Browse More Interviews</Btn>
         </div>
       </div>
       <Footer go={go} />

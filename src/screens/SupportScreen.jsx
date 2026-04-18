@@ -11,7 +11,7 @@ export default function SupportScreen({ go, user, logout }) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
-  const categories = ["서비스 이용 문의", "결제 / 환불", "패널 리워드", "계정 / 로그인", "기술 오류 신고", "제휴 / 파트너십", "기타"];
+  const categories = ["General inquiry", "Billing / Refunds", "Panel rewards", "Account / Login", "Report a bug", "Partnership / Business", "Other"];
 
   if (sent) {
     return (
@@ -22,14 +22,14 @@ export default function SupportScreen({ go, user, logout }) {
             <div style={{ width: 56, height: 56, borderRadius: "50%", background: C.successBg, border: `1px solid ${C.successBorder}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
               {Ic.Check({s:24,c:C.success})}
             </div>
-            <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 10 }}>문의가 접수되었습니다</div>
+            <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 10 }}>Message received!</div>
             <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 28 }}>
-              입력하신 이메일로 영업일 1~2일 내에 답변 드리겠습니다.<br />
-              빠른 답변이 필요하시면 <span style={{ color: C.purple }}>voica.support@gmail.com</span>로 직접 연락해 주세요.
+              We'll reply to your email within 1–2 business days.<br />
+              For urgent matters, reach us directly at <span style={{ color: C.purple }}>voica.support@gmail.com</span>
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-              <Btn onClick={() => go(user ? "dashboard" : "landing")}>{user ? "대시보드로 돌아가기" : "홈으로 돌아가기"}</Btn>
-              {!user && <Btn variant="ghost" onClick={() => go("panel_board")}>인터뷰 참여하기</Btn>}
+              <Btn onClick={() => go(user ? "dashboard" : "landing")}>{user ? "Back to dashboard" : "Back to home"}</Btn>
+              {!user && <Btn variant="ghost" onClick={() => go("panel_board")}>Browse interviews</Btn>}
             </div>
           </div>
         </div>
@@ -45,25 +45,25 @@ export default function SupportScreen({ go, user, logout }) {
         <div style={{ width: "100%", maxWidth: 560 }}>
           {/* Header */}
           <div style={{ marginBottom: 28 }}>
-            <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>고객센터</div>
-            <div style={{ fontSize: 14, color: C.body }}>문의 사항을 남겨주시면 영업일 1~2일 내 이메일로 답변 드립니다.</div>
+            <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>Support</div>
+            <div style={{ fontSize: 14, color: C.body }}>Send us a message and we'll get back to you by email within 1–2 business days.</div>
           </div>
 
-          {/* FAQ 빠른 링크 */}
+          {/* FAQ quick link */}
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "16px 20px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>자주 묻는 질문</div>
-              <div style={{ fontSize: 12, color: C.body }}>빠른 답변이 필요하신가요?</div>
+              <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>Frequently asked questions</div>
+              <div style={{ fontSize: 12, color: C.body }}>Need a quick answer?</div>
             </div>
-            <Btn size="sm" onClick={() => go("faq")}>FAQ 보기</Btn>
+            <Btn size="sm" onClick={() => go("faq")}>View FAQ</Btn>
           </div>
 
           {/* Form */}
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: isMobile ? "20px 20px" : "28px 28px", boxShadow: S.ambient }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-              {/* 카테고리 */}
+              {/* Category */}
               <div>
-                <div style={{ fontSize: 12, fontWeight: 500, color: C.label, marginBottom: 8 }}>문의 유형 <span style={{ color: C.ruby }}>*</span></div>
+                <div style={{ fontSize: 12, fontWeight: 500, color: C.label, marginBottom: 8 }}>Category <span style={{ color: C.ruby }}>*</span></div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {categories.map(c => {
                     const active = category === c;
@@ -77,37 +77,37 @@ export default function SupportScreen({ go, user, logout }) {
                 </div>
               </div>
 
-              {/* 이메일 */}
-              <Input label={<>답변받을 이메일 <span style={{ color: C.ruby }}>*</span></>} type="email" placeholder="hello@example.com" value={email} onChange={e => setEmail(e.target.value)} />
+              {/* Email */}
+              <Input label={<>Reply-to email <span style={{ color: C.ruby }}>*</span></>} type="email" placeholder="hello@example.com" value={email} onChange={e => setEmail(e.target.value)} />
 
-              {/* 제목 */}
-              <Input label={<>제목 <span style={{ color: C.ruby }}>*</span></>} placeholder="문의 제목을 입력해주세요" value={subject} onChange={e => setSubject(e.target.value)} />
+              {/* Subject */}
+              <Input label={<>Subject <span style={{ color: C.ruby }}>*</span></>} placeholder="Brief summary of your issue" value={subject} onChange={e => setSubject(e.target.value)} />
 
-              {/* 내용 */}
+              {/* Message */}
               <div>
                 <label style={{ fontSize: 12, fontWeight: 500, color: C.label, display: "block", marginBottom: 6 }}>
-                  문의 내용 <span style={{ color: C.ruby }}>*</span>
+                  Message <span style={{ color: C.ruby }}>*</span>
                 </label>
                 <textarea
-                  placeholder="문의 내용을 자세히 적어주세요. 스크린샷이나 오류 메시지가 있다면 함께 설명해 주시면 빠른 답변에 도움이 됩니다."
+                  placeholder="Please describe your issue in detail. Including screenshots or error messages helps us respond faster."
                   value={body} onChange={e => setBody(e.target.value)}
                   rows={7}
                   style={{ width: "100%", padding: "10px 12px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, resize: "vertical", outline: "none", boxSizing: "border-box", lineHeight: 1.6, transition: "border-color 0.15s" }}
                   onFocus={e => e.target.style.borderColor = C.purple}
                   onBlur={e => e.target.style.borderColor = C.border}
                 />
-                <div style={{ fontSize: 11, color: C.body, marginTop: 4, textAlign: "right" }}>{body.length} 자</div>
+                <div style={{ fontSize: 11, color: C.body, marginTop: 4, textAlign: "right" }}>{body.length} chars</div>
               </div>
             </div>
 
             <Btn full size="lg" style={{ marginTop: 24 }}
               disabled={!category || !email || !subject || !body}
               onClick={() => setSent(true)}>
-              문의 보내기
+              Send message
             </Btn>
 
             <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 12, lineHeight: 1.6 }}>
-              또는 직접 이메일: <a href="mailto:voica.support@gmail.com" style={{ color: C.purple }}>voica.support@gmail.com</a>
+              Or email us directly: <a href="mailto:voica.support@gmail.com" style={{ color: C.purple }}>voica.support@gmail.com</a>
             </div>
           </div>
         </div>

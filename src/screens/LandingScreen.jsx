@@ -102,7 +102,7 @@ function BeforeAfterSection({ isMobile }) {
       border: side === "after" ? "none" : `1px solid ${C.border}`,
     }}>
       <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: side === "after" ? "rgba(255,255,255,0.65)" : C.body, marginBottom: 16 }}>
-        {side === "before" ? "기존 방식" : "✦ Voice Survey"}
+        {side === "before" ? "Traditional approach" : "✦ Voice Survey"}
       </div>
       {items.map(({ icon, bold, rest }) => (
         <div key={bold} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -120,18 +120,18 @@ function BeforeAfterSection({ isMobile }) {
       <section style={{ background: C.white, padding: isMobile ? "60px 20px" : "80px 24px" }}>
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <Badge variant="purple" style={{ marginBottom: 12 }}>비교</Badge>
+            <Badge variant="purple" style={{ marginBottom: 12 }}>Comparison</Badge>
             <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, color: C.navy, margin: "0 0 12px", fontFamily: F }}>
-              기존 방식 vs <span style={{ color: C.purple }}>Voice Survey</span>
+              Old way vs <span style={{ color: C.purple }}>Voice Survey</span>
             </h2>
-            <p style={{ fontSize: 15, color: C.body, margin: 0 }}>소비자의 목소리를<br />정확하고 빠르게</p>
+            <p style={{ fontSize: 15, color: C.body, margin: 0 }}>Hear from your customers<br />accurately and fast</p>
           </div>
 
           <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexDirection: isMobile ? "column" : "row", alignItems: "stretch" }}>
             {col("before", [
-              { icon: "⏳", bold: "2주", rest: "소요" },
-              { icon: "💸", bold: "200만원", rest: "비용" },
-              { icon: "👤", bold: "10명", rest: "인터뷰" },
+              { icon: "⏳", bold: "2 weeks", rest: "to complete" },
+              { icon: "💸", bold: "$1,500+", rest: "cost" },
+              { icon: "👤", bold: "10 people", rest: "interviewed" },
             ])}
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: C.body, flexShrink: 0 }}>
@@ -139,9 +139,9 @@ function BeforeAfterSection({ isMobile }) {
             </div>
 
             {col("after", [
-              { icon: "⚡", bold: "10분", rest: "완료" },
-              { icon: "💡", bold: "5만원", rest: "비용" },
-              { icon: "🎙️", bold: "500명", rest: "동시 인터뷰" },
+              { icon: "⚡", bold: "10 minutes", rest: "to complete" },
+              { icon: "💡", bold: "$49", rest: "cost" },
+              { icon: "🎙️", bold: "500 people", rest: "interviewed simultaneously" },
             ])}
           </div>
         </div>
@@ -163,15 +163,15 @@ function FinalCtaSection({ go, isMobile }) {
       }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <Badge variant="purple" style={{ marginBottom: 20, background: "rgba(255,255,255,0.12)", color: C.white, border: "1px solid rgba(255,255,255,0.2)" }}>
-            지금 바로 시작
+            Start today
           </Badge>
           <h2 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 700, color: C.white, margin: "0 0 16px", fontFamily: F, lineHeight: 1.15 }}>
-            지금 무료로 시작하기
+            Get started for free
           </h2>
           <p style={{ fontSize: isMobile ? 15 : 17, color: "rgba(255,255,255,0.72)", margin: "0 0 44px", lineHeight: 1.6 }}>
             {isMobile
-              ? "신용카드 없이, 지금 바로."
-              : <>신용카드 없이도 즉시 시작할 수 있어요.<br />첫 인터뷰 프로젝트는 무료로 진행해 드립니다.</>}
+              ? "No credit card required."
+              : <>No credit card needed — start right away.<br />Your first interview project is completely free.</>}
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button
@@ -187,7 +187,7 @@ function FinalCtaSection({ go, isMobile }) {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,0,0,0.2)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.15)"; }}
             >
-              리서처 시작 →
+              Start as researcher →
             </button>
             <button
               onClick={() => go("panel_entry")}
@@ -201,7 +201,7 @@ function FinalCtaSection({ go, isMobile }) {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.background = "transparent"; }}
             >
-              패널 참여
+              Join as panelist
             </button>
           </div>
         </div>
@@ -261,16 +261,16 @@ export default function LandingScreen({ go, user, logout }) {
 
         <div style={{ maxWidth: 680, margin: "0 auto", textAlign: "center", position: "relative" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-            <Badge variant="purple">✦ AI가 인터뷰하고, AI가 분석합니다</Badge>
+            <Badge variant="purple">✦ AI interviews. AI analyzes. You decide.</Badge>
           </div>
 
           {(() => {
             const heroMessages = [
-              { line1: "비싸고 오래 걸리는 인터뷰", line2: "AI로 수백 명을 동시에" },
-              { line1: "소비자의 목소리를", line2: "정확하고\u00A0빠르게" },
+              { line1: "Slow, expensive research?", line2: "Interview hundreds with AI" },
+              { line1: "Hear from your customers,", line2: "accurately\u00A0and\u00A0fast" },
             ];
             const msg = fromInterview
-              ? { line1: "AI 인터뷰를 경험하셨나요?", line2: "AI로 수백 명을 동시에" }
+              ? { line1: "How was your AI interview?", line2: "Interview hundreds with AI" }
               : heroMessages[heroIdx];
             return (
               <h1 style={{
@@ -293,13 +293,13 @@ export default function LandingScreen({ go, user, logout }) {
 
           <p style={{ fontSize: isMobile ? 15 : 17, fontWeight: 400, color: "rgba(10,11,13,0.56)", lineHeight: 1.6, letterSpacing: "0.16px", margin: "0 0 44px", fontFamily: F }}>
             {isMobile
-              ? <>질문만 만들면 AI가 다 해요.<br />분석 · 감정 · 리포트까지 자동으로.</>
-              : <>질문만 설계하면 AI가 수백 명의 패널과 보이스 인터뷰를 직접 진행해요.<br />테마 분석 · 감정 분류 · 인사이트 리포트까지 자동으로 완성돼요.</>}
+              ? <>Just write your questions — AI handles the rest.<br />Analysis, sentiment, and reports, fully automated.</>
+              : <>Design your questions and AI conducts live voice interviews with hundreds of panelists at once.<br />Theme analysis, sentiment tagging, and insight reports are generated automatically.</>}
           </p>
 
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 20, background: C.bg, border: `1px solid ${C.border}`, marginBottom: 32 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.success, animation: "pulse-dot 2s ease-in-out infinite" }} />
-            <span style={{ fontSize: 13, color: C.body }}>지금 <strong style={{ fontWeight: 600, color: C.purple }}>{liveCount}명</strong>이 인터뷰에 참여하고 있어요</span>
+            <span style={{ fontSize: 13, color: C.body }}><strong style={{ fontWeight: 600, color: C.purple }}>{liveCount} people</strong> are in an interview right now</span>
           </div>
 
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -308,18 +308,18 @@ export default function LandingScreen({ go, user, logout }) {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(83,58,253,0.14), 0 8px 28px rgba(83,58,253,0.1)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "none"; }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>🎯</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>리서처 / 기업</div>
-              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>{isMobile ? "인터뷰 만들고 리포트 받기" : "인터뷰 설계부터 리포트 받기까지"}</div>
-              <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: C.purple, background: "rgba(83,58,253,0.07)", padding: "5px 10px", borderRadius: 6 }}>시작하기 →</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>Researcher / Business</div>
+              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>{isMobile ? "Build interviews and get reports" : "Design interviews and receive full reports"}</div>
+              <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: C.purple, background: "rgba(83,58,253,0.07)", padding: "5px 10px", borderRadius: 6 }}>Get started →</div>
             </button>
             <button onClick={() => go("panel_entry")}
               style={{ cursor: "pointer", padding: "22px 24px", borderRadius: 16, background: C.white, border: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)", width: isMobile ? "100%" : "auto", minWidth: isMobile ? 0 : 230, transition: "box-shadow 0.2s, transform 0.2s", textAlign: "left", fontFamily: F }}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(83,58,253,0.14), 0 8px 28px rgba(83,58,253,0.1)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "none"; }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>🎙️</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>Voice Survey 패널</div>
-              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>{isMobile ? "말하고 리워드 받기" : "보이스로 인터뷰 참여하고 리워드 받기"}</div>
-              <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: C.purple, background: "rgba(83,58,253,0.07)", padding: "5px 10px", borderRadius: 6 }}>참여하기 →</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 5, letterSpacing: "0.16px" }}>Voice Survey Panel</div>
+              <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.55, letterSpacing: "0.16px" }}>{isMobile ? "Speak up and earn rewards" : "Join voice interviews and earn rewards"}</div>
+              <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: C.purple, background: "rgba(83,58,253,0.07)", padding: "5px 10px", borderRadius: 6 }}>Join now →</div>
             </button>
           </div>
         </div>
@@ -330,10 +330,10 @@ export default function LandingScreen({ go, user, logout }) {
         <section style={{ background: C.white, padding: isMobile ? "40px 20px" : "52px 24px" }}>
           <div style={{ maxWidth: 800, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)" }}>
             {[
-              { end: 12400, suffix: "+", label: "등록된 패널", color: C.purple, delay: 0 },
-              { end: 4200, suffix: "건", label: "이번 달 완료 인터뷰", color: C.navy, delay: 100 },
-              { end: 94, suffix: "%", label: "AI 분석 정확도", color: C.successText, delay: 200 },
-              { end: 8, suffix: "분", label: "평균 인터뷰 시간", color: C.ruby, delay: 300 },
+              { end: 12400, suffix: "+", label: "Registered panelists", color: C.purple, delay: 0 },
+              { end: 4200, suffix: "", label: "Interviews completed this month", color: C.navy, delay: 100 },
+              { end: 94, suffix: "%", label: "AI analysis accuracy", color: C.successText, delay: 200 },
+              { end: 8, suffix: " min", label: "Average interview length", color: C.ruby, delay: 300 },
             ].map(({ label, ...stat }, i) => (
               <div key={label} style={{
                 textAlign: "center",
