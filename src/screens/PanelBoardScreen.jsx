@@ -165,7 +165,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
         </div>
 
         {/* Job cards */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {filtered.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: C.body }}>
               <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
