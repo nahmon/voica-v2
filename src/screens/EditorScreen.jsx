@@ -40,9 +40,9 @@ const MAX_Q_CHARS = 200;
 
 // Question type definitions with icons and descriptions
 const Q_TYPES = [
-  { type: "voice",           icon: "🎙", label: "Voice Answer",      desc: "Participants respond freely by voice" },
-  { type: "multiple_choice", icon: "☑",  label: "Multiple Choice",   desc: "Select one option from a predefined list" },
-  { type: "likert",          icon: "📊", label: "Rating Scale",      desc: "Rate on a 1–5 scale" },
+  { type: "voice",           icon: "🎙", label: "음성 답변",   desc: "참여자가 자유롭게 음성으로 답변해요" },
+  { type: "multiple_choice", icon: "☑",  label: "객관식",     desc: "미리 정해진 보기 중 하나를 선택해요" },
+  { type: "likert",          icon: "📊", label: "평가 척도",  desc: "1~5점 척도로 평가해요" },
 ];
 
 export default function EditorScreen({ go, user, logout, interviewId }) {
@@ -93,7 +93,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       setSelectedIdx(0);
       setShowAiModal(false);
       setAiPrompt("");
-      showToast("AI draft questions generated ✓", "success");
+      showToast("AI 초안 질문이 생성됐어요 ✓", "success");
     } catch (e) {
       showToast(e.message || "AI generation failed", "error");
     } finally {
@@ -156,7 +156,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
   const loadTemplate = () => {
     const hasContent = title.trim() || questions.some(q => q.content.trim());
-    if (hasContent && !window.confirm("This will replace your current content with the template. Continue?")) return;
+    if (hasContent && !window.confirm("현재 내용이 템플릿으로 교체돼요. 계속할까요?")) return;
     setTitle(VOICA_SURVEY_TEMPLATE.title);
     setQuestions(VOICA_SURVEY_TEMPLATE.questions.map(q => ({ ...q, id: mkId() })));
     setSelectedIdx(0);
@@ -177,14 +177,14 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       <div style={{ background: "linear-gradient(135deg,rgba(83,58,253,0.06),rgba(249,107,238,0.06))", border: `1.5px solid rgba(83,58,253,0.18)`, borderRadius: 14, padding: "16px 18px", marginBottom: 18 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
           <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✦</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>Generate a draft with AI</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>AI로 초안 만들기</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <input
             value={aiPrompt}
             onChange={e => setAiPrompt(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") { setShowAiModal(true); } }}
-            placeholder="Describe your interview goal — e.g. Understand pain points of 20-something app users"
+            placeholder="인터뷰 목적을 설명하세요 — 예: 20대 앱 사용자의 불편함을 파악하고 싶어요"
             style={{ flex: 1, padding: "9px 12px", borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, outline: "none", minWidth: 0 }}
             onFocus={e => e.target.style.borderColor = C.purple}
             onBlur={e => e.target.style.borderColor = C.border}
@@ -193,17 +193,17 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             onClick={() => setShowAiModal(true)}
             style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#533afd,#f96bee)", color: C.white, fontSize: 13, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap" }}
           >
-            Generate Draft
+            초안 생성
           </button>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>Start from a template</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>템플릿으로 시작하기</div>
         <button
           onClick={() => applyTemplate({ title: "", questions: [] }) || setTitle("") || setQuestions([newQ("voice")])}
           style={{ background: "none", border: "none", fontSize: 12, color: C.body, cursor: "pointer", padding: 0, textDecoration: "underline" }}
         >
-          Start from scratch
+          빈 템플릿으로 시작
         </button>
       </div>
       <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
@@ -216,7 +216,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               onClick={() => applyTemplate(tpl)}
               style={{ marginTop: 4, padding: "6px 0", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 12, fontWeight: 500, fontFamily: F, cursor: "pointer" }}
             >
-              Use Template
+              템플릿 사용
             </button>
           </div>
         ))}
@@ -296,7 +296,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         track("interview_published", { shareCode: data.share_code, questionCount: questions.length });
         setShowShareOverlay(true); // only for new interviews
       } else {
-        showToast("Saved ✓", "success");
+        showToast("저장됐어요 ✓", "success");
       }
       if (!editingId && data.interview?.id) setEditingId(data.interview.id);
       localStorage.removeItem(DRAFT_KEY);
@@ -308,8 +308,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   };
 
   const handleSave = () => {
-    if (!title.trim()) { showToast("Please enter an interview title", "error"); return; }
-    if (questions.some(q => !q.content.trim())) { showToast("Please fill in all question text", "error"); return; }
+    if (!title.trim()) { showToast("인터뷰 제목을 입력해주세요", "error"); return; }
+    if (questions.some(q => !q.content.trim())) { showToast("모든 질문 내용을 입력해주세요", "error"); return; }
     if (questions.length < 10) { setShowIncompleteWarn(true); return; }
     doSave();
   };
@@ -330,7 +330,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const typeLabel = { voice: "Voice", multiple_choice: "Multiple Choice", likert: "Rating" };
+  const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "평가" };
   const typeVariant = { voice: "purple", multiple_choice: "success", likert: "warning" };
 
   // ─── Overlays (share success + incomplete warning) ───
@@ -342,28 +342,28 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(21,190,83,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
           {Ic.CheckCircle({ s: 28, c: C.success })}
         </div>
-        <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 8 }}>Your link is ready</div>
+        <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 8 }}>링크가 준비됐어요</div>
         <div style={{ fontSize: 13, color: C.body, marginBottom: 24, lineHeight: 1.6 }}>
-          Share the link below with your participants.<br />No login required to join.
+          아래 링크를 참여자에게 공유하세요.<br />로그인 없이 바로 참여할 수 있어요.
         </div>
         <div style={{ background: C.bg, borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, marginBottom: 20, border: `1px solid ${C.border}` }}>
           <span style={{ flex: 1, fontSize: 13, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
-          <Btn size="sm" onClick={handleCopy}>{copied ? "Copied ✓" : "Copy"}</Btn>
+          <Btn size="sm" onClick={handleCopy}>{copied ? "복사됨 ✓" : "복사"}</Btn>
         </div>
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 12, color: C.body, marginBottom: 10 }}>📱 Share via QR code</div>
+          <div style={{ fontSize: 12, color: C.body, marginBottom: 10 }}>📱 QR 코드로 공유</div>
           <img
             src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`}
             alt="QR Code"
             style={{ width: 180, height: 180, borderRadius: 12, border: `1px solid ${C.border}` }}
           />
           <div style={{ marginTop: 10 }}>
-            <Btn size="sm" variant="ghost" onClick={() => window.open(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`, "_blank")}>Save QR Code</Btn>
+            <Btn size="sm" variant="ghost" onClick={() => window.open(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`, "_blank")}>QR 코드 저장</Btn>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn full variant="ghost" onClick={() => setShowShareOverlay(false)}>Keep Editing</Btn>
-          <Btn full onClick={() => go("dashboard")}>Go to Dashboard</Btn>
+          <Btn full variant="ghost" onClick={() => setShowShareOverlay(false)}>계속 편집</Btn>
+          <Btn full onClick={() => go("dashboard")}>대시보드로 이동</Btn>
         </div>
       </div>
     </div>
@@ -373,16 +373,16 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ background: C.white, borderRadius: 16, padding: "32px 32px 28px", maxWidth: 400, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.18) 0px 30px 60px -12px" }}>
         <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 22 }}>✏️</div>
-        <div style={{ fontSize: 18, fontWeight: 600, color: C.navy, marginBottom: 8 }}>Interview isn't complete yet</div>
+        <div style={{ fontSize: 18, fontWeight: 600, color: C.navy, marginBottom: 8 }}>인터뷰가 아직 완성되지 않았어요</div>
         <div style={{ fontSize: 13, color: C.body, marginBottom: 6, lineHeight: 1.65 }}>
-          You currently have <strong style={{ color: C.navy }}>{questions.length} question{questions.length !== 1 ? "s" : ""}</strong>.
+          현재 질문이 <strong style={{ color: C.navy }}>{questions.length}개</strong> 있어요.
         </div>
         <div style={{ fontSize: 13, color: C.body, marginBottom: 28, lineHeight: 1.65 }}>
-          We recommend at least 10 questions to get meaningful insights. Would you like to keep writing?
+          의미 있는 인사이트를 얻으려면 질문이 10개 이상 있어야 해요. 계속 작성할까요?
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn full variant="ghost" onClick={() => setShowIncompleteWarn(false)}>Keep Writing</Btn>
-          <Btn full onClick={doSave} style={{ background: "#f59e0b", border: "none" }}>Publish Anyway</Btn>
+          <Btn full variant="ghost" onClick={() => setShowIncompleteWarn(false)}>계속 작성</Btn>
+          <Btn full onClick={doSave} style={{ background: "#f59e0b", border: "none" }}>그냥 공개하기</Btn>
         </div>
       </div>
     </div>
@@ -394,15 +394,15 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       <div style={{ background: C.white, borderRadius: 20, padding: "36px 32px 28px", maxWidth: 480, width: "100%", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>Generate AI Draft Questions</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>AI로 질문 초안 만들기</div>
         </div>
         <div style={{ fontSize: 13, color: C.body, marginBottom: 20, lineHeight: 1.6 }}>
-          Briefly describe your interview goal and AI will generate 10–12 questions.
+          인터뷰 목적을 간단히 설명하면 AI가 10~12개 질문을 만들어드려요.
         </div>
         <textarea
           value={aiPrompt}
           onChange={e => setAiPrompt(e.target.value)}
-          placeholder="e.g. Understand payment experience and pain points of Gen Z app users. For a fintech startup's UX improvement."
+          placeholder="예: Z세대 앱 사용자의 결제 경험과 불편함을 파악하고 싶어요. 핀테크 스타트업 UX 개선을 위한 인터뷰입니다."
           rows={4}
           autoFocus
           onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generateWithAI(); }}
@@ -412,9 +412,9 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         />
         <div style={{ fontSize: 11, color: C.body, textAlign: "right", marginBottom: 20, marginTop: 4 }}>{aiPrompt.length}/600 chars · ⌘Enter to generate</div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn full variant="ghost" onClick={() => setShowAiModal(false)} disabled={aiGenerating}>Cancel</Btn>
+          <Btn full variant="ghost" onClick={() => setShowAiModal(false)} disabled={aiGenerating}>취소</Btn>
           <Btn full onClick={generateWithAI} disabled={aiGenerating || !aiPrompt.trim()}>
-            {aiGenerating ? "Generating…" : "✦ Generate Draft"}
+            {aiGenerating ? "생성 중…" : "✦ 초안 생성"}
           </Btn>
         </div>
       </div>
@@ -424,51 +424,49 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   // ─── Top nav bar ───
   const NavBar = (
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
-      <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← Dashboard</Btn>
+      <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        {logout && <Btn variant="ghost" size="sm" onClick={logout} style={{ fontSize: 12, color: C.body }}>Sign Out</Btn>}
-        {/* Unsaved changes indicator */}
+        {logout && <Btn variant="ghost" size="sm" onClick={logout} style={{ fontSize: 12, color: C.body }}>로그아웃</Btn>}
         {editingId && hasUnsaved && (
           <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#f59e0b", fontWeight: 500 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
-            Unsaved changes
+            저장 안 됨
           </span>
         )}
-        {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>Draft saved ✓</span>}
+        {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시 저장됨 ✓</span>}
         <span style={{ fontSize: 11, color: questions.length >= 10 ? C.success : "rgba(180,120,0,0.85)", fontWeight: 500 }}>
-          {questions.length} question{questions.length !== 1 ? "s" : ""}{questions.length < 10 ? ` / 10 recommended` : ` ✓`}
+          {questions.length}개 질문{questions.length < 10 ? ` / 10개 권장` : ` ✓`}
         </span>
-        <Btn size="sm" onClick={() => setShowAiModal(true)} style={{ background: "linear-gradient(135deg,#533afd,#f96bee)", border: "none", color: C.white, fontWeight: 600 }}>✦ AI Draft</Btn>
+        <Btn size="sm" onClick={() => setShowAiModal(true)} style={{ background: "linear-gradient(135deg,#533afd,#f96bee)", border: "none", color: C.white, fontWeight: 600 }}>✦ AI 초안</Btn>
         <div style={{ position: "relative" }}>
-          <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>Templates</Btn>
+          <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>템플릿</Btn>
           {templateOpen && (
             <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 4, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 100, minWidth: 220 }}>
-              <div style={{ padding: "8px 14px 4px", fontSize: 10, color: C.body, fontWeight: 600, letterSpacing: 0.5 }}>Load a template</div>
+              <div style={{ padding: "8px 14px 4px", fontSize: 10, color: C.body, fontWeight: 600, letterSpacing: 0.5 }}>템플릿 불러오기</div>
               <div onClick={loadTemplate}
                 style={{ padding: "10px 14px", fontSize: 13, color: C.navy, cursor: "pointer", borderTop: `1px solid ${C.border}` }}
                 onMouseEnter={e => e.currentTarget.style.background = C.bg}
                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                <div style={{ fontWeight: 500 }}>Voice Survey User Satisfaction Study</div>
-                <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>7 voice + 7 multiple choice · 14 questions</div>
+                <div style={{ fontWeight: 500 }}>Voice Survey 사용자 만족도 조사</div>
+                <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>음성 7개 + 객관식 7개 · 14개 질문</div>
               </div>
             </div>
           )}
         </div>
         {shareCode && (
           <Btn variant="ghost" size="sm" onClick={handleCopy}>
-            {copied ? "Copied ✓" : "Copy Link"}
+            {copied ? "복사됨 ✓" : "링크 복사"}
           </Btn>
         )}
-        {/* Save button with ⌘S tooltip */}
         <div style={{ position: "relative" }}
           onMouseEnter={() => setShowSaveTooltip(true)}
           onMouseLeave={() => setShowSaveTooltip(false)}>
           <Btn size="sm" onClick={handleSave} disabled={saving}>
-            {saving ? "Saving…" : editingId ? "Save" : "Create Link →"}
+            {saving ? "저장 중…" : editingId ? "저장" : "링크 생성 →"}
           </Btn>
           {showSaveTooltip && (
             <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: C.navy, color: C.white, fontSize: 11, padding: "4px 8px", borderRadius: 6, whiteSpace: "nowrap", zIndex: 200, pointerEvents: "none" }}>
-              ⌘S to save
+              ⌘S로 저장
             </div>
           )}
         </div>
@@ -478,7 +476,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
   const ShareLinkBar = shareCode && editingId && (
     <div style={{ background: "rgba(83,58,253,0.06)", borderBottom: `1px solid rgba(83,58,253,0.15)`, padding: "8px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-      <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>Share Link</span>
+      <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>공유 링크</span>
       <span style={{ flex: 1, fontSize: 12, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
       <Btn size="sm" variant="ghost" onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px" }}>{copied ? "Copied ✓" : "Copy"}</Btn>
     </div>
@@ -497,13 +495,13 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         <input
           value={title}
           onChange={e => setTitle(e.target.value)}
-          placeholder="Enter interview title"
+          placeholder="인터뷰 제목을 입력하세요"
           style={{ width: "100%", border: "none", outline: "none", fontSize: 18, fontFamily: F, fontWeight: 600, color: C.navy, background: "transparent", boxSizing: "border-box" }}
         />
         <input
           value={incentive}
           onChange={e => setIncentive(e.target.value)}
-          placeholder="Participation reward (optional) — e.g. $5 Amazon gift card"
+          placeholder="참여 보상 (선택) — 예: 스타벅스 아메리카노 1잔"
           style={{ width: "100%", border: "none", outline: "none", fontSize: 13, fontFamily: F, color: C.body, background: "transparent", boxSizing: "border-box", marginTop: 6 }}
         />
       </div>
@@ -555,8 +553,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         {/* Left: question list */}
         <div style={{ width: 260, borderRight: `1px solid ${C.border}`, background: C.white, display: "flex", flexDirection: "column", flexShrink: 0 }}>
           <div style={{ padding: "12px 14px", borderBottom: `1px solid ${C.border}`, position: "relative" }}>
-            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>Questions ({questions.length})</div>
-            <Btn size="sm" full onClick={() => setAddTypeOpen(v => !v)}>+ Add Question</Btn>
+            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>질문 ({questions.length})</div>
+            <Btn size="sm" full onClick={() => setAddTypeOpen(v => !v)}>+ 질문 추가</Btn>
             {addTypeOpen && (
               <div style={{ position: "absolute", top: "100%", left: 14, right: 14, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 10 }}>
                 {Q_TYPES.map(({ type, icon, label, desc }) => (
@@ -609,7 +607,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
                   </div>
                 </div>
                 <div style={{ fontSize: 12, color: selectedIdx === i ? C.navy : C.body, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                  {qq.content || <span style={{ color: C.border }}>No question text</span>}
+                  {qq.content || <span style={{ color: C.border }}>질문 없음</span>}
                 </div>
               </div>
             ))}
@@ -621,11 +619,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
           {/* Title input — prominent, top of canvas */}
           <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "20px 40px 16px" }}>
-            <div style={{ fontSize: 11, color: C.body, marginBottom: 6, letterSpacing: 0.5 }}>Interview Title</div>
+            <div style={{ fontSize: 11, color: C.body, marginBottom: 6, letterSpacing: 0.5 }}>인터뷰 제목</div>
             <input
               value={title}
               onChange={e => setTitle(e.target.value)}
-              placeholder="e.g. New Product Usability Interview — 2026 Q2"
+              placeholder="예: 신제품 사용성 인터뷰 — 2026 Q2"
               style={{
                 width: "100%",
                 border: "none",
@@ -644,11 +642,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               onBlur={e => e.target.style.borderBottomColor = title ? C.purple : C.border}
             />
             <div style={{ marginTop: 14 }}>
-              <div style={{ fontSize: 11, color: C.body, marginBottom: 4, letterSpacing: 0.5 }}>Participation Reward (optional)</div>
+              <div style={{ fontSize: 11, color: C.body, marginBottom: 4, letterSpacing: 0.5 }}>참여 보상 (선택)</div>
               <input
                 value={incentive}
                 onChange={e => setIncentive(e.target.value)}
-                placeholder="e.g. $5 Starbucks gift card"
+                placeholder="예: 스타벅스 아메리카노 1잔"
                 style={{ width: "100%", border: "none", borderBottom: `1px solid ${incentive ? C.purple : C.border}`, outline: "none", fontSize: 14, fontFamily: F, color: C.navy, background: "transparent", paddingBottom: 4, boxSizing: "border-box", transition: "border-color 0.15s" }}
                 onFocus={e => e.target.style.borderBottomColor = C.purple}
                 onBlur={e => e.target.style.borderBottomColor = incentive ? C.purple : C.border}
@@ -658,7 +656,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
           {/* Preview card */}
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 40px", gap: 12 }}>
-            <div style={{ fontSize: 11, color: C.body, letterSpacing: 0.3 }}>Participant view — click to edit directly</div>
+            <div style={{ fontSize: 11, color: C.body, letterSpacing: 0.3 }}>참여자 화면 — 클릭해서 바로 편집하세요</div>
             <PreviewCard q={q} idx={selectedIdx} total={questions.length} updateQ={updateQ} />
             {/* Character count */}
             <div style={{ fontSize: 11, color: (q?.content?.length ?? 0) > MAX_Q_CHARS ? C.ruby : C.body, alignSelf: "flex-end", marginRight: 0 }}>
@@ -694,7 +692,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
           <textarea
             value={q?.content ?? ""}
             onChange={e => updateQ(idx, { content: e.target.value })}
-            placeholder="Enter question text"
+            placeholder="질문 내용을 입력하세요"
             rows={3}
             style={{ width: "100%", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.2)", outline: "none", resize: "none", fontSize: 15, fontWeight: 400, color: "white", lineHeight: 1.65, letterSpacing: "-0.3px", fontFamily: F, marginBottom: 20, padding: "0 0 6px", boxSizing: "border-box", caretColor: "rgba(185,185,249,0.9)" }}
             onFocus={e => e.target.style.borderBottomColor = "rgba(185,185,249,0.7)"}
@@ -702,7 +700,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
           />
         ) : (
           <p style={{ fontSize: 15, fontWeight: 400, color: "white", lineHeight: 1.65, letterSpacing: -0.3, margin: "0 0 20px" }}>
-            {q?.content || <span style={{ opacity: 0.3 }}>Enter question text</span>}
+            {q?.content || <span style={{ opacity: 0.3 }}>질문 내용을 입력하세요</span>}
           </p>
         )}
 
@@ -711,7 +709,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
             <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(26,115,232,0.25)", border: "1px solid rgba(26,115,232,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {Ic.Mic({ s: 18, c: "#b9b9f9" })}
             </div>
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Press the button to respond</span>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>버튼을 눌러 답변하세요</span>
           </div>
         )}
 
@@ -752,11 +750,11 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
 
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>Question Settings</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>질문 설정</div>
 
       {/* Type selector with icons and descriptions */}
       <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 8 }}>Question Type</label>
+        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 8 }}>질문 유형</label>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {Q_TYPES.map(({ type, icon, label, desc }) => (
             <div key={type}
@@ -773,12 +771,12 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
       </div>
 
       <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>Question Text</label>
+        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>질문 내용</label>
         <textarea
           value={q.content}
           onChange={e => updateQ(idx, { content: e.target.value })}
           rows={4}
-          placeholder="Enter your question"
+          placeholder="질문을 입력하세요"
           style={{ width: "100%", padding: "8px 10px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.5 }}
         />
         <div style={{ fontSize: 10, color: (q.content?.length ?? 0) > 200 ? C.ruby : C.body, textAlign: "right", marginTop: 3 }}>
@@ -787,7 +785,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
       </div>
       {q.type === "multiple_choice" && Array.isArray(q.options) && (
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>Options</label>
+          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>보기</label>
           {q.options.map((opt, i) => (
             <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6 }}>
               <input
@@ -802,13 +800,13 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
             </div>
           ))}
           {q.options.length < 6 && (
-            <button onClick={() => updateQ(idx, { options: [...q.options, ""] })} style={{ fontSize: 12, color: C.purple, background: "none", border: "none", cursor: "pointer", padding: 0 }}>+ Add Option</button>
+            <button onClick={() => updateQ(idx, { options: [...q.options, ""] })} style={{ fontSize: 12, color: C.purple, background: "none", border: "none", cursor: "pointer", padding: 0 }}>+ 보기 추가</button>
           )}
         </div>
       )}
       {q.type === "likert" && (
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>Scale Range</label>
+          <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>척도 범위</label>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input type="number" value={q.options?.min ?? 1} min={1} max={4}
               onChange={e => updateQ(idx, { options: { ...q.options, min: Number(e.target.value) } })}
