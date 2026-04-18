@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
-import { PANEL_JOBS, MOCK_PANEL_PROFILE, getMatchScore } from "../lib/mockData.js";
+import { PANEL_JOBS, PANEL_JOBS_KO, MOCK_PANEL_PROFILE, getMatchScore } from "../lib/mockData.js";
 import { GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
@@ -50,7 +50,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
   const catLabel = (key) => isKo ? (CATEGORY_LABELS_KO[key] ?? key) : key;
   const profile = MOCK_PANEL_PROFILE;
 
-  const jobsWithScore = PANEL_JOBS.map(j => ({ ...j, _matchScore: getMatchScore(j, profile) }));
+  const jobsWithScore = (isKo ? PANEL_JOBS_KO : PANEL_JOBS).map(j => ({ ...j, _matchScore: getMatchScore(j, profile) }));
   const MATCH_THRESHOLD = 4;
 
   const filtered = jobsWithScore

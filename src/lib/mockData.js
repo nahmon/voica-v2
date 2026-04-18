@@ -60,6 +60,39 @@ export const PANEL_JOBS = [
     targetProfile: { age: "30–55", gender: "Any", region: "Nationwide (metro preferred)", lifestyle: "IT procurement lead, CTO, or manager+ at a company with 50+ employees who has directly decided or strongly influenced a SaaS/software adoption", exclude: "Excludes SaaS vendors and IT solution sales staff" } },
 ];
 
+export const PANEL_JOBS_KO = [
+  { id: 1, title: "앱 사용성 인터뷰", company: "핀테크 스타트업 A", duration: "약 10분", reward: "₩4,500", conditions: ["20~40세", "스마트폰 앱 사용자"], deadline: "2026.04.15", filled: 187, total: 300, category: "Tech", urgent: true, matchTags: ["Tech/IT", "Finance/Investment"], ageRange: [20,40],
+    description: "출시 예정인 모바일 결제 앱의 온보딩 흐름과 핵심 기능 사용성을 검증하고 있어요. 불편한 점, 직관성, 신뢰도에 대한 솔직한 의견을 나눠주세요.",
+    targetProfile: { age: "20~40세", gender: "무관", region: "전국", lifestyle: "스마트폰으로 금융 앱을 주 1회 이상 사용하는 분", exclude: "금융업 종사자 제외" } },
+  { id: 2, title: "신제품 브랜드 인식 조사", company: "뷰티 브랜드 B", duration: "약 15분", reward: "₩7,000", conditions: ["20~35세 여성", "뷰티 제품에 관심 있는 분"], deadline: "2026.04.20", filled: 312, total: 500, category: "Beauty", urgent: false, matchTags: ["Beauty/Fashion"], ageRange: [20,35], genderMatch: "Female",
+    description: "새로운 스킨케어 라인 출시 전, 소비자 인지도와 구매 의향을 조사하고 있어요. 뷰티 제품 선택 기준과 브랜드 선호도에 대한 솔직한 의견을 들려주세요.",
+    targetProfile: { age: "20~35세", gender: "여성", region: "수도권 선호 (전국 가능)", lifestyle: "뷰티 제품을 월 1회 이상 구매하는 분", exclude: "뷰티업 종사자 제외" } },
+  { id: 3, title: "스트리밍 서비스 만족도 인터뷰", company: "엔터테인먼트 C사", duration: "약 8분", reward: "₩3,000", conditions: ["전 연령", "스트리밍 서비스 이용자"], deadline: "2026.04.12", filled: 91, total: 100, category: "Media", urgent: true, matchTags: ["Media/Entertainment"], ageRange: [10,60],
+    description: "넷플릭스, 웨이브 등 주요 스트리밍 플랫폼 이용 패턴과 만족도를 알아보고 있어요. 구독·해지 이유, 콘텐츠 만족도, 가격에 대한 솔직한 의견을 들려주세요.",
+    targetProfile: { age: "전 연령", gender: "무관", region: "전국", lifestyle: "현재 스트리밍 서비스를 구독 중이거나 최근 6개월 내 구독한 분", exclude: "방송·미디어업 종사자 제외" } },
+  { id: 4, title: "식료품 온라인 쇼핑 행동 조사", company: "식품 기업 D", duration: "약 12분", reward: "₩6,000", conditions: ["30~50세", "주 1회 이상 온라인 식료품 구매자"], deadline: "2026.04.25", filled: 78, total: 400, category: "Food", urgent: false, matchTags: ["Food/Dining", "Shopping/Retail"], ageRange: [30,50],
+    description: "자녀가 있는 가구를 중심으로 온라인 식료품 구매 행동과 브랜드 선호도를 연구하고 있어요.",
+    targetProfile: { age: "30~50세", gender: "무관 (자녀 있는 가구 선호)", region: "수도권 선호", lifestyle: "쿠팡, 마켓컬리 등 온라인 식료품 배달을 주 1회 이상 이용하는 분. 자녀 있는 가구 우대.", exclude: "식품·유통업 종사자 제외" } },
+  { id: 5, title: "뱅킹 앱 UX 리서치", company: "은행 계열사 E", duration: "약 20분", reward: "₩11,000", conditions: ["25~45세", "모바일 뱅킹 이용자"], deadline: "2026.04.18", filled: 143, total: 200, category: "Finance", urgent: false, matchTags: ["Finance/Investment", "Tech/IT"], ageRange: [25,45],
+    description: "주요 은행 앱의 자산 관리, 이체, 대출 조회 기능 UX를 평가하고 있어요. 불편했던 화면, 원하는 기능, 다른 앱과의 비교 의견을 구체적으로 나눠주세요.",
+    targetProfile: { age: "25~45세", gender: "무관", region: "전국", lifestyle: "모바일 뱅킹을 주 2회 이상 사용하고 예·적금 또는 투자 상품을 1개 이상 보유한 분", exclude: "현직 금융·핀테크 종사자 제외" } },
+  { id: 6, title: "온라인 학습 플랫폼 경험 조사", company: "에듀테크 F사", duration: "약 10분", reward: "₩5,000", conditions: ["학부모 또는 학생", "온라인 강의 수강 경험자"], deadline: "2026.04.30", filled: 34, total: 150, category: "Education", urgent: false, matchTags: ["Education"], ageRange: [20,50],
+    description: "클래스101, 인프런 등 온라인 교육 플랫폼의 학습 경험을 연구하고 있어요. 강의 선택 기준, 수료율, 만족 요인을 탐색해 플랫폼을 개선하려 해요.",
+    targetProfile: { age: "중·고·대학생 또는 30~50세 학부모", gender: "무관", region: "전국", lifestyle: "최근 1년 내 온라인 강의를 수강한 분. 자녀 교육에 관심 있는 학부모도 환영.", exclude: "교육 전문가(교사·강사·튜터) 제외" } },
+  { id: 7, title: "의료 AI 진단 도구 평가", company: "헬스케어 스타트업 G", duration: "약 25분", reward: "₩170,000", conditions: ["의사·간호사·의료 종사자", "임상 경력 3년 이상"], deadline: "2026.04.22", filled: 18, total: 50, category: "Expert", urgent: false, expert: true, expertTag: "의료", matchTags: ["Medical/Healthcare"], ageRange: [25,60], jobMatch: ["Professional (doctor/lawyer/accountant)"],
+    description: "AI 보조 영상 진단 솔루션의 임상 적용 가능성을 평가하고 있어요. 임상 현장에서 AI 도구 수용도, 신뢰 기준, 워크플로 통합 시 고려사항에 대한 전문 의견을 구해요.",
+    targetProfile: { age: "25~60세", gender: "무관", region: "전국", lifestyle: "임상 경력 3년 이상의 현직 의사·간호사·영상의학과 전문의", exclude: "의료기기·헬스케어 스타트업 종사자 제외" } },
+  { id: 8, title: "스타트업 투자 의사결정 인터뷰", company: "VC 리서치 H", duration: "약 30분", reward: "₩280,000", conditions: ["VC·엔젤투자자·심사역", "실제 투자 집행 경험자"], deadline: "2026.04.18", filled: 7, total: 30, category: "Expert", urgent: true, expert: true, expertTag: "투자", matchTags: ["Finance/Investment"], ageRange: [25,55], jobMatch: ["Professional (doctor/lawyer/accountant)", "Corporate employee (large/mid-size)"],
+    description: "초기 스타트업 투자 의사결정 프레임워크와 실사 과정을 연구하고 있어요. 실제 투자 사례, 거절 기준, 팀·시장·기술 가중치 부여 방식에 대한 인사이트를 구해요.",
+    targetProfile: { age: "25~55세", gender: "무관", region: "전국 (서울·판교 중심)", lifestyle: "VC·CVC·액셀러레이터 심사역 또는 직접 투자를 1건 이상 집행한 엔젤투자자", exclude: "창업자·스타트업 대표 제외" } },
+  { id: 9, title: "법률 SaaS 사용성 검토", company: "리걸테크 I사", duration: "약 20분", reward: "₩210,000", conditions: ["변호사·법무사·법률 담당자", "기업 법무 경험자"], deadline: "2026.04.28", filled: 11, total: 40, category: "Expert", urgent: false, expert: true, expertTag: "법률", matchTags: ["Legal/Tax"], ageRange: [25,55], jobMatch: ["Professional (doctor/lawyer/accountant)"],
+    description: "계약 검토·법률 리서치 SaaS의 기업 법무 적용 가능성을 검토하고 있어요. 현재 법률 문서 업무 방식, AI 도구 도입 장벽, 가격 기준에 대한 전문 의견을 구해요.",
+    targetProfile: { age: "25~55세", gender: "무관", region: "전국", lifestyle: "계약서·법률 문서 업무가 주된 현직 변호사·법무사·기업 법무팀 구성원", exclude: "법률 IT 솔루션 개발·영업 담당자 제외" } },
+  { id: 10, title: "B2B SaaS 도입 의사결정 인터뷰", company: "엔터프라이즈 J사", duration: "약 20분", reward: "₩110,000", conditions: ["IT 구매 담당자·CTO·관리자급 이상", "소프트웨어 도입 주도 경험자"], deadline: "2026.05.02", filled: 29, total: 100, category: "Expert", urgent: false, expert: true, expertTag: "엔터프라이즈 IT", matchTags: ["Tech/IT"], ageRange: [30,55], jobMatch: ["Corporate employee (large/mid-size)", "Corporate employee (small/medium)"],
+    description: "기업의 SaaS 도입 의사결정 과정과 평가 기준을 연구하고 있어요. RFP부터 벤더 비교·계약까지의 결정 흐름, 내부 승인 구조, 도입 후 ROI 측정 방식을 탐색해요.",
+    targetProfile: { age: "30~55세", gender: "무관", region: "전국 (수도권 선호)", lifestyle: "임직원 50인 이상 기업의 IT 구매 담당자·CTO 또는 SaaS/소프트웨어 도입을 직접 결정하거나 강하게 영향을 미친 관리자급 이상", exclude: "SaaS 벤더·IT 솔루션 영업 담당자 제외" } },
+];
+
 // Panelist user profile (demo) — in production, fetched from Supabase
 export const MOCK_PANEL_PROFILE = {
   age: "30s",
