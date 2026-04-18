@@ -96,8 +96,8 @@ const TRANSLATIONS = {
       liveCounter: (n) => <><strong style={{ fontWeight: 600, color: C.purple }}>지금 {n}명</strong>이 인터뷰 중입니다</>,
     },
     stats: {
-      label: "지금 이 순간",
-      title: "지금도 인터뷰가 진행되고 있어요",
+      label: "Live",
+      title: "어딘가에서 지금 이 순간도 인터뷰가 이어지고 있어요",
       items: [
         { end: 12400, suffix: "+", label: "등록된 패널리스트" },
         { end: 4200, suffix: "", label: "이번 달 완료된 인터뷰" },
