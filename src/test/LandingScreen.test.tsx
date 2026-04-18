@@ -23,12 +23,12 @@ const renderLanding = async () => {
 describe('LandingScreen', () => {
   it('shows updated badge copy', async () => {
     await renderLanding();
-    const badges = screen.getAllByText(/AI가 인터뷰하고, AI가 분석합니다/);
+    const badges = screen.getAllByText(/AI interviews\. AI analyzes\. You decide\./);
     expect(badges.length).toBeGreaterThan(0);
   });
 
   it('does not show old badge copy', async () => {
     await renderLanding();
-    expect(screen.queryByText(/AI 보이스 인터뷰 플랫폼/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/AI가 인터뷰하고, AI가 분석합니다/)).not.toBeInTheDocument();
   });
 });
