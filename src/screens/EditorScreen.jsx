@@ -425,19 +425,22 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const NavBar = (
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
       <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        {logout && <Btn variant="ghost" size="sm" onClick={logout} style={{ fontSize: 12, color: C.body }}>로그아웃</Btn>}
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        {/* Status — subtle, leftmost */}
         {editingId && hasUnsaved && (
-          <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#f59e0b", fontWeight: 500 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
+          <span style={{ fontSize: 11, color: "#f59e0b", fontWeight: 500, display: "flex", alignItems: "center", gap: 3 }}>
+            <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
             저장 안 됨
           </span>
         )}
         {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시 저장됨 ✓</span>}
-        <span style={{ fontSize: 11, color: questions.length >= 10 ? C.success : "rgba(180,120,0,0.85)", fontWeight: 500 }}>
-          {questions.length}개 질문{questions.length < 10 ? ` / 10개 권장` : ` ✓`}
+        {/* Question count pill */}
+        <span style={{ fontSize: 11, fontWeight: 500, padding: "3px 8px", borderRadius: 20, background: questions.length >= 10 ? "rgba(30,142,62,0.1)" : "rgba(180,120,0,0.08)", color: questions.length >= 10 ? C.successText : "rgba(140,90,0,0.9)" }}>
+          {questions.length}/10
         </span>
-        <Btn size="sm" onClick={() => setShowAiModal(true)} style={{ background: "linear-gradient(135deg,#533afd,#f96bee)", border: "none", color: C.white, fontWeight: 600 }}>✦ AI 초안</Btn>
+        {/* Divider */}
+        <div style={{ width: 1, height: 16, background: C.border, margin: "0 2px" }} />
+        {/* Tools */}
         <div style={{ position: "relative" }}>
           <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>템플릿</Btn>
           {templateOpen && (
@@ -453,6 +456,10 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             </div>
           )}
         </div>
+        <Btn size="sm" onClick={() => setShowAiModal(true)} style={{ background: "linear-gradient(135deg,#533afd,#f96bee)", border: "none", color: C.white, fontWeight: 600 }}>✦ AI 초안</Btn>
+        {/* Divider */}
+        <div style={{ width: 1, height: 16, background: C.border, margin: "0 2px" }} />
+        {/* Primary CTA */}
         {shareCode && (
           <Btn variant="ghost" size="sm" onClick={handleCopy}>
             {copied ? "복사됨 ✓" : "링크 복사"}
@@ -462,7 +469,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           onMouseEnter={() => setShowSaveTooltip(true)}
           onMouseLeave={() => setShowSaveTooltip(false)}>
           <Btn size="sm" onClick={handleSave} disabled={saving}>
-            {saving ? "저장 중…" : editingId ? "저장" : "링크 생성 →"}
+            {saving ? "저장 중…" : editingId ? "저장하기" : "링크 생성 →"}
           </Btn>
           {showSaveTooltip && (
             <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: C.navy, color: C.white, fontSize: 11, padding: "4px 8px", borderRadius: 6, whiteSpace: "nowrap", zIndex: 200, pointerEvents: "none" }}>
@@ -470,6 +477,10 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             </div>
           )}
         </div>
+        {/* Logout — utility, rightmost, minimal */}
+        {logout && (
+          <button onClick={logout} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 11, color: C.body, fontFamily: F, padding: "4px 6px", opacity: 0.6 }}>로그아웃</button>
+        )}
       </div>
     </div>
   );
