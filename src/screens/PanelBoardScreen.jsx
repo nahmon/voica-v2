@@ -90,7 +90,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
           </div>
 
           <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 700, color: "#fff", margin: "0 0 8px", lineHeight: 1.25 }}>
-            {isKo ? "의견을 나누고, 리워드를 받아요." : "Share your voice. Earn rewards."}
+            {isKo ? "인터뷰에 참여하고, 리워드를 받아보세요" : "Share your voice. Earn rewards."}
           </h1>
           <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", margin: "0 0 24px" }}>
             {isKo ? "내 프로필에 딱 맞는 AI 인터뷰에 참여해 보세요." : "Join AI-powered interviews matched to your profile."}
