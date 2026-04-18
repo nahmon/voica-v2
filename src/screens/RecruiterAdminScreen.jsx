@@ -58,7 +58,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
         </div>
       </div>
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px" }}>
+      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px", flex: 1, width: "100%" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 28 }}>
           {[
             { label: "Total applicants", value: PANEL_APPLICANTS.length, color: C.navy },

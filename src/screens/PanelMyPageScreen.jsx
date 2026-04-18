@@ -102,7 +102,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
       <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
 
-      <div style={{ maxWidth: 640, margin: "0 auto", padding: isMobile ? "20px 16px 48px" : "28px 24px 48px" }}>
+      <div style={{ maxWidth: 640, margin: "0 auto", padding: isMobile ? "20px 16px 48px" : "28px 24px 48px", flex: 1, width: "100%" }}>
 
         {/* ── Rewards Card ── */}
         <div style={{ background: "linear-gradient(135deg, #0a1628 0%, #1a2a4a 100%)", borderRadius: 16, padding: "24px", marginBottom: 16, color: C.white, position: "relative", overflow: "hidden" }}>

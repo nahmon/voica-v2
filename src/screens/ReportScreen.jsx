@@ -162,8 +162,8 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   })();
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: dk.bg, fontFamily: F }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
+    <div style={{ minHeight: "100vh", background: dk.bg, fontFamily: F, display: "flex", flexDirection: "column" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px", flex: 1, width: "100%" }}>
         <Skeleton width={220} height={28} borderRadius={8} style={{ marginBottom: 8 }} />
         <Skeleton width={160} height={16} borderRadius={6} style={{ marginBottom: 32 }} />
         <div style={{ background: dk.card, borderRadius: 16, padding: "28px 24px" }}>
@@ -260,7 +260,7 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
         </div>
       )}
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "16px" : "28px 24px", display: "flex", flexDirection: isMobile ? "column" : "row", gap: 24, alignItems: "flex-start" }}>
+      <main style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "16px" : "28px 24px", display: "flex", flexDirection: isMobile ? "column" : "row", gap: 24, alignItems: "flex-start", flex: 1, width: "100%" }}>
 
         {/* Sticky sidebar (desktop) */}
         {hasReport && !isMobile && (
