@@ -99,7 +99,7 @@ export default function SupportScreen({ go, user, logout }) {
                   onFocus={e => e.target.style.borderColor = C.purple}
                   onBlur={e => e.target.style.borderColor = C.border}
                 />
-                <div style={{ fontSize: 11, color: C.body, marginTop: 4, textAlign: "right" }}>{body.length} chars</div>
+                <div style={{ fontSize: 11, color: C.body, marginTop: 4, textAlign: "right" }}>{body.length} {isKo ? "자" : "chars"}</div>
               </div>
             </div>
 
@@ -110,7 +110,7 @@ export default function SupportScreen({ go, user, logout }) {
             </Btn>
 
             <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 12, lineHeight: 1.6 }}>
-              Or email us directly: <a href="mailto:voica.support@gmail.com" style={{ color: C.purple }}>voica.support@gmail.com</a>
+              {isKo ? "직접 이메일로도 문의하실 수 있어요:" : "Or email us directly:"} <a href="mailto:voica.support@gmail.com" style={{ color: C.purple }}>voica.support@gmail.com</a>
             </div>
           </div>
         </div>

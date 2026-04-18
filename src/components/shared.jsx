@@ -723,7 +723,7 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
 // ─── Footer — shared across all pages ───
 export function Footer({ go, lang = "en", onLangChange, tagline }) {
   const isMobile = useIsMobile();
-  const displayTagline = tagline || (lang === "ko" ? "AI 인터뷰. AI 분석." : "AI interviews. AI analyzes.");
+  const displayTagline = tagline || (lang === "ko" ? "AI가 인터뷰하고, AI가 분석해요." : "AI interviews. AI analyzes.");
   const navLinks = lang === "ko"
     ? [["소개", "about"], ["요금제", "pricing"], ["패널 보드", "panel_board"], ["지원", "support"], ["개인정보처리방침", "privacy"], ["이용약관", "terms"]]
     : [["About", "about"], ["Pricing", "pricing"], ["Panelist Board", "panel_board"], ["Support", "support"], ["Privacy Policy", "privacy"], ["Terms of Service", "terms"]];
