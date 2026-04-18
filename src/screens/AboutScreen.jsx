@@ -44,18 +44,17 @@ export default function AboutScreen({ go, user, logout }) {
           </p>
         </section>
 
-        {/* CTA + Legal links */}
+        {/* CTA */}
         <section style={{ background: C.white, borderRadius: 16, border: `1px solid ${C.border}`, padding: isMobile ? "28px 20px" : "40px 48px", textAlign: "center" }}>
           <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 10 }}>
-            {isKo ? "같이 만들어요" : "Let's build together"}
+            {isKo ? "함께 만들어가요" : "Join the team"}
           </div>
-          <div style={{ fontSize: 14, color: C.body, marginBottom: 28, lineHeight: 1.7 }}>
-            {isKo ? <>첫 인터뷰는 무료로 시작할 수 있어요. 카드 정보 없이도 돼요.<br />패널이라면 지금 바로 인터뷰 보드를 둘러보세요.</> : <>Your first interview is free — no credit card needed.<br />If you're a panelist, browse the interview board now.</>}
+          <div style={{ fontSize: 14, color: C.body, marginBottom: 24, lineHeight: 1.7 }}>
+            {isKo ? "Voice Survey와 함께 리서치의 미래를 만들어갈 분을 찾고 있어요." : "We're looking for people to help shape the future of research."}
           </div>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-            <Btn onClick={() => go("advertiser_login")}>{isKo ? "리서처로 시작하기" : "Start as researcher"}</Btn>
-            <Btn variant="ghost" onClick={() => go("panel_board")}>{isKo ? "인터뷰 보드 보기" : "Browse panel board"}</Btn>
-          </div>
+          <a href="mailto:20morn@gmail.com" style={{ textDecoration: "none" }}>
+            <Btn>{isKo ? "팀에 합류하고 싶어요 →" : "Join our team →"}</Btn>
+          </a>
           <div style={{ marginTop: 28, paddingTop: 20, borderTop: `1px solid ${C.border}`, display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
             {(isKo
               ? [["이용약관", "terms"], ["개인정보처리방침", "privacy"], ["자주 묻는 질문", "faq"], ["고객지원", "support"]]
