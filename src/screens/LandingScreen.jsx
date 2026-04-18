@@ -130,7 +130,7 @@ const TRANSLATIONS = {
       title: "무료로 시작하세요",
       subtitleDesktop: <>신용카드 없이 바로 시작할 수 있어요.<br />첫 번째 인터뷰 프로젝트는 완전 무료예요.</>,
       subtitleMobile: "신용카드 불필요.",
-      cta1: "연구자로 시작하기 →",
+      cta1: "리서치 시작하기 →",
       cta2: "패널리스트로 참여",
     },
   },
