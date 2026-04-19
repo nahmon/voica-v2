@@ -433,6 +433,7 @@ function BeforeAfterSection({ isMobile, t }) {
 /* ── Use cases section ── */
 function UseCasesSection({ isMobile, t }) {
   const { label, title, subtitle, items } = t.useCases;
+  const [hoveredIdx, setHoveredIdx] = useState(null);
   return (
     <section style={{ padding: isMobile ? "60px 20px" : "80px 24px", background: "#fff" }}>
       <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
@@ -442,12 +443,18 @@ function UseCasesSection({ isMobile, t }) {
           <p style={{ fontSize: 15, color: C.body, margin: "0 auto", maxWidth: 600 }}>{subtitle}</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr", gap: isMobile ? "2px 4px" : "2px 8px" }}>
-          {items.map((item, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 12px" }}>
-              {Ic[item.icon] && Ic[item.icon]({ s: 15, c: C.body })}
-              <span style={{ fontSize: 14, color: C.body }}>{item.label}</span>
-            </div>
-          ))}
+          {items.map((item, i) => {
+            const hovered = hoveredIdx === i;
+            return (
+              <div key={i}
+                onMouseEnter={() => setHoveredIdx(i)}
+                onMouseLeave={() => setHoveredIdx(null)}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 12px", transition: "all 0.08s ease-out", cursor: "default" }}>
+                {Ic[item.icon] && Ic[item.icon]({ s: 15, c: hovered ? C.purple : C.body })}
+                <span style={{ fontSize: 14, color: hovered ? C.navy : C.body, transition: "color 0.08s ease-out" }}>{item.label}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
