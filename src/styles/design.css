@@ -114,3 +114,14 @@ a:focus-visible,
   opacity: 1;
   transform: none;
 }
+
+/* Dashboard interview card hover lift (Stripe pattern) */
+.dash-card {
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+@media (hover: hover) {
+  .dash-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(110,75,255,0.12);
+  }
+}

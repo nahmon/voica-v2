@@ -372,7 +372,7 @@ function BeforeAfterSection({ isMobile, t }) {
           {/* header */}
           <div style={{ marginBottom: 40 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(160,140,255,0.7)", marginBottom: 10 }}>{label}</div>
-            <h2 style={{ fontSize: isMobile ? 24 : 36, fontWeight: 700, color: "#fff", margin: "0 0 10px", fontFamily: F }}>
+            <h2 style={{ fontSize: isMobile ? 24 : 36, fontWeight: 700, color: "#fff", margin: "0 0 10px", fontFamily: F, letterSpacing: "-0.02em" }}>
               {title(C.purpleLight)}
             </h2>
             <p style={{ fontSize: 15, color: "rgba(200,190,255,0.6)", margin: 0 }}>{subtitle}</p>
@@ -432,7 +432,7 @@ function UseCasesSection({ isMobile, t }) {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ marginBottom: 36, textAlign: "center" }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 10 }}>{label}</div>
-          <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, margin: "0 auto 10px", fontFamily: F, maxWidth: 700 }}>{title}</h2>
+          <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, margin: "0 auto 10px", fontFamily: F, maxWidth: 700, letterSpacing: "-0.02em" }}>{title}</h2>
           <p style={{ fontSize: 15, color: C.body, margin: "0 auto", maxWidth: 600 }}>{subtitle}</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 2 : "2px 48px" }}>
@@ -476,7 +476,7 @@ function FinalCtaSection({ go, isMobile, t }) {
           <Badge variant="purple" style={{ marginBottom: 20, background: "rgba(255,255,255,0.12)", color: C.white, border: "1px solid rgba(255,255,255,0.2)" }}>
             {badgeText}
           </Badge>
-          <h2 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 700, color: C.white, margin: "0 0 16px", fontFamily: F, lineHeight: 1.15 }}>
+          <h2 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 700, color: C.white, margin: "0 0 16px", fontFamily: F, lineHeight: 1.15, letterSpacing: "-0.02em" }}>
             {title}
           </h2>
           <p style={{ fontSize: isMobile ? 15 : 17, color: "rgba(255,255,255,0.72)", margin: "0 0 44px", lineHeight: 1.6 }}>
@@ -577,7 +577,7 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
 
             <h1 style={{
               fontSize: isMobile ? 32 : 52, fontWeight: 700, lineHeight: 1.2, margin: "0 0 20px",
-              fontFamily: F, wordBreak: "keep-all",
+              fontFamily: F, wordBreak: "keep-all", letterSpacing: "-0.02em",
               minHeight: isMobile ? 120 : 260, overflow: "hidden",
               opacity: heroVisible ? 1 : 0,
               transition: "opacity 0.4s ease",

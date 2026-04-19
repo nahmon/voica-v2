@@ -82,7 +82,7 @@ export function Btn({ children, variant = "primary", size = "md", onClick, disab
   const [hov, setHov] = useState(false);
   const sz = { sm: { padding: "5px 14px", fontSize: 13 }, md: { padding: "9px 20px", fontSize: 15 }, lg: { padding: "13px 32px", fontSize: 16 } };
   const vr = {
-    primary: { background: disabled ? "#a09de8" : hov ? C.purpleHover : C.purple, color: C.white, border: "none" },
+    primary: { background: disabled ? "#a09de8" : hov ? C.purpleHover : C.purple, color: C.white, border: "none", transform: !disabled && hov ? "translateY(-1px)" : "translateY(0)", boxShadow: !disabled && hov ? "0 6px 20px rgba(110,75,255,0.35)" : "none" },
     ghost: { background: hov ? C.purpleBg : "transparent", color: C.purple, border: `1px solid ${C.purpleLight}` },
     dark: { background: hov ? "#2a2d6a" : C.brandDark, color: C.white, border: "none" },
     white: { background: hov ? "rgba(255,255,255,0.9)" : C.white, color: C.navy, border: "none" },
