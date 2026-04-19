@@ -63,7 +63,7 @@ const TRANSLATIONS = {
       ],
       rows: [
         { label: "Timeline", before: "~2 weeks", after: "10 minutes to launch" },
-        { label: "Cost", before: "$2,000+", after: "$49~/project" },
+        { label: "Cost", before: "$2,000+/project", after: "$149~/mo" },
         { label: "Sample", before: "10 participants", after: "500 parallel" },
         { label: "Analysis", before: "Manual transcription", after: "Automated, by-theme" },
         { label: "Recruiting", before: "Agency dependent", after: "Matched in-platform" },
@@ -116,7 +116,7 @@ const TRANSLATIONS = {
       ],
       rows: [
         { label: "기간", before: "약 2주", after: "10분 안에 시작" },
-        { label: "비용", before: "₩2,600,000+", after: "₩65,000~/프로젝트" },
+        { label: "비용", before: "₩2,600,000+/프로젝트", after: "₩199,000~/월" },
         { label: "표본", before: "10명", after: "500명 동시" },
         { label: "분석", before: "직접 전사", after: "자동화, 주제별" },
         { label: "모집", before: "대행사 의존", after: "플랫폼 내 매칭" },
