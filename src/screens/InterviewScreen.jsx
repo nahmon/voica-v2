@@ -570,43 +570,46 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Warmup ───
   if (introStep === "warmup") return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
-      <div style={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 20, letterSpacing: 0.3 }}>Mic check</div>
-        <div style={{ fontSize: isMobile ? 18 : 20, fontWeight: 600, color: C.white, marginBottom: 8 }}>Can you hear yourself clearly?</div>
-        <div style={{ fontSize: isMobile ? 13 : 14, color: "rgba(255,255,255,0.5)", marginBottom: 32, lineHeight: 1.7 }}>
-          Say a few words and play it back<br />to make sure your mic is working.
+    <div style={{ minHeight: "100vh", background: "#111827", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
+      <div style={{ width: "100%", maxWidth: 420, textAlign: "center" }}>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 28, fontWeight: 500 }}>Step 1 / 2 · Mic Check</div>
+        <div style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: "#fff", marginBottom: 10, lineHeight: 1.2 }}>Can you hear yourself clearly?</div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.45)", marginBottom: 48, lineHeight: 1.6 }}>
+          Speak for three seconds and play it back.
         </div>
 
         {warmupPhase === "idle" && (
-          <button onClick={startWarmup}
-            style={{ width: 72, height: 72, borderRadius: "50%", border: "none", cursor: "pointer", background: C.purple, boxShadow: "0 0 0 8px rgba(83,58,253,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-            {Ic.Mic({ s: 28, c: "white" })}
-          </button>
+          <>
+            <button onClick={startWarmup}
+              style={{ width: 128, height: 128, borderRadius: "50%", border: "none", cursor: "pointer", background: C.purple, boxShadow: "0 0 0 12px rgba(83,58,253,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+              {Ic.Mic({ s: 40, c: "white" })}
+            </button>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 48 }}>Tap mic to start</div>
+          </>
         )}
 
         {warmupPhase === "recording" && (
           <>
             <button onClick={stopWarmup}
-              style={{ width: 72, height: 72, borderRadius: "50%", border: "none", cursor: "pointer", background: C.ruby, boxShadow: "0 0 0 8px rgba(217,48,37,0.2),0 0 0 16px rgba(217,48,37,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-              {Ic.Stop({ s: 24, c: "white" })}
+              style={{ width: 128, height: 128, borderRadius: "50%", border: "none", cursor: "pointer", background: C.ruby, boxShadow: "0 0 0 12px rgba(217,48,37,0.15),0 0 0 24px rgba(217,48,37,0.07)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", animation: "rec-pulse 1.2s ease-in-out infinite" }}>
+              {Ic.Stop({ s: 36, c: "white" })}
             </button>
-            <div style={{ fontSize: 12, color: "rgba(217,48,37,0.9)" }}>Recording... tap to stop</div>
+            <div style={{ fontSize: 12, color: "rgba(217,48,37,0.8)", marginBottom: 48 }}>Recording... tap to stop</div>
           </>
         )}
 
         {warmupPhase === "done" && warmupPlayUrl && (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginBottom: 8 }}>
-            <audio controls src={warmupPlayUrl} style={{ width: "100%", maxWidth: 300, borderRadius: 8 }} />
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, marginBottom: 48 }}>
+            <audio controls src={warmupPlayUrl} style={{ width: "100%", maxWidth: 320, borderRadius: 10 }} />
             <button onClick={() => { setWarmupPhase("idle"); setWarmupPlayUrl(null); setWarmupBlob(null); }}
-              style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", background: "none", border: "none", cursor: "pointer", fontFamily: F, textDecoration: "underline" }}>
+              style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer", fontFamily: F, textDecoration: "underline" }}>
               Test again
             </button>
           </div>
         )}
 
         {recordingWarning && (
-          <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,200,50,0.08)", border: "1px solid rgba(255,200,50,0.2)", fontSize: 12, color: "rgba(255,200,50,0.9)", textAlign: "left" }}>
+          <div style={{ marginBottom: 20, padding: "12px 16px", borderRadius: 10, background: "rgba(255,200,50,0.07)", border: "1px solid rgba(255,200,50,0.2)", fontSize: 13, color: "rgba(255,200,50,0.85)", textAlign: "left" }}>
             {recordingWarning}
           </div>
         )}
@@ -614,8 +617,8 @@ export default function InterviewScreen({ go, shareCode }) {
         <button
           onClick={() => { setIntroStep("started"); }}
           disabled={warmupPhase === "recording"}
-          style={{ marginTop: 24, width: "100%", padding: "14px", borderRadius: 10, border: "none", background: warmupPhase === "recording" ? "rgba(255,255,255,0.1)" : `linear-gradient(135deg,${C.purple},${C.purpleDeep})`, color: C.white, fontSize: 15, fontWeight: 500, fontFamily: F, cursor: warmupPhase === "recording" ? "not-allowed" : "pointer", opacity: warmupPhase === "recording" ? 0.5 : 1 }}>
-          {warmupPhase === "done" ? (isMobile ? "Looks good — Start →" : "Mic confirmed — Start interview →") : (isMobile ? "Skip mic test →" : "Skip mic test and start →")}
+          style={{ width: "100%", padding: "16px", borderRadius: 12, border: "none", background: warmupPhase === "recording" ? "rgba(255,255,255,0.08)" : C.purple, color: "#fff", fontSize: 16, fontWeight: 600, fontFamily: F, cursor: warmupPhase === "recording" ? "not-allowed" : "pointer", opacity: warmupPhase === "recording" ? 0.5 : 1 }}>
+          {warmupPhase === "done" ? "Mic confirmed — Start interview →" : "Skip mic check →"}
         </button>
       </div>
     </div>
@@ -623,68 +626,77 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Intro / Info ───
   if (introStep === "info") return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124 0%,#292a2d 50%,#202124 100%)", display: "flex", alignItems: "flex-start", justifyContent: "center", fontFamily: F, padding: "40px 24px 40px", overflowY: "auto" }}>
-      <div style={{ width: "100%", maxWidth: 440 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
-          <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
-          <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", fontWeight: 400 }}>{isMobile ? "AI Interview" : "Voice Survey AI Interview"}</span>
+    <div style={{ minHeight: "100vh", background: "#111827", display: "flex", alignItems: "flex-start", justifyContent: "center", fontFamily: F, padding: "48px 24px 48px", overflowY: "auto" }}>
+      <div style={{ width: "100%", maxWidth: 576 }}>
+        {/* Logo row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 36 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: "#3b5bdb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <svg width="16" height="14" viewBox="0 0 16 14" fill="none"><rect x="0" y="4" width="4" height="10" fill="white" rx="1"/><rect x="6" y="0" width="4" height="14" fill="white" rx="1"/><rect x="12" y="6" width="4" height="8" fill="white" rx="1"/></svg>
+          </div>
+          <span style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", fontWeight: 400 }}>voicesurvey · AI interview</span>
         </div>
-        <div style={{ fontSize: isMobile ? 19 : 22, fontWeight: 500, color: C.white, marginBottom: 8, lineHeight: 1.3 }}>{interview.title}</div>
-        {interview.description && <div style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", marginBottom: 16, lineHeight: 1.6 }}>{interview.description}</div>}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>{interview.questions.length} questions · includes voice responses</span>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", display: "flex", alignItems: "center", gap: 5 }}>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="1.4" strokeLinecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v2.5l1.5 1.5"/></svg>
-            Estimated time {fmtMinutes(estimateDuration(interview.questions))}
-          </span>
+        {/* Session code */}
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10, fontWeight: 500 }}>Session · {(shareCode || "").toUpperCase()}</div>
+        {/* Title */}
+        <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: "#fff", marginBottom: 10, lineHeight: 1.25 }}>{interview.title}</div>
+        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 28, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span>{interview.questions.length} questions · voice responses</span>
+          <span>·</span>
+          <span>≈ {Math.ceil(estimateDuration(interview.questions) / 60)} min</span>
         </div>
+        {interview.description && <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 20, lineHeight: 1.65 }}>{interview.description}</div>}
         {interview.incentive && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 8, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.25)", marginBottom: 20 }}>
-            <span style={{ fontSize: 16 }}>🎁</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(21,190,83,0.08)", border: "1px solid rgba(21,190,83,0.2)", marginBottom: 20 }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>🎁</span>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(21,190,83,0.9)" }}>Participation reward</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", marginTop: 1 }}>{interview.incentive}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(21,190,83,0.85)" }}>Participation reward</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>{interview.incentive}</div>
             </div>
           </div>
         )}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+        <div style={{ height: 1, background: "rgba(255,255,255,0.06)", marginBottom: 28 }} />
+        {/* Form fields */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 24 }}>
           {[
-            { key: "name", label: "Nickname", placeholder: "e.g. coffee-lover", required: true },
-            { key: "age", label: "Age (optional)", placeholder: "e.g. 29", inputMode: "numeric" },
+            { key: "name", label: "Nickname", sub: "required", placeholder: "e.g. coffee-saving-desk", required: true },
+            { key: "age", label: "Age", sub: "optional", placeholder: "e.g. 29", inputMode: "numeric" },
           ].map(f => (
             <div key={f.key}>
-              <label style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>
-                {f.label}{f.required && <span style={{ color: C.magenta, marginLeft: 3 }}>*</span>}
-              </label>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 6 }}>
+                <label style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>{f.label}</label>
+                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>· {f.sub}</span>
+              </div>
               <input value={respondent[f.key]} onChange={e => setRespondent(r => ({ ...r, [f.key]: e.target.value }))} onBlur={() => { if (f.key === "name") setNameTouched(true); }} placeholder={f.placeholder} inputMode={f.inputMode}
-                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${f.required && nameTouched && !respondent[f.key].trim() ? "rgba(255,80,80,0.3)" : "rgba(255,255,255,0.12)"}`, background: "rgba(255,255,255,0.06)", fontSize: 16, fontFamily: F, color: C.white, outline: "none", boxSizing: "border-box" }} />
+                style={{ width: "100%", padding: "13px 16px", borderRadius: 10, border: `1px solid ${f.required && nameTouched && !respondent[f.key].trim() ? "rgba(255,80,80,0.4)" : "rgba(255,255,255,0.08)"}`, background: "rgba(255,255,255,0.04)", fontSize: 15, fontFamily: F, color: "#fff", outline: "none", boxSizing: "border-box" }} />
             </div>
           ))}
           <div>
-            <label style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Gender (optional)</label>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 6 }}>
+              <label style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>Gender</label>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>· optional</span>
+            </div>
             <div style={{ display: "flex", gap: 8 }}>
               {["Male", "Female", "Other"].map(g => (
                 <button key={g} onClick={() => setRespondent(r => ({ ...r, gender: g }))}
-                  style={{ flex: 1, padding: "8px", borderRadius: 8, border: `1px solid ${respondent.gender === g ? C.purple : "rgba(255,255,255,0.12)"}`, background: respondent.gender === g ? "rgba(83,58,253,0.2)" : "transparent", color: respondent.gender === g ? C.purpleLight : "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer", fontFamily: F }}>
+                  style={{ flex: 1, padding: "11px 8px", borderRadius: 10, border: `1px solid ${respondent.gender === g ? C.purple : "rgba(255,255,255,0.08)"}`, background: respondent.gender === g ? "rgba(83,58,253,0.18)" : "rgba(255,255,255,0.04)", color: respondent.gender === g ? "#fff" : "rgba(255,255,255,0.45)", fontSize: 13, cursor: "pointer", fontFamily: F, fontWeight: respondent.gender === g ? 500 : 400 }}>
                   {g}
                 </button>
               ))}
             </div>
           </div>
         </div>
-        {/* Sound notice */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(255,200,50,0.14)", border: "1px solid rgba(255,200,50,0.5)", marginBottom: 20, boxShadow: "0 0 12px rgba(255,200,50,0.08)" }}>
-          <span style={{ fontSize: 20, flexShrink: 0 }}>🔊</span>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,210,60,1.0)" }}>Please turn on your sound</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>{isMobile ? "The AI will read questions aloud. Headphones recommended." : "The AI interviewer will read questions aloud. We recommend using headphones."}</div>
+        {/* Audio notice */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 24 }}>
+          <span style={{ fontSize: 18, flexShrink: 0 }}>🎙️</span>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>
+            <span style={{ fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>Turn your audio on.</span> The interviewer reads each question aloud. Headphones recommended.
           </div>
         </div>
         {nameTouched && !respondent.name.trim() && <div style={{ fontSize: 12, color: "rgba(255,100,100,0.7)", marginBottom: 10 }}>Please enter a nickname</div>}
-        <button onClick={startSession} disabled={!respondent.name.trim() || starting} style={{ width: "100%", padding: "14px", borderRadius: 10, border: "none", background: respondent.name.trim() ? `linear-gradient(135deg,${C.purple},${C.purpleDeep})` : "rgba(255,255,255,0.1)", color: C.white, fontSize: 15, fontWeight: 500, fontFamily: F, cursor: respondent.name.trim() ? "pointer" : "not-allowed", opacity: respondent.name.trim() ? 1 : 0.45 }}>
+        <button onClick={startSession} disabled={!respondent.name.trim() || starting} style={{ width: "100%", padding: "16px", borderRadius: 12, border: "none", background: respondent.name.trim() ? C.purple : "rgba(255,255,255,0.08)", color: "#fff", fontSize: 16, fontWeight: 600, fontFamily: F, cursor: respondent.name.trim() ? "pointer" : "not-allowed", opacity: respondent.name.trim() ? 1 : 0.4 }}>
           Start interview →
         </button>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", textAlign: "center", marginTop: 14 }}>Your responses are encrypted and stored securely</div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", textAlign: "center", marginTop: 16, fontFamily: "monospace", letterSpacing: "0.05em" }}>answers are encrypted end-to-end</div>
       </div>
     </div>
   );
@@ -710,7 +722,7 @@ export default function InterviewScreen({ go, shareCode }) {
   }));
 
   if (completed) return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d,#202124)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, fontFamily: F, position: "relative", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "#111827", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, fontFamily: F, position: "relative", overflow: "hidden" }}>
       <style>{INTERVIEW_STYLES}</style>
 
       {/* Confetti dots */}
@@ -790,7 +802,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Main interview (chat UI) ───
   return (
-    <div style={{ height: "100dvh", minHeight: "100vh", background: "linear-gradient(145deg,#202124 0%,#292a2d 45%,#303134 80%,#202124 100%)", display: "flex", flexDirection: "column", fontFamily: F, position: "relative", overflow: "hidden" }}>
+    <div style={{ height: "100dvh", minHeight: "100vh", background: "#111827", display: "flex", flexDirection: "column", fontFamily: F, position: "relative", overflow: "hidden" }}>
       <style>{INTERVIEW_STYLES}</style>
 
       {showExitConfirm && (
@@ -859,7 +871,9 @@ export default function InterviewScreen({ go, shareCode }) {
             <div key={i} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {/* AI question bubble */}
               <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <div style={{ width: 26, height: 26, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, flexShrink: 0, marginTop: 2 }}>✦</div>
+                <div style={{ width: 28, height: 28, borderRadius: 7, background: "#3b5bdb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
+                  <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><rect x="0" y="3" width="3" height="7" fill="white" rx="0.8"/><rect x="4.5" y="0" width="3" height="10" fill="white" rx="0.8"/><rect x="9" y="4" width="3" height="6" fill="white" rx="0.8"/></svg>
+                </div>
                 <div style={{ maxWidth: "78%", background: "rgba(255,255,255,0.12)", borderRadius: "4px 16px 16px 16px", padding: "10px 14px" }}>
                   <p style={{ margin: 0, fontSize: isMobile ? 13 : 14, color: "rgba(255,255,255,0.75)", lineHeight: 1.6 }}>{chat.qText}</p>
                 </div>
@@ -882,12 +896,14 @@ export default function InterviewScreen({ go, shareCode }) {
       </div>
 
       {/* Sticky bottom panel — current question + controls */}
-      <div style={{ flexShrink: 0, position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.07)", background: "#1c1d20", padding: isMobile ? "16px 16px calc(28px + env(safe-area-inset-bottom,0px))" : "20px 32px calc(28px + env(safe-area-inset-bottom,0px))" }}>
+      <div style={{ flexShrink: 0, position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.07)", background: "#141d2e", padding: isMobile ? "16px 16px calc(28px + env(safe-area-inset-bottom,0px))" : "20px 32px calc(28px + env(safe-area-inset-bottom,0px))" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
 
           {/* AI avatar row + current question */}
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14 }}>
-            <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0, boxShadow: phase === "ai_speaking" ? `0 0 14px rgba(83,58,253,0.6)` : "none", transition: "box-shadow 0.4s" }}>✦</div>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: "#3b5bdb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: phase === "ai_speaking" ? "0 0 14px rgba(59,91,219,0.5)" : "none", transition: "box-shadow 0.4s" }}>
+              <svg width="14" height="12" viewBox="0 0 14 12" fill="none"><rect x="0" y="3" width="3.5" height="9" fill="white" rx="1"/><rect x="5.25" y="0" width="3.5" height="12" fill="white" rx="1"/><rect x="10.5" y="5" width="3.5" height="7" fill="white" rx="1"/></svg>
+            </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 11, color: C.purpleLight, marginBottom: 5, display: "flex", alignItems: "center", gap: 6 }}>
                 {phase === "ai_speaking" ? <WaveAnimation active /> : <span style={{ color: "rgba(255,255,255,0.3)" }}>AI Interviewer</span>}

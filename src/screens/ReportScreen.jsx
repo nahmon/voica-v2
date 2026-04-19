@@ -107,9 +107,9 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   const completedSessions = sessions.filter(s => s.status === "completed");
 
   const dk = {
-    bg: "#0b0f1c", card: "#141927", card2: "#1a2035",
-    border: "rgba(255,255,255,0.07)", text: "#e8eaf4",
-    muted: "rgba(180,185,215,0.65)", label: "rgba(160,165,200,0.8)",
+    bg: "#111827", card: "#1a2236", card2: "#1e2947",
+    border: "rgba(255,255,255,0.07)", text: "#e2e8f0",
+    muted: "rgba(255,255,255,0.5)", dim: "rgba(255,255,255,0.3)", label: "rgba(160,165,200,0.8)",
   };
 
   // Compute key metrics
@@ -523,13 +523,13 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
 
 function MetricCard({ label, value, icon }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "#1a2035", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)", minWidth: 120 }}>
-      <div style={{ width: 32, height: 32, borderRadius: 8, background: "#141927", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "#1e2947", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)", minWidth: 120 }}>
+      <div style={{ width: 32, height: 32, borderRadius: 8, background: "#1a2236", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         {icon}
       </div>
       <div>
-        <div style={{ fontSize: 10, color: "rgba(180,185,215,0.65)", marginBottom: 2 }}>{label}</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#e8eaf4" }}>{value}</div>
+        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>{label}</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#e2e8f0" }}>{value}</div>
       </div>
     </div>
   );
