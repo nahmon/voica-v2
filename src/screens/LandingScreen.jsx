@@ -433,34 +433,21 @@ function BeforeAfterSection({ isMobile, t }) {
 /* ── Use cases section ── */
 function UseCasesSection({ isMobile, t }) {
   const { label, title, subtitle, items } = t.useCases;
-  const [activeIdx, setActiveIdx] = useState(0);
   return (
     <section style={{ padding: isMobile ? "60px 20px" : "80px 24px", background: "#fff" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ marginBottom: 36, textAlign: "center" }}>
+      <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
+        <div style={{ marginBottom: 36 }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 10 }}>{label}</div>
-          <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, margin: "0 auto 10px", fontFamily: F, maxWidth: 700, letterSpacing: "-0.02em" }}>{title}</h2>
+          <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, margin: "0 auto 10px", fontFamily: F, letterSpacing: "-0.02em" }}>{title}</h2>
           <p style={{ fontSize: 15, color: C.body, margin: "0 auto", maxWidth: 600 }}>{subtitle}</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 2 : "2px 48px", maxWidth: 720, margin: "0 auto" }}>
-          {items.map((item, i) => {
-            const isActive = activeIdx === i;
-            return (
-              <div
-                key={i}
-                onClick={() => setActiveIdx(i)}
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                  padding: "12px 16px", borderRadius: 8, cursor: "pointer",
-                  background: isActive ? C.purpleBg : "transparent",
-                  transition: "background 0.15s",
-                }}
-              >
-                {Ic[item.icon] && Ic[item.icon]({ s: 16, c: isActive ? C.purple : C.body })}
-                <span style={{ fontSize: 15, fontWeight: isActive ? 600 : 400, color: isActive ? C.navy : C.body }}>{item.label}</span>
-              </div>
-            );
-          })}
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr", gap: isMobile ? "2px 4px" : "2px 8px" }}>
+          {items.map((item, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 12px" }}>
+              {Ic[item.icon] && Ic[item.icon]({ s: 15, c: C.body })}
+              <span style={{ fontSize: 14, color: C.body }}>{item.label}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -571,7 +558,7 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
       <section style={{
         position: "relative", overflow: "hidden",
         padding: isMobile ? "72px 20px 80px" : "88px 24px 96px",
-        background: "transparent",
+        background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(110,75,255,0.12) 0%, transparent 70%)",
       }}>
 
         <div style={{ maxWidth: 1200, margin: "0 auto", display: isMobile ? "flex" : "grid", gridTemplateColumns: "520px 1fr", alignItems: "center", gap: isMobile ? 0 : 64, flexDirection: isMobile ? "column" : "row", position: "relative", minHeight: isMobile ? "auto" : 580 }}>

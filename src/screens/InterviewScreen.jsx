@@ -993,6 +993,10 @@ export default function InterviewScreen({ go, shareCode }) {
                     <div style={{ textAlign: "center" }}>
                       <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>탭해서 답변 시작</div>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginTop: 2 }}>최소 {MIN_RECORD_SECS}초 이상 답변해 주세요</div>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 10 }}>
+                        <kbd style={{ fontSize: 11, fontFamily: "monospace", border: "1px solid rgba(110,75,255,0.35)", borderRadius: 4, padding: "1px 6px", background: "rgba(110,75,255,0.1)", color: C.purple }}>Space</kbd>
+                        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>녹음 시작/중지</span>
+                      </div>
                     </div>
                   )}
                   {/* Skip */}

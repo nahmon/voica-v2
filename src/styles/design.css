@@ -117,7 +117,7 @@ a:focus-visible,
 
 /* Dashboard interview card hover lift (Stripe pattern) */
 .dash-card {
-  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
 }
 @media (hover: hover) {
   .dash-card:hover {

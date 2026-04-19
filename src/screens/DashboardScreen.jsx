@@ -131,7 +131,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
           to { transform: translateY(-3px); }
         }
         .dash-card {
-          transition: transform 0.18s ease, box-shadow 0.18s ease;
+          transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
         .dash-card:hover {
           transform: translateY(-3px);
@@ -180,7 +180,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
             { icon: "users", title: isKo ? "인터뷰 패널 모집" : "Panelist Recruiting", desc: isKo ? "지원자를 검토하고 승인해요" : "Review and approve applicants", screen: "recruiter_admin" },
             { icon: "search", title: isKo ? "모집 보드" : "Recruitment Board", desc: isKo ? "공개 모집 공고를 관리해요" : "Manage public recruitment listings", screen: "panel_board" },
           ].map(item => (
-            <div key={item.title} onClick={() => go(item.screen)} style={{ background: C.white, borderRadius: 16, padding: "16px 18px", boxShadow: S.ambient, border: `1px solid ${C.border}`, cursor: "pointer", display: "flex", alignItems: "center", gap: 14, transition: "box-shadow 0.2s" }}
+            <div key={item.title} onClick={() => go(item.screen)} style={{ background: C.white, borderRadius: 16, padding: "16px 18px", boxShadow: S.ambient, border: "1px solid rgba(110,75,255,0.10)", cursor: "pointer", display: "flex", alignItems: "center", gap: 14, transition: "box-shadow 0.08s ease-out" }}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = S.card; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = S.ambient; }}>
               <div style={{ width: 40, height: 40, borderRadius: 8, background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{({users:Ic.Users,search:Ic.Search})[item.icon]?.({s:20,c:C.purple})}</div>
@@ -212,7 +212,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
             <div style={{ display: "flex", gap: 6 }}>
               {STATUS_KEYS.map((key, idx) => (
                 <button key={key} onClick={() => setStatusFilter(key)}
-                  style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${statusFilter === key ? C.purple : C.border}`, background: statusFilter === key ? C.purple : C.white, color: statusFilter === key ? C.white : C.body, fontSize: 12, fontFamily: F, cursor: "pointer", fontWeight: statusFilter === key ? 500 : 400, transition: "all 0.15s" }}>
+                  style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${statusFilter === key ? C.purple : C.border}`, background: statusFilter === key ? C.purple : C.white, color: statusFilter === key ? C.white : C.body, fontSize: 12, fontFamily: F, cursor: "pointer", fontWeight: statusFilter === key ? 500 : 400, transition: "all 0.08s ease-out" }}>
                   {STATUS_LABELS[idx]}
                 </button>
               ))}
@@ -259,7 +259,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
               <div key={p.id}
                 className="dash-card"
                 onClick={() => { markAsSeen(p.id, sessionCount); go(p.status === "closed" ? "report" : "editor", p.id); }}
-                style={{ background: C.white, borderRadius: 16, padding: isMobile ? "16px" : "20px 24px", border: `1px solid ${C.border}`, cursor: "pointer" }}>
+                style={{ background: C.white, borderRadius: 16, padding: isMobile ? "16px" : "20px 24px", border: "1px solid rgba(110,75,255,0.10)", cursor: "pointer" }}>
                 {/* Title + status */}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 15, fontWeight: 500, color: C.navy, fontFeatureSettings: '"ss01"', flex: 1, minWidth: 0 }}>{p.title}</span>
