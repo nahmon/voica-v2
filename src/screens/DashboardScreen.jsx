@@ -169,7 +169,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                   {STAT_ICONS[stat.iconIdx]?.(stat.color)}
                 </div>
               </div>
-              <div style={{ fontSize: 36, fontWeight: 600, color: stat.color, lineHeight: 1.0, marginBottom: 6, fontFamily: F, letterSpacing: "-1px" }}>{stat.value}</div>
+              <div style={{ fontSize: 36, fontWeight: 600, color: stat.color, lineHeight: 1.0, marginBottom: 6, fontFamily: F, letterSpacing: "-1px", fontFeatureSettings: '"tnum"' }}>{stat.value}</div>
               <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>{stat.sub}</div>
             </div>
           ))}
@@ -231,16 +231,15 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {!loading && interviews.length === 0 && (
-            <div style={{ background: C.white, border: `2px dashed ${C.border}`, borderRadius: 8, padding: "48px 24px", textAlign: "center" }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>📋</div>
-              <div style={{ fontSize: 16, fontWeight: 500, color: C.navy, marginBottom: 8 }}>{isKo ? "아직 프로젝트가 없어요" : "No projects yet"}</div>
-              <div style={{ fontSize: 13, color: C.body, marginBottom: 24, lineHeight: 1.6 }}>
-                {isKo
-                  ? <>첫 번째 인터뷰를 만들어보세요.<br />질문을 설계하면 AI가 인터뷰 패널과 인터뷰를 자동으로 진행해줘요.</>
-                  : <>Create your first interview.<br />Design your questions and let AI conduct interviews with panelists automatically.</>
-                }
+            <div style={{ background: C.white, border: "1px solid rgba(110,75,255,0.10)", borderRadius: 16, padding: "40px 24px", textAlign: "center" }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                {Ic.Pencil({ s: 20, c: C.purple })}
               </div>
-              <Btn onClick={() => go("editor")}>{isKo ? "+ 첫 프로젝트 만들기" : "+ Create First Project"}</Btn>
+              <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 8, letterSpacing: "-0.02em" }}>{isKo ? "첫 인터뷰를 만들어보세요" : "Create your first interview"}</div>
+              <div style={{ fontSize: 13, color: C.body, marginBottom: 20, lineHeight: 1.6 }}>
+                {isKo ? "질문을 설계하면 AI가 자동으로 인터뷰를 진행해줘요." : "Design your questions and let AI conduct interviews automatically."}
+              </div>
+              <Btn onClick={() => go("editor")}>{isKo ? "+ 새 프로젝트" : "+ New Project"}</Btn>
             </div>
           )}
           {!loading && interviews.length > 0 && filteredInterviews.length === 0 && (
@@ -262,11 +261,15 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                 style={{ background: C.white, borderRadius: 16, padding: isMobile ? "16px" : "20px 24px", border: "1px solid rgba(110,75,255,0.10)", cursor: "pointer" }}>
                 {/* Title + status */}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
+                  <span style={{ fontFamily: "monospace", fontSize: 11, color: C.body, letterSpacing: "0.04em", opacity: 0.6, flexShrink: 0 }}>VCS-{String(interviews.findIndex(i => i.id === p.id) + 1).padStart(3, "0")}</span>
                   <span style={{ fontSize: 15, fontWeight: 500, color: C.navy, fontFeatureSettings: '"ss01"', flex: 1, minWidth: 0 }}>{p.title}</span>
                   {newResponses > 0 && (
                     <span style={{ fontSize: 11, fontWeight: 600, color: C.white, background: C.ruby, borderRadius: 20, padding: "2px 8px", letterSpacing: "0.1px" }}>{isKo ? `${newResponses}개의 새 응답` : `${newResponses} new response${newResponses !== 1 ? "s" : ""}`}</span>
                   )}
-                  <Badge variant={st.variant}>{label}</Badge>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 20, background: "rgba(0,0,0,0.04)" }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: st.dot, display: "inline-block", flexShrink: 0 }} />
+                    <span style={{ fontSize: 11, color: C.body, fontWeight: 500 }}>{label}</span>
+                  </span>
                 </div>
                 <div style={{ fontSize: 12, color: C.body, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
                   <span>{isKo ? `질문 ${questionCount}개` : `${questionCount} question${questionCount !== 1 ? "s" : ""}`}</span>
