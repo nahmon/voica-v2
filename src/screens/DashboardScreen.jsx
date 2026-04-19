@@ -23,22 +23,22 @@ const STAT_ICONS = {
   3: (c) => Ic.Check({ s: 16, c }),
 };
 
-const STATUS_FILTERS_EN = ["All", "In Progress", "Draft", "Completed"];
-const STATUS_FILTERS_KO = ["전체", "진행 중", "초안", "완료"];
+const STATUS_KEYS = ["all", "active", "draft", "closed"];
+const STATUS_LABELS_EN = ["All", "In Progress", "Draft", "Completed"];
+const STATUS_LABELS_KO = ["전체", "진행 중", "초안", "완료"];
 
-export default function DashboardScreen({ go, user, logout }) {
+export default function DashboardScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
-  const [lang, setLang] = useState("ko");
   const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredCard, setHoveredCard] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
 
   const isKo = lang === "ko";
 
-  const STATUS_FILTERS = isKo ? STATUS_FILTERS_KO : STATUS_FILTERS_EN;
+  const STATUS_LABELS = isKo ? STATUS_LABELS_KO : STATUS_LABELS_EN;
 
   useEffect(() => {
     if (!user) return;
@@ -89,9 +89,7 @@ export default function DashboardScreen({ go, user, logout }) {
   const totalSessions = interviews.reduce((s, i) => s + (i.sessions?.[0]?.count ?? 0), 0);
 
   const filteredInterviews = interviews.filter(p => {
-    const label = statusLabel[p.status] ?? p.status;
-    const enLabel = { draft: "Draft", active: "In Progress", closed: "Completed" }[p.status] ?? p.status;
-    const matchStatus = statusFilter === "All" || statusFilter === "전체" || label === statusFilter || enLabel === statusFilter;
+    const matchStatus = statusFilter === "all" || p.status === statusFilter;
     const matchSearch = !searchQuery.trim() || p.title.toLowerCase().includes(searchQuery.trim().toLowerCase());
     return matchStatus && matchSearch;
   });
@@ -103,7 +101,7 @@ export default function DashboardScreen({ go, user, logout }) {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 12 }}>
         {[
           { step: "1", icon: (c) => Ic.Pencil({ s: 20, c }), title: isKo ? "질문 설계" : "Design Questions", desc: isKo ? "음성 및 객관식 질문을 만들어 인터뷰를 구성해요" : "Create voice and multiple-choice questions to build your interview", action: () => go("editor"), actionLabel: isKo ? "시작하기" : "Get Started", color: C.purple },
-          { step: "2", icon: (c) => Ic.Users({ s: 20, c }), title: isKo ? "패널리스트 모집" : "Recruit Panelists", desc: isKo ? "링크를 공유하거나 공개 보드에서 패널리스트를 모집해요" : "Share a link or recruit panelists from the public board", action: () => go("panel_board"), actionLabel: isKo ? "보드 보기" : "View Board", color: C.success },
+          { step: "2", icon: (c) => Ic.Users({ s: 20, c }), title: isKo ? "인터뷰 패널 모집" : "Recruit Panelists", desc: isKo ? "링크를 공유하거나 공개 보드에서 인터뷰 패널을 모집해요" : "Share a link or recruit panelists from the public board", action: () => go("panel_board"), actionLabel: isKo ? "보드 보기" : "View Board", color: C.success },
           { step: "3", icon: (c) => Ic.Sparkle({ s: 20, c }), title: isKo ? "AI 리포트" : "AI Report", desc: isKo ? "응답이 모이면 AI가 자동으로 인사이트 리포트를 만들어줘요" : "Once responses come in, AI automatically generates an insights report", action: null, actionLabel: null, color: C.navy },
         ].map(item => (
           <div key={item.step} style={{ background: C.white, borderRadius: 16, padding: "20px 20px 18px", border: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 10 }}>
@@ -160,14 +158,14 @@ export default function DashboardScreen({ go, user, logout }) {
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fit,minmax(180px,1fr))", gap: isMobile ? 10 : 14, marginBottom: 32 }}>
           {[
             { label: isKo ? "전체 프로젝트" : "Total Projects", value: loading ? "—" : String(interviews.length), sub: isKo ? "생성된 인터뷰" : "Interviews created", color: C.purple, iconIdx: 0 },
-            { label: isKo ? "전체 응답" : "Total Responses", value: loading ? "—" : String(totalSessions), sub: isKo ? "패널리스트 응답" : "Panelist responses", color: C.success, iconIdx: 1 },
+            { label: isKo ? "전체 응답" : "Total Responses", value: loading ? "—" : String(totalSessions), sub: isKo ? "인터뷰 패널 응답" : "Panelist responses", color: C.success, iconIdx: 1 },
             { label: isKo ? "진행 중" : "In Progress", value: loading ? "—" : String(interviews.filter(i => i.status === "active").length), sub: isKo ? "진행 중인 인터뷰" : "Active interviews", color: C.navy, iconIdx: 2 },
-            { label: isKo ? "완료" : "Completed", value: loading ? "—" : String(interviews.filter(i => i.status === "closed").length), sub: isKo ? "마감된 인터뷰" : "Closed interviews", color: C.ruby, iconIdx: 3 },
+            { label: isKo ? "완료" : "Completed", value: loading ? "—" : String(interviews.filter(i => i.status === "closed").length), sub: isKo ? "마감된 인터뷰" : "Closed interviews", color: C.body, iconIdx: 3 },
           ].map(stat => (
             <div key={stat.label} style={{ background: C.white, borderRadius: 16, padding: "20px 20px", boxShadow: S.standard, border: `1px solid ${C.border}` }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>{stat.label}</div>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: `rgba(${stat.color === C.purple ? "83,58,253" : stat.color === C.success ? "21,190,83" : stat.color === C.navy ? "6,27,49" : "234,34,97"},0.08)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: `rgba(${stat.color === C.purple ? "83,58,253" : stat.color === C.success ? "21,190,83" : "6,27,49"},0.08)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {STAT_ICONS[stat.iconIdx]?.(stat.color)}
                 </div>
               </div>
@@ -179,7 +177,7 @@ export default function DashboardScreen({ go, user, logout }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12, marginBottom: 28 }}>
           {[
-            { icon: "users", title: isKo ? "패널리스트 모집" : "Panelist Recruiting", desc: isKo ? "지원자를 검토하고 승인해요" : "Review and approve applicants", screen: "recruiter_admin" },
+            { icon: "users", title: isKo ? "인터뷰 패널 모집" : "Panelist Recruiting", desc: isKo ? "지원자를 검토하고 승인해요" : "Review and approve applicants", screen: "recruiter_admin" },
             { icon: "search", title: isKo ? "모집 보드" : "Recruitment Board", desc: isKo ? "공개 모집 공고를 관리해요" : "Manage public recruitment listings", screen: "panel_board" },
           ].map(item => (
             <div key={item.title} onClick={() => go(item.screen)} style={{ background: C.white, borderRadius: 16, padding: "16px 18px", boxShadow: S.ambient, border: `1px solid ${C.border}`, cursor: "pointer", display: "flex", alignItems: "center", gap: 14, transition: "box-shadow 0.2s" }}
@@ -187,7 +185,7 @@ export default function DashboardScreen({ go, user, logout }) {
               onMouseLeave={e => { e.currentTarget.style.boxShadow = S.ambient; }}>
               <div style={{ width: 40, height: 40, borderRadius: 8, background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{({users:Ic.Users,search:Ic.Search})[item.icon]?.({s:20,c:C.purple})}</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 400, color: C.navy, marginBottom: 2 }}>{item.title}</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>{item.title}</div>
                 <div style={{ fontSize: 12, color: C.body }}>{item.desc}</div>
               </div>
             </div>
@@ -212,10 +210,10 @@ export default function DashboardScreen({ go, user, logout }) {
               />
             </div>
             <div style={{ display: "flex", gap: 6 }}>
-              {STATUS_FILTERS.map((f, idx) => (
-                <button key={f} onClick={() => setStatusFilter(f)}
-                  style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${statusFilter === f || statusFilter === (isKo ? STATUS_FILTERS_EN[idx] : STATUS_FILTERS_KO[idx]) ? C.purple : C.border}`, background: statusFilter === f || statusFilter === (isKo ? STATUS_FILTERS_EN[idx] : STATUS_FILTERS_KO[idx]) ? C.purple : C.white, color: statusFilter === f || statusFilter === (isKo ? STATUS_FILTERS_EN[idx] : STATUS_FILTERS_KO[idx]) ? C.white : C.body, fontSize: 12, fontFamily: F, cursor: "pointer", fontWeight: statusFilter === f || statusFilter === (isKo ? STATUS_FILTERS_EN[idx] : STATUS_FILTERS_KO[idx]) ? 500 : 400, transition: "all 0.15s" }}>
-                  {f}
+              {STATUS_KEYS.map((key, idx) => (
+                <button key={key} onClick={() => setStatusFilter(key)}
+                  style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${statusFilter === key ? C.purple : C.border}`, background: statusFilter === key ? C.purple : C.white, color: statusFilter === key ? C.white : C.body, fontSize: 12, fontFamily: F, cursor: "pointer", fontWeight: statusFilter === key ? 500 : 400, transition: "all 0.15s" }}>
+                  {STATUS_LABELS[idx]}
                 </button>
               ))}
             </div>
@@ -225,9 +223,11 @@ export default function DashboardScreen({ go, user, logout }) {
         <div style={{ marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontSize: 14, fontWeight: 400, color: C.label }}>
             {isKo ? "프로젝트" : "Projects"}
-            {statusFilter !== "All" && statusFilter !== "전체" && <span style={{ fontSize: 12, color: C.body, marginLeft: 6 }}>— {statusFilter} ({filteredInterviews.length})</span>}
+            {statusFilter !== "all" && <span style={{ fontSize: 12, color: C.body, marginLeft: 6 }}>— {STATUS_LABELS[STATUS_KEYS.indexOf(statusFilter)]} ({filteredInterviews.length})</span>}
           </div>
-          <div style={{ fontSize: 12, color: C.body }}>{isKo ? "🔔 응답 알림 활성화됨" : "🔔 Response notifications active"}</div>
+          <div style={{ fontSize: 12, color: C.body }}>
+            {filteredInterviews.length > 0 ? (isKo ? `${filteredInterviews.length}개` : `${filteredInterviews.length} project${filteredInterviews.length !== 1 ? "s" : ""}`) : ""}
+          </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {!loading && interviews.length === 0 && (
@@ -236,7 +236,7 @@ export default function DashboardScreen({ go, user, logout }) {
               <div style={{ fontSize: 16, fontWeight: 500, color: C.navy, marginBottom: 8 }}>{isKo ? "아직 프로젝트가 없어요" : "No projects yet"}</div>
               <div style={{ fontSize: 13, color: C.body, marginBottom: 24, lineHeight: 1.6 }}>
                 {isKo
-                  ? <>첫 번째 인터뷰를 만들어보세요.<br />질문을 설계하면 AI가 패널리스트와 인터뷰를 자동으로 진행해줘요.</>
+                  ? <>첫 번째 인터뷰를 만들어보세요.<br />질문을 설계하면 AI가 인터뷰 패널과 인터뷰를 자동으로 진행해줘요.</>
                   : <>Create your first interview.<br />Design your questions and let AI conduct interviews with panelists automatically.</>
                 }
               </div>
@@ -262,7 +262,7 @@ export default function DashboardScreen({ go, user, logout }) {
                 style={{ background: C.white, borderRadius: 16, padding: isMobile ? "16px" : "20px 24px", border: `1px solid ${C.border}`, cursor: "pointer" }}>
                 {/* Title + status */}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 15, fontWeight: 400, color: C.navy, fontFeatureSettings: '"ss01"', flex: 1, minWidth: 0 }}>{p.title}</span>
+                  <span style={{ fontSize: 15, fontWeight: 500, color: C.navy, fontFeatureSettings: '"ss01"', flex: 1, minWidth: 0 }}>{p.title}</span>
                   {newResponses > 0 && (
                     <span style={{ fontSize: 11, fontWeight: 600, color: C.white, background: C.ruby, borderRadius: 20, padding: "2px 8px", letterSpacing: "0.1px" }}>{isKo ? `${newResponses}개의 새 응답` : `${newResponses} new response${newResponses !== 1 ? "s" : ""}`}</span>
                   )}
@@ -274,14 +274,9 @@ export default function DashboardScreen({ go, user, logout }) {
                   <span>{timeAgo(p.created_at, isKo)}</span>
                 </div>
                 {/* Response count */}
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ fontSize: 11, color: C.body }}>{isKo ? "응답" : "Responses"}</span>
-                    <span style={{ fontSize: 11, fontWeight: 500, color: C.navy, fontFeatureSettings: '"tnum"' }}>{sessionCount}</span>
-                  </div>
-                  <div style={{ height: 4, background: C.border, borderRadius: 2 }}>
-                    <div style={{ height: "100%", width: `${Math.min((sessionCount / Math.max(sessionCount, 20)) * 100, 100)}%`, background: C.purple, borderRadius: 2, transition: "width 0.5s" }} />
-                  </div>
+                <div style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 11, color: C.body }}>{isKo ? "응답" : "Responses"}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: sessionCount > 0 ? C.purple : C.body, fontFeatureSettings: '"tnum"' }}>{sessionCount}</span>
                 </div>
                 {/* Actions */}
                 <div style={{ display: "flex", gap: 8, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
@@ -299,7 +294,7 @@ export default function DashboardScreen({ go, user, logout }) {
           })}
         </div>
       </main>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }

@@ -86,16 +86,30 @@ function WelcomeIllustration({ isMobile }) {
 }
 
 const FAQ_ITEMS = [
-  { q: "How will my voice data be used?", a: "Your voice is transcribed to text (STT) and used solely for research analysis. It is automatically deleted one year after the interview is completed and will never be sold to third parties." },
-  { q: "Who receives my personal information?", a: "Researchers only receive voice and text analysis results. Identifying information such as your name and contact details is never shared." },
-  { q: "When will I receive my reward?", a: "Rewards are issued by the researcher (operator) who commissioned the interview. The payment method and timeline are specified in each interview listing — please check before participating." },
-  { q: "Can I stop partway through?", a: "You may stop the interview at any time, but rewards are only paid upon completion. Withdrawing without good cause three or more times may affect your panelist standing." },
-  { q: "What if voice recognition isn't working well?", a: "Please speak clearly in a quiet environment, close to your microphone. If voice recognition is difficult, a text input option is also available." },
+  {
+    q: { ko: "내 음성 데이터는 어떻게 사용되나요?", en: "How will my voice data be used?" },
+    a: { ko: "음성은 텍스트로 전환(STT)되어 리서치 분석에만 사용됩니다. 인터뷰 완료 후 1년이 지나면 자동 삭제되며, 제3자에게 판매되지 않습니다.", en: "Your voice is transcribed to text (STT) and used solely for research analysis. It is automatically deleted one year after the interview is completed and will never be sold to third parties." },
+  },
+  {
+    q: { ko: "내 개인정보는 누가 받아보나요?", en: "Who receives my personal information?" },
+    a: { ko: "연구자는 음성 및 텍스트 분석 결과만 받아볼 수 있습니다. 이름·연락처 등 식별 정보는 절대 공유되지 않습니다.", en: "Researchers only receive voice and text analysis results. Identifying information such as your name and contact details is never shared." },
+  },
+  {
+    q: { ko: "리워드는 언제 받을 수 있나요?", en: "When will I receive my reward?" },
+    a: { ko: "리워드는 인터뷰를 의뢰한 연구자(운영사)가 지급합니다. 지급 방법과 일정은 각 인터뷰 공고에 명시되어 있으니 참여 전 확인하세요.", en: "Rewards are issued by the researcher (operator) who commissioned the interview. The payment method and timeline are specified in each interview listing — please check before participating." },
+  },
+  {
+    q: { ko: "중간에 그만둬도 되나요?", en: "Can I stop partway through?" },
+    a: { ko: "언제든지 인터뷰를 중단할 수 있지만, 리워드는 완료 시에만 지급됩니다. 정당한 사유 없이 3회 이상 중도 이탈 시 인터뷰 패널 자격에 영향을 줄 수 있습니다.", en: "You may stop the interview at any time, but rewards are only paid upon completion. Withdrawing without good cause three or more times may affect your panelist standing." },
+  },
+  {
+    q: { ko: "음성 인식이 잘 안 되면 어떻게 하나요?", en: "What if voice recognition isn't working well?" },
+    a: { ko: "조용한 환경에서 마이크 가까이 대고 또렷하게 말씀해 주세요. 음성 인식이 어려울 경우 텍스트 입력 옵션도 사용할 수 있습니다.", en: "Please speak clearly in a quiet environment, close to your microphone. If voice recognition is difficult, a text input option is also available." },
+  },
 ];
 
-export default function ConsentScreen({ go, user, logout, shareCode }) {
+export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
-  const [lang, setLang] = useState("ko");
   const [step, setStep] = useState(0); // 0=Overview, 1=Consent, 2=Start
   const [agreed1, setAgreed1] = useState(false);
   const [agreed2, setAgreed2] = useState(false);
@@ -187,7 +201,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
 
             {/* FAQ accordion */}
             <div style={{ marginBottom: 24 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 10 }}>Frequently Asked Questions</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 10 }}>{lang === "ko" ? "자주 묻는 질문" : "Frequently Asked Questions"}</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {FAQ_ITEMS.map((item, i) => (
                   <div key={i} style={{ background: C.white, border: `1px solid ${faqOpen === i ? "rgba(83,58,253,0.2)" : C.border}`, borderRadius: 8, overflow: "hidden", transition: "border-color 0.15s" }}>
@@ -198,14 +212,14 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
                         display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, fontFamily: F,
                       }}
                     >
-                      <span style={{ fontSize: 13, color: C.navy, fontWeight: 500, textAlign: "left" }}>{item.q}</span>
+                      <span style={{ fontSize: 13, color: C.navy, fontWeight: 500, textAlign: "left" }}>{item.q[lang] ?? item.q.en}</span>
                       <span style={{ transform: faqOpen === i ? "rotate(180deg)" : "none", transition: "transform 0.2s", flexShrink: 0, display: "flex" }}>
                         {Ic.ChevronDown({ s: 15, c: C.body })}
                       </span>
                     </button>
                     {faqOpen === i && (
                       <div style={{ padding: "0 16px 14px", borderTop: `1px solid ${C.border}`, paddingTop: 10 }}>
-                        <div style={{ fontSize: 12, color: C.body, lineHeight: 1.75 }}>{item.a}</div>
+                        <div style={{ fontSize: 12, color: C.body, lineHeight: 1.75 }}>{item.a[lang] ?? item.a.en}</div>
                       </div>
                     )}
                   </div>
@@ -218,7 +232,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
             </Btn>
           </div>
         </div>
-        <Footer go={go} lang={lang} onLangChange={setLang} />
+        <Footer go={go} lang={lang} onLangChange={onLangChange} />
       </div>
     );
   }
@@ -304,7 +318,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
             </div>
           </div>
         </div>
-        <Footer go={go} lang={lang} onLangChange={setLang} />
+        <Footer go={go} lang={lang} onLangChange={onLangChange} />
       </div>
     );
   }
@@ -354,7 +368,7 @@ export default function ConsentScreen({ go, user, logout, shareCode }) {
           </div>
         </div>
       </div>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }

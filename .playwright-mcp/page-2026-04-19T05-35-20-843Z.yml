@@ -1,0 +1,28 @@
+- generic [ref=e335]:
+  - navigation [ref=e336]:
+    - generic [ref=e337]:
+      - generic [ref=e342] [cursor=pointer]: voicesurvey
+      - button "☰" [ref=e344] [cursor=pointer]
+  - generic [ref=e346]:
+    - generic [ref=e347]:
+      - generic [ref=e348]: 로그인
+      - generic [ref=e349]: 이메일로 로그인하세요
+    - generic [ref=e350]:
+      - generic [ref=e351]:
+        - button "로그인" [ref=e352] [cursor=pointer]
+        - button "회원가입" [ref=e353] [cursor=pointer]
+      - generic [ref=e354]:
+        - generic [ref=e355]:
+          - generic [ref=e356]: 이메일
+          - textbox "이메일 주소를 입력하세요" [ref=e357]
+        - generic [ref=e358]:
+          - generic [ref=e359]: 비밀번호
+          - textbox "8자 이상" [ref=e360]
+      - link "비밀번호를 잊으셨나요?" [ref=e362] [cursor=pointer]:
+        - /url: "#"
+      - button "로그인" [disabled] [ref=e363]
+      - generic [ref=e366]: 또는
+      - button "Google로 계속하기" [ref=e369] [cursor=pointer]:
+        - img [ref=e370]
+        - text: Google로 계속하기
+    - generic [ref=e375]: 처음 오셨나요? 회원가입

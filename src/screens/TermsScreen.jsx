@@ -3,9 +3,8 @@ import { C, F } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function TermsScreen({ go, user, logout }) {
+export default function TermsScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
-  const [lang, setLang] = useState("ko");
   const isKo = lang === "ko";
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
@@ -180,7 +179,7 @@ export default function TermsScreen({ go, user, logout }) {
           </div>
         </div>
       </main>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }

@@ -3,9 +3,8 @@ import { C, F } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function PrivacyScreen({ go, user, logout }) {
+export default function PrivacyScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
-  const [lang, setLang] = useState("ko");
   const isKo = lang === "ko";
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
@@ -32,7 +31,7 @@ export default function PrivacyScreen({ go, user, logout }) {
             <Table rows={isKo ? [
               ["회원 가입·관리", "가입 의사 확인, 회원 식별·인증, 회원 자격 유지·관리, 서비스 부정 이용 방지, 공지 전달"],
               ["서비스 제공", "AI 음성 인터뷰 설계·진행, 음성 녹음·전사, 분석 리포트 생성, 인터뷰 결과 제공"],
-              ["패널리스트 서비스 운영", "패널리스트 모집·관리, 보상 지급, 인터뷰 참여 이력 관리"],
+              ["인터뷰 패널 서비스 운영", "인터뷰 패널 모집·관리, 보상 지급, 인터뷰 참여 이력 관리"],
               ["고객 지원", "민원인 신원 확인, 사실 조사, 처리 결과 통보"],
               ["마케팅·광고", "신규 서비스 개발 및 맞춤 서비스 제공, 이벤트·홍보 정보 제공(별도 동의)"],
             ] : [
@@ -55,7 +54,7 @@ export default function PrivacyScreen({ go, user, logout }) {
               ["Optional", "Company name, job title, department, company size, company type, research purpose and categories"],
               ["Automatically Collected", "IP address, cookies, service usage records, access logs"],
             ]} />
-            <SubTitle style={{ marginTop: 16 }}>{isKo ? "② 패널리스트 계정" : "② Panelist Accounts"}</SubTitle>
+            <SubTitle style={{ marginTop: 16 }}>{isKo ? "② 인터뷰 패널 계정" : "② Panelist Accounts"}</SubTitle>
             <Table rows={isKo ? [
               ["필수", "이메일, 비밀번호(암호화), 이름"],
               ["선택", "나이, 성별, 직업, 거주지역"],
@@ -268,7 +267,7 @@ export default function PrivacyScreen({ go, user, logout }) {
           </div>
         </div>
       </main>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }

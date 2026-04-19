@@ -2,9 +2,10 @@ import { useState } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F } from "../lib/constants.jsx";
 import { Btn, Input, Divider, GlobalNav } from "../components/shared.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function AdvertiserLoginScreen({ go }) {
-  const [lang] = useState("ko");
+export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
+  const isMobile = useIsMobile();
   const [role, setRole] = useState("researcher");
   const [tab, setTab] = useState("login");
   const [email, setEmail] = useState("");
@@ -89,22 +90,22 @@ export default function AdvertiserLoginScreen({ go }) {
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
       <GlobalNav go={go} variant="sub" lang={lang} />
 
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: tab === "signup" ? "32px 24px 48px" : "60px 24px" }}>
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: isMobile ? (tab === "signup" ? "24px 16px 40px" : "32px 16px") : (tab === "signup" ? "32px 24px 48px" : "60px 24px") }}>
         <div style={{ width: "100%", maxWidth: 440 }}>
           <div style={{ textAlign: "center", marginBottom: 28 }}>
-            <div style={{ fontSize: 28, fontWeight: 600, color: C.navy, letterSpacing: "0.196px", lineHeight: 1.14, marginBottom: 6, fontFamily: F }}>
+            <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 600, color: C.navy, letterSpacing: "0.196px", lineHeight: 1.14, marginBottom: 6, fontFamily: F }}>
               {tab === "login" ? "로그인" : "회원가입"}
             </div>
-            <div style={{ fontSize: 14, color: C.body }}>{tab === "login" ? "이메일로 로그인하세요" : "Voice Survey 계정을 만들어보세요"}</div>
+            <div style={{ fontSize: 14, color: C.body }}>{tab === "login" ? "이메일로 로그인하세요" : "voicesurvey 계정을 만들어보세요"}</div>
           </div>
 
           {tab === "signup" && (
             <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-              {[["researcher", "리서처 / 기업", "인터뷰 설계 · 리포트"], ["panel", "패널리스트", "인터뷰 참여 · 리워드 수령"]].map(([v, label, desc]) => (
+              {[["researcher", "리서처 / 기업", "인터뷰 설계 · 리포트"], ["panel", "인터뷰 패널", "인터뷰 참여 · 리워드 수령"]].map(([v, label, desc]) => (
                 <div key={v} onClick={() => setRole(v)}
                   style={{ flex: 1, padding: "14px 16px", borderRadius: 10, border: `2px solid ${role === v ? C.purple : C.border}`, background: role === v ? C.purpleBg : C.white, cursor: "pointer", transition: "all 0.15s" }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: role === v ? C.purple : C.navy, marginBottom: 3 }}>{label}</div>
-                  <div style={{ fontSize: 11, color: role === v ? C.purple : C.body, opacity: role === v ? 0.8 : 1 }}>{desc}</div>
+                  <div style={{ fontSize: 12, color: role === v ? C.purple : C.body, opacity: role === v ? 0.8 : 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{desc}</div>
                 </div>
               ))}
             </div>
@@ -177,7 +178,7 @@ export default function AdvertiserLoginScreen({ go }) {
                 </div>
 
                 {authError && <div style={{ marginBottom: 12, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
-                <Btn full size="lg" disabled={loading || !email || !pw || !name} onClick={handleSignup}>{loading ? "계정 생성 중..." : role === "panel" ? "패널리스트로 참여하기" : "계정 만들기"}</Btn>
+                <Btn full size="lg" disabled={loading || !email || !pw || !name} onClick={handleSignup}>{loading ? "계정 생성 중..." : role === "panel" ? "인터뷰 패널로 참여하기" : "계정 만들기"}</Btn>
                 <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 12, lineHeight: 1.6 }}>
                   회원가입 시 <a href="#" onClick={e => { e.preventDefault(); go("terms"); }} style={{ color: C.purple }}>이용약관</a> 및 <a href="#" onClick={e => { e.preventDefault(); go("privacy"); }} style={{ color: C.purple }}>개인정보처리방침</a>에 동의하는 것으로 간주돼요.
                 </div>

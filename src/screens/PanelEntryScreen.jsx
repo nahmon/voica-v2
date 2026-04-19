@@ -3,9 +3,8 @@ import { C, S, F } from "../lib/constants.jsx";
 import { Btn, Input, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function PanelEntryScreen({ go }) {
+export default function PanelEntryScreen({ go, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
-  const [lang, setLang] = useState("ko");
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "", phone: "", region: "", gender: "", age: "",
@@ -18,23 +17,27 @@ export default function PanelEntryScreen({ go }) {
     interests: f.interests.includes(v) ? f.interests.filter(i => i !== v) : [...f.interests, v],
   }));
 
-  const REGIONS = ["Seoul", "Gyeonggi/Incheon", "Busan/South Gyeongsang", "Daegu/North Gyeongsang", "Gwangju/Jeolla", "Daejeon/Chungcheong", "Gangwon", "Jeju", "Living Abroad"];
-  const GENDERS = ["Male", "Female", "Prefer not to say"];
-  const AGES = ["Teens", "20s", "30s", "40s", "50s", "60+"];
-  const JOBS = ["Corporate (Large/Mid-size)", "Corporate (Small Business)", "Freelancer/Self-employed", "Professional (Doctor, Lawyer, Accountant, etc.)", "Government/Public Sector", "Student", "Homemaker", "Job Seeking", "Other"];
-  const INCOMES = ["None", "Under $1,000/mo", "$1,000–$3,000/mo", "$3,000–$5,000/mo", "$5,000–$7,000/mo", "$7,000+/mo", "Prefer not to say"];
-  const INTERESTS = ["Tech/IT", "Beauty/Fashion", "Food & Dining", "Finance/Investing", "Healthcare/Medical", "Education", "Travel/Leisure", "Media/Entertainment", "Real Estate", "Automotive/Mobility", "Shopping/Retail", "Sports/Fitness", "Environment/Sustainability", "Legal/Tax"];
+  const REGIONS = ["서울", "경기/인천", "부산/경남", "대구/경북", "광주/전라", "대전/충청", "강원", "제주", "해외거주"];
+  const GENDERS = ["남성", "여성", "밝히고 싶지 않음"];
+  const AGES = ["10대", "20대", "30대", "40대", "50대", "60대 이상"];
+  const JOBS = ["대기업/중견기업", "중소기업", "프리랜서/자영업", "전문직 (의사, 변호사, 회계사 등)", "공공기관/공무원", "학생", "주부", "구직 중", "기타"];
+  const INCOMES = ["없음", "월 100만원 미만", "월 100~300만원", "월 300~500만원", "월 500~700만원", "월 700만원 이상", "밝히고 싶지 않음"];
+  const INTERESTS = ["테크/IT", "뷰티/패션", "식음료", "금융/투자", "헬스케어/의료", "교육", "여행/레저", "미디어/엔터테인먼트", "부동산", "자동차/모빌리티", "쇼핑/리테일", "스포츠/피트니스", "환경/지속가능성", "법률/세금"];
 
-  const STEPS = ["Basic Info", "Matching Profile", "Consent & Finish"];
+  const STEPS = ["기본 정보", "매칭 프로필", "동의 및 완료"];
   const step0Valid = form.name && form.phone && form.region && form.gender && form.age;
   const step1Valid = form.job && form.income && form.interests.length > 0;
 
-  function FieldLabel({ children }) {
-    return <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.label, marginBottom: 8, fontFamily: F }}>{children}</label>;
+  function FieldLabel({ children, required }) {
+    return (
+      <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.label, marginBottom: 8, fontFamily: F }}>
+        {children}{required && <span style={{ color: C.ruby, marginLeft: 3 }}>*</span>}
+      </label>
+    );
   }
   function ChipGroup({ options, value, onSelect, multi }) {
     return (
-      <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         {options.map(o => {
           const active = multi ? value.includes(o) : value === o;
           return (
@@ -73,7 +76,7 @@ export default function PanelEntryScreen({ go }) {
   if (step === 0) return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
       {navBar}
-      <div style={{ display: "flex", justifyContent: "center", padding: "40px 24px" }}>
+      <div style={{ display: "flex", justifyContent: "center", padding: isMobile ? "24px 16px" : "40px 24px" }}>
         <div style={{ width: "100%", maxWidth: 520 }}>
           <StepBar />
           <div style={{ textAlign: "center", marginBottom: 24 }}>
@@ -82,22 +85,22 @@ export default function PanelEntryScreen({ go }) {
           </div>
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "28px", boxShadow: S.standard, display: "flex", flexDirection: "column", gap: 22 }}>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
-              <Input label="Full Name" placeholder="Jane Smith" value={form.name} onChange={e => upd("name", e.target.value)} />
-              <Input label="Phone Number" type="tel" placeholder="(555) 000-0000" value={form.phone} onChange={e => upd("phone", e.target.value)} />
+              <Input label="이름" placeholder="홍길동" value={form.name} onChange={e => upd("name", e.target.value)} required />
+              <Input label="전화번호" type="tel" placeholder="010-0000-0000" value={form.phone} onChange={e => upd("phone", e.target.value)} required />
             </div>
             <div>
-              <FieldLabel>Region</FieldLabel>
+              <FieldLabel required>거주 지역</FieldLabel>
               <ChipGroup options={REGIONS} value={form.region} onSelect={v => upd("region", v)} />
             </div>
             <div>
-              <FieldLabel>Gender</FieldLabel>
+              <FieldLabel required>성별</FieldLabel>
               <ChipGroup options={GENDERS} value={form.gender} onSelect={v => upd("gender", v)} />
             </div>
             <div>
-              <FieldLabel>Age Group</FieldLabel>
+              <FieldLabel required>연령대</FieldLabel>
               <ChipGroup options={AGES} value={form.age} onSelect={v => upd("age", v)} />
             </div>
-            <Btn full size="lg" disabled={!step0Valid} onClick={() => setStep(1)}>Next</Btn>
+            <Btn full size="lg" disabled={!step0Valid} onClick={() => setStep(1)}>다음</Btn>
           </div>
         </div>
       </div>
@@ -107,32 +110,32 @@ export default function PanelEntryScreen({ go }) {
   if (step === 1) return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
       {navBar}
-      <div style={{ display: "flex", justifyContent: "center", padding: "40px 24px" }}>
+      <div style={{ display: "flex", justifyContent: "center", padding: isMobile ? "24px 16px" : "40px 24px" }}>
         <div style={{ width: "100%", maxWidth: 520 }}>
           <StepBar />
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>Set up your matching profile</div>
-            <div style={{ fontSize: 13, color: C.body }}>Researchers use this to find the right panelists</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>매칭 프로필 설정</div>
+            <div style={{ fontSize: 13, color: C.body }}>연구자가 적합한 인터뷰 패널을 찾는 데 사용됩니다</div>
           </div>
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "28px", boxShadow: S.standard, display: "flex", flexDirection: "column", gap: 24 }}>
             <div>
-              <FieldLabel>Occupation</FieldLabel>
+              <FieldLabel required>직업</FieldLabel>
               <ChipGroup options={JOBS} value={form.job} onSelect={v => upd("job", v)} />
             </div>
             <div>
-              <FieldLabel>Monthly Income</FieldLabel>
+              <FieldLabel required>월 소득</FieldLabel>
               <ChipGroup options={INCOMES} value={form.income} onSelect={v => upd("income", v)} />
             </div>
             <div>
-              <FieldLabel>Areas of Expertise / Interest <span style={{ fontWeight: 400, color: C.body }}>(select all that apply)</span></FieldLabel>
+              <FieldLabel required>전문 분야 / 관심 분야 <span style={{ fontWeight: 400, color: C.body }}>(해당하는 항목 모두 선택)</span></FieldLabel>
               <ChipGroup options={INTERESTS} value={form.interests} onSelect={toggleInterest} multi />
               {form.interests.length > 0 && (
-                <div style={{ marginTop: 10, fontSize: 12, color: C.purple }}>{form.interests.length} selected</div>
+                <div style={{ marginTop: 10, fontSize: 12, color: C.purple }}>{form.interests.length}개 선택됨</div>
               )}
             </div>
             <div style={{ display: "flex", gap: 10 }}>
-              <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => setStep(0)}>Back</Btn>
-              <Btn size="lg" style={{ flex: 2 }} disabled={!step1Valid} onClick={() => setStep(2)}>Next</Btn>
+              <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => setStep(0)}>이전</Btn>
+              <Btn size="lg" style={{ flex: 2 }} disabled={!step1Valid} onClick={() => setStep(2)}>다음</Btn>
             </div>
           </div>
         </div>
@@ -146,19 +149,19 @@ export default function PanelEntryScreen({ go }) {
       <div style={{ display: "flex", justifyContent: "center", padding: "60px 24px" }}>
         <div style={{ width: "100%", maxWidth: 520, textAlign: "center" }}>
           <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(30,142,62,0.12)", border: "1px solid rgba(30,142,62,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>✓</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 10 }}>You're registered as a Panelist</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 10 }}>인터뷰 패널로 등록됐어요</div>
           <div style={{ fontSize: 14, color: C.body, lineHeight: 1.75, marginBottom: 32 }}>
-            Welcome, {form.name}.<br />
-            Browse the interview board to find opportunities.<br />
-            Rewards are automatically disbursed after AI quality review upon interview completion.
+            {form.name}님 환영합니다.<br />
+            인터뷰 보드에서 참여할 인터뷰를 찾아보세요.<br />
+            인터뷰 완료 후 AI 품질 검토를 거쳐 리워드가 자동 지급됩니다.
           </div>
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "18px 20px", marginBottom: 24, textAlign: "left", boxShadow: S.ambient }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, marginBottom: 10 }}>What happens next</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, marginBottom: 10 }}>다음 단계</div>
             {[
-              ["1", "Browse the interview board and choose an interview"],
-              ["2", "Apply → AI screening → Researcher final confirmation"],
-              ["3", "Once confirmed, sign the consent form and complete your voice interview"],
-              ["4", "After completion, AI quality review → reward automatically disbursed"],
+              ["1", "인터뷰 보드에서 원하는 인터뷰를 선택해 주세요"],
+              ["2", "지원 → AI 스크리닝 → 연구자 최종 확인"],
+              ["3", "확정 후 동의서에 서명하고 음성 인터뷰를 완료해 주세요"],
+              ["4", "인터뷰 완료 후 AI 품질 검토 → 리워드 자동 지급"],
             ].map(([n, txt]) => (
               <div key={n} style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "flex-start" }}>
                 <div style={{ width: 22, height: 22, borderRadius: "50%", background: C.purpleBg, border: `1px solid ${C.purpleLight}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: C.purple, flexShrink: 0 }}>{n}</div>
@@ -167,9 +170,9 @@ export default function PanelEntryScreen({ go }) {
             ))}
           </div>
           <div style={{ display: "flex", gap: 10 }}>
-            <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => go("landing")}>Go Home</Btn>
+            <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => go("landing")}>홈으로</Btn>
             <Btn size="lg" style={{ flex: 2 }} onClick={() => go("panel_board")}>
-              Browse Interviews
+              인터뷰 보드 보기
             </Btn>
           </div>
         </div>
@@ -181,21 +184,21 @@ export default function PanelEntryScreen({ go }) {
   return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
       {navBar}
-      <div style={{ display: "flex", justifyContent: "center", padding: "40px 24px" }}>
+      <div style={{ display: "flex", justifyContent: "center", padding: isMobile ? "24px 16px" : "40px 24px" }}>
         <div style={{ width: "100%", maxWidth: 520 }}>
           <StepBar />
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>Data Collection &amp; Use Consent</div>
-            <div style={{ fontSize: 13, color: C.body }}>Please review and agree to the following</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>데이터 수집 및 이용 동의</div>
+            <div style={{ fontSize: 13, color: C.body }}>아래 내용을 검토하고 동의해 주세요</div>
           </div>
           <div style={{ background: C.white, borderRadius: 8, border: `1px solid ${C.border}`, padding: "28px", boxShadow: S.standard }}>
             <div style={{ background: C.purpleBg, border: `1px solid ${C.purpleLight}`, borderRadius: 8, padding: "14px 16px", marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, marginBottom: 8 }}>Your profile summary</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, marginBottom: 8 }}>프로필 요약</div>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "6px 16px" }}>
                 {[
-                  ["Name", form.name], ["Region", form.region],
-                  ["Age/Gender", `${form.age} · ${form.gender}`], ["Occupation", form.job],
-                  ["Monthly Income", form.income], ["Interests", form.interests.slice(0, 3).join(", ") + (form.interests.length > 3 ? ` +${form.interests.length - 3} more` : "")],
+                  ["이름", form.name], ["지역", form.region],
+                  ["나이/성별", `${form.age} · ${form.gender}`], ["직업", form.job],
+                  ["월 소득", form.income], ["관심 분야", form.interests.slice(0, 3).join(", ") + (form.interests.length > 3 ? ` 외 ${form.interests.length - 3}개` : "")],
                 ].map(([k, v]) => (
                   <div key={k}>
                     <span style={{ fontSize: 11, color: C.body }}>{k} </span>
@@ -205,12 +208,12 @@ export default function PanelEntryScreen({ go }) {
               </div>
             </div>
 
-            <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 12 }}>Data Collection &amp; Use Details</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 12 }}>데이터 수집 및 이용 내역</div>
             {[
-              ["Data Collected", "Name, phone number, region, gender, age, occupation, income, interests, voice responses"],
-              ["Purpose", "Panelist matching for interviews, research analysis, and report generation"],
-              ["Retention", "Until account deletion or 2 years after last interview completion"],
-              ["Third-party Sharing", "Anonymized analysis data shared with client companies (no personally identifiable information)"],
+              ["수집 항목", "이름, 전화번호, 지역, 성별, 나이, 직업, 소득, 관심 분야, 음성 응답"],
+              ["이용 목적", "인터뷰 패널 매칭, 리서치 분석 및 리포트 생성"],
+              ["보관 기간", "계정 삭제 시 또는 마지막 인터뷰 완료 후 2년까지"],
+              ["제3자 제공", "익명화된 분석 데이터만 클라이언트에 제공 (개인식별정보 제외)"],
             ].map(([k, v]) => (
               <div key={k} style={{ display: "flex", gap: 12, padding: "9px 0", borderBottom: `1px solid ${C.border}` }}>
                 <span style={{ fontSize: 11, color: C.body, minWidth: 72, flexShrink: 0 }}>{k}</span>
@@ -219,23 +222,23 @@ export default function PanelEntryScreen({ go }) {
             ))}
             <div style={{ marginTop: 16, padding: "12px 14px", borderRadius: 6, background: C.bg, border: `1px solid ${C.border}` }}>
               <div style={{ fontSize: 12, color: C.body, lineHeight: 1.75 }}>
-                ✦ Audio is transcribed by AI and deleted immediately after<br />
-                ✦ Personally identifiable information is never shared with advertisers<br />
-                ✦ You can withdraw consent and delete your account at any time
+                ✦ 음성은 AI가 텍스트로 변환 후 즉시 삭제됩니다<br />
+                ✦ 개인식별정보는 광고주와 절대 공유되지 않습니다<br />
+                ✦ 언제든지 동의를 철회하고 계정을 삭제할 수 있습니다
               </div>
             </div>
 
-            <div onClick={() => setAgreed(a => !a)} style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 20, cursor: "pointer" }}>
-              <div style={{ width: 20, height: 20, borderRadius: 4, border: `1.5px solid ${agreed ? C.purple : C.border}`, background: agreed ? C.purple : C.white, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s", flexShrink: 0 }}>
+            <div onClick={() => setAgreed(a => !a)} style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 20, cursor: "pointer", minHeight: 44, padding: "4px 0" }}>
+              <div style={{ width: 24, height: 24, borderRadius: 5, border: `1.5px solid ${agreed ? C.purple : C.border}`, background: agreed ? C.purple : C.white, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s", flexShrink: 0 }}>
                 {agreed && <span style={{ color: C.white, fontSize: 12, lineHeight: 1 }}>✓</span>}
               </div>
-              <span style={{ fontSize: 13, color: C.navy }}>I have read and agree to all of the above</span>
+              <span style={{ fontSize: 13, color: C.navy }}>위 내용을 모두 읽고 동의합니다</span>
             </div>
 
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => setStep(1)}>Back</Btn>
+              <Btn variant="ghost" size="lg" style={{ flex: 1 }} onClick={() => setStep(1)}>이전</Btn>
               <Btn size="lg" style={{ flex: 2 }} disabled={!agreed} onClick={() => setStep(3)}>
-                Register as Panelist
+                인터뷰 패널 등록
               </Btn>
             </div>
           </div>

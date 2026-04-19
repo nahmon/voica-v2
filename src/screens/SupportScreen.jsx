@@ -3,14 +3,13 @@ import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Btn, Input, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function SupportScreen({ go, user, logout }) {
+export default function SupportScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
   const [category, setCategory] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
-  const [lang, setLang] = useState("ko");
   const isKo = lang === "ko";
 
   const categories = isKo
@@ -115,7 +114,7 @@ export default function SupportScreen({ go, user, logout }) {
           </div>
         </div>
       </div>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }

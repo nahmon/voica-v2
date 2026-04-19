@@ -130,8 +130,7 @@ function StatsBar({ sessions, allResponses }) {
   );
 }
 
-export default function ResponsesScreen({ go, user, logout, interviewId }) {
-  const [lang, setLang] = useState("ko");
+export default function ResponsesScreen({ go, user, logout, interviewId, lang = "ko", onLangChange }) {
   const [interview, setInterview] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -603,27 +602,22 @@ function MCAnswer({ response, question }) {
 
 function LikertAnswer({ response, question }) {
   const selected = Number(response.value);
-  const min = question.options?.min ?? 1;
   const max = question.options?.max ?? 5;
   const labels = question.options?.labels ?? [];
+  const labelText = labels[selected - (question.options?.min ?? 1)] ?? "";
+  const pct = Math.round(((selected - (question.options?.min ?? 1)) / (max - (question.options?.min ?? 1))) * 100);
   return (
-    <div>
-      <div style={{ display: "flex", gap: 6 }}>
-        {Array.from({ length: max - min + 1 }, (_, i) => i + min).map(n => {
-          const isSelected = n === selected;
-          return (
-            <div key={n} style={{ flex: 1, aspectRatio: "1", borderRadius: 8, border: `2px solid ${isSelected ? C.purple : C.border}`, background: isSelected ? C.purple : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 600, color: isSelected ? C.white : C.body }}>
-              {n}
-            </div>
-          );
-        })}
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: C.purple, flexShrink: 0 }}>
+        {selected}
       </div>
-      {labels.length > 0 && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-          <span style={{ fontSize: 10, color: C.body }}>{labels[0]}</span>
-          <span style={{ fontSize: 10, color: C.body }}>{labels[labels.length - 1]}</span>
+      <div style={{ flex: 1 }}>
+        {labelText && <div style={{ fontSize: 13, color: C.navy, fontWeight: 500, marginBottom: 4 }}>{labelText}</div>}
+        <div style={{ height: 4, borderRadius: 2, background: C.border, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${pct}%`, background: C.purple, borderRadius: 2 }} />
         </div>
-      )}
+      </div>
+      <div style={{ fontSize: 11, color: C.body, flexShrink: 0 }}>{selected}/{max}</div>
     </div>
   );
 }

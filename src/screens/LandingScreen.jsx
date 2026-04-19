@@ -24,6 +24,13 @@ const GLOBAL_STYLES = `
 @keyframes rec-ring { 0%{box-shadow:0 0 0 0 rgba(220,38,38,0.5)} 70%{box-shadow:0 0 0 10px rgba(220,38,38,0)} 100%{box-shadow:0 0 0 0 rgba(220,38,38,0)} }
 @keyframes wave-bar { 0%,100%{transform:scaleY(0.4)} 50%{transform:scaleY(1)} }
 @keyframes typing-dot { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-4px);opacity:1} }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 `;
 
 /* ── Translations ── */
@@ -443,14 +450,18 @@ function UseCasesSection({ isMobile, t }) {
                 key={i}
                 onClick={() => setActiveIdx(i)}
                 style={{
-                  display: "flex", alignItems: "center", gap: 14,
-                  padding: "13px 16px", borderRadius: 10, cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "12px 16px", borderRadius: 8, cursor: "pointer",
                   background: isActive ? C.purpleBg : "transparent",
                   transition: "background 0.15s",
                 }}
               >
-                <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
-                <span style={{ fontSize: 15, fontWeight: isActive ? 700 : 500, color: isActive ? C.navy : C.body }}>{item.label}</span>
+                <div style={{
+                  width: 6, height: 6, borderRadius: "50%", flexShrink: 0,
+                  background: isActive ? C.purple : C.border,
+                  transition: "background 0.15s",
+                }} />
+                <span style={{ fontSize: 15, fontWeight: isActive ? 600 : 400, color: isActive ? C.navy : C.body }}>{item.label}</span>
               </div>
             );
           })}

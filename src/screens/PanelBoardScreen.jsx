@@ -34,13 +34,13 @@ function addRecentlyViewed(jobId) {
   localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify([jobId, ...prev].slice(0, 6)));
 }
 
-export default function PanelBoardScreen({ go, user, logout }) {
-  const [lang, setLang] = useState("ko");
+export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isKo = lang === "ko";
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("All");
   const [sortKey, setSortKey] = useState("recommended");
+  const [mobileSortOpen, setMobileSortOpen] = useState(false);
   const [applyState, setApplyState] = useState({});
   const [recentIds, setRecentIds] = useState(getRecentlyViewed);
 
@@ -74,14 +74,16 @@ export default function PanelBoardScreen({ go, user, logout }) {
   }
 
   return (
-    <div style={{ background: "#f5f6fa", minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
+    <div style={{ background: "#ffffff", minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <GlobalNav go={go} activeTab="panel_board" variant={user?.user_metadata?.role === "researcher" ? "app" : "panel"} user={user} logout={logout} lang={lang} />
 
       {/* Hero */}
       <div style={{
         background: `linear-gradient(135deg, ${C.navy} 0%, #2d1b6b 100%)`,
         padding: isMobile ? "32px 20px 40px" : "48px 24px 56px",
+        position: "relative", overflow: "hidden",
       }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, opacity: 0.035, pointerEvents: "none" }} />
         <div style={{ maxWidth: 760, margin: "0 auto" }}>
           {/* Live indicator */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "5px 12px", marginBottom: 20 }}>
@@ -92,7 +94,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
           <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 700, color: "#fff", margin: "0 0 8px", lineHeight: 1.25 }}>
             {isKo ? "인터뷰에 참여하고, 리워드를 받아보세요" : "Share your voice. Earn rewards."}
           </h1>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", margin: "0 0 24px" }}>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", margin: "0 0 24px" }}>
             {isKo ? "내 프로필에 딱 맞는 AI 인터뷰에 참여해 보세요." : "Join AI-powered interviews matched to your profile."}
           </p>
 
@@ -120,29 +122,31 @@ export default function PanelBoardScreen({ go, user, logout }) {
             {[
               { label: isKo ? "평균 리워드" : "Avg. reward", value: "₩25,000" },
               { label: isKo ? "평균 소요 시간" : "Avg. duration", value: isKo ? "8분" : "8 min" },
-              { label: isKo ? "나에게 맞는 인터뷰" : "Matched for you", value: isKo ? `${recommendedCount}건` : `${recommendedCount} interviews` },
-            ].map(s => (
+              recommendedCount > 0 && { label: isKo ? "나에게 맞는 인터뷰" : "Matched for you", value: isKo ? `${recommendedCount}건` : `${recommendedCount} interviews` },
+            ].filter(Boolean).map(s => (
               <div key={s.label}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{s.label}</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", marginTop: 1 }}>{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: isMobile ? "20px 16px 80px" : "28px 24px 80px", flex: 1 }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: isMobile ? "20px 16px 80px" : "28px 24px 80px", flex: 1, minWidth: 0, width: "100%" }}>
 
         {/* Filters + Sort row */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
           {/* Category pills */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto", scrollbarWidth: "none", flex: 1 }}>
+          <div style={{ position: "relative", flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto", scrollbarWidth: "none" }}>
+
             {CATEGORY_KEYS.map(c => {
               const active = catFilter === c;
               return (
                 <button key={c} onClick={() => setCatFilter(c)} style={{
                   padding: "6px 14px", borderRadius: 20, fontSize: 12, fontFamily: F, cursor: "pointer",
-                  border: `1px solid ${active ? C.purple : "rgba(0,0,0,0.1)"}`,
+                  border: `1px solid ${active ? C.purple : C.border}`,
                   background: active ? C.purple : "#fff",
                   color: active ? "#fff" : C.body,
                   fontWeight: active ? 600 : 400, flexShrink: 0,
@@ -153,14 +157,26 @@ export default function PanelBoardScreen({ go, user, logout }) {
               );
             })}
           </div>
+          <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 32, background: "linear-gradient(to right, transparent, #fff)", pointerEvents: "none" }} />
+          </div>
 
-          {/* Sort dropdown */}
-          {!isMobile && (
+          {/* Sort: desktop dropdown / mobile icon button */}
+          {isMobile ? (
+            <button
+              onClick={() => setMobileSortOpen(v => !v)}
+              style={{
+                padding: "6px 10px", borderRadius: 8, border: `1px solid ${mobileSortOpen ? C.purple : C.border}`,
+                background: mobileSortOpen ? C.purpleBg : "#fff", color: mobileSortOpen ? C.purple : C.body,
+                fontSize: 13, cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", gap: 4, fontFamily: F,
+              }}>
+              ⇅
+            </button>
+          ) : (
             <select
               value={sortKey}
               onChange={e => setSortKey(e.target.value)}
               style={{
-                padding: "7px 12px", borderRadius: 8, border: `1px solid rgba(0,0,0,0.1)`,
+                padding: "7px 12px", borderRadius: 8, border: `1px solid ${C.border}`,
                 background: "#fff", fontSize: 12, fontFamily: F, color: C.navy,
                 cursor: "pointer", flexShrink: 0, outline: "none",
               }}>
@@ -168,6 +184,50 @@ export default function PanelBoardScreen({ go, user, logout }) {
             </select>
           )}
         </div>
+        {/* Mobile sort options row */}
+        {isMobile && mobileSortOpen && (
+          <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+            {SORT_OPTIONS.map(o => {
+              const active = sortKey === o.key;
+              return (
+                <button key={o.key} onClick={() => { setSortKey(o.key); setMobileSortOpen(false); }} style={{
+                  padding: "6px 14px", borderRadius: 20, fontSize: 12, fontFamily: F, cursor: "pointer",
+                  border: `1px solid ${active ? C.purple : C.border}`,
+                  background: active ? C.purple : "#fff",
+                  color: active ? "#fff" : C.body,
+                  fontWeight: active ? 600 : 400,
+                }}>
+                  {o.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Recently viewed — top */}
+        {recentJobs.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              {isKo ? "최근 본 인터뷰" : "Recently viewed"}
+            </div>
+            <div style={{ display: "flex", gap: 10, overflowX: "auto", scrollbarWidth: "none", paddingBottom: 4 }}>
+              {recentJobs.map(job => (
+                <div key={job.id} style={{
+                  background: "#fff", borderRadius: 12, padding: "12px 14px",
+                  border: `1px solid rgba(0,0,0,0.08)`, flexShrink: 0,
+                  minWidth: 200, maxWidth: 240,
+                }}>
+                  <div style={{ fontSize: 12, color: C.body, marginBottom: 4 }}>{job.company}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{job.title}</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: C.purple }}>{job.reward}</span>
+                    <MatchBadge score={job._matchScore} isKo={isKo} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Result count */}
         <div style={{ fontSize: 12, color: C.body, marginBottom: 12 }}>
@@ -177,7 +237,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
         </div>
 
         {/* Job cards */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {filtered.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: C.body }}>
               <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
@@ -202,33 +262,8 @@ export default function PanelBoardScreen({ go, user, logout }) {
             />
           ))}
         </div>
-
-        {/* Recently viewed */}
-        {recentJobs.length > 0 && (
-          <div style={{ marginTop: 48 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              {isKo ? "최근 본 인터뷰" : "Recently viewed"}
-            </div>
-            <div style={{ display: "flex", gap: 10, overflowX: "auto", scrollbarWidth: "none", paddingBottom: 4 }}>
-              {recentJobs.map(job => (
-                <div key={job.id} style={{
-                  background: "#fff", borderRadius: 10, padding: "12px 14px",
-                  border: `1px solid rgba(0,0,0,0.08)`, flexShrink: 0,
-                  minWidth: 200, maxWidth: 240,
-                }}>
-                  <div style={{ fontSize: 12, color: C.body, marginBottom: 4 }}>{job.company}</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{job.title}</div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: C.purple }}>{job.reward}</span>
-                    <MatchBadge score={job._matchScore} isKo={isKo} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }
@@ -236,24 +271,23 @@ export default function PanelBoardScreen({ go, user, logout }) {
 function MatchBadge({ score, isKo }) {
   const pct = Math.min(100, Math.round((score / 8) * 100));
   let color, bg;
-  if (pct >= 70) { color = "#15803d"; bg = "rgba(21,190,83,0.1)"; }
+  if (pct >= 70) { color = C.successText; bg = C.successBg; }
   else if (pct >= 40) { color = "#92650a"; bg = "rgba(251,191,36,0.12)"; }
-  else { color = "#64748d"; bg = "rgba(100,116,141,0.08)"; }
+  else { color = C.body; bg = "rgba(0,0,0,0.05)"; }
   return (
-    <span style={{ fontSize: 11, fontWeight: 600, color, background: bg, padding: "2px 8px", borderRadius: 4, flexShrink: 0 }}>
+    <span style={{ fontSize: 11, fontWeight: 600, color, background: bg, padding: "2px 8px", borderRadius: 6, flexShrink: 0 }}>
       {isKo ? `${pct}% 일치` : `${pct}% match`}
     </span>
   );
 }
 
 function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, onCycleDemo, go }) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const remaining = job.total - job.filled;
   const fillPct = Math.round((job.filled / job.total) * 100);
   const isConfirmed = status === "confirmed";
   const isApplied = status !== "none";
   const isUrgent = job.urgent || remaining <= 10;
-  const matchPct = Math.min(100, Math.round((job._matchScore / 8) * 100));
 
   function handleToggle() {
     if (!isApplied) { setExpanded(v => !v); onView(); }
@@ -261,41 +295,35 @@ function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, 
 
   return (
     <div
-      onClick={handleToggle}
       style={{
         background: "#fff",
-        borderRadius: 14,
-        border: isRecommended ? `1.5px solid ${C.purpleLight}40` : "1px solid rgba(0,0,0,0.08)",
+        borderRadius: 12,
+        border: isRecommended ? `1.5px solid ${C.purpleLight}` : `1px solid ${C.border}`,
         overflow: "hidden",
-        cursor: isApplied ? "default" : "pointer",
-        transition: "box-shadow 0.15s, transform 0.15s",
-        boxShadow: isRecommended ? "0 2px 12px rgba(110,75,255,0.08)" : "0 1px 4px rgba(0,0,0,0.05)",
+        transition: "box-shadow 0.15s",
       }}
-      onMouseEnter={e => { if (!isApplied) { e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)"; e.currentTarget.style.transform = "translateY(-1px)"; } }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = isRecommended ? "0 2px 12px rgba(110,75,255,0.08)" : "0 1px 4px rgba(0,0,0,0.05)"; e.currentTarget.style.transform = "none"; }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.08)"; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
     >
-      {/* Recommended accent bar */}
-      {isRecommended && <div style={{ height: 3, background: `linear-gradient(90deg, ${C.purple}, ${C.purpleLight})` }} />}
+      <div style={{ padding: isMobile ? "14px 16px" : "18px 22px" }}>
 
-      <div style={{ padding: isMobile ? "16px" : "18px 22px" }}>
-
-        {/* Header row: company + category / reward */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: C.body }}>{job.company}</span>
-            <span style={{ width: 3, height: 3, borderRadius: "50%", background: C.border, display: "inline-block" }} />
-            <span style={{ fontSize: 11, color: C.body, background: "rgba(0,0,0,0.04)", padding: "2px 7px", borderRadius: 4 }}>{job.category}</span>
-            {isRecommended && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: C.purple, background: `${C.purpleBg}`, padding: "2px 7px", borderRadius: 4 }}>{isKo ? "✦ 추천" : "✦ Matched"}</span>
-            )}
+        {/* Header row: company + badges / reward */}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", flex: 1, minWidth: 0, paddingRight: 10 }}>
+            <span style={{ fontSize: 12, fontWeight: 500, color: C.body, whiteSpace: "nowrap" }}>{job.company}</span>
             {isUrgent && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#dc2626", background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 4 }}>{isKo ? "⚡ 마감 임박" : "⚡ Closing Soon"}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: "#dc2626", background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                {isKo ? "⚡ 마감 임박" : "⚡ Closing"}
+              </span>
+            )}
+            {isRecommended && (
+              <span style={{ fontSize: 11, fontWeight: 600, color: C.purple, background: C.purpleBg, padding: "2px 7px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                {isKo ? "★ 추천" : "★ Matched"}
+              </span>
             )}
           </div>
-
-          {/* Reward — hero number */}
-          <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 12 }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{job.reward}</div>
+          <div style={{ textAlign: "right", flexShrink: 0 }}>
+            <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: C.purple, lineHeight: 1 }}>{job.reward}</div>
             <div style={{ fontSize: 11, color: C.body, marginTop: 3, display: "flex", alignItems: "center", gap: 3, justifyContent: "flex-end" }}>
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={C.body} strokeWidth="1.4" strokeLinecap="round"><circle cx="5" cy="5" r="4"/><path d="M5 3v2l1.5 1.5"/></svg>
               {job.duration}
@@ -304,27 +332,20 @@ function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, 
         </div>
 
         {/* Title */}
-        <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 700, color: C.navy, lineHeight: 1.4, marginBottom: 12 }}>
+        <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 700, color: C.navy, lineHeight: 1.4, marginBottom: 10 }}>
           {job.title}
         </div>
 
         {/* Match + fill row */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, minWidth: 0 }}>
           <MatchBadge score={job._matchScore} isKo={isKo} />
-          <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" }}>
-            <div style={{
-              height: "100%", borderRadius: 2,
-              width: `${fillPct}%`,
-              background: fillPct >= 80 ? "#ef4444" : C.purple,
-              transition: "width 0.3s",
-            }} />
+          <div style={{ flex: 1, minWidth: 0, height: 5, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ height: "100%", borderRadius: 2, width: `${fillPct}%`, background: fillPct >= 80 ? C.ruby : C.purple, transition: "width 0.3s" }} />
           </div>
-          <span style={{ fontSize: 11, color: isUrgent ? "#dc2626" : C.body, fontWeight: isUrgent ? 600 : 400, whiteSpace: "nowrap" }}>
-            {isUrgent
-              ? (isKo ? `⚡ ${remaining}자리 남음` : `⚡ ${remaining} left`)
-              : (isKo ? `${remaining}자리 남음` : `${remaining} spots`)}
+          <span style={{ fontSize: 11, color: isUrgent ? "#dc2626" : C.body, fontWeight: isUrgent ? 600 : 400, whiteSpace: "nowrap", flexShrink: 0 }}>
+            {isKo ? `${remaining}자리 남음` : `${remaining} left`}
           </span>
-          <span style={{ fontSize: 11, color: C.body, whiteSpace: "nowrap" }}>~{job.deadline}</span>
+          {!isMobile && <span style={{ fontSize: 11, color: C.body, whiteSpace: "nowrap", flexShrink: 0 }}>~{job.deadline}</span>}
         </div>
 
         {/* CTA */}
@@ -334,32 +355,49 @@ function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, 
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
               <span style={{ fontSize: 13, fontWeight: 600, color: "#15803d" }}>{isKo ? "참여 확정됐어요!" : "Confirmed — you're in!"}</span>
             </div>
-            <button onClick={() => go("consent")} style={{
-              padding: "10px 20px", background: C.purple, color: "#fff",
-              border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600,
-              cursor: "pointer", fontFamily: F, whiteSpace: "nowrap",
-            }}>
+            <button onClick={() => go("consent")} style={{ padding: "10px 20px", background: C.purple, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: F, whiteSpace: "nowrap" }}>
               {isKo ? "시작하기 →" : "Start →"}
             </button>
           </div>
         ) : isApplied ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: C.purpleBg, borderRadius: 8, border: `1px solid ${C.purple}20` }}>
-            <div style={{ width: 7, height: 7, borderRadius: "50%", background: C.purple, flexShrink: 0 }} />
-            <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>
-              {status === "applied"
-                ? (isKo ? "AI가 지원서를 검토하고 있어요…" : "AI screening in progress…")
-                : (isKo ? "연구자 확인을 기다리고 있어요" : "Awaiting researcher confirmation")}
-            </span>
+          <div style={{ padding: "10px 14px", background: C.purpleBg, borderRadius: 8, border: `1px solid ${C.purple}20` }}>
+            {(() => {
+              const steps = isKo
+                ? ["지원 완료", "AI 심사중", "확정 대기"]
+                : ["Applied", "AI Review", "Confirming"];
+              const stepIdx = status === "applied" ? 1 : 2;
+              return (
+                <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                  {steps.map((label, i) => {
+                    const done = i < stepIdx;
+                    const active = i === stepIdx;
+                    return (
+                      <div key={i} style={{ display: "flex", alignItems: "center", flex: i < steps.length - 1 ? 1 : "none" }}>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                          <div style={{
+                            width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+                            background: done ? C.purple : active ? C.purple : "rgba(0,0,0,0.08)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 10, color: "#fff", fontWeight: 700,
+                          }}>
+                            {done ? "✓" : i + 1}
+                          </div>
+                          <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? C.purple : done ? C.purple : C.body, whiteSpace: "nowrap" }}>{label}</span>
+                        </div>
+                        {i < steps.length - 1 && (
+                          <div style={{ flex: 1, height: 2, background: done ? C.purple : "rgba(0,0,0,0.08)", margin: "0 4px", marginBottom: 14, borderRadius: 1 }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         ) : (
           <button
             onClick={e => { e.stopPropagation(); onApply(); }}
-            style={{
-              width: "100%", padding: "11px 14px", borderRadius: 8,
-              border: "none", background: C.purple, color: "#fff",
-              fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: F,
-              transition: "background 0.12s",
-            }}
+            style={{ width: "100%", padding: "11px 14px", borderRadius: 8, border: "none", background: C.purple, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: F, transition: "background 0.12s" }}
             onMouseEnter={e => e.currentTarget.style.background = C.purpleHover}
             onMouseLeave={e => e.currentTarget.style.background = C.purple}
           >
@@ -367,16 +405,27 @@ function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, 
           </button>
         )}
 
+        {/* Expand / collapse toggle (mobile only) */}
+        {isMobile && !isApplied && (
+          <button
+            onClick={e => { e.stopPropagation(); handleToggle(); }}
+            style={{ width: "100%", marginTop: 10, padding: "7px 0", background: expanded ? C.purpleBg : "#f8fafc", border: `1px solid ${expanded ? C.purpleLight : C.border}`, borderRadius: 7, cursor: "pointer", fontSize: 12, color: expanded ? C.purple : C.body, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, fontFamily: F }}
+          >
+            {expanded ? (isKo ? "접기" : "Less") : (isKo ? "자세히 보기" : "Details")}
+            <span style={{ display: "inline-block", transform: expanded ? "rotate(-90deg)" : "rotate(90deg)", transition: "transform 0.2s", fontSize: 11 }}>›</span>
+          </button>
+        )}
+
         {/* Expanded details */}
         {expanded && !isApplied && (
-          <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid rgba(0,0,0,0.06)` }} onClick={e => e.stopPropagation()}>
+          <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid rgba(0,0,0,0.06)` }} onClick={e => e.stopPropagation()}>
             {job.description && (
               <p style={{ fontSize: 13, color: C.body, lineHeight: 1.75, margin: "0 0 14px" }}>{job.description}</p>
             )}
-            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 16, flexDirection: isMobile ? "column" : "row" }}>
               {job.targetProfile && (
-                <div style={{ flex: 1, minWidth: 140 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>{isKo ? "모집 대상" : "Looking for"}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>{isKo ? "모집 대상" : "Looking for"}</div>
                   <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                     {[job.targetProfile.age, job.targetProfile.gender, job.targetProfile.region].map((v, i) => (
                       <span key={i} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(0,0,0,0.04)", color: C.navy, fontWeight: 500 }}>{v}</span>
@@ -387,11 +436,11 @@ function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, 
                   )}
                 </div>
               )}
-              <div style={{ flex: 1, minWidth: 140 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>{isKo ? "참여 조건" : "Requirements"}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.label, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>{isKo ? "참여 조건" : "Requirements"}</div>
                 <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                   {job.conditions.map(c => (
-                    <span key={c} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: C.purpleBg, color: C.purple, fontWeight: 500 }}>{c}</span>
+                    <span key={c} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(0,0,0,0.04)", color: C.navy, fontWeight: 500 }}>{c}</span>
                   ))}
                 </div>
               </div>
@@ -399,12 +448,6 @@ function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, 
           </div>
         )}
 
-        {/* Collapse hint */}
-        {!isApplied && (
-          <div style={{ textAlign: "center", marginTop: 10 }}>
-            <span style={{ fontSize: 11, color: C.body, opacity: 0.5 }}>{expanded ? (isKo ? "▲ 접기" : "▲ less") : (isKo ? "▼ 자세히" : "▼ details")}</span>
-          </div>
-        )}
       </div>
     </div>
   );

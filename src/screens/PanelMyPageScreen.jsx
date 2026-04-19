@@ -56,8 +56,7 @@ const MY_INTERVIEWS_KO = [
   { id: 4, title: "금융 앱 UX 개선 연구",                company: "핀테크 D",        status: "applied",    reward: "₩8,000",  date: "2026.04.10", rewardStatus: null },
 ];
 
-export default function PanelMyPageScreen({ go, user, logout }) {
-  const [lang, setLang] = useState("ko");
+export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isKo = lang === "ko";
   const isMobile = useIsMobile();
   const [notifInterview, setNotifInterview] = useState(true);
@@ -373,7 +372,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
                   <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>{item.desc}</div>
                 </div>
                 <button onClick={() => item.set(v => !v)}
-                  style={{ width: 42, height: 24, borderRadius: 12, border: "none", background: item.value ? C.purple : C.border, cursor: "pointer", position: "relative", flexShrink: 0, transition: "background 0.2s", padding: 0 }}>
+                  style={{ width: 42, height: 24, minHeight: "unset", borderRadius: 12, border: "none", background: item.value ? C.purple : C.border, cursor: "pointer", position: "relative", flexShrink: 0, transition: "background 0.2s", padding: 0 }}>
                   <div style={{ position: "absolute", top: 3, left: item.value ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: C.white, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.18)" }} />
                 </button>
               </div>
@@ -385,7 +384,7 @@ export default function PanelMyPageScreen({ go, user, logout }) {
           <Btn variant="ghost" onClick={() => go("panel_board")}>{isKo ? "인터뷰 더 보기" : "Browse More Interviews"}</Btn>
         </div>
       </div>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }

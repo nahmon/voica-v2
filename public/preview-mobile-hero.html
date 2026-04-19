@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 390px; background: #f8f9ff; font-family: -apple-system, 'Pretendard', sans-serif; }
+
+/* GNB */
+.gnb { height: 56px; background: #fff; border-bottom: 1px solid #e5edf5; display: flex; align-items: center; padding: 0 20px; gap: 8px; }
+.logo-icon { width: 20px; height: 20px; border-radius: 5px; background: #6E4BFF; display: flex; align-items: center; justify-content: center; }
+.logo-inner { width: 8px; height: 8px; border-radius: 2px; background: #fff; }
+.logo-text { font-size: 15.5px; font-weight: 700; letter-spacing: -0.03em; color: #0f172a; }
+
+/* Hero */
+.hero { padding: 40px 20px 36px; background: #f8f9ff; }
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; background: rgba(110,75,255,0.08); border: 1px solid rgba(110,75,255,0.2); font-size: 12px; color: #6E4BFF; font-weight: 500; margin-bottom: 16px; }
+h1 { font-size: 32px; font-weight: 700; color: #0f172a; line-height: 1.2; margin-bottom: 16px; letter-spacing: -0.5px; }
+h1 .gradient { background: linear-gradient(135deg, #6E4BFF, #3d2ab0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.sub { font-size: 14px; color: #64748b; line-height: 1.65; margin-bottom: 24px; }
+
+/* CTAs */
+.ctas { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.btn-primary { padding: 13px 22px; border-radius: 10px; background: #6E4BFF; color: #fff; font-size: 14px; font-weight: 600; border: none; flex: 1; }
+.btn-secondary { padding: 13px 22px; border-radius: 10px; background: #fff; color: #6E4BFF; font-size: 14px; font-weight: 600; border: 1.5px solid rgba(110,75,255,0.3); flex: 1; }
+
+/* Live counter */
+.live-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; background: rgba(110,75,255,0.06); border: 1px solid rgba(110,75,255,0.15); font-size: 12px; color: #64748b; margin-bottom: 20px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: #15be53; flex-shrink: 0; }
+
+/* ── Option A: Slim Chat Preview Card ── */
+.chat-preview {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5edf5;
+  box-shadow: 0 4px 20px rgba(110,75,255,0.10), 0 1px 4px rgba(0,0,0,0.05);
+  overflow: hidden;
+  margin-top: 4px;
+}
+.chat-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f0f2f9;
+  background: #fafbff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.chat-header-left { font-size: 11px; color: #94a3b8; }
+.live-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #15803d; font-weight: 600; }
+.rec-dot { width: 5px; height: 5px; border-radius: 50%; background: #15be53; }
+
+.chat-body { padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 10px; }
+
+/* AI question bubble */
+.ai-row { display: flex; gap: 8px; align-items: flex-start; }
+.ai-avatar { width: 28px; height: 28px; border-radius: 7px; background: rgba(110,75,255,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ai-bubble { background: #f4f1fe; border-radius: 4px 12px 12px 12px; padding: 10px 12px; font-size: 13px; color: #0f172a; line-height: 1.5; max-width: 270px; }
+
+/* Recording indicator */
+.rec-row { display: flex; justify-content: flex-end; }
+.rec-chip { background: rgba(220,38,38,0.05); border: 1px solid rgba(220,38,38,0.18); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; }
+.rec-indicator { width: 8px; height: 8px; border-radius: 50%; background: #dc2626; }
+.wave { display: flex; align-items: center; gap: 2px; height: 16px; }
+.wave-bar { width: 3px; border-radius: 2px; background: #dc2626; }
+.rec-label { font-size: 11px; color: #dc2626; font-weight: 600; }
+
+/* Slide-in label */
+.preview-label {
+  text-align: center;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 8px;
+  letter-spacing: 0.01em;
+}
+
+@keyframes wave { 0%,100%{transform:scaleY(0.4)} 50%{transform:scaleY(1)} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+</style>
+</head>
+<body>
+
+<!-- GNB -->
+<div class="gnb">
+  <div class="logo-icon"><div class="logo-inner"></div></div>
+  <span class="logo-text">voicesurvey</span>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="badge">
+    <span>✦</span> AI가 인터뷰하고, AI가 분석해요.
+  </div>
+  <h1>비싸고 오래 걸리는<br>사용자 조사,<br><span class="gradient">AI로 수백 명을 한 번에</span></h1>
+  <p class="sub">질문만 작성하면 AI가 나머지를 처리합니다.<br>분석, 감성, 리포트 모두 AI가 자동으로 처리해요.</p>
+
+  <div class="ctas">
+    <button class="btn-primary">인터뷰 만들기 →</button>
+    <button class="btn-secondary">패널로 참여하기</button>
+  </div>
+
+  <div class="live-pill">
+    <div class="dot" style="animation: pulse 2s infinite"></div>
+    <span><strong style="color:#6E4BFF">지금 249명</strong>이 인터뷰 중입니다</span>
+  </div>
+
+  <!-- Option A: Slim chat preview -->
+  <div class="chat-preview">
+    <div class="chat-header">
+      <span class="chat-header-left">AI 인터뷰 진행 중 · Q2/5</span>
+      <span class="live-tag"><span class="rec-dot"></span> 라이브</span>
+    </div>
+    <div class="chat-body">
+      <!-- AI Question -->
+      <div class="ai-row">
+        <div class="ai-avatar">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="#6E4BFF" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="1" width="6" height="11" rx="3"/><path d="M3.5 10a6.5 6.5 0 0013 0"/><line x1="10" y1="16.5" x2="10" y2="19"/><line x1="7" y1="19" x2="13" y2="19"/></svg>
+        </div>
+        <div class="ai-bubble">지금 리서치에서 가장 부담스러운 부분이 어디인가요?</div>
+      </div>
+      <!-- Recording -->
+      <div class="rec-row">
+        <div class="rec-chip">
+          <div class="rec-indicator" style="animation: pulse 1.2s infinite"></div>
+          <div class="wave">
+            <div class="wave-bar" style="height:6px; animation: wave 0.6s ease-in-out 0s infinite"></div>
+            <div class="wave-bar" style="height:12px; animation: wave 0.6s ease-in-out 0.08s infinite"></div>
+            <div class="wave-bar" style="height:16px; animation: wave 0.6s ease-in-out 0.16s infinite"></div>
+            <div class="wave-bar" style="height:10px; animation: wave 0.6s ease-in-out 0.24s infinite"></div>
+            <div class="wave-bar" style="height:14px; animation: wave 0.6s ease-in-out 0.32s infinite"></div>
+            <div class="wave-bar" style="height:8px; animation: wave 0.6s ease-in-out 0.4s infinite"></div>
+          </div>
+          <span class="rec-label">녹음 중…</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="preview-label">실제 AI 인터뷰 화면이에요</div>
+</div>
+
+</body>
+</html>

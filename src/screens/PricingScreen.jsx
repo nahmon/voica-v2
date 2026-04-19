@@ -3,10 +3,10 @@ import { C, S, F } from "../lib/constants.jsx";
 import { Badge, Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function PricingScreen({ go, user, logout }) {
+export default function PricingScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
   const [billing, setBilling] = useState("monthly");
-  const [lang, setLang] = useState("ko");
+  const [hoveredCard, setHoveredCard] = useState(null);
   const isKo = lang === "ko";
 
   const proMonthly = 149;
@@ -88,8 +88,10 @@ export default function PricingScreen({ go, user, logout }) {
 
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2,1fr)", gap: 20, alignItems: "stretch", maxWidth: 780, margin: "0 auto" }}>
 
-          <div style={{ background: C.white, border: `2px solid ${C.purple}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.elevated, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}>
-            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${C.purple},#f96bee)` }} />
+          <div
+            onMouseEnter={() => setHoveredCard("pro")}
+            onMouseLeave={() => setHoveredCard(null)}
+            style={{ background: C.white, border: `2px solid ${hoveredCard === "pro" ? C.purple : C.purple}`, borderRadius: 20, padding: "32px 28px", boxShadow: hoveredCard === "pro" ? "0 16px 48px rgba(83,58,253,0.28)" : S.elevated, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "pro" ? "translateY(-3px)" : "none", transition: "box-shadow 0.2s, transform 0.2s" }}>
             <div style={{ position: "absolute", top: 14, right: 14 }}>
               <span style={{ fontSize: 10, fontWeight: 700, background: C.purpleBg, color: C.purple, padding: "3px 8px", borderRadius: 4 }}>{isKo ? "인기" : "Most popular"}</span>
             </div>
@@ -107,7 +109,10 @@ export default function PricingScreen({ go, user, logout }) {
             <Btn full onClick={() => go("advertiser_login")}>{isKo ? "Pro 시작하기 →" : "Start Pro →"}</Btn>
           </div>
 
-          <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.standard, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+          <div
+            onMouseEnter={() => setHoveredCard("enterprise")}
+            onMouseLeave={() => setHoveredCard(null)}
+            style={{ background: C.white, border: `${hoveredCard === "enterprise" ? "2px" : "1px"} solid ${hoveredCard === "enterprise" ? C.purple : C.border}`, borderRadius: 20, padding: "32px 28px", boxShadow: hoveredCard === "enterprise" ? "0 16px 48px rgba(83,58,253,0.28)" : S.standard, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "enterprise" ? "translateY(-3px)" : "none", transition: "box-shadow 0.2s, transform 0.2s, border-color 0.2s, border-width 0.2s" }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 8, letterSpacing: 0.5 }}>Enterprise</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: C.navy, lineHeight: 1.2, marginBottom: 4 }}>{isKo ? "맞춤 요금" : "Custom pricing"}</div>
             <div style={{ fontSize: 12, color: C.body, marginBottom: 28 }}>{isKo ? "연간 계약 · 대량 할인 가능" : "Annual contract · volume discounts available"}</div>
@@ -124,7 +129,7 @@ export default function PricingScreen({ go, user, logout }) {
 
         </div>
       </div>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }

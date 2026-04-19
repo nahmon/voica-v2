@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { supabase } from "../supabase.js";
 import { C, F, Ic } from "../lib/constants.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function RoleSelectScreen({ go, user }) {
+  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
 
   const handleSelect = async (role) => {
@@ -23,17 +25,17 @@ export default function RoleSelectScreen({ go, user }) {
           <span style={{ color: C.purple }}>Vo</span>ica
         </div>
         <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 6 }}>
-          {name ? `How will you be using Voice Survey, ${name}?` : "How will you be using Voice Survey?"}
+          {name ? `How will you be using voicesurvey, ${name}?` : "How will you be using voicesurvey?"}
         </div>
         <div style={{ fontSize: 14, color: C.body }}>Choose your role to get started</div>
       </div>
 
-      <div style={{ display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center", width: "100%", maxWidth: 560 }}>
+      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: 16, width: "100%", maxWidth: isMobile ? 400 : 560 }}>
         {/* Researcher */}
         <button
           onClick={() => !loading && handleSelect("researcher")}
           disabled={loading}
-          style={{ flex: 1, minWidth: 220, maxWidth: 260, background: C.white, border: `2px solid ${C.border}`, borderRadius: 20, padding: "36px 28px", cursor: "pointer", textAlign: "left", transition: "all 0.18s", fontFamily: F }}
+          style={{ flex: 1, minWidth: isMobile ? "auto" : 220, maxWidth: isMobile ? "100%" : 260, background: C.white, border: `2px solid ${C.border}`, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 28px", cursor: "pointer", textAlign: "left", transition: "all 0.18s", fontFamily: F }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.boxShadow = "0 8px 32px rgba(83,58,253,0.12)"; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = "none"; }}
         >
@@ -61,14 +63,14 @@ export default function RoleSelectScreen({ go, user }) {
         <button
           onClick={() => !loading && handleSelect("panel")}
           disabled={loading}
-          style={{ flex: 1, minWidth: 220, maxWidth: 260, background: C.white, border: `2px solid ${C.border}`, borderRadius: 20, padding: "36px 28px", cursor: "pointer", textAlign: "left", transition: "all 0.18s", fontFamily: F }}
+          style={{ flex: 1, minWidth: isMobile ? "auto" : 220, maxWidth: isMobile ? "100%" : 260, background: C.white, border: `2px solid ${C.border}`, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 28px", cursor: "pointer", textAlign: "left", transition: "all 0.18s", fontFamily: F }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = C.success; e.currentTarget.style.boxShadow = "0 8px 32px rgba(21,190,83,0.12)"; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = "none"; }}
         >
           <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(21,190,83,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
             {Ic.Mic({ s: 24, c: C.success })}
           </div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Voice Survey Panelist</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 8 }}>voicesurvey Panelist</div>
           <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 20 }}>
             Participate in voice interviews and earn rewards. Just 8 minutes of your time.
           </div>

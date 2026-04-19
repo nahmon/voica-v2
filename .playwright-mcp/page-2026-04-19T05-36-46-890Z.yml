@@ -1,0 +1,263 @@
+- generic [ref=e4]:
+  - navigation [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e11] [cursor=pointer]: voicesurvey
+      - button "☰" [ref=e13] [cursor=pointer]
+  - generic [ref=e16]:
+    - generic [ref=e18]: ✦ AI가 인터뷰하고, AI가 분석해요.
+    - heading "비싸고 오래 걸리는 사용자 조사, AI로 수백 명을 한 번에" [level=1] [ref=e19]:
+      - text: 비싸고 오래 걸리는 사용자 조사,
+      - text: AI로 수백 명을 한 번에
+    - paragraph [ref=e20]:
+      - text: 질문만 작성하면 AI가 나머지를 처리합니다.
+      - text: 분석, 감성, 리포트 모두 AI가 자동으로 처리해요.
+    - generic [ref=e21]:
+      - button "인터뷰 만들기 →" [ref=e22] [cursor=pointer]
+      - button "패널로 참여하기" [ref=e23] [cursor=pointer]
+    - generic [ref=e26]:
+      - strong [ref=e27]: 지금 247명
+      - text: 이 인터뷰 중입니다
+  - generic [ref=e30]:
+    - generic [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]: Live
+        - heading "지금 이 순간도 인터뷰가 이어지고 있어요" [level=2] [ref=e34]
+      - generic [ref=e35]: 실시간
+    - generic [ref=e37]:
+      - generic [ref=e39]:
+        - generic [ref=e40]: —+
+        - generic [ref=e41]: 등록된 인터뷰 패널
+      - generic [ref=e43]:
+        - generic [ref=e44]: —
+        - generic [ref=e45]: 이번 달 완료된 인터뷰
+      - generic [ref=e47]:
+        - generic [ref=e48]: —%
+        - generic [ref=e49]: AI 분석 정확도
+      - generic [ref=e51]:
+        - generic [ref=e52]: — min
+        - generic [ref=e53]: 평균 인터뷰 시간
+  - generic [ref=e56]:
+    - generic [ref=e57]:
+      - generic [ref=e58]: 비교
+      - heading "기존 방식 vs. voicesurvey" [level=2] [ref=e59]
+      - paragraph [ref=e60]: 같은 조사를, 50배 더 많은 표본으로, 40분의 1 비용으로.
+    - generic [ref=e61]:
+      - generic [ref=e62]:
+        - generic [ref=e63]: 50×
+        - generic [ref=e64]: 더 큰 표본
+      - generic [ref=e65]:
+        - generic [ref=e66]: 1/40
+        - generic [ref=e67]: 비용 절감
+      - generic [ref=e68]:
+        - generic [ref=e69]: ×144
+        - generic [ref=e70]: 더 빠른 출시
+    - generic [ref=e71]:
+      - generic [ref=e72]:
+        - generic [ref=e74]: 기존 방식
+        - generic [ref=e75]:
+          - generic [ref=e76]: 기간
+          - generic [ref=e77]: 약 2주
+        - generic [ref=e78]:
+          - generic [ref=e79]: 비용
+          - generic [ref=e80]: ₩2,600,000+/프로젝트
+        - generic [ref=e81]:
+          - generic [ref=e82]: 표본
+          - generic [ref=e83]: 10명
+        - generic [ref=e84]:
+          - generic [ref=e85]: 분석
+          - generic [ref=e86]: 직접 전사
+        - generic [ref=e87]:
+          - generic [ref=e88]: 모집
+          - generic [ref=e89]: 대행사 의존
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]: voicesurvey
+          - generic [ref=e93]: 추천
+        - generic [ref=e94]:
+          - generic [ref=e95]: 기간
+          - generic [ref=e96]: 10분 안에 시작
+        - generic [ref=e97]:
+          - generic [ref=e98]: 비용
+          - generic [ref=e99]: ₩199,000~/월
+        - generic [ref=e100]:
+          - generic [ref=e101]: 표본
+          - generic [ref=e102]: 500명 동시
+        - generic [ref=e103]:
+          - generic [ref=e104]: 분석
+          - generic [ref=e105]: 자동화, 주제별
+        - generic [ref=e106]:
+          - generic [ref=e107]: 모집
+          - generic [ref=e108]: 플랫폼 내 매칭
+  - generic [ref=e111]:
+    - generic [ref=e112]:
+      - generic [ref=e113]: 고객 리뷰
+      - heading "사용자들의 이야기" [level=2] [ref=e114]
+    - generic [ref=e116]:
+      - generic [ref=e118]:
+        - paragraph [ref=e119]: "\"솔직히 처음엔 반신반의했어요. AI가 인터뷰를 제대로 할 수 있을까 싶었는데, 결과물 보고 생각이 완전히 바뀌었어요. 인터뷰어 없으니까 오히려 응답이 더 솔직하더라고요.\""
+        - generic [ref=e120]:
+          - img "김민준" [ref=e121]
+          - generic [ref=e122]:
+            - generic [ref=e123]: 김민준
+            - generic [ref=e124]: 마케팅팀장 · **전자 MX사업부
+      - generic [ref=e126]:
+        - paragraph [ref=e127]: "\"분기에 한 번 하던 사용성 테스트를 이제 매달 해요. 예전엔 섭외부터 진행까지 3주 걸렸는데, 지금은 필터 설정하고 이틀이면 리포트가 나와요.\""
+        - generic [ref=e128]:
+          - img "박지은" [ref=e129]
+          - generic [ref=e130]:
+            - generic [ref=e131]: 박지은
+            - generic [ref=e132]: UX 리서처 · **카카오 서비스디자인팀
+      - generic [ref=e134]:
+        - paragraph [ref=e135]: "\"출시 2주 전에 급하게 유저 의견이 필요했는데, 72시간 만에 200명 분석 리포트를 받았어요. 타이밍이 딱 맞아서 런칭 결정에 바로 반영했습니다.\""
+        - generic [ref=e136]:
+          - generic [ref=e137]: 이
+          - generic [ref=e138]:
+            - generic [ref=e139]: 이승우
+            - generic [ref=e140]: 프로덕트 매니저 · **라인 신규사업팀
+      - generic [ref=e142]:
+        - paragraph [ref=e143]: "\"외부 대행사 맡기면 견적부터 두 달이에요. 보이스서베이는 당일 세팅하고 다음날 결과 보고 있었어요. 비용도 10분의 1도 안 됐고요.\""
+        - generic [ref=e144]:
+          - img "최유나" [ref=e145]
+          - generic [ref=e146]:
+            - generic [ref=e147]: 최유나
+            - generic [ref=e148]: 브랜드 전략 매니저 · LG** 뷰티 마케팅팀
+      - generic [ref=e150]:
+        - paragraph [ref=e151]: "\"설문은 답하다가 지쳐서 대충 클릭하게 되는데, 음성 인터뷰는 그냥 대화하는 느낌이라 훨씬 편했어요. 포인트도 바로 적립되고요.\""
+        - generic [ref=e152]:
+          - img "정다현" [ref=e153]
+          - generic [ref=e154]:
+            - generic [ref=e155]: 정다현
+            - generic [ref=e156]: 프리랜서 인터뷰 패널 · 개인 참여자
+      - generic [ref=e158]:
+        - paragraph [ref=e159]: "\"글로벌 진출 전에 국내 타깃 인터뷰가 필요했어요. 조건 필터 설정하니까 원하는 페르소나가 빠르게 모였고, 3영업일 만에 인사이트 정리된 리포트 받았습니다.\""
+        - generic [ref=e160]:
+          - generic [ref=e161]: 강
+          - generic [ref=e162]:
+            - generic [ref=e163]: 강현석
+            - generic [ref=e164]: 사업개발 총괄 · **s 신사업팀
+      - generic [ref=e166]:
+        - paragraph [ref=e167]: "\"대행사 비용의 20%로 더 큰 표본을 뽑을 수 있다는 게 아직도 신기해요. 주제별로 자동 클러스터링이 돼서 나오니까 분석 시간도 확 줄었어요.\""
+        - generic [ref=e168]:
+          - img "오수빈" [ref=e169]
+          - generic [ref=e170]:
+            - generic [ref=e171]: 오수빈
+            - generic [ref=e172]: 서비스 기획자 · **모터스 디지털서비스팀
+      - generic [ref=e174]:
+        - paragraph [ref=e175]: "\"처음엔 정성조사를 AI가 할 수 있다는 게 믿기지 않았는데, 실제로 써보니 응답 깊이가 생각보다 훨씬 깊었어요. 팀에서 지금 정기적으로 활용하고 있어요.\""
+        - generic [ref=e176]:
+          - generic [ref=e177]: 한
+          - generic [ref=e178]:
+            - generic [ref=e179]: 한지원
+            - generic [ref=e180]: 마케팅 디렉터 · **앙 그로스마케팅팀
+      - generic [ref=e182]:
+        - paragraph [ref=e183]: "\"동시에 500명 인터뷰가 가능하다는 건 기존 방식으론 상상도 못 했어요. 비용 대비 퀄리티가 너무 좋아서 이제 리서치 안 하는 게 더 이상하게 느껴져요.\""
+        - generic [ref=e184]:
+          - generic [ref=e185]: 임
+          - generic [ref=e186]:
+            - generic [ref=e187]: 임채원
+            - generic [ref=e188]: 제품 마케팅 매니저 · **에이버 마케팅실
+    - generic [ref=e189]:
+      - button "Go to review 1" [ref=e190] [cursor=pointer]
+      - button "Go to review 2" [ref=e192] [cursor=pointer]
+      - button "Go to review 3" [ref=e194] [cursor=pointer]
+      - button "Go to review 4" [ref=e196] [cursor=pointer]
+      - button "Go to review 5" [ref=e198] [cursor=pointer]
+      - button "Go to review 6" [ref=e200] [cursor=pointer]
+      - button "Go to review 7" [ref=e202] [cursor=pointer]
+      - button "Go to review 8" [ref=e204] [cursor=pointer]
+      - button "Go to review 9" [ref=e206] [cursor=pointer]
+  - generic [ref=e210]:
+    - generic [ref=e211]:
+      - heading "고객의 목소리를 정확하고 빠르게" [level=2] [ref=e212]
+      - paragraph [ref=e213]: 처음부터 끝까지 모든 것을 처리하는 인터뷰 플랫폼
+    - generic [ref=e214]:
+      - generic [ref=e215]:
+        - generic [ref=e216]: 인터뷰를 설계하고 진행하고 싶으신가요?
+        - generic [ref=e217]: 질문만 작성하면 — AI가 수천 명과 대화하고 리포트를 전달합니다
+      - generic [ref=e218]:
+        - generic [ref=e219]:
+          - generic [ref=e220]:
+            - generic [ref=e221]:
+              - img [ref=e223]
+              - generic [ref=e225]: "01"
+            - generic [ref=e226]: 질문 설계
+            - generic [ref=e227]: 인터뷰 목표와 질문 흐름을 설정하세요. AI가 자연스러운 대화 구조를 제안해드려요.
+          - generic [ref=e228]:
+            - generic [ref=e229]:
+              - img [ref=e231]
+              - generic [ref=e236]: "02"
+            - generic [ref=e237]: 패널 모집
+            - generic [ref=e238]: 공고를 올려 적합한 패널을 모집하고, AI 매칭으로 최적의 참여자를 선발하세요.
+          - generic [ref=e239]:
+            - generic [ref=e240]:
+              - img [ref=e242]
+              - generic [ref=e244]: "03"
+            - generic [ref=e245]: AI 인터뷰 진행
+            - generic [ref=e246]: AI가 24시간 음성 인터뷰를 진행해요. 연구자가 개입하지 않아도 응답이 자동으로 모여요.
+          - generic [ref=e247]:
+            - generic [ref=e248]:
+              - img [ref=e250]
+              - generic [ref=e254]: "04"
+            - generic [ref=e255]: 리포트 수령
+            - generic [ref=e256]: 주제 분석, 감성 분류, 인사이트 요약이 담긴 즉각적인 리포트를 받아보세요.
+        - generic [ref=e257]:
+          - button "←" [ref=e258] [cursor=pointer]
+          - button "→" [ref=e259] [cursor=pointer]
+    - generic [ref=e260]:
+      - generic [ref=e261]:
+        - generic [ref=e262]: 참여하고 보상을 받고 싶으신가요?
+        - generic [ref=e263]: 짧은 음성 인터뷰에 참여하고 즉시 포인트를 받아보세요
+      - generic [ref=e264]:
+        - generic [ref=e265]:
+          - generic [ref=e266]:
+            - generic [ref=e267]:
+              - img [ref=e269]
+              - generic [ref=e272]: "01"
+            - generic [ref=e273]: 공고 탐색
+            - generic [ref=e274]: 인터뷰 패널 보드에서 관심 있는 인터뷰 기회를 찾아보세요.
+          - generic [ref=e275]:
+            - generic [ref=e276]:
+              - img [ref=e278]
+              - generic [ref=e280]: "02"
+            - generic [ref=e281]: 지원 및 선발
+            - generic [ref=e282]: 조건을 확인하고 지원하세요. AI가 얼마나 잘 맞는지 평가해서 빠르게 선발해요.
+          - generic [ref=e283]:
+            - generic [ref=e284]:
+              - img [ref=e286]
+              - generic [ref=e289]: "03"
+            - generic [ref=e290]: 음성 인터뷰 참여
+            - generic [ref=e291]: 링크로 AI와 자연스럽게 대화하세요. 어디서든 참여할 수 있고, 평균 8분이면 끝나요.
+          - generic [ref=e292]:
+            - generic [ref=e293]:
+              - img [ref=e295]
+              - generic [ref=e299]: "04"
+            - generic [ref=e300]: 보상 수령
+            - generic [ref=e301]: 인터뷰 완료 후 포인트 보상이 즉시 지급돼요.
+        - generic [ref=e302]:
+          - button "←" [ref=e303] [cursor=pointer]
+          - button "→" [ref=e304] [cursor=pointer]
+  - generic [ref=e307]:
+    - generic [ref=e308]: 지금 시작하기
+    - heading "무료로 시작하세요" [level=2] [ref=e309]
+    - paragraph [ref=e310]: 신용카드 불필요.
+    - generic [ref=e311]:
+      - button "리서치 시작하기 →" [ref=e312] [cursor=pointer]
+      - button "패널로 참여하기" [ref=e313] [cursor=pointer]
+  - contentinfo [ref=e314]:
+    - generic [ref=e315]:
+      - generic [ref=e316]:
+        - generic [ref=e317]:
+          - generic [ref=e321]: voicesurvey
+          - generic [ref=e322]: AI가 인터뷰하고, AI가 분석해요.
+        - generic [ref=e323]:
+          - button "소개" [ref=e324] [cursor=pointer]
+          - button "요금제" [ref=e325] [cursor=pointer]
+          - button "패널 보드" [ref=e326] [cursor=pointer]
+          - button "지원" [ref=e327] [cursor=pointer]
+          - button "개인정보처리방침" [ref=e328] [cursor=pointer]
+          - button "이용약관" [ref=e329] [cursor=pointer]
+      - generic [ref=e330]:
+        - generic [ref=e331]: Copyright © 2026 Voice Survey Inc. All rights reserved.
+        - generic [ref=e332]:
+          - button "ENG" [ref=e333] [cursor=pointer]
+          - button "한국어" [ref=e334] [cursor=pointer]

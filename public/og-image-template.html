@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 630px;
+    background: #0c0a1e;
+    font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .bg-glow-1 {
+    position: absolute;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(110,75,255,0.18) 0%, transparent 70%);
+    top: -200px; left: -100px;
+  }
+  .bg-glow-2 {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(249,107,238,0.10) 0%, transparent 70%);
+    bottom: -150px; right: 100px;
+  }
+  .content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 96px;
+    width: 100%;
+  }
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .logo-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #6E4BFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-icon-inner {
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+    background: white;
+  }
+  .logo-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  .logo-name span {
+    color: #a78bff;
+  }
+  .headline {
+    font-size: 64px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.15;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+  }
+  .headline em {
+    background: linear-gradient(90deg, #6E4BFF, #f96bee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-style: normal;
+  }
+  .sub {
+    font-size: 22px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .badge-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 40px;
+  }
+  .badge {
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1px solid rgba(110,75,255,0.35);
+    background: rgba(110,75,255,0.12);
+    color: #a78bff;
+    font-size: 14px;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+  <div class="content">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <div class="logo-icon-inner"></div>
+      </div>
+      <div class="logo-name">voice<span>survey</span></div>
+    </div>
+    <div class="headline">AI가 인터뷰하고,<br><em>AI가 분석해요.</em></div>
+    <div class="sub">패널 모집부터 음성 인터뷰, 분석 리포트까지 — 하나로 끝나요</div>
+    <div class="badge-row">
+      <div class="badge">✦ AI 음성 인터뷰</div>
+      <div class="badge">패널 자동 매칭</div>
+      <div class="badge">즉시 리포트</div>
+    </div>
+  </div>
+</body>
+</html>

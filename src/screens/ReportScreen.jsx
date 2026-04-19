@@ -10,9 +10,8 @@ const SECTIONS = [
   { id: "recommendations", label: "Recommendations" },
 ];
 
-export default function ReportScreen({ go, user, logout, interviewId }) {
+export default function ReportScreen({ go, user, logout, interviewId, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
-  const [lang, setLang] = useState("ko");
   const { showToast } = useToast();
   const [interview, setInterview] = useState(null);
   const [sessions, setSessions] = useState([]);
@@ -156,27 +155,31 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
   })();
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: dk.bg, fontFamily: F, display: "flex", flexDirection: "column" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px", flex: 1, width: "100%" }}>
-        <Skeleton width={220} height={28} borderRadius={8} style={{ marginBottom: 8 }} />
-        <Skeleton width={160} height={16} borderRadius={6} style={{ marginBottom: 32 }} />
-        <div style={{ background: dk.card, borderRadius: 16, padding: "28px 24px" }}>
-          <Skeleton width="100%" height={20} borderRadius={6} style={{ marginBottom: 12 }} />
-          <Skeleton width="80%" height={16} borderRadius={6} style={{ marginBottom: 8 }} />
-          <Skeleton width="60%" height={16} borderRadius={6} />
-        </div>
-      </div>
+    <div style={{ minHeight: "100vh", background: dk.bg, fontFamily: F, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <div style={{ width: 36, height: 36, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.1)", borderTopColor: "#7c6af7", animation: "spin 0.8s linear infinite" }} />
+      <div style={{ fontSize: 14, color: dk.muted }}>{isKo ? "리포트 불러오는 중..." : "Loading report..."}</div>
     </div>
   );
 
   if (!interviewId) return (
     <div style={{ minHeight: "100vh", background: dk.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F, gap: 16 }}>
-      <div style={{ fontSize: 16, color: dk.text }}>Please select an interview</div>
-      <Btn onClick={() => go("dashboard")}>Go to dashboard</Btn>
+      <div style={{ fontSize: 16, color: dk.text }}>{isKo ? "인터뷰를 선택해주세요" : "Please select an interview"}</div>
+      <Btn onClick={() => go("dashboard")}>{isKo ? "대시보드로" : "Go to dashboard"}</Btn>
     </div>
   );
 
   const hasReport = report?.status === "completed" && report.content;
+
+  const dateRange = (() => {
+    const starts = sessions.map(s => new Date(s.started_at)).filter(d => !isNaN(d));
+    const ends = sessions.map(s => s.completed_at && new Date(s.completed_at)).filter(Boolean).filter(d => !isNaN(d));
+    if (starts.length === 0) return null;
+    const minDate = new Date(Math.min(...starts));
+    const maxDate = ends.length > 0 ? new Date(Math.max(...ends)) : new Date();
+    const fmt = d => d.toLocaleDateString(isKo ? "ko-KR" : "en-US", { month: "short", day: "numeric", year: "numeric" });
+    return `${fmt(minDate)} – ${fmt(maxDate)}`;
+  })();
 
   return (
     <div style={{ background: dk.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
@@ -192,354 +195,276 @@ export default function ReportScreen({ go, user, logout, interviewId }) {
         }
       `}</style>
 
-      <div className="no-print">
-        <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
-      </div>
-
-      {/* Sub nav */}
-      <div className="no-print" style={{ padding: isMobile ? "8px 16px" : "10px 24px", background: dk.card, borderBottom: `1px solid ${dk.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← {isMobile ? "" : "Dashboard"}</Btn>
-        <div style={{ fontSize: 13, fontWeight: 400, color: dk.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>{interview?.title}</div>
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          {hasReport && (
-            <Btn variant="ghost" size="sm" onClick={handleShare}>
-              {Ic.Clip({ s: 13, c: C.purple })} Share
-            </Btn>
-          )}
-          <Badge variant="neutral">{completedSessions.length} completed</Badge>
-        </div>
-      </div>
-
-      {/* Summary header card — shown when report exists */}
-      {hasReport && (
-        <div className="no-print" style={{ background: dk.card, borderBottom: `1px solid ${dk.border}`, padding: isMobile ? "14px 16px" : "16px 24px" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-            <div style={{ display: "flex", gap: isMobile ? 12 : 24, flexWrap: "wrap" }}>
-              <MetricCard label="Total responses" value={`${totalSessions}`} icon={Ic.Users({ s: 16, c: C.purple })} />
-              <MetricCard label="Completion rate" value={`${completionRate}%`} icon={Ic.CheckCircle({ s: 16, c: C.success })} />
-              {avgDurationMin !== null && (
-                <MetricCard label="Avg. time to complete" value={`${avgDurationMin} min`} icon={Ic.Target({ s: 16, c: "#1a73e8" })} />
-              )}
-              {sentimentDist && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "10px 14px", background: dk.card2, borderRadius: 10, border: `1px solid ${dk.border}`, minWidth: 220 }}>
-                  <span style={{ fontSize: 11, color: dk.muted }}>Sentiment distribution</span>
-                  <div style={{ display: "flex", height: 8, borderRadius: 4, overflow: "hidden" }}>
-                    <div style={{ width: `${sentimentDist.positive}%`, background: C.success }} />
-                    <div style={{ width: `${sentimentDist.neutral}%`, background: "#d0d0d8" }} />
-                    <div style={{ width: `${sentimentDist.negative}%`, background: C.ruby }} />
-                  </div>
-                  <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
-                    <span style={{ color: C.success }}>Positive {sentimentDist.positive}%</span>
-                    <span style={{ color: dk.muted }}>Neutral {sentimentDist.neutral}%</span>
-                    <span style={{ color: C.ruby }}>Negative {sentimentDist.negative}%</span>
-                  </div>
-                </div>
-              )}
-            </div>
+      {/* Top bar */}
+      <div className="no-print" style={{ background: dk.card, borderBottom: `1px solid ${dk.border}`, padding: isMobile ? "0 16px" : "0 32px", height: 52, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, overflow: "hidden" }}>
+          <div style={{ width: 22, height: 22, borderRadius: 5, background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <div style={{ width: 9, height: 9, borderRadius: 2, background: "white" }} />
           </div>
+          <span style={{ fontSize: 13, color: dk.muted }}>voicesurvey</span>
+          <span style={{ color: dk.border }}>/</span>
+          <span style={{ fontSize: 13, color: dk.muted }}>{isKo ? "리포트" : "Reports"}</span>
+          {interview?.title && !isMobile && (
+            <>
+              <span style={{ color: dk.border }}>·</span>
+              <span style={{ fontSize: 13, color: dk.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 320 }}>{interview.title}</span>
+            </>
+          )}
         </div>
-      )}
-
-      {/* Section tabs (mobile) / sticky sidebar (desktop) */}
-      {hasReport && isMobile && (
-        <div className="no-print" style={{ background: dk.card, borderBottom: `1px solid ${dk.border}`, padding: "0 16px", display: "flex", gap: 0, overflowX: "auto" }}>
-          {SECTIONS.map(sec => (
-            <button key={sec.id} onClick={() => {
-              setActiveSection(sec.id);
-              document.getElementById(`section-${sec.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }} style={{ background: "none", border: "none", borderBottom: `2px solid ${activeSection === sec.id ? C.purple : "transparent"}`, padding: "10px 16px", fontSize: 13, fontWeight: activeSection === sec.id ? 600 : 400, color: activeSection === sec.id ? C.purple : dk.muted, cursor: "pointer", whiteSpace: "nowrap", fontFamily: F }}>
-              {sec.label}
-            </button>
-          ))}
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+          <button onClick={() => go("dashboard")} style={{ background: "none", border: "none", padding: "6px 10px", color: dk.muted, fontSize: 13, cursor: "pointer", fontFamily: F }}>
+            ← {isMobile ? "" : (isKo ? "대시보드" : "Dashboard")}
+          </button>
+          {hasReport && (
+            <>
+              <button onClick={handleShare} style={{ padding: "6px 14px", borderRadius: 8, border: `1px solid ${dk.border}`, background: "none", color: dk.text, fontSize: 13, cursor: "pointer", fontFamily: F }}>
+                {isKo ? "공유" : "Share"}
+              </button>
+              <button onClick={handlePrint} style={{ padding: "6px 16px", borderRadius: 8, border: "none", background: C.purple, color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F }}>
+                {isKo ? "내보내기 →" : "Export →"}
+              </button>
+            </>
+          )}
         </div>
-      )}
+      </div>
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "16px" : "28px 24px", display: "flex", flexDirection: isMobile ? "column" : "row", gap: 24, alignItems: "flex-start", flex: 1, width: "100%" }}>
-
-        {/* Sticky sidebar (desktop) */}
-        {hasReport && !isMobile && (
-          <div className="no-print" style={{ width: 160, flexShrink: 0, position: "sticky", top: 24 }}>
-            <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 10, overflow: "hidden" }}>
-              <div style={{ padding: "8px 12px", fontSize: 10, fontWeight: 600, color: dk.muted, borderBottom: `1px solid ${dk.border}`, letterSpacing: 0.5 }}>Jump to section</div>
-              {SECTIONS.map(sec => (
-                <button key={sec.id} onClick={() => {
-                  setActiveSection(sec.id);
-                  document.getElementById(`section-${sec.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }} style={{ display: "block", width: "100%", background: activeSection === sec.id ? C.purpleBg : "none", border: "none", borderLeft: `3px solid ${activeSection === sec.id ? C.purple : "transparent"}`, padding: "9px 12px", fontSize: 13, fontWeight: activeSection === sec.id ? 500 : 400, color: activeSection === sec.id ? C.purple : dk.text, cursor: "pointer", textAlign: "left", fontFamily: F }}>
-                  {sec.label}
-                </button>
+      {/* Header card */}
+      {hasReport && (
+        <div style={{ background: dk.card, borderBottom: `1px solid ${dk.border}` }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "24px 16px 20px" : "32px 32px 28px" }}>
+            <div style={{ marginBottom: 16 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 20, background: "rgba(110,75,255,0.15)", border: "1px solid rgba(110,75,255,0.25)", fontSize: 12, color: "#a78bff" }}>
+                <span>✦</span>
+                {isKo ? "AI 분석 완료" : "AI analysis complete"}
+                <span style={{ color: dk.border }}>·</span>
+                <span style={{ color: dk.muted }}>{completedSessions.length} {isKo ? "명 응답" : "respondents"}</span>
+              </span>
+            </div>
+            <div style={{ fontSize: isMobile ? 22 : 30, fontWeight: 700, color: dk.text, marginBottom: 8, lineHeight: 1.2 }}>{interview?.title}</div>
+            {dateRange && <div style={{ fontSize: 13, color: dk.muted, marginBottom: 24 }}>{dateRange}</div>}
+            <div style={{ height: 1, background: dk.border, marginBottom: 24 }} />
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 20 : 0 }}>
+              {[
+                { label: isKo ? "응답자" : "RESPONDENTS", value: String(totalSessions), color: dk.text },
+                { label: isKo ? "평균 소요 시간" : "AVG DURATION", value: avgDurationMin !== null ? (isKo ? `${avgDurationMin}분` : `${avgDurationMin}m`) : "—", color: dk.text },
+                { label: isKo ? "완료율" : "COMPLETION", value: `${completionRate}%`, color: completionRate >= 80 ? C.success : dk.text },
+                { label: isKo ? "주제" : "THEMES", value: String(report.content.themes?.length ?? 0), color: C.purple },
+              ].map((m, i) => (
+                <div key={i} style={{ paddingRight: isMobile ? 0 : 32, borderRight: (!isMobile && i < 3) ? `1px solid ${dk.border}` : "none", paddingLeft: (!isMobile && i > 0) ? 32 : 0 }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: dk.muted, letterSpacing: "0.08em", marginBottom: 10, textTransform: "uppercase" }}>{m.label}</div>
+                  <div style={{ fontSize: 34, fontWeight: 700, color: m.color, lineHeight: 1 }}>{m.value}</div>
+                </div>
               ))}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Left: Sessions list (no sidebar) or main area */}
-        {!hasReport && (
-          <div style={{ width: isMobile ? "100%" : 280, flexShrink: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 12 }}>Responses ({sessions.length})</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {sessions.length === 0 && (
-                <div style={{ background: dk.card, border: `1px dashed ${dk.border}`, borderRadius: 8, padding: "24px", textAlign: "center" }}>
-                  <div style={{ fontSize: 13, color: dk.muted }}>No responses yet</div>
-                </div>
-              )}
-              {sessions.map((s, i) => {
-                const duration = s.completed_at && s.started_at
-                  ? Math.round((new Date(s.completed_at) - new Date(s.started_at)) / 60000) + " min"
-                  : "In progress";
-                const name = s.respondent?.name || `Respondent ${i + 1}`;
-                return (
-                  <div key={s.id} onClick={() => setSelectedSession(selectedSession?.id === s.id ? null : s)}
-                    style={{ background: dk.card, border: `1px solid ${selectedSession?.id === s.id ? C.purple : dk.border}`, borderRadius: 10, padding: "12px 14px", cursor: "pointer" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                      <span style={{ fontSize: 13, fontWeight: 400, color: dk.text }}>{name}</span>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        {allResponses.some(r => r.session_id === s.id && r.audio_url) && (
-                          <svg width={10} height={10} viewBox="0 0 16 16" fill={C.purple} title="Has voice recording"><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M4.5 8a.5.5 0 0 0-1 0 4.5 4.5 0 0 0 9 0 .5.5 0 0 0-1 0A3.5 3.5 0 0 1 8 11.5 3.5 3.5 0 0 1 4.5 8z"/></svg>
-                        )}
-                        <Badge variant={s.status === "completed" ? "success" : "warning"}>{s.status === "completed" ? "Completed" : "In progress"}</Badge>
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 11, color: dk.muted }}>{duration} · {allResponses.filter(r => r.session_id === s.id).length} responses</div>
-                  </div>
-                );
-              })}
+      <main style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "16px" : "28px 32px", flex: 1, width: "100%" }} className="print-content">
+
+        {/* No report CTA */}
+        {!report && (
+          <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "40px 32px", textAlign: "center", marginTop: 24 }}>
+            <div style={{ fontSize: 32, marginBottom: 16, color: C.purple }}>✦</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: dk.text, marginBottom: 8 }}>{isKo ? "AI 리포트 생성" : "Generate AI Report"}</div>
+            <div style={{ fontSize: 13, color: dk.muted, marginBottom: 24, lineHeight: 1.7 }}>
+              {isKo
+                ? <>완료된 응답 {completedSessions.length}개를 AI가 분석해<br />주제, 감정, 인사이트를 자동으로 추출해드려요.</>
+                : <>AI will analyze {completedSessions.length} completed responses<br />and automatically extract themes, sentiment, and insights.</>}
             </div>
+            {generating ? (
+              <GeneratingProgress steps={GEN_STEPS} currentStep={genStep} elapsed={genElapsed} />
+            ) : (
+              <Btn onClick={handleGenerateReport} disabled={completedSessions.length === 0} style={completedSessions.length === 0 ? { background: "rgba(110,75,255,0.3)", color: "rgba(255,255,255,0.4)", cursor: "not-allowed" } : {}}>
+                {isKo ? "리포트 생성 →" : "Generate Report →"}
+              </Btn>
+            )}
+            {completedSessions.length === 0 && !generating && (
+              <div style={{ fontSize: 12, color: dk.muted, marginTop: 12 }}>{isKo ? "완료된 응답이 1개 이상 있어야 리포트를 생성할 수 있어요" : "You need at least 1 completed response to generate a report"}</div>
+            )}
           </div>
         )}
 
-        {/* Right: Report or session drill-down */}
-        <div style={{ flex: 1, minWidth: 0 }} className="print-content">
-
-          {/* Session detail */}
-          {selectedSession && (
-            <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "20px 22px", marginBottom: 24 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 400, color: dk.text }}>
-                    {selectedSession.respondent?.name || "Anonymous"} — Response detail
+        {hasReport && (
+          <>
+            {/* Key insights — top 3 themes as numbered insights */}
+            {report.content.themes?.length > 0 && (
+              <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: isMobile ? "20px 16px" : "28px 32px", marginBottom: 16 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: dk.text, marginBottom: 24 }}>{isKo ? "핵심 인사이트" : "Key insights"}</div>
+                {report.content.themes.slice(0, 3).map((theme, i) => (
+                  <div key={i} style={{ display: "flex", gap: 24, paddingBottom: i < 2 ? 24 : 0, marginBottom: i < 2 ? 24 : 0, borderBottom: i < 2 ? `1px solid ${dk.border}` : "none" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: C.purple, flexShrink: 0, width: 24, paddingTop: 1 }}>0{i + 1}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 500, color: dk.text, marginBottom: theme.quotes?.[0] ? 6 : 0 }}>{theme.label}</div>
+                      {theme.quotes?.[0] && (
+                        <div style={{ fontSize: 13, color: dk.muted, lineHeight: 1.6 }}>{theme.quotes[0]}</div>
+                      )}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 11, color: dk.muted, marginTop: 3 }}>
-                    {allResponses.filter(r => r.session_id === selectedSession.id && r.audio_url).length} voice · {allResponses.filter(r => r.session_id === selectedSession.id).length} responses
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <button onClick={() => setVoiceOnly(v => !v)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, border: `1px solid ${voiceOnly ? C.purple : dk.border}`, background: voiceOnly ? C.purpleBg : "transparent", color: voiceOnly ? C.purple : dk.muted, cursor: "pointer", fontFamily: F }}>
-                    {voiceOnly ? "Show all" : "Voice only"}
-                  </button>
-                  <button onClick={() => setSelectedSession(null)} style={{ background: "none", border: "none", color: dk.muted, cursor: "pointer", fontSize: 18 }}>✕</button>
-                </div>
+                ))}
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {questions.filter(q => !voiceOnly || q.type === "voice").map((q, i) => {
-                  const r = allResponses.find(r => r.session_id === selectedSession.id && r.question_id === q.id);
-                  const isVoiceWithAudio = q.type === "voice" && r?.audio_url;
-                  return (
-                    <div key={q.id} style={{ borderBottom: `1px solid ${dk.border}`, paddingBottom: 12, background: isVoiceWithAudio ? "rgba(83,58,253,0.08)" : "transparent", borderRadius: isVoiceWithAudio ? 8 : 0, padding: "10px 0" }}>
-                      <div style={{ fontSize: 12, color: dk.muted, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
-                        {isVoiceWithAudio && <svg width={10} height={10} viewBox="0 0 16 16" fill={C.purple}><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/></svg>}
-                        Q{questions.indexOf(q) + 1} · {q.content}
-                      </div>
-                      {!r ? (
-                        <span style={{ fontSize: 12, color: dk.muted, fontStyle: "italic" }}>No response</span>
-                      ) : q.type === "voice" ? (
-                        <VoicePlayer audioUrl={r.audio_url} transcript={r.transcript} />
-                      ) : q.type === "multiple_choice" ? (
-                        <div style={{ padding: "6px 12px", borderRadius: 6, background: C.purpleBg, border: `1px solid ${C.purple}20`, display: "inline-block" }}>
-                          <span style={{ fontSize: 13, color: C.purple, fontWeight: 500 }}>
-                            {Array.isArray(r.value) ? r.value.join(", ") : String(r.value ?? "")}
+            )}
+
+            {/* AI summary (fallback if no themes) */}
+            {!report.content.themes?.length && report.content.summary && (
+              <div style={{ background: "linear-gradient(135deg,rgba(83,58,253,0.12),rgba(83,58,253,0.05))", border: "1px solid rgba(83,58,253,0.2)", borderRadius: 12, padding: "24px 28px", marginBottom: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 500, color: C.purple, marginBottom: 10 }}>✦ {isKo ? "AI 요약" : "AI Summary"}</div>
+                <p style={{ margin: 0, fontSize: 15, color: dk.text, lineHeight: 1.7 }}>{report.content.summary}</p>
+              </div>
+            )}
+
+            {/* Sentiment + Theme clusters */}
+            {(sentimentDist || report.content.themes?.length > 0) && (
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                {sentimentDist && (
+                  <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "24px 28px" }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: dk.text, marginBottom: 20 }}>{isKo ? "감정 분포" : "Sentiment distribution"}</div>
+                    <div style={{ display: "flex", height: 28, borderRadius: 6, overflow: "hidden", marginBottom: 12 }}>
+                      {sentimentDist.positive > 0 && (
+                        <div style={{ width: `${sentimentDist.positive}%`, background: C.success, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: "#fff", whiteSpace: "nowrap", padding: "0 4px" }}>
+                            {isKo ? "긍정" : "Positive"} {sentimentDist.positive}%
                           </span>
                         </div>
-                      ) : (
-                        <div style={{ display: "flex", gap: 6 }}>
-                          {Array.from({ length: (q.options?.max ?? 5) - (q.options?.min ?? 1) + 1 }, (_, k) => k + (q.options?.min ?? 1)).map(n => {
-                            const sel = n === Number(r.value);
-                            return (
-                              <div key={n} style={{ width: 32, height: 32, borderRadius: 6, border: `2px solid ${sel ? C.purple : dk.border}`, background: sel ? C.purple : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: sel ? "#fff" : dk.muted }}>
-                                {n}
-                              </div>
-                            );
-                          })}
+                      )}
+                      {sentimentDist.neutral > 0 && (
+                        <div style={{ width: `${sentimentDist.neutral}%`, background: "#6b7280", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span style={{ fontSize: 11, color: "#fff", whiteSpace: "nowrap", padding: "0 4px" }}>
+                            {isKo ? "중립" : "Neutral"} {sentimentDist.neutral}%
+                          </span>
+                        </div>
+                      )}
+                      {sentimentDist.negative > 0 && (
+                        <div style={{ width: `${sentimentDist.negative}%`, background: C.ruby, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span style={{ fontSize: 11, color: "#fff", whiteSpace: "nowrap", padding: "0 4px" }}>
+                            {isKo ? "부정" : "Negative"} {sentimentDist.negative}%
+                          </span>
                         </div>
                       )}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Report section */}
-          {!report && (
-            <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "32px", textAlign: "center" }}>
-              <div style={{ fontSize: 32, marginBottom: 16 }}>✦</div>
-              <div style={{ fontSize: 18, fontWeight: 400, color: dk.text, marginBottom: 8 }}>Generate AI Report</div>
-              <div style={{ fontSize: 13, color: dk.muted, marginBottom: 24, lineHeight: 1.6 }}>
-                GPT-4o will analyze {completedSessions.length} completed response{completedSessions.length !== 1 ? "s" : ""} and<br />
-                automatically identify themes, sentiment, and insights.
-              </div>
-              {generating ? (
-                <GeneratingProgress steps={GEN_STEPS} currentStep={genStep} elapsed={genElapsed} />
-              ) : (
-                <Btn onClick={handleGenerateReport} disabled={completedSessions.length === 0}>
-                  Generate report →
-                </Btn>
-              )}
-              {completedSessions.length === 0 && !generating && (
-                <div style={{ fontSize: 12, color: dk.muted, marginTop: 12 }}>You need at least one completed response to generate a report</div>
-              )}
-            </div>
-          )}
-
-          {hasReport && (
-            <div>
-              {/* Stats */}
-              {report.content.stats && (
-                <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
-                  <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 14 }}>Response stats</div>
-                  <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
-                    <div>
-                      <div style={{ fontSize: 11, color: dk.muted, marginBottom: 4 }}>Total responses</div>
-                      <div style={{ fontSize: 20, fontWeight: 600, color: dk.text }}>{report.content.stats.total_responses}</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 11, color: dk.muted, marginBottom: 4 }}>Avg. completion time</div>
-                      <div style={{ fontSize: 20, fontWeight: 600, color: dk.text }}>{report.content.stats.avg_completion_time}</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Rating distributions */}
-              {ratingDists.length > 0 && (
-                <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
-                  <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 16 }}>Rating distribution</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-                    {ratingDists.map(({ question: q, dist, min, max, maxCount, avg, total }) => (
-                      <div key={q.id}>
-                        <div style={{ fontSize: 12, color: dk.muted, marginBottom: 12, lineHeight: 1.5 }}>{q.content}</div>
-                        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 60 }}>
-                          {Array.from({ length: max - min + 1 }, (_, k) => k + min).map(n => {
-                            const count = dist[n] ?? 0;
-                            const barH = Math.round(count / maxCount * 44);
-                            return (
-                              <div key={n} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                                <div style={{ fontSize: 10, color: count > 0 ? dk.text : "transparent" }}>{count}</div>
-                                <div style={{ width: "100%", height: barH || 2, background: count > 0 ? C.purple : dk.border, borderRadius: "2px 2px 0 0", opacity: count > 0 ? 0.35 + (count / maxCount) * 0.65 : 1 }} />
-                                <div style={{ fontSize: 11, color: dk.muted }}>{n}</div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        <div style={{ fontSize: 11, color: dk.muted, marginTop: 8 }}>Avg. {avg} · {total} responses</div>
+                    {report.content.summary && (
+                      <div style={{ fontSize: 12, color: dk.muted, lineHeight: 1.6 }}>
+                        {report.content.summary.slice(0, 160)}{report.content.summary.length > 160 ? "..." : ""}
                       </div>
-                    ))}
+                    )}
+                  </div>
+                )}
+                {report.content.themes?.length > 0 && (
+                  <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "24px 28px" }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: dk.text, marginBottom: 20 }}>{isKo ? "주제 클러스터" : "Theme clusters"}</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {report.content.themes.map((theme, i) => (
+                        <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, background: dk.card2, border: `1px solid ${dk.border}`, fontSize: 12, color: dk.text }}>
+                          {theme.label}
+                          <span style={{ fontSize: 11, fontWeight: 600, color: dk.muted }}>{theme.count}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Voice quotes */}
+            {(() => {
+              const voiceQuotes = allResponses
+                .filter(r => r.transcript && r.transcript.trim().length > 20)
+                .slice(0, 6);
+              if (voiceQuotes.length === 0) return null;
+              return (
+                <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: isMobile ? "20px 16px" : "28px 32px", marginBottom: 16 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: dk.text, marginBottom: 20 }}>
+                    {isKo ? "응답자 실제 발언" : "Respondent Quotes"}
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill,minmax(280px,1fr))", gap: 14 }}>
+                    {voiceQuotes.map((r, i) => {
+                      const session = sessions.find(s => s.id === r.session_id);
+                      const name = session?.respondent?.name || (isKo ? `응답자 ${sessions.indexOf(session) + 1}` : `Respondent ${sessions.indexOf(session) + 1}`);
+                      return (
+                        <div key={i} style={{ background: dk.card2, border: `1px solid ${dk.border}`, borderRadius: 10, padding: "16px 18px", position: "relative" }}>
+                          <div style={{ fontSize: 28, color: C.purple, lineHeight: 1, marginBottom: 8, opacity: 0.4, fontFamily: "Georgia, serif" }}>"</div>
+                          <div style={{ fontSize: 13, color: dk.text, lineHeight: 1.7, marginBottom: 12 }}>
+                            {r.transcript.length > 200 ? r.transcript.slice(0, 200) + "..." : r.transcript}
+                          </div>
+                          <div style={{ fontSize: 11, color: dk.muted }}>— {name}</div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              )}
+              );
+            })()}
 
-              {/* Summary */}
-              <div id="section-summary" style={{ background: `linear-gradient(135deg,rgba(83,58,253,0.12),rgba(83,58,253,0.05))`, border: `1px solid rgba(83,58,253,0.2)`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
-                <div style={{ fontSize: 12, fontWeight: 400, color: C.purple, marginBottom: 10 }}>✦ AI Summary</div>
-                <p style={{ margin: 0, fontSize: 15, color: dk.text, lineHeight: 1.7 }}>{report.content.summary}</p>
-              </div>
-
-              {/* Themes */}
-              {report.content.themes?.length > 0 && (
-                <div id="section-themes" style={{ marginBottom: 24 }}>
-                  <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 14 }}>Discovered themes</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14 }}>
-                    {(() => {
-                      const maxCount = Math.max(...report.content.themes.map(t => t.count ?? 0), 1);
-                      return report.content.themes.map((t, i) => (
-                        <div key={i} style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 8, padding: 18 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                            <Badge variant={t.sentiment === "positive" ? "success" : t.sentiment === "negative" ? "negative" : "dark"}>
-                              {t.sentiment === "positive" ? "Positive" : t.sentiment === "negative" ? "Negative" : "Neutral"}
-                            </Badge>
-                          </div>
-                          <div style={{ fontSize: 15, fontWeight: 400, color: dk.text, marginBottom: 8 }}>{t.label}</div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                            <div style={{ flex: 1, height: 4, borderRadius: 2, background: dk.border, overflow: "hidden" }}>
-                              <div style={{ width: `${Math.round((t.count ?? 0) / maxCount * 100)}%`, height: "100%", background: t.sentiment === "positive" ? C.success : t.sentiment === "negative" ? C.ruby : C.purple, borderRadius: 2 }} />
+            {/* Rating distributions */}
+            {ratingDists.length > 0 && (
+              <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "24px 28px", marginBottom: 16 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: dk.text, marginBottom: 16 }}>{isKo ? "평점 분포" : "Rating Distribution"}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                  {ratingDists.map(({ question: q, dist, min, max, maxCount, avg, total }) => (
+                    <div key={q.id}>
+                      <div style={{ fontSize: 12, color: dk.muted, marginBottom: 12, lineHeight: 1.5 }}>{q.content}</div>
+                      <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 60 }}>
+                        {Array.from({ length: max - min + 1 }, (_, k) => k + min).map(n => {
+                          const count = dist[n] ?? 0;
+                          const barH = Math.round(count / maxCount * 44);
+                          return (
+                            <div key={n} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                              <div style={{ fontSize: 10, color: count > 0 ? dk.text : "transparent" }}>{count}</div>
+                              <div style={{ width: "100%", height: barH || 2, background: count > 0 ? C.purple : dk.border, borderRadius: "2px 2px 0 0", opacity: count > 0 ? 0.35 + (count / maxCount) * 0.65 : 1 }} />
+                              <div style={{ fontSize: 11, color: dk.muted }}>{n}</div>
                             </div>
-                            <span style={{ fontSize: 11, color: dk.muted, whiteSpace: "nowrap" }}>{t.count}x</span>
-                          </div>
-                          {t.quotes?.[0] && (
-                            <div style={{ fontSize: 12, color: dk.muted, fontStyle: "italic", lineHeight: 1.5, borderLeft: `2px solid ${dk.border}`, paddingLeft: 8 }}>"{t.quotes[0]}"</div>
-                          )}
-                        </div>
-                      ));
-                    })()}
-                  </div>
-                </div>
-              )}
-
-              {/* Recommendations */}
-              {report.content.recommendations?.length > 0 && (
-                <div id="section-recommendations" style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24 }}>
-                  <div style={{ fontSize: 13, fontWeight: 400, color: dk.label, marginBottom: 14 }}>Recommendations</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {report.content.recommendations.map((r, i) => (
-                      <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                        <div style={{ width: 20, height: 20, borderRadius: "50%", background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          {Ic.CheckCircle({ s: 12, c: C.purple })}
-                        </div>
-                        <span style={{ fontSize: 13, color: dk.text, lineHeight: 1.6 }}>{r}</span>
+                          );
+                        })}
                       </div>
-                    ))}
-                  </div>
+                      <div style={{ fontSize: 11, color: dk.muted, marginTop: 8 }}>{isKo ? `평균 ${avg} · ${total}개 응답` : `Avg ${avg} · ${total} responses`}</div>
+                    </div>
+                  ))}
                 </div>
-              )}
-
-              <div style={{ marginTop: 16, display: "flex", gap: 8, flexWrap: "wrap" }} className="no-print">
-                <Btn variant="ghost" size="sm" onClick={handleGenerateReport} disabled={generating}>
-                  {generating ? "Regenerating..." : "Regenerate report"}
-                </Btn>
-                <Btn variant="ghost" size="sm" onClick={handlePrint}>
-                  Save as PDF
-                </Btn>
-                <Btn variant="ghost" size="sm" onClick={handleShare}>
-                  Share report
-                </Btn>
               </div>
-            </div>
-          )}
+            )}
 
-          {report?.status === "failed" && (
-            <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "24px", textAlign: "center" }}>
-              <div style={{ fontSize: 14, color: C.ruby, marginBottom: 12 }}>Report generation failed</div>
-              <Btn size="sm" onClick={handleGenerateReport} disabled={generating}>Try again</Btn>
+            {/* Recommendations */}
+            {report.content.recommendations?.length > 0 && (
+              <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "24px 28px", marginBottom: 16 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: dk.text, marginBottom: 16 }}>{isKo ? "인사이트 & 제안" : "Insights & Recommendations"}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {report.content.recommendations.map((r, i) => (
+                    <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                      <div style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(110,75,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+                        {Ic.CheckCircle({ s: 12, c: C.purple })}
+                      </div>
+                      <span style={{ fontSize: 13, color: dk.text, lineHeight: 1.6 }}>{r}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", paddingTop: 8 }} className="no-print">
+              <Btn variant="ghost" size="sm" onClick={handleGenerateReport} disabled={generating} style={{ color: "rgba(255,255,255,0.75)", borderColor: "rgba(255,255,255,0.2)" }}>
+                {generating ? (isKo ? "재생성 중..." : "Regenerating...") : (isKo ? "리포트 재생성" : "Regenerate")}
+              </Btn>
+              <Btn variant="ghost" size="sm" onClick={handlePrint} style={{ color: "rgba(255,255,255,0.75)", borderColor: "rgba(255,255,255,0.2)" }}>
+                {isKo ? "PDF 저장" : "Save PDF"}
+              </Btn>
+              <Btn variant="ghost" size="sm" onClick={handleShare} style={{ color: "rgba(255,255,255,0.75)", borderColor: "rgba(255,255,255,0.2)" }}>
+                {isKo ? "리포트 공유" : "Share Report"}
+              </Btn>
             </div>
-          )}
-        </div>
+          </>
+        )}
+
+        {report?.status === "failed" && (
+          <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "24px", textAlign: "center" }}>
+            <div style={{ fontSize: 14, color: C.ruby, marginBottom: 12 }}>{isKo ? "리포트 생성에 실패했어요" : "Report generation failed"}</div>
+            <Btn size="sm" onClick={handleGenerateReport} disabled={generating}>{isKo ? "다시 시도" : "Try Again"}</Btn>
+          </div>
+        )}
       </main>
       <div className="no-print">
-        <Footer go={go} lang={lang} onLangChange={setLang} />
+        <Footer go={go} lang={lang} onLangChange={onLangChange} />
       </div>
-    </div>
-  );
-}
-
-function MetricCard({ label, value, icon }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "#1e2947", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)", minWidth: 120 }}>
-      <div style={{ width: 32, height: 32, borderRadius: 8, background: "#1a2236", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        {icon}
-      </div>
-      <div>
-        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>{label}</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#e2e8f0" }}>{value}</div>
-      </div>
-    </div>
-  );
-}
-
-function SentimentBadge({ label, pct, color }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-      <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
-      <span style={{ fontSize: 11, color: C.navy }}>{label} <strong style={{ color }}>{pct}%</strong></span>
     </div>
   );
 }

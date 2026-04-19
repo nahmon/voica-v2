@@ -1,0 +1,84 @@
+- generic [ref=e700]:
+  - navigation [ref=e701]:
+    - generic [ref=e702]:
+      - generic [ref=e707] [cursor=pointer]: voicesurvey
+      - button "☰" [ref=e709] [cursor=pointer]
+  - generic [ref=e710]:
+    - generic [ref=e711]: 요금제
+    - heading "빠르고 저렴하게 인터뷰를 시작해보세요" [level=1] [ref=e712]
+    - paragraph [ref=e713]: 딱 맞는 플랜을 골라보세요
+  - generic [ref=e714]:
+    - generic [ref=e716]:
+      - button "월간" [ref=e717] [cursor=pointer]
+      - button "연간20% 할인" [ref=e718] [cursor=pointer]
+    - generic [ref=e719]:
+      - generic [ref=e720]:
+        - generic [ref=e721]: 인기
+        - generic [ref=e722]: Pro
+        - generic [ref=e723]: ₩199,000/월
+        - generic [ref=e724]: 월간 결제 · 언제든 자유롭게 취소
+        - generic [ref=e725]:
+          - generic [ref=e726]:
+            - generic [ref=e727]: ✓
+            - generic [ref=e728]: 월 500개 응답 포함 (초과 시 응답당 ₩660)
+          - generic [ref=e729]:
+            - generic [ref=e730]: ✓
+            - generic [ref=e731]: AI 심층 분석 · 주제 드릴다운
+          - generic [ref=e732]:
+            - generic [ref=e733]: ✓
+            - generic [ref=e734]: 대표 인용문 자동 추출
+          - generic [ref=e735]:
+            - generic [ref=e736]: ✓
+            - generic [ref=e737]: 크로스탭 분석 · 세그먼트 비교
+          - generic [ref=e738]:
+            - generic [ref=e739]: ✓
+            - generic [ref=e740]: CSV / PDF 내보내기
+          - generic [ref=e741]:
+            - generic [ref=e742]: ✓
+            - generic [ref=e743]: 팀원 최대 5명
+          - generic [ref=e744]:
+            - generic [ref=e745]: ✓
+            - generic [ref=e746]: 데이터 1년 보관
+        - button "Pro 시작하기 →" [ref=e747] [cursor=pointer]
+      - generic [ref=e748]:
+        - generic [ref=e749]: Enterprise
+        - generic [ref=e750]: 맞춤 요금
+        - generic [ref=e751]: 연간 계약 · 대량 할인 가능
+        - generic [ref=e752]:
+          - generic [ref=e753]:
+            - generic [ref=e754]: ✓
+            - generic [ref=e755]: 무제한 인터뷰
+          - generic [ref=e756]:
+            - generic [ref=e757]: ✓
+            - generic [ref=e758]: 전담 CSM
+          - generic [ref=e759]:
+            - generic [ref=e760]: ✓
+            - generic [ref=e761]: 맞춤 리포트
+          - generic [ref=e762]:
+            - generic [ref=e763]: ✓
+            - generic [ref=e764]: 99.9% SLA
+          - generic [ref=e765]:
+            - generic [ref=e766]: ✓
+            - generic [ref=e767]: PPT 슬라이드 자동 생성
+          - generic [ref=e768]:
+            - generic [ref=e769]: ✓
+            - generic [ref=e770]: Slack & Notion 연동
+        - button "영업팀 문의 →" [ref=e771] [cursor=pointer]
+  - contentinfo [ref=e772]:
+    - generic [ref=e773]:
+      - generic [ref=e774]:
+        - generic [ref=e775]:
+          - generic [ref=e779]: voicesurvey
+          - generic [ref=e780]: AI가 인터뷰하고, AI가 분석해요.
+        - generic [ref=e781]:
+          - button "소개" [ref=e782] [cursor=pointer]
+          - button "요금제" [ref=e783] [cursor=pointer]
+          - button "패널 보드" [ref=e784] [cursor=pointer]
+          - button "지원" [ref=e785] [cursor=pointer]
+          - button "개인정보처리방침" [ref=e786] [cursor=pointer]
+          - button "이용약관" [ref=e787] [cursor=pointer]
+      - generic [ref=e788]:
+        - generic [ref=e789]: Copyright © 2026 Voice Survey Inc. All rights reserved.
+        - generic [ref=e790]:
+          - button "ENG" [ref=e791] [cursor=pointer]
+          - button "한국어" [ref=e792] [cursor=pointer]

@@ -31,13 +31,19 @@ function InfoTooltip({ text }) {
   );
 }
 
-export default function RecruiterAdminScreen({ go, user, logout }) {
-  const [lang, setLang] = useState("ko");
+export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const [filter, setFilter] = useState("All");
   const [selected, setSelected] = useState(new Set());
   const isMobile = useIsMobile();
   const filters = ["All", "Applied", "Qualified", "Unqualified", "Completed"];
+  const isKo = lang === "ko";
   const statusMap = { "All": "All", "Applied": "Applied", "Qualified": "Qualified", "Unqualified": "Not Qualified", "Completed": "Completed" };
+  const statusLabel = {
+    "Applied":       isKo ? "검토 중" : "Applied",
+    "Qualified":     isKo ? "적격" : "Qualified",
+    "Not Qualified": isKo ? "부적격" : "Not Qualified",
+    "Completed":     isKo ? "완료" : "Completed",
+  };
   const statusStyle = {
     "Applied":       { color: "#92650a", bg: "rgba(251,191,36,0.12)", border: "rgba(251,191,36,0.3)" },
     "Qualified":     { color: C.successText, bg: C.successBg, border: C.successBorder },
@@ -51,10 +57,10 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
       <div style={{ padding: "10px 24px", background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← Dashboard</Btn>
+        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← {isKo ? "대시보드" : "Dashboard"}</Btn>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn variant="ghost" size="sm" onClick={() => go("editor")}>Edit interview</Btn>
-          <Btn size="sm" onClick={() => go("report")}>View report</Btn>
+          <Btn variant="ghost" size="sm" onClick={() => go("editor")}>{isKo ? "인터뷰 편집" : "Edit interview"}</Btn>
+          <Btn size="sm" onClick={() => go("report")}>{isKo ? "리포트 보기" : "View report"}</Btn>
         </div>
       </div>
 
@@ -140,7 +146,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
             ))}
             <div style={{ fontSize: 11, fontWeight: 600, color: C.body, letterSpacing: "0.3px", textTransform: "uppercase", display: "flex", alignItems: "center" }}>
               AI Fit Score
-              <InfoTooltip text={"Profile match + interview history + response quality\ncombined into a 0–100 AI fit score.\n85+ Qualified · 70–84 Review · Below 70 Unqualified"} />
+              <InfoTooltip text={"프로필 매칭 40% + 인터뷰 이력 30% + 응답 품질 30%\n세 항목을 가중 합산해 0~100점으로 산출해요.\n85점 이상 적격 · 70~84점 검토 · 70점 미만 부적격"} />
             </div>
             {["Status", "Actions"].map((h, i) => (
               <div key={i} style={{ fontSize: 11, fontWeight: 600, color: C.body, letterSpacing: "0.3px", textTransform: "uppercase", paddingLeft: i === 1 ? 16 : 0 }}>{h}</div>
@@ -191,7 +197,7 @@ export default function RecruiterAdminScreen({ go, user, logout }) {
         </div>
         )}
       </main>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }

@@ -3,9 +3,8 @@ import { C, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { FAQ_DATA, FAQ_DATA_KO } from "../lib/mockData.js";
 
-export default function FAQScreen({ go, user, logout }) {
+export default function FAQScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const [openIdx, setOpenIdx] = useState(null);
-  const [lang, setLang] = useState("ko");
   const isKo = lang === "ko";
   const data = isKo ? FAQ_DATA_KO : FAQ_DATA;
 
@@ -71,7 +70,7 @@ export default function FAQScreen({ go, user, logout }) {
           </div>
         </div>
       </div>
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }
