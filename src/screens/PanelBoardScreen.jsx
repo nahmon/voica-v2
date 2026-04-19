@@ -131,7 +131,7 @@ export default function PanelBoardScreen({ go, user, logout }) {
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: isMobile ? "20px 16px 80px" : "28px 24px 80px" }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: isMobile ? "20px 16px 80px" : "28px 24px 80px", flex: 1 }}>
 
         {/* Filters + Sort row */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
