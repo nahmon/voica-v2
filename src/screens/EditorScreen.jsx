@@ -479,33 +479,36 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   );
 
   // ─── Top nav bar ───
-  const NavBar = (
+  const NavBar = isMobile ? (
+    <div style={{ padding: "0 12px", height: 52, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
+      <button onClick={() => go("dashboard")} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px 4px", fontSize: 20, color: C.navy, lineHeight: 1, minWidth: 40, minHeight: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
+      <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: questions.length >= 10 ? "rgba(30,142,62,0.1)" : "rgba(180,120,0,0.08)", color: questions.length >= 10 ? C.successText : "rgba(140,90,0,0.9)" }}>
+        {questions.length}/10
+      </span>
+      <Btn size="sm" onClick={handleSave} disabled={saving}>
+        {saving ? "저장 중…" : editingId ? "저장" : "링크 생성"}
+      </Btn>
+    </div>
+  ) : (
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
       <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        {/* Status — subtle, leftmost (desktop only) */}
-        {!isMobile && editingId && hasUnsaved && (
+        {editingId && hasUnsaved && (
           <span style={{ fontSize: 11, color: "#f59e0b", fontWeight: 500, display: "flex", alignItems: "center", gap: 3 }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
             저장 안 됨
           </span>
         )}
-        {!isMobile && !editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시 저장됨 ✓</span>}
-        {/* Question count pill */}
+        {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시 저장됨 ✓</span>}
         <span style={{ fontSize: 11, fontWeight: 500, padding: "3px 8px", borderRadius: 20, background: questions.length >= 10 ? "rgba(30,142,62,0.1)" : "rgba(180,120,0,0.08)", color: questions.length >= 10 ? C.successText : "rgba(140,90,0,0.9)" }}>
           {questions.length}/10
         </span>
-        {/* Draft save (desktop only) */}
-        {!isMobile && <div style={{ width: 1, height: 16, background: C.border, margin: "0 2px" }} />}
-        {!isMobile && (
-          <Btn variant="ghost" size="sm" onClick={saveDraft} style={{ color: draftSaved ? C.success : undefined }}>
-            {draftSaved ? "저장됨 ✓" : <span style={{ display: "flex", alignItems: "center", gap: 5 }}>임시저장 <kbd style={{ fontSize: 9, padding: "1px 4px", borderRadius: 3, border: `1px solid ${C.border}`, background: C.bg, color: C.body, fontFamily: "inherit", lineHeight: 1.4 }}>⌘S</kbd></span>}
-          </Btn>
-        )}
-        {/* Divider */}
         <div style={{ width: 1, height: 16, background: C.border, margin: "0 2px" }} />
-        {/* Link copy (desktop only) */}
-        {!isMobile && shareCode && (
+        <Btn variant="ghost" size="sm" onClick={saveDraft} style={{ color: draftSaved ? C.success : undefined }}>
+          {draftSaved ? "저장됨 ✓" : <span style={{ display: "flex", alignItems: "center", gap: 5 }}>임시저장 <kbd style={{ fontSize: 9, padding: "1px 4px", borderRadius: 3, border: `1px solid ${C.border}`, background: C.bg, color: C.body, fontFamily: "inherit", lineHeight: 1.4 }}>⌘S</kbd></span>}
+        </Btn>
+        <div style={{ width: 1, height: 16, background: C.border, margin: "0 2px" }} />
+        {shareCode && (
           <Btn variant="ghost" size="sm" onClick={handleCopy}>
             {copied ? "복사됨 ✓" : "링크 복사"}
           </Btn>
