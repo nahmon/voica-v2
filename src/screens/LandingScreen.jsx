@@ -57,9 +57,10 @@ const TRANSLATIONS = {
       title: (purpleLight) => <>Traditional flow vs. <span style={{ color: purpleLight }}>voicesurvey</span></>,
       subtitle: "Same research — fifty times the sample, at one-fortieth the cost.",
       metrics: [
-        { value: "50×", label: "larger sample" },
+        { value: "×50", label: "larger sample" },
         { value: "1/40", label: "the cost" },
         { value: "×144", label: "faster to launch" },
+        { value: "500+", label: "parallel panelists" },
       ],
       rows: [
         { label: "Timeline", before: "~2 weeks", after: "10 minutes to launch" },
@@ -71,6 +72,25 @@ const TRANSLATIONS = {
       headerTraditional: "Traditional",
       headerVS: "voicesurvey",
       recommended: "Recommended",
+    },
+    useCases: {
+      label: "Use cases",
+      title: "Interview for anything",
+      subtitle: "Discover the numerous ways companies are using voicesurvey.",
+      items: [
+        { icon: "🛒", label: "Consumer goods testing" },
+        { icon: "🎨", label: "Creative testing" },
+        { icon: "📣", label: "Message testing" },
+        { icon: "🖥️", label: "Prototype testing" },
+        { icon: "🌐", label: "Website testing" },
+        { icon: "📱", label: "Mobile app testing" },
+        { icon: "✨", label: "AI quality evals" },
+        { icon: "🧪", label: "Product & UX evals" },
+        { icon: "👟", label: "Brand perception" },
+        { icon: "🗺️", label: "Customer journey map" },
+        { icon: "🎯", label: "Customer segmentation" },
+        { icon: "💼", label: "Employee experience" },
+      ],
     },
     cta: {
       badge: "Start today",
@@ -85,11 +105,11 @@ const TRANSLATIONS = {
     badge: "✦ AI가 인터뷰하고, AI가 분석해요.",
     hero: {
       messages: [
-        { line1: "비싸고 오래 걸리는 사용자 조사,", line2: "AI로 수백 명을 한 번에" },
-        { line0: "고객의 목소리를", line1: "직접 들으세요,", line2: "정확하고\u00A0빠르게" },
+        { line0: "비싸고 오래 걸리는", line1: "사용자 조사,", line2: "AI로 수백 명을 한 번에" },
+        { line1: "고객의 목소리를", line2: "정확하고\u00A0빠르게" },
       ],
       fromInterview: { line1: "AI 인터뷰는 어떠셨나요?", line2: "AI로 수백 명과 인터뷰하세요" },
-      subtitleDesktop: <>질문만 작성하면 AI가 수백 명의 패널리스트와 동시에 인터뷰를 진행합니다.<br />주제 분석, 감성 태깅, 인사이트 리포트까지 AI가 알아서 만들어줘요.</>,
+      subtitleDesktop: <>질문만 작성하면 AI가 수백 명의 인터뷰 패널과 동시에 인터뷰를 진행합니다.<br />주제 분석, 감성 태깅, 인사이트 리포트까지 AI가 알아서 만들어줘요.</>,
       subtitleMobile: <>질문만 작성하면 AI가 나머지를 처리합니다.<br />분석, 감성, 리포트 모두 AI가 자동으로 처리해요.</>,
       cta1: "인터뷰 만들기 →",
       cta2: "패널로 참여하기",
@@ -97,9 +117,9 @@ const TRANSLATIONS = {
     },
     stats: {
       label: "Live",
-      title: "어딘가에서 지금 이 순간도 인터뷰가 이어지고 있어요",
+      title: <>지금 많은 인터뷰가<br />진행 중이에요</>,
       items: [
-        { end: 12400, suffix: "+", label: "등록된 패널리스트" },
+        { end: 12400, suffix: "+", label: "등록된 인터뷰 패널" },
         { end: 4200, suffix: "", label: "이번 달 완료된 인터뷰" },
         { end: 94, suffix: "%", label: "AI 분석 정확도" },
         { end: 8, suffix: " min", label: "평균 인터뷰 시간" },
@@ -110,9 +130,10 @@ const TRANSLATIONS = {
       title: (purpleLight) => <>기존 방식 vs. <span style={{ color: purpleLight }}>voicesurvey</span></>,
       subtitle: "같은 조사를, 50배 더 많은 표본으로, 40분의 1 비용으로.",
       metrics: [
-        { value: "50×", label: "더 큰 표본" },
+        { value: "×50", label: "더 큰 표본" },
         { value: "1/40", label: "비용 절감" },
         { value: "×144", label: "더 빠른 출시" },
+        { value: "500+", label: "동시 패널 참여" },
       ],
       rows: [
         { label: "기간", before: "약 2주", after: "10분 안에 시작" },
@@ -125,11 +146,30 @@ const TRANSLATIONS = {
       headerVS: "voicesurvey",
       recommended: "추천",
     },
+    useCases: {
+      label: "활용 사례",
+      title: "무엇이든 인터뷰할 수 있어요",
+      subtitle: "다양한 기업들이 voicesurvey로 조사를 진행하는 방식을 확인해보세요.",
+      items: [
+        { icon: "🛒", label: "소비재 인터뷰" },
+        { icon: "🎨", label: "광고·크리에이티브 테스트" },
+        { icon: "📣", label: "메시지 테스트" },
+        { icon: "🖥️", label: "프로토타입 테스트" },
+        { icon: "🌐", label: "웹사이트 테스트" },
+        { icon: "📱", label: "모바일 앱 테스트" },
+        { icon: "✨", label: "AI 품질 평가" },
+        { icon: "🧪", label: "제품·UX 평가" },
+        { icon: "👟", label: "브랜드 인식 조사" },
+        { icon: "🗺️", label: "고객 여정 분석" },
+        { icon: "🎯", label: "고객 세분화" },
+        { icon: "💼", label: "직원 경험 조사" },
+      ],
+    },
     cta: {
       badge: "지금 시작하기",
       title: "무료로 시작하세요",
       subtitleDesktop: <>신용카드 없이 바로 시작할 수 있어요.<br />첫 번째 인터뷰 프로젝트는 완전 무료예요.</>,
-      subtitleMobile: "신용카드 불필요.",
+      subtitleMobile: "빠르게 인터뷰를 시작해보세요.",
       cta1: "리서치 시작하기 →",
       cta2: "패널로 참여하기",
     },
@@ -340,10 +380,10 @@ function BeforeAfterSection({ isMobile, t }) {
 
           {/* metric cards */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
-            {metrics.map(m => (
+            {(isMobile ? metrics : metrics.slice(0, 3)).map(m => (
               <div key={m.value} style={{ background: "rgba(110,75,255,0.12)", border: "1px solid rgba(110,75,255,0.25)", borderRadius: 12, padding: isMobile ? "20px 18px" : "28px 24px" }}>
                 <div style={{ fontSize: isMobile ? 36 : 48, fontWeight: 700, color: C.purpleLight, lineHeight: 1, fontFamily: F }}>{m.value}</div>
-                <div style={{ fontSize: 14, color: "rgba(200,190,255,0.65)", marginTop: 10 }}>{m.label}</div>
+                <div style={{ fontSize: 14, color: "rgba(220,210,255,0.9)", marginTop: 10 }}>{m.label}</div>
               </div>
             ))}
           </div>
@@ -351,12 +391,12 @@ function BeforeAfterSection({ isMobile, t }) {
           {/* two-table layout */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
             {/* Traditional table */}
-            <div style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", overflow: "hidden" }}>
+            <div style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", overflow: "hidden", background: "rgba(255,255,255,0.06)" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.1)" }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(220,215,255,0.75)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{headerTraditional}</div>
               </div>
               {rows.map((row, i) => (
-                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none", background: "rgba(255,255,255,0.06)" }}>
+                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
                   <div style={{ fontSize: 13, color: "rgba(220,215,255,0.6)", fontWeight: 500 }}>{row.label}</div>
                   <div style={{ fontSize: 13, color: "rgba(220,215,255,0.8)" }}>{row.before}</div>
                 </div>
@@ -364,13 +404,13 @@ function BeforeAfterSection({ isMobile, t }) {
             </div>
 
             {/* voicesurvey table — brighter */}
-            <div style={{ borderRadius: 12, border: "1px solid rgba(110,75,255,0.6)", overflow: "hidden" }}>
+            <div style={{ borderRadius: 12, border: "1px solid rgba(110,75,255,0.6)", overflow: "hidden", background: "rgba(110,75,255,0.28)" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(110,75,255,0.4)", background: "rgba(110,75,255,0.35)", display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: "0.08em" }}>{headerVS}</div>
                 <span style={{ fontSize: 10, background: "rgba(255,255,255,0.2)", color: "#fff", padding: "2px 8px", borderRadius: 4 }}>{recommended}</span>
               </div>
               {rows.map((row, i) => (
-                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(110,75,255,0.25)" : "none", background: "rgba(110,75,255,0.28)" }}>
+                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 20px", borderBottom: i < rows.length - 1 ? "1px solid rgba(110,75,255,0.25)" : "none" }}>
                   <div style={{ fontSize: 13, color: "rgba(220,210,255,0.7)", fontWeight: 500 }}>{row.label}</div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{row.after}</div>
                 </div>
@@ -380,6 +420,43 @@ function BeforeAfterSection({ isMobile, t }) {
         </div>
       </section>
     </FadeInSection>
+  );
+}
+
+/* ── Use cases section ── */
+function UseCasesSection({ isMobile, t }) {
+  const { label, title, subtitle, items } = t.useCases;
+  const [activeIdx, setActiveIdx] = useState(0);
+  return (
+    <section style={{ padding: isMobile ? "60px 20px" : "80px 24px", background: "#fff" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ marginBottom: 36, textAlign: "center" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 10 }}>{label}</div>
+          <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, margin: "0 auto 10px", fontFamily: F, maxWidth: 700 }}>{title}</h2>
+          <p style={{ fontSize: 15, color: C.body, margin: "0 auto", maxWidth: 600 }}>{subtitle}</p>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 2 : "2px 48px" }}>
+          {items.map((item, i) => {
+            const isActive = activeIdx === i;
+            return (
+              <div
+                key={i}
+                onClick={() => setActiveIdx(i)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 14,
+                  padding: "13px 16px", borderRadius: 10, cursor: "pointer",
+                  background: isActive ? C.purpleBg : "transparent",
+                  transition: "background 0.15s",
+                }}
+              >
+                <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
+                <span style={{ fontSize: 15, fontWeight: isActive ? 700 : 500, color: isActive ? C.navy : C.body }}>{item.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -443,9 +520,8 @@ function FinalCtaSection({ go, isMobile, t }) {
 }
 
 /* ── Main screen ── */
-export default function LandingScreen({ go, user, logout }) {
+export default function LandingScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
-  const [lang, setLang] = useState("ko");
   const [liveCount, setLiveCount] = useState(247);
   const [heroIdx, setHeroIdx] = useState(0);
   const [heroVisible, setHeroVisible] = useState(true);
@@ -490,9 +566,6 @@ export default function LandingScreen({ go, user, logout }) {
         padding: isMobile ? "72px 20px 80px" : "88px 24px 96px",
         background: "transparent",
       }}>
-        {/* blobs */}
-        <div style={{ position: "absolute", top: -80, right: "10%", width: 560, height: 560, borderRadius: "50%", background: `radial-gradient(circle, ${C.purple}18, transparent 70%)`, filter: "blur(80px)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -60, left: "5%", width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle, ${C.purple}10, transparent 70%)`, filter: "blur(60px)", pointerEvents: "none" }} />
 
         <div style={{ maxWidth: 1200, margin: "0 auto", display: isMobile ? "flex" : "grid", gridTemplateColumns: "520px 1fr", alignItems: "center", gap: isMobile ? 0 : 64, flexDirection: isMobile ? "column" : "row", position: "relative", minHeight: isMobile ? "auto" : 580 }}>
 
@@ -505,7 +578,7 @@ export default function LandingScreen({ go, user, logout }) {
             <h1 style={{
               fontSize: isMobile ? 32 : 52, fontWeight: 700, lineHeight: 1.2, margin: "0 0 20px",
               fontFamily: F, wordBreak: "keep-all",
-              height: isMobile ? 160 : 260, overflow: "hidden",
+              minHeight: isMobile ? 120 : 260, overflow: "hidden",
               opacity: heroVisible ? 1 : 0,
               transition: "opacity 0.4s ease",
             }}>
@@ -521,25 +594,21 @@ export default function LandingScreen({ go, user, logout }) {
               {isMobile ? t.hero.subtitleMobile : t.hero.subtitleDesktop}
             </p>
 
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28 }}>
+            <div style={{ display: "flex", gap: 12, flexDirection: isMobile ? "column" : "row", marginBottom: 28, maxWidth: isMobile ? "100%" : 480 }}>
               <button onClick={() => go("advertiser_login")}
-                style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: C.purple, border: "none", fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: F, transition: "background 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", gap: 8 }}
+                style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: C.purple, border: "none", fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: F, transition: "background 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, flex: 1 }}
                 onMouseEnter={e => { e.currentTarget.style.background = C.purpleHover; e.currentTarget.style.transform = "translateY(-1px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = C.purple; e.currentTarget.style.transform = "none"; }}>
                 {t.hero.cta1}
               </button>
               <button onClick={() => go("panel_entry")}
-                style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: "#fff", border: `1.5px solid ${C.purpleLight}`, fontSize: 15, fontWeight: 600, color: C.purple, fontFamily: F, transition: "border-color 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", gap: 8 }}
+                style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: "#fff", border: `1.5px solid ${C.purpleLight}`, fontSize: 15, fontWeight: 600, color: C.purple, fontFamily: F, transition: "border-color 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, flex: 1 }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.transform = "translateY(-1px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = C.purpleLight; e.currentTarget.style.transform = "none"; }}>
                 {t.hero.cta2}
               </button>
             </div>
 
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 14px", borderRadius: 20, background: "rgba(110,75,255,0.07)", border: `1px solid ${C.purpleLight}` }}>
-              <div style={{ width: 7, height: 7, borderRadius: "50%", background: C.success, animation: "pulse-dot 2s ease-in-out infinite" }} />
-              <span style={{ fontSize: 13, color: C.body }}>{t.hero.liveCounter(liveCount)}</span>
-            </div>
           </div>
 
           {/* ── Right: animated interview mockup ── */}
@@ -552,18 +621,19 @@ export default function LandingScreen({ go, user, logout }) {
       </section>
 
       {/* ── Stats ── */}
+      <div style={{ display: "flex", justifyContent: "center" }}><div style={{ width: "70%", borderTop: `1px solid ${C.border}` }} /></div>
       <FadeInSection>
-        <section style={{ background: "rgba(110,75,255,0.04)", borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "48px 20px" : "64px 24px" }}>
+        <section style={{ background: "transparent", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "48px 20px" : "64px 24px" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 40, flexWrap: "wrap", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 8 }}>{t.stats.label}</div>
-                <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: C.navy, margin: 0, fontFamily: F }}>{t.stats.title}</h2>
+            <div style={{ marginBottom: 40 }}>
+              <div style={{ marginBottom: 10 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple }}>{t.stats.label}</span>
               </div>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.25)", fontSize: 12, fontWeight: 600, color: C.successText }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
-                {lang === "ko" ? "실시간" : "live"}
-              </span>
+              <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: C.navy, margin: "0 0 14px", fontFamily: F }}>{t.stats.title}</h2>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 20, background: "rgba(110,75,255,0.07)", border: `1px solid ${C.purpleLight}`, fontSize: 13, color: C.body }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, animation: "pulse-dot 2s ease-in-out infinite", flexShrink: 0 }} />
+                {t.hero.liveCounter(liveCount)}
+              </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 0 }}>
               {t.stats.items.map(({ label, ...stat }, i) => (
@@ -585,10 +655,22 @@ export default function LandingScreen({ go, user, logout }) {
       {/* ── Before vs After ── */}
       <BeforeAfterSection isMobile={isMobile} t={t} />
 
+      <div style={{ display: "flex", justifyContent: "center" }}><div style={{ width: "70%", borderTop: `1px solid ${C.border}` }} /></div>
+
       {/* ── Carousels ── */}
       <FadeInSection>
         <VoCCarousel lang={lang} />
       </FadeInSection>
+
+      <div style={{ display: "flex", justifyContent: "center" }}><div style={{ width: "70%", borderTop: `1px solid ${C.border}` }} /></div>
+
+      {/* ── Use cases ── */}
+      <FadeInSection>
+        <UseCasesSection isMobile={isMobile} t={t} />
+      </FadeInSection>
+
+      <div style={{ display: "flex", justifyContent: "center" }}><div style={{ width: "70%", borderTop: `1px solid ${C.border}` }} /></div>
+
       <FadeInSection>
         <HowItWorksCarousel lang={lang} />
       </FadeInSection>
@@ -596,7 +678,7 @@ export default function LandingScreen({ go, user, logout }) {
       {/* ── Final CTA ── */}
       <FinalCtaSection go={go} isMobile={isMobile} t={t} />
 
-      <Footer go={go} lang={lang} onLangChange={setLang} />
+      <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
   );
 }

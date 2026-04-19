@@ -1,12 +1,8 @@
 // POST /api/report/[id] — generate report via GPT-4o
 // GET  /api/report/[id] — fetch existing report
-import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
+import { supabase } from "../_supabase.js";
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export default async function handler(req, res) {
@@ -102,6 +98,7 @@ export default async function handler(req, res) {
         messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
         response_format: { type: "json_object" },
         temperature: 0.3,
+        timeout: 50000,
       });
 
       const raw = completion.choices[0]?.message?.content;

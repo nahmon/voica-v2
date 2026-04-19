@@ -1,25 +1,31 @@
-import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
+import { rateLimit, getIp } from "./_rateLimit.js";
+import { supabase } from "./_supabase.js";
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
+  // Rate limit: 30 TTS calls per minute per IP
+  const ip = getIp(req);
+  if (!rateLimit(`tts:${ip}`, 30)) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
   const { text, question_id } = req.body;
   if (!text || !question_id) return res.status(400).json({ error: "text and question_id required" });
 
-  // Check cache
+  // Check cache — also validates question_id exists in DB
   const { data: q } = await supabase
     .from("questions")
     .select("tts_url")
     .eq("id", question_id)
     .single();
-  if (q?.tts_url) return res.status(200).json({ url: q.tts_url });
+
+  // Reject unknown question IDs to prevent arbitrary TTS generation
+  if (!q) return res.status(404).json({ error: "Question not found" });
+  if (q.tts_url) return res.status(200).json({ url: q.tts_url });
 
   // Generate TTS
   const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "nova", input: text });

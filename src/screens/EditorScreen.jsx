@@ -51,6 +51,10 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const savedDraft = !interviewId ? (() => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; } })() : null;
   const [title, setTitle] = useState(savedDraft?.title ?? "");
   const [incentive, setIncentive] = useState(savedDraft?.incentive ?? "");
+  const [rewardAmount, setRewardAmount] = useState(() => {
+    const m = (savedDraft?.incentive ?? "").match(/(\d[\d,]*)/);
+    return m ? parseInt(m[1].replace(/,/g, "")) : 0;
+  });
   const [questions, setQuestions] = useState(savedDraft?.questions ?? [newQ("voice")]);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -115,6 +119,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           setSavedTitle(iv.title ?? "");
           setIncentive(iv.incentive ?? "");
           setSavedIncentive(iv.incentive ?? "");
+          const rwMatch = (iv.incentive ?? "").match(/(\d[\d,]*)/);
+          if (rwMatch) setRewardAmount(parseInt(rwMatch[1].replace(/,/g, "")));
           if (iv.share_code) setShareCode(iv.share_code);
         }
         if (qs && qs.length > 0) {
@@ -131,16 +137,24 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     })();
   }, [interviewId]);
 
-  // Auto-save draft to localStorage only for new interviews
+  const saveDraft = () => {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, incentive, questions }));
+    setDraftSaved(true);
+    setTimeout(() => setDraftSaved(false), 1500);
+  };
+
+  // Debounce auto-save on change (new interviews only)
   useEffect(() => {
     if (editingId) return;
-    const timer = setTimeout(() => {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, incentive, questions }));
-      setDraftSaved(true);
-      setTimeout(() => setDraftSaved(false), 1500);
-    }, 800);
+    const timer = setTimeout(saveDraft, 800);
     return () => clearTimeout(timer);
   }, [title, questions, editingId]);
+
+  // 3-minute interval auto-save (all interviews)
+  useEffect(() => {
+    const interval = setInterval(saveDraft, 3 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [title, incentive, questions]);
 
   // Keyboard shortcut: Cmd+S / Ctrl+S to save
   useEffect(() => {
@@ -270,7 +284,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       const token = session?.access_token;
       const payload = {
         title: title.trim(),
-        incentive: incentive.trim() || null,
+        incentive: rewardAmount > 0 ? `₩${rewardAmount.toLocaleString("ko-KR")}` : null,
         questions: questions.map((q, i) => ({
           id: q.id,
           order_num: i + 1,
@@ -343,9 +357,50 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           {Ic.CheckCircle({ s: 28, c: C.success })}
         </div>
         <div style={{ fontSize: 20, fontWeight: 600, color: C.navy, marginBottom: 8 }}>링크가 준비됐어요</div>
-        <div style={{ fontSize: 13, color: C.body, marginBottom: 24, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 13, color: C.body, marginBottom: 20, lineHeight: 1.6 }}>
           아래 링크를 참여자에게 공유하세요.<br />로그인 없이 바로 참여할 수 있어요.
         </div>
+
+        {/* Reward picker */}
+        <div style={{ background: C.bg, borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", border: `1px solid ${C.border}` }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 10, letterSpacing: 0.5 }}>참여 보상 설정</div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: rewardAmount > 0 ? 10 : 0 }}>
+            {[0, 1000, 3000, 5000, 10000].map(amt => (
+              <button key={amt} onClick={() => {
+                setRewardAmount(amt);
+                if (editingId) supabase.from("interviews").update({ incentive: amt > 0 ? `₩${amt.toLocaleString("ko-KR")}` : null }).eq("id", editingId);
+              }}
+                style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${rewardAmount === amt ? C.purple : C.border}`, background: rewardAmount === amt ? C.purpleBg : C.white, color: rewardAmount === amt ? C.purple : C.body, fontSize: 13, fontFamily: F, cursor: "pointer", fontWeight: rewardAmount === amt ? 600 : 400, transition: "all 0.15s" }}>
+                {amt === 0 ? "없음" : amt === 1000 ? "₩1,000" : amt === 3000 ? "₩3,000 ✦" : amt === 5000 ? "₩5,000" : "₩10,000"}
+              </button>
+            ))}
+          </div>
+          {rewardAmount > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11, color: C.body }}>조정:</span>
+              {[1000, 5000, 10000].map(inc => (
+                <button key={inc} onClick={() => {
+                  const next = rewardAmount + inc;
+                  setRewardAmount(next);
+                  if (editingId) supabase.from("interviews").update({ incentive: `₩${next.toLocaleString("ko-KR")}` }).eq("id", editingId);
+                }}
+                  style={{ padding: "3px 9px", borderRadius: 6, border: `1px solid ${C.border}`, background: "transparent", fontSize: 11, color: C.body, cursor: "pointer", fontFamily: F }}>
+                  +{inc >= 10000 ? "₩10만" : inc >= 5000 ? "₩5천" : "₩1천"}
+                </button>
+              ))}
+              <button onClick={() => {
+                  const next = Math.max(0, rewardAmount - 1000);
+                  setRewardAmount(next);
+                  if (editingId) supabase.from("interviews").update({ incentive: next > 0 ? `₩${next.toLocaleString("ko-KR")}` : null }).eq("id", editingId);
+                }}
+                style={{ padding: "3px 9px", borderRadius: 6, border: `1px solid ${C.border}`, background: "transparent", fontSize: 11, color: C.body, cursor: "pointer", fontFamily: F }}>
+                -₩1천
+              </button>
+              <span style={{ marginLeft: "auto", fontSize: 13, fontWeight: 600, color: C.purple }}>₩{rewardAmount.toLocaleString("ko-KR")}</span>
+            </div>
+          )}
+        </div>
+
         <div style={{ background: C.bg, borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, marginBottom: 20, border: `1px solid ${C.border}` }}>
           <span style={{ flex: 1, fontSize: 13, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
           <Btn size="sm" onClick={handleCopy}>{copied ? "복사됨 ✓" : "복사"}</Btn>
@@ -393,7 +448,9 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       onClick={e => { if (e.target === e.currentTarget) setShowAiModal(false); }}>
       <div style={{ background: C.white, borderRadius: 20, padding: "36px 32px 28px", maxWidth: 480, width: "100%", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M8 0 C8 0 8.8 3.5 10.5 5.5 C12.2 7.5 16 8 16 8 C16 8 12.2 8.5 10.5 10.5 C8.8 12.5 8 16 8 16 C8 16 7.2 12.5 5.5 10.5 C3.8 8.5 0 8 0 8 C0 8 3.8 7.5 5.5 5.5 C7.2 3.5 8 0 8 0Z"/></svg>
+          </div>
           <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>AI로 질문 초안 만들기</div>
         </div>
         <div style={{ fontSize: 13, color: C.body, marginBottom: 20, lineHeight: 1.6 }}>
@@ -414,7 +471,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         <div style={{ display: "flex", gap: 8 }}>
           <Btn full variant="ghost" onClick={() => setShowAiModal(false)} disabled={aiGenerating}>취소</Btn>
           <Btn full onClick={generateWithAI} disabled={aiGenerating || !aiPrompt.trim()}>
-            {aiGenerating ? "생성 중…" : "✦ 초안 생성"}
+            {aiGenerating ? "생성 중…" : <><svg width="12" height="12" viewBox="0 0 16 16" fill="white" style={{ marginRight: 5, verticalAlign: "middle" }}><path d="M8 0 C8 0 8.8 3.5 10.5 5.5 C12.2 7.5 16 8 16 8 C16 8 12.2 8.5 10.5 10.5 C8.8 12.5 8 16 8 16 C8 16 7.2 12.5 5.5 10.5 C3.8 8.5 0 8 0 8 C0 8 3.8 7.5 5.5 5.5 C7.2 3.5 8 0 8 0Z"/></svg>초안 생성</>}
           </Btn>
         </div>
       </div>
@@ -426,41 +483,29 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
       <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        {/* Status — subtle, leftmost */}
-        {editingId && hasUnsaved && (
+        {/* Status — subtle, leftmost (desktop only) */}
+        {!isMobile && editingId && hasUnsaved && (
           <span style={{ fontSize: 11, color: "#f59e0b", fontWeight: 500, display: "flex", alignItems: "center", gap: 3 }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
             저장 안 됨
           </span>
         )}
-        {!editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시 저장됨 ✓</span>}
+        {!isMobile && !editingId && draftSaved && <span style={{ fontSize: 11, color: C.success }}>임시 저장됨 ✓</span>}
         {/* Question count pill */}
         <span style={{ fontSize: 11, fontWeight: 500, padding: "3px 8px", borderRadius: 20, background: questions.length >= 10 ? "rgba(30,142,62,0.1)" : "rgba(180,120,0,0.08)", color: questions.length >= 10 ? C.successText : "rgba(140,90,0,0.9)" }}>
           {questions.length}/10
         </span>
+        {/* Draft save (desktop only) */}
+        {!isMobile && <div style={{ width: 1, height: 16, background: C.border, margin: "0 2px" }} />}
+        {!isMobile && (
+          <Btn variant="ghost" size="sm" onClick={saveDraft} style={{ color: draftSaved ? C.success : undefined }}>
+            {draftSaved ? "저장됨 ✓" : <span style={{ display: "flex", alignItems: "center", gap: 5 }}>임시저장 <kbd style={{ fontSize: 9, padding: "1px 4px", borderRadius: 3, border: `1px solid ${C.border}`, background: C.bg, color: C.body, fontFamily: "inherit", lineHeight: 1.4 }}>⌘S</kbd></span>}
+          </Btn>
+        )}
         {/* Divider */}
         <div style={{ width: 1, height: 16, background: C.border, margin: "0 2px" }} />
-        {/* Tools */}
-        <div style={{ position: "relative" }}>
-          <Btn variant="ghost" size="sm" onClick={() => setTemplateOpen(v => !v)}>템플릿</Btn>
-          {templateOpen && (
-            <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 4, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 100, minWidth: 220 }}>
-              <div style={{ padding: "8px 14px 4px", fontSize: 10, color: C.body, fontWeight: 600, letterSpacing: 0.5 }}>템플릿 불러오기</div>
-              <div onClick={loadTemplate}
-                style={{ padding: "10px 14px", fontSize: 13, color: C.navy, cursor: "pointer", borderTop: `1px solid ${C.border}` }}
-                onMouseEnter={e => e.currentTarget.style.background = C.bg}
-                onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                <div style={{ fontWeight: 500 }}>Voice Survey 사용자 만족도 조사</div>
-                <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>음성 7개 + 객관식 7개 · 14개 질문</div>
-              </div>
-            </div>
-          )}
-        </div>
-        <Btn size="sm" onClick={() => setShowAiModal(true)} style={{ background: "linear-gradient(135deg,#533afd,#f96bee)", border: "none", color: C.white, fontWeight: 600 }}>✦ AI 초안</Btn>
-        {/* Divider */}
-        <div style={{ width: 1, height: 16, background: C.border, margin: "0 2px" }} />
-        {/* Primary CTA */}
-        {shareCode && (
+        {/* Link copy (desktop only) */}
+        {!isMobile && shareCode && (
           <Btn variant="ghost" size="sm" onClick={handleCopy}>
             {copied ? "복사됨 ✓" : "링크 복사"}
           </Btn>
@@ -505,12 +550,6 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           placeholder="인터뷰 제목을 입력하세요"
           style={{ width: "100%", border: "none", outline: "none", fontSize: 18, fontFamily: F, fontWeight: 600, color: C.navy, background: "transparent", boxSizing: "border-box" }}
         />
-        <input
-          value={incentive}
-          onChange={e => setIncentive(e.target.value)}
-          placeholder="참여 보상 (선택) — 예: 스타벅스 아메리카노 1잔"
-          style={{ width: "100%", border: "none", outline: "none", fontSize: 13, fontFamily: F, color: C.body, background: "transparent", boxSizing: "border-box", marginTop: 6 }}
-        />
       </div>
       {/* Question tabs */}
       <div style={{ display: "flex", gap: 6, padding: "10px 16px", overflowX: "auto", background: C.white, borderBottom: `1px solid ${C.border}` }}>
@@ -540,6 +579,11 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       <div style={{ padding: 16 }}>
         <PreviewCard q={q} idx={selectedIdx} total={questions.length} updateQ={updateQ} />
       </div>
+      <div style={{ padding: "0 16px 12px" }}>
+        <button onClick={() => setShowAiModal(true)} style={{ width: "100%", padding: "12px 16px", borderRadius: 10, border: `1px solid ${C.purple}`, background: C.purpleBg, color: C.purple, fontSize: 14, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+          ✨ AI로 인터뷰 쉽게 만들기
+        </button>
+      </div>
       <div style={{ padding: "0 16px 24px" }}>
         <QuestionSettings q={q} idx={selectedIdx} updateQ={updateQ} typeLabel={typeLabel} />
       </div>
@@ -549,6 +593,13 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   // ─── Desktop layout ───
   return (
     <div style={{ fontFamily: F, height: "100vh", display: "flex", flexDirection: "column" }}>
+      <style>{`
+        @keyframes aiGradientShift {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
       {ShareOverlay}
       {IncompleteWarnOverlay}
       {AiModal}
@@ -648,27 +699,24 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               onFocus={e => e.target.style.borderBottomColor = C.purple}
               onBlur={e => e.target.style.borderBottomColor = title ? C.purple : C.border}
             />
-            <div style={{ marginTop: 14 }}>
-              <div style={{ fontSize: 11, color: C.body, marginBottom: 4, letterSpacing: 0.5 }}>참여 보상 (선택)</div>
-              <input
-                value={incentive}
-                onChange={e => setIncentive(e.target.value)}
-                placeholder="예: 스타벅스 아메리카노 1잔"
-                style={{ width: "100%", border: "none", borderBottom: `1px solid ${incentive ? C.purple : C.border}`, outline: "none", fontSize: 14, fontFamily: F, color: C.navy, background: "transparent", paddingBottom: 4, boxSizing: "border-box", transition: "border-color 0.15s" }}
-                onFocus={e => e.target.style.borderBottomColor = C.purple}
-                onBlur={e => e.target.style.borderBottomColor = incentive ? C.purple : C.border}
-              />
-            </div>
           </div>
 
           {/* Preview card */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 40px", gap: 12 }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 40px", gap: 12, position: "relative" }}>
             <div style={{ fontSize: 11, color: C.body, letterSpacing: 0.3 }}>참여자 화면 — 클릭해서 바로 편집하세요</div>
             <PreviewCard q={q} idx={selectedIdx} total={questions.length} updateQ={updateQ} />
             {/* Character count */}
             <div style={{ fontSize: 11, color: (q?.content?.length ?? 0) > MAX_Q_CHARS ? C.ruby : C.body, alignSelf: "flex-end", marginRight: 0 }}>
               {q?.content?.length ?? 0}/{MAX_Q_CHARS} chars
             </div>
+            {/* AI 초안 floating button with soft glow pulse */}
+            <button
+              onClick={() => setShowAiModal(true)}
+              style={{ position: "absolute", bottom: 48, left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg, #2d25b0, #533afd, #9b7eff, #533afd, #2d25b0)", backgroundSize: "300% 300%", border: "none", borderRadius: 24, padding: "10px 22px", color: C.white, fontFamily: F, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", boxShadow: "0 4px 18px rgba(83,58,253,0.25)", animation: "aiGradientShift 16s ease infinite" }}
+            >
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="white"><path d="M8 0 C8 0 8.8 3.5 10.5 5.5 C12.2 7.5 16 8 16 8 C16 8 12.2 8.5 10.5 10.5 C8.8 12.5 8 16 8 16 C8 16 7.2 12.5 5.5 10.5 C3.8 8.5 0 8 0 8 C0 8 3.8 7.5 5.5 5.5 C7.2 3.5 8 0 8 0Z"/></svg>
+              AI로 인터뷰 쉽게 만들기
+            </button>
           </div>
         </div>
 
@@ -692,12 +740,14 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 function PreviewCard({ q, idx, total, updateQ }) {
   const editable = !!updateQ;
   return (
-    <div style={{ width: "100%", maxWidth: 420, background: C.interviewBg, borderRadius: 8, padding: "28px 24px", boxShadow: "rgba(50,50,93,0.25) 0px 30px 45px -30px", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: -40, right: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(26,115,232,0.15),transparent)", filter: "blur(40px)", pointerEvents: "none" }} />
+    <div style={{ width: "100%", maxWidth: 600, background: C.interviewBg, borderRadius: 12, padding: "36px 32px", boxShadow: "rgba(50,50,93,0.25) 0px 30px 60px -20px", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: -40, right: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(110,75,255,0.18),transparent)", filter: "blur(40px)", pointerEvents: "none" }} />
       <div style={{ position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#1a73e8,#e8710a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>✦</div>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>AI Interviewer · Voice Survey</span>
+          <div style={{ width: 32, height: 32, borderRadius: "50%", background: `linear-gradient(135deg,${C.purple},#f96bee)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width={14} height={14} viewBox="0 0 16 16" fill="white"><path d="M8 0 C8 0 8.8 3.5 10.5 5.5 C12.2 7.5 16 8 16 8 C16 8 12.2 8.5 10.5 10.5 C8.8 12.5 8 16 8 16 C8 16 7.2 12.5 5.5 10.5 C3.8 8.5 0 8 0 8 C0 8 3.8 7.5 5.5 5.5 C7.2 3.5 8 0 8 0Z"/></svg>
+          </div>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>AI Interviewer · voicesurvey</span>
           <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,0.25)" }}>Q{idx + 1}/{total}</span>
         </div>
 
@@ -734,14 +784,24 @@ function PreviewCard({ q, idx, total, updateQ }) {
                 key={i}
                 value={opt}
                 onChange={e => { const next = [...q.options]; next[i] = e.target.value; updateQ(idx, { options: next }); }}
-                placeholder={`Option ${i + 1}`}
+                placeholder={`보기 ${i + 1}`}
                 style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", fontSize: 13, color: "rgba(255,255,255,0.85)", fontFamily: F, outline: "none", width: "100%", boxSizing: "border-box", caretColor: "rgba(185,185,249,0.9)" }}
                 onFocus={e => e.target.style.borderColor = "rgba(185,185,249,0.5)"}
                 onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.15)"}
               />
             ) : (
-              <div key={i} style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{opt || `Option ${i + 1}`}</div>
+              <div key={i} style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{opt || `보기 ${i + 1}`}</div>
             ))}
+            {editable && (
+              <button
+                onClick={() => updateQ(idx, { options: [...q.options, ""] })}
+                style={{ marginTop: 4, padding: "8px 14px", borderRadius: 8, border: "1px dashed rgba(255,255,255,0.2)", background: "transparent", fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: F, cursor: "pointer", textAlign: "left", transition: "all 0.15s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(185,185,249,0.5)"; e.currentTarget.style.color = "rgba(185,185,249,0.8)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
+              >
+                + 보기 추가
+              </button>
+            )}
           </div>
         )}
 

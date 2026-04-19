@@ -12,7 +12,7 @@ function LogoMark({ size = 20, dark = false }) {
       }}>
         <div style={{ width: Math.round(size * 0.38), height: Math.round(size * 0.38), borderRadius: Math.round(size * 0.07), background: "#fff" }} />
       </div>
-      <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.03em", color: dark ? "#ffffff" : "#0f172a", fontFamily: F }}>
+      <span style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: "-0.03em", color: dark ? "#ffffff" : "#0f172a", fontFamily: F }}>
         voicesurvey
       </span>
     </div>
@@ -115,11 +115,11 @@ export function NavTab({ label, onClick, active, dark = false }) {
   );
 }
 
-export function Input({ label, type = "text", placeholder, value, onChange, helper }) {
+export function Input({ label, type = "text", placeholder, value, onChange, helper, required }) {
   const [focused, setFocused] = useState(false);
   return (
     <div>
-      {label && <label style={{ display: "block", fontSize: 14, fontWeight: 400, color: C.navy, marginBottom: 6, fontFamily: F, letterSpacing: "0.16px" }}>{label}</label>}
+      {label && <label style={{ display: "block", fontSize: 14, fontWeight: 400, color: C.navy, marginBottom: 6, fontFamily: F, letterSpacing: "0.16px" }}>{label}{required && <span style={{ color: "#ea2261", marginLeft: 3 }}>*</span>}</label>}
       <input
         type={type} placeholder={placeholder} value={value} onChange={onChange}
         onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
@@ -163,6 +163,15 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
   );
 
   useEffect(() => {
+    if (!menuOpen) {
+      document.body.style.overflow = "";
+      return;
+    }
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  useEffect(() => {
     if (variant !== "app" || !user?.id) return;
     if (_interviewCountCache[user.id] !== undefined) {
       setHasInterviews(_interviewCountCache[user.id]);
@@ -191,7 +200,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
 
   return (
     <>
-      <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.97)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
+      <nav style={{ position: "sticky", top: 0, zIndex: 100, background: isMobile ? "#ffffff" : "rgba(255,255,255,0.97)", borderBottom: `1px solid ${C.border}`, padding: isMobile ? "0 20px" : "0 32px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "stretch", height: 56 }}>
           <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => go(homeTarget)}>
             <LogoMark dark={false} />
@@ -245,7 +254,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
       {/* Mobile Drawer */}
       {menuOpen && (
         <>
-          <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, backdropFilter: "blur(2px)" }} />
+          <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100dvh", background: "rgba(0,0,0,0.4)", zIndex: 200, backdropFilter: "blur(2px)" }} />
           <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 280, background: C.white, zIndex: 201, boxShadow: S.card, display: "flex", flexDirection: "column", fontFamily: F }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", height: 56, borderBottom: `1px solid rgba(0,0,0,0.08)` }}>
               <LogoMark />
@@ -266,17 +275,14 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
                       onMouseEnter={e => e.currentTarget.style.background = C.bg}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                      <div>
-                        <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
-                        <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
-                      </div>
+                      <div style={{ fontSize: 15, fontWeight: 400, color: C.navy }}>{item.label}</div>
                       <span style={{ fontSize: 12, color: C.border }}>›</span>
                     </div>
                   ))}
                 </>
               ) : variant === "panel" ? (
                 <>
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>{isKo ? "패널리스트" : "Panelist"}</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>{isKo ? "인터뷰 패널" : "Panelist"}</div>
                   {[
                     { label: isKo ? "인터뷰 찾기" : "Open Interviews", target: "panel_board", desc: isKo ? "공개 인터뷰 목록" : "Browse open listings" },
                     { label: isKo ? "나의 인터뷰" : "My Interviews", target: "panel_mypage", desc: isKo ? "지원 현황 및 진행 상황" : "Applications & progress" },
@@ -287,10 +293,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
                       onMouseEnter={e => e.currentTarget.style.background = C.bg}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                      <div>
-                        <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
-                        <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
-                      </div>
+                      <div style={{ fontSize: 15, fontWeight: 400, color: C.navy }}>{item.label}</div>
                       <span style={{ fontSize: 12, color: C.border }}>›</span>
                     </div>
                   ))}
@@ -299,7 +302,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                 <>
                   <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>{isKo ? "서비스" : "Product"}</div>
                   {[
-                    { label: isKo ? "소개" : "About", target: "about", desc: isKo ? "Voice Survey 소개" : "What Voice Survey does" },
+                    { label: isKo ? "소개" : "About", target: "about", desc: isKo ? "voicesurvey 소개" : "What voicesurvey does" },
                     { label: isKo ? "요금제" : "Pricing", target: "pricing", desc: isKo ? "플랜 비교" : "Compare plans" },
                     { label: "FAQ", target: "faq", desc: isKo ? "자주 묻는 질문" : "Frequently asked questions" },
                     { label: isKo ? "고객 지원" : "Support", target: "support", desc: isKo ? "도움말 및 문의" : "Help & contact" },
@@ -308,27 +311,21 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
                       onMouseEnter={e => e.currentTarget.style.background = C.bg}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                      <div>
-                        <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
-                        <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
-                      </div>
+                      <div style={{ fontSize: 15, fontWeight: 400, color: C.navy }}>{item.label}</div>
                       <span style={{ fontSize: 12, color: C.border }}>›</span>
                     </div>
                   ))}
                   <div style={{ height: 1, background: C.border, margin: "8px 20px" }} />
-                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>{isKo ? "패널리스트" : "Panelist"}</div>
+                  <div style={{ padding: "8px 20px 4px", fontSize: 10, fontWeight: 600, color: C.body, letterSpacing: 0.8 }}>{isKo ? "인터뷰 패널" : "Panelist"}</div>
                   {[
                     { label: isKo ? "인터뷰 찾기" : "Available Interviews", target: "panel_board", desc: isKo ? "공개 인터뷰 목록" : "Browse open listings" },
-                    { label: isKo ? "패널리스트 등록" : "Register as Panelist", target: "panel_entry", desc: isKo ? "참여하고 보상 받기" : "Participate and earn rewards" },
+                    { label: isKo ? "인터뷰 패널 등록" : "Register as Panelist", target: "panel_entry", desc: isKo ? "참여하고 보상 받기" : "Participate and earn rewards" },
                   ].map(item => (
                     <div key={item.label} onClick={() => { go(item.target); setMenuOpen(false); }}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", cursor: "pointer", background: "transparent", transition: "background 0.15s" }}
                       onMouseEnter={e => e.currentTarget.style.background = C.bg}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                      <div>
-                        <div style={{ fontSize: 14, color: C.navy }}>{item.label}</div>
-                        <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{item.desc}</div>
-                      </div>
+                      <div style={{ fontSize: 15, fontWeight: 400, color: C.navy }}>{item.label}</div>
                       <span style={{ fontSize: 12, color: C.border }}>›</span>
                     </div>
                   ))}
@@ -360,7 +357,7 @@ const VOC_LIST = [
   { quote: "We ran 500 simultaneous interviews for a fraction of what an agency would charge. The quality was on par with traditional methods and the AI report was outstanding.", name: "Paul H.", title: "Product Marketing Manager", company: "**aver Marketing Team" },
   { quote: "I was skeptical that AI could conduct real interviews, but when I read the transcripts, users were opening up naturally. Without a human interviewer watching them, the answers were far more candid.", name: "Christine Y.", title: "UX Researcher", company: "**aver UX Research Lab", photo: "/profiles/female-2.png" },
   { quote: "Participating as a panelist was incredibly easy and the reward arrived immediately. A voice interview felt much more natural than filling out a survey form.", name: "Sarah L.", title: "Freelance Panelist", company: "Individual Participant" },
-  { quote: "Before our global expansion, we needed to interview target users domestically. After setting our demographic filters, the right panelists were assembled quickly and we had the report within three business days.", name: "Justin C.", title: "Head of Business Development", company: "**s New Business Team", photo: "/profiles/male-2.png" },
+  { quote: "Before our global expansion, we needed to interview target users domestically. After setting our demographic filters, the right panelists were assembled quickly and we had the report within three business days.", name: "Justin C.", title: "Head of Business Development", company: "**s New Business Team" },
   { quote: "Usability tests we used to run quarterly are now a monthly practice. Lower cost and time barriers mean we actually use research data in decision-making far more often.", name: "Hannah S.", title: "Service Planner", company: "**Motors Connected Car Team", photo: "/profiles/female-3.png" },
   { quote: "Costs dropped 80% compared to an external research agency, and results came in twice as fast. Automatic theme clustering and sentiment analysis eliminated almost all manual analysis time.", name: "Owen M.", title: "Marketing Director", company: "**ang Growth Marketing Division" },
 ];
@@ -370,7 +367,7 @@ const VOC_LIST_KO = [
   { quote: "분기에 한 번 하던 사용성 테스트를 이제 매달 해요. 예전엔 섭외부터 진행까지 3주 걸렸는데, 지금은 필터 설정하고 이틀이면 리포트가 나와요.", name: "박지은", title: "UX 리서처", company: "**카카오 서비스디자인팀", photo: "/profiles/female-1.png" },
   { quote: "출시 2주 전에 급하게 유저 의견이 필요했는데, 72시간 만에 200명 분석 리포트를 받았어요. 타이밍이 딱 맞아서 런칭 결정에 바로 반영했습니다.", name: "이승우", title: "프로덕트 매니저", company: "**라인 신규사업팀" },
   { quote: "외부 대행사 맡기면 견적부터 두 달이에요. 보이스서베이는 당일 세팅하고 다음날 결과 보고 있었어요. 비용도 10분의 1도 안 됐고요.", name: "최유나", title: "브랜드 전략 매니저", company: "LG** 뷰티 마케팅팀", photo: "/profiles/female-2.png" },
-  { quote: "설문은 답하다가 지쳐서 대충 클릭하게 되는데, 음성 인터뷰는 그냥 대화하는 느낌이라 훨씬 편했어요. 포인트도 바로 적립되고요.", name: "정다현", title: "프리랜서 패널리스트", company: "개인 참여자", photo: "/profiles/female-3.png" },
+  { quote: "설문은 답하다가 지쳐서 대충 클릭하게 되는데, 음성 인터뷰는 그냥 대화하는 느낌이라 훨씬 편했어요. 포인트도 바로 적립되고요.", name: "정다현", title: "프리랜서 인터뷰 패널", company: "개인 참여자", photo: "/profiles/female-3.png" },
   { quote: "글로벌 진출 전에 국내 타깃 인터뷰가 필요했어요. 조건 필터 설정하니까 원하는 페르소나가 빠르게 모였고, 3영업일 만에 인사이트 정리된 리포트 받았습니다.", name: "강현석", title: "사업개발 총괄", company: "**s 신사업팀" },
   { quote: "대행사 비용의 20%로 더 큰 표본을 뽑을 수 있다는 게 아직도 신기해요. 주제별로 자동 클러스터링이 돼서 나오니까 분석 시간도 확 줄었어요.", name: "오수빈", title: "서비스 기획자", company: "**모터스 디지털서비스팀", photo: "/profiles/female-4.png" },
   { quote: "처음엔 정성조사를 AI가 할 수 있다는 게 믿기지 않았는데, 실제로 써보니 응답 깊이가 생각보다 훨씬 깊었어요. 팀에서 지금 정기적으로 활용하고 있어요.", name: "한지원", title: "마케팅 디렉터", company: "**앙 그로스마케팅팀" },
@@ -380,6 +377,7 @@ const VOC_LIST_KO = [
 export function VoCCarousel({ lang = "en" }) {
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
+  const isMobile = useIsMobile();
   const list = lang === "ko" ? VOC_LIST_KO : VOC_LIST;
   const total = list.length;
   const trackRef = useRef(null);
@@ -397,18 +395,18 @@ export function VoCCarousel({ lang = "en" }) {
   }, [idx]);
 
   return (
-    <section style={{ background: C.bg, padding: "72px 0", overflow: "hidden" }}>
+    <section style={{ background: "#ffffff", padding: "72px 0", overflow: "hidden" }}>
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <Badge variant="purple" style={{ marginBottom: 12 }}>{lang === "ko" ? "고객 리뷰" : "Customer Reviews"}</Badge>
-          <h2 style={{ fontSize: 28, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>{lang === "ko" ? "사용자들의 이야기" : "What our users are saying"}</h2>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 10 }}>{lang === "ko" ? "고객 리뷰" : "Customer Reviews"}</div>
+          <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>{lang === "ko" ? "사용자들의 이야기" : "What our users are saying"}</h2>
         </div>
         <div style={{ overflow: "hidden" }} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
           <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
             {list.map((v, i) => (
-              <div key={i} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box" }}>
-                <div style={{ background: C.white, borderRadius: 16, padding: "36px 40px", border: `1px solid ${C.border}`, minHeight: 260, display: "flex", flexDirection: "column" }}>
-                  <p style={{ margin: "0 0 24px", fontSize: 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px", flex: 1 }}>"{v.quote}"</p>
+              <div key={i} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box", display: "flex" }}>
+                <div style={{ flex: 1, background: C.white, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 40px", border: `1px solid ${C.border}`, minHeight: 260, display: "flex", flexDirection: "column" }}>
+                  <p style={{ margin: "0 0 24px", fontSize: isMobile ? 14 : 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px", flex: 1 }}>"{v.quote}"</p>
                   <div style={{ display: "flex", alignItems: "center", gap: 16, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
                     {v.photo ? (
                       <img src={v.photo} alt={v.name} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
@@ -455,7 +453,7 @@ export function HowItWorksCarousel({ lang = "en" }) {
     { icon: "barchart", step: "04", title: "Receive Your Report", desc: "Get an instant report with theme analysis, sentiment classification, and insight summaries." },
   ];
   const panelSteps = isKo ? [
-    { icon: "search", step: "01", title: "공고 탐색", desc: "패널리스트 보드에서 관심 있는 인터뷰 기회를 찾아보세요." },
+    { icon: "search", step: "01", title: "공고 탐색", desc: "인터뷰 패널 보드에서 관심 있는 인터뷰 기회를 찾아보세요." },
     { icon: "check", step: "02", title: "지원 및 선발", desc: "조건을 확인하고 지원하세요. AI가 얼마나 잘 맞는지 평가해서 빠르게 선발해요." },
     { icon: "mic", step: "03", title: "음성 인터뷰 참여", desc: "링크로 AI와 자연스럽게 대화하세요. 어디서든 참여할 수 있고, 평균 8분이면 끝나요." },
     { icon: "gift", step: "04", title: "보상 수령", desc: "인터뷰 완료 후 포인트 보상이 즉시 지급돼요." },
@@ -477,10 +475,8 @@ export function HowItWorksCarousel({ lang = "en" }) {
       <div key={i} style={{
         background: C.white, borderRadius: 14, padding: "24px 20px",
         flex: isMobile ? `0 0 ${cardW}px` : "1 1 0",
-        transition: "box-shadow 0.2s",
-      }}
-        onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)"; }}
-        onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}>
+        border: `1px solid ${C.border}`,
+      }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             {iconMap[s.icon]?.({ s: 18, c: C.purple })}
@@ -504,14 +500,6 @@ export function HowItWorksCarousel({ lang = "en" }) {
             <div ref={ref} style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
               {steps.map((s, i) => <Card key={i} s={s} i={i} />)}
             </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 12 }}>
-              {["←", "→"].map((arrow, i) => (
-                <button key={arrow} onClick={() => scroll(i === 0 ? -1 : 1)}
-                  style={{ width: 44, height: 44, borderRadius: "50%", border: `1px solid ${C.border}`, background: C.bg, cursor: "pointer", fontSize: 13, color: C.body, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {arrow}
-                </button>
-              ))}
-            </div>
           </div>
         ) : (
           <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
@@ -533,12 +521,12 @@ export function HowItWorksCarousel({ lang = "en" }) {
   const pRef = useRef(null);
 
   return (
-    <section style={{ background: C.bg, padding: isMobile ? "60px 20px" : "80px 24px" }}>
+    <section style={{ background: "#ffffff", padding: isMobile ? "60px 20px" : "80px 24px" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: isMobile ? 40 : 56 }}>
           <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", margin: "0 0 14px", lineHeight: 1.10, fontFamily: F }}>
             {isKo
-              ? (isMobile ? <>고객의 목소리를 <span style={{ color: C.purple }}>정확하고 빠르게</span></> : <>고객의 목소리를<br /><span style={{ color: C.purple }}>정확하고 빠르게 들으세요</span></>)
+              ? (isMobile ? <>고객의 목소리를<br /><span style={{ color: C.purple }}>정확하고 빠르게</span></> : <>고객의 목소리를<br /><span style={{ color: C.purple }}>정확하고 빠르게 들으세요</span></>)
               : (isMobile ? <>Hear your customers <span style={{ color: C.purple }}>accurately and fast</span></> : <>Hear your customers<br /><span style={{ color: C.purple }}>accurately and fast</span></>)}
           </h2>
           <p style={{ fontSize: 16, color: "rgba(10,11,13,0.56)", margin: 0, letterSpacing: "0.16px", lineHeight: 1.47 }}>
@@ -746,11 +734,11 @@ export function Footer({ go, lang = "en", onLangChange, tagline }) {
         </div>
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.16px" }}>Copyright © {new Date().getFullYear()} Voice Survey Inc. All rights reserved.</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "2px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 2, background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "2px", flexShrink: 0 }}>
             {[["ENG", "en"], ["한국어", "ko"]].map(([label, code]) => {
               const isActive = lang === code;
               return onLangChange
-                ? <button key={code} onClick={() => onLangChange(code)} style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)", background: isActive ? "rgba(255,255,255,0.12)" : "transparent", borderRadius: 6, padding: "4px 10px", letterSpacing: "0.02em", border: "none", cursor: "pointer", fontFamily: F, transition: "color 0.15s" }}>{label}</button>
+                ? <button key={code} onClick={() => onLangChange(code)} style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)", background: isActive ? "rgba(255,255,255,0.12)" : "transparent", borderRadius: 6, padding: "4px 10px", minHeight: 44, minWidth: 44, letterSpacing: "0.02em", border: "none", cursor: "pointer", fontFamily: F, transition: "color 0.15s", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{label}</button>
                 : <span key={code} style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)", background: isActive ? "rgba(255,255,255,0.12)" : "transparent", borderRadius: 6, padding: "4px 10px", letterSpacing: "0.02em" }}>{label}</span>;
             })}
           </div>
@@ -761,7 +749,7 @@ export function Footer({ go, lang = "en", onLangChange, tagline }) {
 }
 
 // ─── VoicePlayer — shared audio player (used in ResponsesScreen and ReportScreen) ───
-export function VoicePlayer({ audioUrl, transcript }) {
+export function VoicePlayer({ audioUrl, transcript, dark = false }) {
   const audioRef = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -800,7 +788,12 @@ export function VoicePlayer({ audioUrl, transcript }) {
 
   const pct = duration ? Math.min((current / duration) * 100, 100) : 0;
 
-  if (!audioUrl && !transcript) return <div style={{ fontSize: 13, color: C.body, fontStyle: "italic" }}>No recording</div>;
+  const bg = dark ? "rgba(255,255,255,0.05)" : C.bg;
+  const border = dark ? "rgba(255,255,255,0.08)" : C.border;
+  const textMuted = dark ? "rgba(255,255,255,0.35)" : C.body;
+  const textMain = dark ? "#e2e8f0" : C.navy;
+
+  if (!audioUrl && !transcript) return <div style={{ fontSize: 13, color: textMuted, fontStyle: "italic" }}>No recording</div>;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -813,7 +806,7 @@ export function VoicePlayer({ audioUrl, transcript }) {
             onLoadedMetadata={e => setDuration(e.target.duration)}
             onEnded={() => { setPlaying(false); setCurrent(0); }}
           />
-          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: C.bg, borderRadius: 10, border: `1px solid ${C.border}` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: bg, borderRadius: 10, border: `1px solid ${border}` }}>
             <button
               onClick={toggle}
               style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.12s" }}
@@ -828,13 +821,13 @@ export function VoicePlayer({ audioUrl, transcript }) {
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
               <div
                 onClick={seek}
-                style={{ height: 4, background: C.border, borderRadius: 2, cursor: "pointer", position: "relative" }}
+                style={{ height: 4, background: border, borderRadius: 2, cursor: "pointer", position: "relative" }}
               >
                 <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${pct}%`, background: C.purple, borderRadius: 2, transition: "width 0.1s linear" }} />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(current)}</span>
-                <span style={{ fontSize: 10, color: C.body, fontFeatureSettings: '"tnum"' }}>{fmt(duration)}</span>
+                <span style={{ fontSize: 10, color: textMuted, fontFeatureSettings: '"tnum"' }}>{fmt(current)}</span>
+                <span style={{ fontSize: 10, color: textMuted, fontFeatureSettings: '"tnum"' }}>{fmt(duration)}</span>
               </div>
             </div>
           </div>
@@ -842,9 +835,9 @@ export function VoicePlayer({ audioUrl, transcript }) {
             <button
               onClick={download}
               title="Download"
-              style={{ width: 30, height: 30, borderRadius: "50%", background: "transparent", border: `1px solid ${C.border}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: C.body, transition: "all 0.12s" }}
+              style={{ width: 30, height: 30, borderRadius: "50%", background: "transparent", border: `1px solid ${border}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: textMuted, transition: "all 0.12s" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.color = C.purple; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.body; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = border; e.currentTarget.style.color = textMuted; }}
             >
               <svg width={12} height={12} viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v8.5l3-3 1 1-4 4-4-4 1-1 3 3V1h1zM2 13h12v1H2z"/></svg>
             </button>
@@ -852,9 +845,9 @@ export function VoicePlayer({ audioUrl, transcript }) {
         </>
       )}
       {transcript && (
-        <div style={{ padding: "10px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${C.border}` }}>
-          <div style={{ fontSize: 10, color: C.body, fontWeight: 600, marginBottom: 6, letterSpacing: 0.4 }}>Transcript</div>
-          <div style={{ fontSize: 13, color: C.navy, lineHeight: 1.75 }}>{transcript}</div>
+        <div style={{ padding: "10px 14px", background: bg, borderRadius: 8, border: `1px solid ${border}` }}>
+          <div style={{ fontSize: 10, color: textMuted, fontWeight: 600, marginBottom: 6, letterSpacing: 0.4 }}>Transcript</div>
+          <div style={{ fontSize: 13, color: textMain, lineHeight: 1.75 }}>{transcript}</div>
         </div>
       )}
     </div>

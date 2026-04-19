@@ -2,18 +2,21 @@ import formidable from "formidable";
 import fs from "fs";
 import OpenAI from "openai";
 import { toFile } from "openai";
+import { rateLimit, getIp } from "./_rateLimit.js";
+import { supabase } from "./_supabase.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-import { createClient } from "@supabase/supabase-js";
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
 
 export const config = { api: { bodyParser: false } };
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  // Rate limit: 20 STT calls per minute per IP
+  const ip = getIp(req);
+  if (!rateLimit(`stt:${ip}`, 20)) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
 
   const form = formidable({ maxFileSize: 25 * 1024 * 1024 });
   const [fields, files] = await form.parse(req);

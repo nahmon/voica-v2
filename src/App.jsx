@@ -1,27 +1,28 @@
-import { useState, useEffect } from "react";
+import { Suspense, lazy, useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation } from "react-router-dom";
 import { supabase } from "./supabase.js";
 import { C, F } from "./lib/constants.jsx";
-
-import LandingScreen from "./screens/LandingScreen.jsx";
-import RoleSelectScreen from "./screens/RoleSelectScreen.jsx";
-import AuthScreen from "./screens/AuthScreen.jsx";
-import DashboardScreen from "./screens/DashboardScreen.jsx";
-import EditorScreen from "./screens/EditorScreen.jsx";
-import PanelEntryScreen from "./screens/PanelEntryScreen.jsx";
-import PanelMyPageScreen from "./screens/PanelMyPageScreen.jsx";
-import ConsentScreen from "./screens/ConsentScreen.jsx";
-import InterviewScreen from "./screens/InterviewScreen.jsx";
-import ReportScreen from "./screens/ReportScreen.jsx";
-import ResponsesScreen from "./screens/ResponsesScreen.jsx";
-import RecruiterAdminScreen from "./screens/RecruiterAdminScreen.jsx";
-import PanelBoardScreen from "./screens/PanelBoardScreen.jsx";
-import PricingScreen from "./screens/PricingScreen.jsx";
-import SupportScreen from "./screens/SupportScreen.jsx";
-import FAQScreen from "./screens/FAQScreen.jsx";
-import TermsScreen from "./screens/TermsScreen.jsx";
-import PrivacyScreen from "./screens/PrivacyScreen.jsx";
-import AboutScreen from "./screens/AboutScreen.jsx";
 import { ToastProvider, useToast } from "./components/shared.jsx";
+
+const LandingScreen        = lazy(() => import("./screens/LandingScreen.jsx"));
+const RoleSelectScreen     = lazy(() => import("./screens/RoleSelectScreen.jsx"));
+const AuthScreen           = lazy(() => import("./screens/AuthScreen.jsx"));
+const DashboardScreen      = lazy(() => import("./screens/DashboardScreen.jsx"));
+const EditorScreen         = lazy(() => import("./screens/EditorScreen.jsx"));
+const PanelEntryScreen     = lazy(() => import("./screens/PanelEntryScreen.jsx"));
+const PanelMyPageScreen    = lazy(() => import("./screens/PanelMyPageScreen.jsx"));
+const ConsentScreen        = lazy(() => import("./screens/ConsentScreen.jsx"));
+const InterviewScreen      = lazy(() => import("./screens/InterviewScreen.jsx"));
+const ReportScreen         = lazy(() => import("./screens/ReportScreen.jsx"));
+const ResponsesScreen      = lazy(() => import("./screens/ResponsesScreen.jsx"));
+const RecruiterAdminScreen = lazy(() => import("./screens/RecruiterAdminScreen.jsx"));
+const PanelBoardScreen     = lazy(() => import("./screens/PanelBoardScreen.jsx"));
+const PricingScreen        = lazy(() => import("./screens/PricingScreen.jsx"));
+const SupportScreen        = lazy(() => import("./screens/SupportScreen.jsx"));
+const FAQScreen            = lazy(() => import("./screens/FAQScreen.jsx"));
+const TermsScreen          = lazy(() => import("./screens/TermsScreen.jsx"));
+const PrivacyScreen        = lazy(() => import("./screens/PrivacyScreen.jsx"));
+const AboutScreen          = lazy(() => import("./screens/AboutScreen.jsx"));
 
 function OAuthErrorHandler() {
   const { showToast } = useToast();
@@ -38,80 +39,122 @@ function OAuthErrorHandler() {
   return null;
 }
 
-export default function Voica() {
-  const [screen, setScreen] = useState("landing");
+// Route wrappers that extract URL params and pass as props
+function EditorRoute(props) {
+  const { id } = useParams();
+  return <EditorScreen {...props} interviewId={id} />;
+}
+function InterviewRoute({ go }) {
+  const { code } = useParams();
+  return <InterviewScreen go={go} shareCode={code} />;
+}
+function ConsentRoute(props) {
+  const { code } = useParams();
+  const { state } = useLocation();
+  return <ConsentScreen {...props} shareCode={code ?? state?.shareCode} />;
+}
+function ReportRoute(props) {
+  const { id } = useParams();
+  return <ReportScreen {...props} interviewId={id} />;
+}
+function ResponsesRoute(props) {
+  const { id } = useParams();
+  return <ResponsesScreen {...props} interviewId={id} />;
+}
+
+function AppRoutes() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [shareCode, setShareCode] = useState(null);
-  const [interviewId, setInterviewId] = useState(null);
-  const go = (s, id, code) => { setInterviewId(id ?? null); if (code !== undefined) setShareCode(code); setScreen(s); window.scrollTo(0, 0); };
+  const [lang, setLang] = useState(() => localStorage.getItem("voica_lang") ?? "ko");
+  const navigate = useNavigate();
+
+  const handleLangChange = (code) => { setLang(code); localStorage.setItem("voica_lang", code); };
+
+  const go = (screen, id, code) => {
+    window.scrollTo(0, 0);
+    if (code !== undefined) setShareCode(code);
+    if (screen === "editor")           { navigate(`/editor/${id}`); return; }
+    if (screen === "interview")        { navigate(`/i/${code ?? id}`); return; }
+    if (screen === "consent")          { navigate("/consent", { state: { shareCode: code ?? shareCode } }); return; }
+    if (screen === "report")           { navigate(`/report/${id}`); return; }
+    if (screen === "responses")        { navigate(`/responses/${id}`); return; }
+    const paths = {
+      landing: "/", dashboard: "/dashboard", role_select: "/role-select",
+      advertiser_login: "/auth", panel_board: "/panel", panel_entry: "/panel/entry",
+      panel_mypage: "/panel/mypage", recruiter_admin: "/admin",
+      pricing: "/pricing", support: "/support", faq: "/faq",
+      terms: "/terms", privacy: "/privacy", about: "/about",
+    };
+    navigate(paths[screen] ?? "/");
+  };
 
   useEffect(() => {
-    // Detect /i/[code] URL for panel interview
-    const match = window.location.pathname.match(/^\/i\/([a-z0-9]+)$/i);
-    if (match) { setShareCode(match[1]); setScreen("interview"); }
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user && !match) {
+      if (session?.user && !window.location.pathname.match(/^\/i\//)) {
         const role = session.user.user_metadata?.role;
-        if (!role) setScreen("role_select");
-        else if (role === "panel") setScreen("panel_board");
-        else setScreen("dashboard");
+        if (!role) navigate("/role-select");
+        else if (role === "panel") navigate("/panel");
+        else navigate("/dashboard");
       }
       setAuthLoading(false);
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      const isInterviewUrl = window.location.pathname.match(/^\/i\/([a-z0-9]+)$/i);
-      const publicScreens = ["landing", "advertiser_login", "pricing", "support", "faq", "panel_entry", "panel_board"];
-      if (session?.user && publicScreens.includes(screen) && !isInterviewUrl) {
+      if (event !== "SIGNED_IN") return;
+      if (session?.user && !window.location.pathname.match(/^\/i\//)) {
         const role = session.user.user_metadata?.role;
-        if (!role) setScreen("role_select");
-        else if (role === "panel") setScreen("panel_board");
-        else setScreen("dashboard");
+        if (!role) navigate("/role-select");
+        else if (role === "panel") navigate("/panel");
+        else navigate("/dashboard");
       }
     });
     return () => subscription.unsubscribe();
   }, []);
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setScreen("landing");
-  };
+  const logout = async () => { await supabase.auth.signOut(); setUser(null); navigate("/"); };
+  const common = { go, user, logout, lang, onLangChange: handleLangChange };
+
+  if (authLoading) return null;
 
   return (
+    <Suspense fallback={null}>
+      <Routes>
+        <Route path="/"              element={<LandingScreen {...common} />} />
+        <Route path="/role-select"   element={<RoleSelectScreen go={go} user={user} />} />
+        <Route path="/auth"          element={<AuthScreen go={go} lang={lang} />} />
+        <Route path="/dashboard"     element={<DashboardScreen {...common} />} />
+        <Route path="/editor/:id"    element={<EditorRoute go={go} user={user} logout={logout} />} />
+        <Route path="/panel/entry"   element={<PanelEntryScreen go={go} lang={lang} onLangChange={handleLangChange} />} />
+        <Route path="/panel/mypage"  element={<PanelMyPageScreen {...common} />} />
+        <Route path="/consent"       element={<ConsentRoute {...common} />} />
+        <Route path="/consent/:code" element={<ConsentRoute {...common} />} />
+        <Route path="/i/:code"       element={<InterviewRoute go={go} />} />
+        <Route path="/report/:id"    element={<ReportRoute {...common} />} />
+        <Route path="/responses/:id" element={<ResponsesRoute {...common} />} />
+        <Route path="/admin"         element={<RecruiterAdminScreen {...common} />} />
+        <Route path="/panel"         element={<PanelBoardScreen {...common} />} />
+        <Route path="/pricing"       element={<PricingScreen {...common} />} />
+        <Route path="/support"       element={<SupportScreen {...common} />} />
+        <Route path="/faq"           element={<FAQScreen {...common} />} />
+        <Route path="/terms"         element={<TermsScreen {...common} />} />
+        <Route path="/privacy"       element={<PrivacyScreen {...common} />} />
+        <Route path="/about"         element={<AboutScreen {...common} />} />
+      </Routes>
+    </Suspense>
+  );
+}
+
+export default function Voica() {
+  return (
     <ToastProvider>
-    <OAuthErrorHandler />
-    <div style={{ fontFamily: F, fontFeatureSettings: '"ss01"', color: C.navy }}>
-      <style>{`@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}.cursor-blink{display:inline-block;width:10px;height:2px;background:${C.purple};margin-left:4px;vertical-align:0.1em;border-radius:0;animation:blink 0.8s step-end infinite;}`}</style>
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        @keyframes wave-0 { from { height: 4px } to { height: 20px } }
-        @keyframes wave-1 { from { height: 6px } to { height: 26px } }
-        @keyframes wave-2 { from { height: 8px } to { height: 22px } }
-      `}</style>
-      {screen === "landing"          && <LandingScreen go={go} user={user} logout={logout} />}
-      {screen === "role_select"      && <RoleSelectScreen go={go} user={user} />}
-      {screen === "advertiser_login" && <AuthScreen go={go} />}
-      {screen === "dashboard"        && <DashboardScreen go={go} user={user} logout={logout} />}
-      {screen === "editor"           && <EditorScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
-      {screen === "panel_entry"      && <PanelEntryScreen go={go} />}
-      {screen === "panel_mypage"     && <PanelMyPageScreen go={go} user={user} logout={logout} />}
-      {screen === "consent"          && <ConsentScreen go={go} user={user} logout={logout} shareCode={shareCode} />}
-      {screen === "interview"        && <InterviewScreen go={go} shareCode={shareCode} />}
-      {screen === "report"           && <ReportScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
-      {screen === "responses"        && <ResponsesScreen go={go} user={user} logout={logout} interviewId={interviewId} />}
-      {screen === "recruiter_admin"  && <RecruiterAdminScreen go={go} user={user} logout={logout} />}
-      {screen === "panel_board"      && <PanelBoardScreen go={go} user={user} logout={logout} />}
-      {screen === "pricing"          && <PricingScreen go={go} user={user} logout={logout} />}
-      {screen === "support"          && <SupportScreen go={go} user={user} logout={logout} />}
-      {screen === "faq"              && <FAQScreen go={go} user={user} logout={logout} />}
-      {screen === "terms"            && <TermsScreen go={go} user={user} logout={logout} />}
-      {screen === "privacy"          && <PrivacyScreen go={go} user={user} logout={logout} />}
-      {screen === "about"            && <AboutScreen go={go} user={user} logout={logout} />}
-    </div>
+      <BrowserRouter>
+        <OAuthErrorHandler />
+        <div style={{ fontFamily: F, fontFeatureSettings: '"ss01"', color: C.navy }}>
+          <AppRoutes />
+        </div>
+      </BrowserRouter>
     </ToastProvider>
   );
 }

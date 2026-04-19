@@ -26,10 +26,7 @@
 
 /* ── Landing light theme (applied to LandingScreen wrapper) ── */
 .landing-light {
-  background: #FBFAFF;
-  background-image:
-    radial-gradient(900px 500px at 90% -10%, rgba(110,75,255,.10), transparent 60%),
-    radial-gradient(700px 400px at -10% 30%, rgba(168,140,255,.12), transparent 60%);
+  background: #ffffff;
   color: #1B1140;
   min-height: 100vh;
 }
@@ -57,6 +54,54 @@
 /* dark footer band stays dark */
 .landing-light footer {
   background: #060f1f !important;
+}
+
+/* ── Global reset ── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1 }
+  50% { opacity: 0 }
+}
+.cursor-blink {
+  display: inline-block;
+  width: 10px;
+  height: 2px;
+  background: #6E4BFF;
+  margin-left: 4px;
+  vertical-align: 0.1em;
+  border-radius: 0;
+  animation: blink 0.8s step-end infinite;
+}
+@keyframes wave-0 { from { height: 4px } to { height: 20px } }
+@keyframes wave-1 { from { height: 6px } to { height: 26px } }
+@keyframes wave-2 { from { height: 8px } to { height: 22px } }
+
+/* ── Mobile touch & accessibility ── */
+
+/* Korean semantic line-breaking — prevents mid-syllable breaks */
+body {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #6E4BFF;
+  outline-offset: 2px;
+}
+
+/* Enforce 44px minimum touch target on all buttons (mobile) */
+@media (max-width: 767px) {
+  button {
+    min-height: 44px;
+  }
 }
 
 /* scroll reveal utility */
