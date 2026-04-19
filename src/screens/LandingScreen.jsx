@@ -85,18 +85,18 @@ const TRANSLATIONS = {
       title: "Interview for anything",
       subtitle: "Discover the numerous ways companies are using voicesurvey.",
       items: [
-        { icon: "🛒", label: "Consumer goods testing" },
-        { icon: "🎨", label: "Creative testing" },
-        { icon: "📣", label: "Message testing" },
-        { icon: "🖥️", label: "Prototype testing" },
-        { icon: "🌐", label: "Website testing" },
-        { icon: "📱", label: "Mobile app testing" },
-        { icon: "✨", label: "AI quality evals" },
-        { icon: "🧪", label: "Product & UX evals" },
-        { icon: "👟", label: "Brand perception" },
-        { icon: "🗺️", label: "Customer journey map" },
-        { icon: "🎯", label: "Customer segmentation" },
-        { icon: "💼", label: "Employee experience" },
+        { icon: "ShoppingCart", label: "Consumer goods testing" },
+        { icon: "Pencil",       label: "Creative testing" },
+        { icon: "Chat",         label: "Message testing" },
+        { icon: "Target",       label: "Prototype testing" },
+        { icon: "Globe",        label: "Website testing" },
+        { icon: "Phone",        label: "Mobile app testing" },
+        { icon: "Sparkle",      label: "AI quality evals" },
+        { icon: "CheckCircle",  label: "Product & UX evals" },
+        { icon: "Star",         label: "Brand perception" },
+        { icon: "Map",          label: "Customer journey map" },
+        { icon: "BarChart",     label: "Customer segmentation" },
+        { icon: "Users",        label: "Employee experience" },
       ],
     },
     cta: {
@@ -158,18 +158,18 @@ const TRANSLATIONS = {
       title: "무엇이든 인터뷰할 수 있어요",
       subtitle: "다양한 기업들이 voicesurvey로 조사를 진행하는 방식을 확인해보세요.",
       items: [
-        { icon: "🛒", label: "소비재 인터뷰" },
-        { icon: "🎨", label: "광고·크리에이티브 테스트" },
-        { icon: "📣", label: "메시지 테스트" },
-        { icon: "🖥️", label: "프로토타입 테스트" },
-        { icon: "🌐", label: "웹사이트 테스트" },
-        { icon: "📱", label: "모바일 앱 테스트" },
-        { icon: "✨", label: "AI 품질 평가" },
-        { icon: "🧪", label: "제품·UX 평가" },
-        { icon: "👟", label: "브랜드 인식 조사" },
-        { icon: "🗺️", label: "고객 여정 분석" },
-        { icon: "🎯", label: "고객 세분화" },
-        { icon: "💼", label: "직원 경험 조사" },
+        { icon: "ShoppingCart", label: "소비재 인터뷰" },
+        { icon: "Pencil",       label: "광고·크리에이티브 테스트" },
+        { icon: "Chat",         label: "메시지 테스트" },
+        { icon: "Target",       label: "프로토타입 테스트" },
+        { icon: "Globe",        label: "웹사이트 테스트" },
+        { icon: "Phone",        label: "모바일 앱 테스트" },
+        { icon: "Sparkle",      label: "AI 품질 평가" },
+        { icon: "CheckCircle",  label: "제품·UX 평가" },
+        { icon: "Star",         label: "브랜드 인식 조사" },
+        { icon: "Map",          label: "고객 여정 분석" },
+        { icon: "BarChart",     label: "고객 세분화" },
+        { icon: "Users",        label: "직원 경험 조사" },
       ],
     },
     cta: {
@@ -450,17 +450,13 @@ function UseCasesSection({ isMobile, t }) {
                 key={i}
                 onClick={() => setActiveIdx(i)}
                 style={{
-                  display: "flex", alignItems: "center", gap: 12,
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                   padding: "12px 16px", borderRadius: 8, cursor: "pointer",
                   background: isActive ? C.purpleBg : "transparent",
                   transition: "background 0.15s",
                 }}
               >
-                <div style={{
-                  width: 6, height: 6, borderRadius: "50%", flexShrink: 0,
-                  background: isActive ? C.purple : C.border,
-                  transition: "background 0.15s",
-                }} />
+                {Ic[item.icon] && Ic[item.icon]({ s: 16, c: isActive ? C.purple : C.body })}
                 <span style={{ fontSize: 15, fontWeight: isActive ? 600 : 400, color: isActive ? C.navy : C.body }}>{item.label}</span>
               </div>
             );
