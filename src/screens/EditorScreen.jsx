@@ -73,6 +73,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [savedQuestions, setSavedQuestions] = useState(savedDraft?.questions ?? [newQ("voice")]);
   const [showSaveTooltip, setShowSaveTooltip] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiGenerating, setAiGenerating] = useState(false);
   const dragIdx = useRef(null);
@@ -480,15 +481,41 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
   // ─── Top nav bar ───
   const NavBar = isMobile ? (
-    <div style={{ padding: "0 12px", height: 52, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
-      <button onClick={() => go("dashboard")} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px 4px", fontSize: 20, color: C.navy, lineHeight: 1, minWidth: 40, minHeight: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
-      <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: questions.length >= 10 ? "rgba(30,142,62,0.1)" : "rgba(180,120,0,0.08)", color: questions.length >= 10 ? C.successText : "rgba(140,90,0,0.9)" }}>
-        {questions.length}/10
-      </span>
-      <Btn size="sm" onClick={handleSave} disabled={saving}>
-        {saving ? "저장 중…" : editingId ? "저장" : "링크 생성"}
-      </Btn>
-    </div>
+    <>
+      <div style={{ padding: "0 12px", height: 52, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
+        <button onClick={() => go("dashboard")} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", fontSize: 22, color: C.navy, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
+        <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: questions.length >= 10 ? "rgba(30,142,62,0.1)" : "rgba(180,120,0,0.08)", color: questions.length >= 10 ? C.successText : "rgba(140,90,0,0.9)" }}>
+          {questions.length}/10
+        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <Btn size="sm" onClick={handleSave} disabled={saving}>
+            {saving ? "저장 중…" : editingId ? "저장" : "링크 생성"}
+          </Btn>
+          <button onClick={() => setShowMobileMenu(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", fontSize: 20, color: C.navy, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>⋯</button>
+        </div>
+      </div>
+      {showMobileMenu && (
+        <>
+          <div onClick={() => setShowMobileMenu(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />
+          <div style={{ position: "fixed", top: 52, right: 12, background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", zIndex: 200, minWidth: 160, overflow: "hidden" }}>
+            <div onClick={() => { saveDraft(); setShowMobileMenu(false); }} style={{ padding: "12px 16px", fontSize: 14, color: draftSaved ? C.success : C.navy, cursor: "pointer", borderBottom: `1px solid ${C.border}` }}>
+              {draftSaved ? "저장됨 ✓" : "임시저장"}
+            </div>
+            {shareCode && (
+              <div onClick={() => { handleCopy(); setShowMobileMenu(false); }} style={{ padding: "12px 16px", fontSize: 14, color: C.navy, cursor: "pointer", borderBottom: `1px solid ${C.border}` }}>
+                {copied ? "복사됨 ✓" : "링크 복사"}
+              </div>
+            )}
+            {editingId && hasUnsaved && (
+              <div style={{ padding: "8px 16px", fontSize: 11, color: "#f59e0b", display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
+                저장되지 않은 변경사항
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </>
   ) : (
     <div style={{ padding: "0 16px", height: 48, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
       <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← 대시보드</Btn>
