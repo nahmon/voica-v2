@@ -442,7 +442,7 @@ function UseCasesSection({ isMobile, t }) {
           <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, margin: "0 auto 10px", fontFamily: F, maxWidth: 700, letterSpacing: "-0.02em" }}>{title}</h2>
           <p style={{ fontSize: 15, color: C.body, margin: "0 auto", maxWidth: 600 }}>{subtitle}</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 2 : "2px 48px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 2 : "2px 48px", maxWidth: 720, margin: "0 auto" }}>
           {items.map((item, i) => {
             const isActive = activeIdx === i;
             return (
