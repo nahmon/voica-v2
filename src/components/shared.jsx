@@ -79,7 +79,7 @@ export function Btn({ children, variant = "primary", size = "md", onClick, disab
   const sz = { sm: { padding: "5px 14px", fontSize: 13 }, md: { padding: "9px 20px", fontSize: 15 }, lg: { padding: "13px 32px", fontSize: 16 } };
   const vr = {
     primary: { background: disabled ? "#a09de8" : hov ? C.purpleHover : C.purple, color: C.white, border: "none", transform: !disabled && hov ? "scale(1.02)" : "scale(1)", filter: !disabled && hov ? "brightness(1.05)" : "brightness(1)" },
-    ghost: { background: hov ? C.purpleBg : "transparent", color: C.purple, border: `1px solid ${C.purpleLight}`, transform: hov ? "scale(1.02)" : "scale(1)", filter: hov ? "brightness(1.05)" : "brightness(1)" },
+    ghost: { background: "transparent", color: C.purple, border: `1px solid ${C.purpleLight}`, transform: hov ? "scale(1.02)" : "scale(1)", filter: hov ? "brightness(1.05)" : "brightness(1)" },
     dark: { background: hov ? "#2a2d6a" : C.brandDark, color: C.white, border: "none", transform: hov ? "scale(1.02)" : "scale(1)", filter: hov ? "brightness(1.05)" : "brightness(1)" },
     white: { background: hov ? "rgba(255,255,255,0.9)" : C.white, color: C.navy, border: "none", transform: hov ? "scale(1.02)" : "scale(1)", filter: hov ? "brightness(0.97)" : "brightness(1)" },
     kakao: { background: hov ? "#e6c200" : "#FEE500", color: "#191919", border: "none", transform: hov ? "scale(1.02)" : "scale(1)", filter: hov ? "brightness(1.05)" : "brightness(1)" },
