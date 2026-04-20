@@ -466,15 +466,14 @@ function UseCasesSection({ isMobile, t }) {
               <div key={i}
                 onMouseEnter={() => setHoveredIdx(i)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 10, padding: "10px 8px", transition: "all 0.08s ease-out", cursor: "default", minWidth: 0, overflow: "hidden" }}>
+                style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 10, padding: "10px 8px", transform: hovered ? "translateY(-2px)" : "none", transition: "transform 0.15s ease-out", cursor: "default", minWidth: 0, overflow: "hidden" }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 10, flexShrink: 0,
                   background: "#fff",
                   border: `1px solid ${hovered ? "rgba(110,75,255,0.35)" : "rgba(110,75,255,0.18)"}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   boxShadow: hovered ? "0 2px 12px rgba(110,75,255,0.13)" : "none",
-                  transform: hovered ? "scale(1.06)" : "scale(1)",
-                  transition: "border-color 0.12s ease-out, box-shadow 0.12s ease-out, transform 0.12s ease-out",
+                  transition: "border-color 0.12s ease-out, box-shadow 0.12s ease-out",
                 }}>
                   {Ic[item.icon] && Ic[item.icon]({ s: 20, c: hovered ? "#5c35f0" : "#7c5ff5" })}
                 </div>

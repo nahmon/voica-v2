@@ -105,11 +105,14 @@ export function NavTab({ label, onClick, active, dark = false }) {
   const [hov, setHov] = useState(false);
   const color = dark
     ? active ? "rgba(190,180,255,0.95)" : hov ? "rgba(255,255,255,0.85)" : "rgba(200,205,230,0.65)"
-    : active ? C.purple : C.navy;
+    : active ? C.purple : hov ? C.navy : C.navy;
+  const bg = dark
+    ? "transparent"
+    : active ? "rgba(110,75,255,0.08)" : hov ? "rgba(110,75,255,0.06)" : "transparent";
   return (
     <button onClick={onClick}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ position: "relative", display: "flex", alignItems: "center", padding: "0 14px", fontSize: 14, fontFamily: F, fontWeight: 400, color, background: "transparent", border: "none", cursor: "pointer", transition: "color 0.15s", whiteSpace: "nowrap", letterSpacing: "0.16px", textDecoration: hov ? "underline" : "none" }}>
+      style={{ position: "relative", display: "flex", alignItems: "center", margin: "10px 2px", padding: "0 12px", height: 36, borderRadius: 8, fontSize: 14, fontFamily: F, fontWeight: active ? 500 : 400, color, background: bg, border: "none", cursor: "pointer", transition: "background 0.12s ease-out, color 0.12s ease-out", whiteSpace: "nowrap", letterSpacing: "0.16px" }}>
       {label}
     </button>
   );

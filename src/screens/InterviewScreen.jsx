@@ -10,6 +10,11 @@ const INTERVIEW_STYLES = `
 @keyframes rec-pulse{0%{box-shadow:0 0 0 0 rgba(217,48,37,0.5)}70%{box-shadow:0 0 0 10px rgba(217,48,37,0)}100%{box-shadow:0 0 0 0 rgba(217,48,37,0)}}
 @keyframes q-fade-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes confetti-fall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(120px) rotate(360deg)}}
+@keyframes rec-wave-0{from{height:4px}to{height:20px}}
+@keyframes rec-wave-1{from{height:6px}to{height:26px}}
+@keyframes rec-wave-2{from{height:8px}to{height:22px}}
+@keyframes iv-dot-bounce{0%,100%{transform:translateY(0);opacity:0.5}50%{transform:translateY(-5px);opacity:1}}
+html,body,#root{background:#141d2e!important;overscroll-behavior:none;}
 `;
 
 const MIN_RECORD_SECS = 5;
@@ -98,7 +103,20 @@ export default function InterviewScreen({ go, shareCode }) {
   // Completed share state — must be at top level (Rules of Hooks)
   const [shareCopied, setShareCopied] = useState(false);
   const audioRef = useRef(null);
-  const ttsCacheRef = useRef({}); // { [question_id]: url }
+  const ttsCacheRef = useRef({});
+  const warmupPlayUrlRef = useRef(null);
+
+  // Cleanup all media resources on unmount
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach(t => t.stop());
+      warmupStreamRef.current?.getTracks().forEach(t => t.stop());
+      if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
+      if (warmupRecorderRef.current?.state === "recording") warmupRecorderRef.current.stop();
+      stopSilenceDetection();
+      if (warmupPlayUrlRef.current) URL.revokeObjectURL(warmupPlayUrlRef.current);
+    };
+  }, []);
 
   const prefetchTts = async (q) => {
     if (!q || ttsCacheRef.current[q.id]) return;
@@ -213,6 +231,20 @@ export default function InterviewScreen({ go, shareCode }) {
     }
     return () => clearInterval(timerRef.current);
   }, [phase]);
+
+  // Space key shortcut for recording start/stop (desktop)
+  useEffect(() => {
+    if (introStep !== "started" || !["ready", "recording"].includes(phase)) return;
+    const handleKey = (e) => {
+      if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
+        e.preventDefault();
+        if (phase === "ready") startRecording();
+        else if (phase === "recording") stopRecording();
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [phase, introStep]);
 
   // Page Visibility — stop recording if screen locks / tab switches
   useEffect(() => {
@@ -454,8 +486,8 @@ export default function InterviewScreen({ go, shareCode }) {
           const uploadRes = await fetch(signedUrl, { method: "PUT", body: blob, headers: { "Content-Type": mimeType } });
           if (uploadRes.ok) {
             if (downloadUrl) audioUrl = downloadUrl;
-          } else { console.error("[audio upload PUT]", uploadRes.status); }
-        } else { console.error("[upload-url API]", urlRes.status); }
+          } else { showToast("음성 저장에 실패했어요. 답변은 기록되지만 오디오가 없을 수 있어요.", "error"); }
+        } else { showToast("업로드 준비 중 오류가 발생했어요.", "error"); }
       } catch (e) { console.error("[audio upload exception]", e); }
       // STT — independent of audio upload
       try {
@@ -516,7 +548,9 @@ export default function InterviewScreen({ go, shareCode }) {
       const mimeType = mr.mimeType;
       const blob = new Blob(warmupChunksRef.current, { type: mimeType });
       setWarmupBlob(blob);
+      if (warmupPlayUrlRef.current) URL.revokeObjectURL(warmupPlayUrlRef.current);
       const url = URL.createObjectURL(blob);
+      warmupPlayUrlRef.current = url;
       setWarmupPlayUrl(url);
       setWarmupPhase("done");
     };
@@ -601,7 +635,7 @@ export default function InterviewScreen({ go, shareCode }) {
         {warmupPhase === "done" && warmupPlayUrl && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, marginBottom: 48 }}>
             <audio controls src={warmupPlayUrl} style={{ width: "100%", maxWidth: 320, borderRadius: 10 }} />
-            <button onClick={() => { setWarmupPhase("idle"); setWarmupPlayUrl(null); setWarmupBlob(null); }}
+            <button onClick={() => { if (warmupPlayUrlRef.current) { URL.revokeObjectURL(warmupPlayUrlRef.current); warmupPlayUrlRef.current = null; } setWarmupPhase("idle"); setWarmupPlayUrl(null); setWarmupBlob(null); }}
               style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer", fontFamily: F, textDecoration: "underline", padding: "10px 16px", minHeight: 44 }}>
               다시 테스트
             </button>
@@ -636,7 +670,7 @@ export default function InterviewScreen({ go, shareCode }) {
       <div style={{ width: "100%", maxWidth: 576 }}>
         {/* Logo row */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 36 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: "#3b5bdb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: "#6E4BFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0C8 4 12 8 16 8C12 8 8 12 8 16C8 12 4 8 0 8C4 8 8 4 8 0Z" fill="white"/></svg>
           </div>
           <span style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", fontWeight: 400 }}>voicesurvey · AI 인터뷰</span>
@@ -808,7 +842,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Main interview (chat UI) ───
   return (
-    <div style={{ height: "100dvh", minHeight: "100vh", background: "#111827", display: "flex", flexDirection: "column", fontFamily: F, position: "relative", overflow: "hidden" }}>
+    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, background: "#141d2e", display: "flex", flexDirection: "column", fontFamily: F, overflow: "hidden" }}>
       <style>{INTERVIEW_STYLES}</style>
 
       {showExitConfirm && (
@@ -871,13 +905,14 @@ export default function InterviewScreen({ go, shareCode }) {
       </div>
 
       {/* Scrollable chat history */}
-      <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1, padding: isMobile ? "8px 16px 16px" : "8px 32px 16px", display: "flex", flexDirection: "column" }}>
-        <div style={{ maxWidth: 700, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", gap: 20, flex: 1 }}>
+      <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", overscrollBehavior: "none", position: "relative", zIndex: 1, padding: isMobile ? "8px 16px 16px" : "8px 32px 16px", display: "flex", flexDirection: "column" }}>
+        <div style={{ maxWidth: 700, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", gap: 20, flex: 1 }}>
+          <div style={{ flex: 1 }} />
           {completedChats.map((chat, i) => (
             <div key={i} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {/* AI question bubble */}
               <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <div style={{ width: 28, height: 28, borderRadius: 7, background: "#3b5bdb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 7, background: "#6E4BFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 0C6 3 9 6 12 6C9 6 6 9 6 12C6 9 3 6 0 6C3 6 6 3 6 0Z" fill="white"/></svg>
                 </div>
                 <div style={{ maxWidth: "78%", background: "rgba(255,255,255,0.12)", borderRadius: "4px 16px 16px 16px", padding: "10px 14px" }}>
@@ -902,12 +937,12 @@ export default function InterviewScreen({ go, shareCode }) {
       </div>
 
       {/* Sticky bottom panel — current question + controls */}
-      <div style={{ flexShrink: 0, position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.07)", background: "#141d2e", padding: isMobile ? "16px 16px calc(28px + env(safe-area-inset-bottom,0px))" : "20px 32px calc(28px + env(safe-area-inset-bottom,0px))" }}>
+      <div style={{ flexShrink: 0, position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.07)", padding: isMobile ? "16px 16px calc(28px + env(safe-area-inset-bottom,0px))" : "20px 32px calc(28px + env(safe-area-inset-bottom,0px))" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
 
           {/* AI avatar row + current question */}
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: "#3b5bdb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: phase === "ai_speaking" ? "0 0 14px rgba(59,91,219,0.5)" : "none", transition: "box-shadow 0.4s" }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: "#6E4BFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: phase === "ai_speaking" ? "0 0 14px rgba(110,75,255,0.5)" : "none", transition: "box-shadow 0.4s" }}>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 0C7 3.5 10.5 7 14 7C10.5 7 7 10.5 7 14C7 10.5 3.5 7 0 7C3.5 7 7 3.5 7 0Z" fill="white"/></svg>
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -927,36 +962,34 @@ export default function InterviewScreen({ go, shareCode }) {
             </div>
           )}
 
-          {/* TTS blocked */}
-          {phase === "ai_speaking" && ttsBlocked && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-              <button onClick={async () => {
-                setTtsBlocked(false);
-                if (audioRef.current) {
-                  try { await audioRef.current.play(); }
-                  catch { setPhase(q.type === "voice" ? "ready" : q.type); }
-                } else {
-                  setPhase(q.type === "voice" ? "ready" : q.type);
-                }
-              }} style={{ padding: "10px 16px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
-                🔊 소리 켜고 다시 듣기
-              </button>
-              <button onClick={() => { setTtsReadFallback(true); setPhase(q.type === "voice" ? "ready" : q.type); }}
-                style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, cursor: "pointer", fontFamily: F, padding: "8px 14px" }}>
-                📖 질문 읽고 계속하기
-              </button>
-            </div>
-          )}
-
           {/* Voice controls */}
           {q.type === "voice" && (
-            <div style={{ minHeight: 160, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <div style={{ minHeight: (phase === "ready" || phase === "recording") ? 160 : 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              {phase === "ai_speaking" && ttsBlocked && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <button onClick={async () => {
+                    setTtsBlocked(false);
+                    if (audioRef.current) {
+                      try { await audioRef.current.play(); }
+                      catch { setPhase(q.type === "voice" ? "ready" : q.type); }
+                    } else {
+                      setPhase(q.type === "voice" ? "ready" : q.type);
+                    }
+                  }} style={{ padding: "10px 16px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
+                    🔊 소리 켜고 다시 듣기
+                  </button>
+                  <button onClick={() => { setTtsReadFallback(true); setPhase(q.type === "voice" ? "ready" : q.type); }}
+                    style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, cursor: "pointer", fontFamily: F, padding: "8px 14px" }}>
+                    📖 질문 읽고 계속하기
+                  </button>
+                </div>
+              )}
               {phase === "ai_speaking" && !ttsBlocked && (
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", textAlign: "center", paddingBottom: 4 }}>AI가 질문을 읽고 있어요...</div>
               )}
               {phase === "submitting" && (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
-                  <div style={{ display: "flex", gap: 3 }}>{[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: C.purple, animation: `wave-${i} 0.6s ease-in-out ${i*0.12}s infinite alternate` }} />)}</div>
+                  <div style={{ display: "flex", gap: 3 }}>{[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: C.purple, animation: `iv-dot-bounce 0.6s ease-in-out ${i*0.15}s infinite` }} />)}</div>
                   <span>저장 중...</span>
                 </div>
               )}
@@ -985,7 +1018,7 @@ export default function InterviewScreen({ go, shareCode }) {
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 2, height: 14 }}>
                         {Array.from({ length: 16 }).map((_, i) => (
-                          <div key={i} style={{ width: 3, borderRadius: 2, background: C.ruby, opacity: 0.7, animation: `wave-${i % 3} 0.5s ease-in-out ${(i * 0.06).toFixed(2)}s infinite alternate`, height: `${8 + (i % 3) * 4}px` }} />
+                          <div key={i} style={{ width: 3, borderRadius: 2, background: C.ruby, opacity: 0.7, animation: `rec-wave-${i % 3} 0.5s ease-in-out ${(i * 0.06).toFixed(2)}s infinite alternate`, height: `${8 + (i % 3) * 4}px` }} />
                         ))}
                       </div>
                     </div>
