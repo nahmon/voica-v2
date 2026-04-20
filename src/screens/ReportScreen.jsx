@@ -366,31 +366,55 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
               </div>
             )}
 
-            {/* Voice quotes */}
+            {/* Voice quotes — per question */}
             {(() => {
-              const voiceQuotes = allResponses
-                .filter(r => r.transcript && r.transcript.trim().length > 20)
-                .slice(0, 6);
-              if (voiceQuotes.length === 0) return null;
+              const questionsWithQuotes = questions
+                .filter(q => q.type !== "scale")
+                .map(q => {
+                  const resps = allResponses
+                    .filter(r => r.question_id === q.id && r.transcript && r.transcript.trim().length > 20)
+                    .sort((a, b) => b.transcript.length - a.transcript.length)
+                    .slice(0, 3);
+                  return { q, resps };
+                })
+                .filter(({ resps }) => resps.length > 0);
+              if (questionsWithQuotes.length === 0) return null;
               return (
                 <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: isMobile ? "20px 16px" : "28px 32px", marginBottom: 16 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: dk.text, marginBottom: 20 }}>
-                    {isKo ? "응답자 실제 발언" : "Respondent Quotes"}
+                  <div style={{ fontSize: 14, fontWeight: 600, color: dk.text, marginBottom: 24 }}>
+                    {isKo ? "문항별 실제 발언" : "Quotes by Question"}
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill,minmax(280px,1fr))", gap: 14 }}>
-                    {voiceQuotes.map((r, i) => {
-                      const session = sessions.find(s => s.id === r.session_id);
-                      const name = session?.respondent?.name || (isKo ? `응답자 ${sessions.indexOf(session) + 1}` : `Respondent ${sessions.indexOf(session) + 1}`);
-                      return (
-                        <div key={i} style={{ background: dk.card2, border: `1px solid ${dk.border}`, borderRadius: 10, padding: "16px 18px", position: "relative" }}>
-                          <div style={{ fontSize: 28, color: C.purple, lineHeight: 1, marginBottom: 8, opacity: 0.4, fontFamily: "Georgia, serif" }}>"</div>
-                          <div style={{ fontSize: 13, color: dk.text, lineHeight: 1.7, marginBottom: 12 }}>
-                            {r.transcript.length > 200 ? r.transcript.slice(0, 200) + "..." : r.transcript}
-                          </div>
-                          <div style={{ fontSize: 11, color: dk.muted }}>— {name}</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+                    {questionsWithQuotes.map(({ q, resps }, qi) => (
+                      <div key={q.id}>
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 14 }}>
+                          <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: C.purple, background: "rgba(110,75,255,0.12)", borderRadius: 5, padding: "2px 7px", marginTop: 1 }}>Q{qi + 1}</span>
+                          <span style={{ fontSize: 13, color: dk.label, lineHeight: 1.55, fontWeight: 500 }}>{q.content}</span>
                         </div>
-                      );
-                    })}
+                        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : resps.length === 1 ? "1fr" : "repeat(auto-fill,minmax(260px,1fr))", gap: 10 }}>
+                          {resps.map((r, i) => {
+                            const session = sessions.find(s => s.id === r.session_id);
+                            const sIdx = sessions.indexOf(session);
+                            const name = session?.respondent?.name || (isKo ? `응답자 ${sIdx + 1}` : `Respondent ${sIdx + 1}`);
+                            const isBest = i === 0;
+                            return (
+                              <div key={r.id || i} style={{ background: dk.card2, border: `1px solid ${isBest ? "rgba(110,75,255,0.25)" : dk.border}`, borderRadius: 10, padding: "14px 16px", position: "relative" }}>
+                                {isBest && (
+                                  <span style={{ position: "absolute", top: 10, right: 12, fontSize: 9, fontWeight: 700, color: C.purple, background: "rgba(110,75,255,0.12)", borderRadius: 4, padding: "2px 6px", letterSpacing: "0.04em" }}>
+                                    {isKo ? "대표" : "TOP"}
+                                  </span>
+                                )}
+                                <div style={{ fontSize: 22, color: C.purple, lineHeight: 1, marginBottom: 6, opacity: 0.35, fontFamily: "Georgia, serif" }}>"</div>
+                                <div style={{ fontSize: 13, color: dk.text, lineHeight: 1.7, marginBottom: 10 }}>
+                                  {r.transcript.length > 220 ? r.transcript.slice(0, 220) + "..." : r.transcript}
+                                </div>
+                                <div style={{ fontSize: 11, color: dk.muted }}>— {name}</div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               );
