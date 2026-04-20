@@ -538,7 +538,7 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
         setHeroIdx(i => (i + 1) % 2);
         setHeroVisible(true);
       }, 400);
-    }, 4000);
+    }, 6500);
     return () => clearInterval(cycle);
   }, []);
   useEffect(() => {
