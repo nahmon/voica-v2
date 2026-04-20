@@ -12,6 +12,7 @@ const SECTIONS = [
 
 export default function ReportScreen({ go, user, logout, interviewId, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
+  const isKo = lang === "ko";
   const { showToast } = useToast();
   const [interview, setInterview] = useState(null);
   const [sessions, setSessions] = useState([]);
