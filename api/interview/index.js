@@ -1,5 +1,6 @@
 // POST /api/interview — create interview + questions atomically
 import { createClient } from "@supabase/supabase-js";
+import { randomBytes } from "crypto";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -19,11 +20,10 @@ async function prewarmTts(supabase, questions) {
   }));
 }
 
-function nanoid(len = 8) {
+function nanoid(len = 10) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let id = "";
-  for (let i = 0; i < len; i++) id += chars[Math.floor(Math.random() * chars.length)];
-  return id;
+  const bytes = randomBytes(len);
+  return Array.from(bytes, b => chars[b % chars.length]).join("");
 }
 
 export default async function handler(req, res) {
@@ -115,7 +115,7 @@ export default async function handler(req, res) {
     .select()
     .single();
 
-  if (ivError) return res.status(500).json({ error: ivError.message });
+  if (ivError) return res.status(500).json({ error: "인터뷰 생성에 실패했습니다." });
 
   // Insert questions if provided
   if (questions.length > 0) {

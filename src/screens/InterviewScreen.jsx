@@ -2,20 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { Btn, WaveAnimation, useToast } from "../components/shared.jsx";
+import { Btn, WaveAnimation, useToast, VoicePlayer } from "../components/shared.jsx";
+
+const IV_BG = "#0d1117";
+const IV_MODAL = "#161b27";
 import { track } from "../lib/analytics.js";
 
-// Keyframes injected once
-const INTERVIEW_STYLES = `
-@keyframes rec-pulse{0%{box-shadow:0 0 0 0 rgba(217,48,37,0.5)}70%{box-shadow:0 0 0 10px rgba(217,48,37,0)}100%{box-shadow:0 0 0 0 rgba(217,48,37,0)}}
-@keyframes q-fade-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes confetti-fall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(120px) rotate(360deg)}}
-@keyframes rec-wave-0{from{height:4px}to{height:20px}}
-@keyframes rec-wave-1{from{height:6px}to{height:26px}}
-@keyframes rec-wave-2{from{height:8px}to{height:22px}}
-@keyframes iv-dot-bounce{0%,100%{transform:translateY(0);opacity:0.5}50%{transform:translateY(-5px);opacity:1}}
-html,body,#root{background:#141d2e!important;overscroll-behavior:none;}
-`;
+// Keyframes live in design.css — only keep the page-level background override here
+const INTERVIEW_STYLES = `html,body,#root{background:${IV_BG}!important;overscroll-behavior:none;}`;
 
 const MIN_RECORD_SECS = 5;
 
@@ -561,13 +555,13 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Loading ───
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "#202124", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F }}>
+    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F }}>
       <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>인터뷰 불러오는 중...</div>
     </div>
   );
 
   if (loadError) return (
-    <div style={{ minHeight: "100vh", background: "#202124", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24, textAlign: "center" }}>
+    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24, textAlign: "center" }}>
       <div style={{ fontSize: 32, marginBottom: 16 }}>🔗</div>
       <div style={{ fontSize: isMobile ? 16 : 18, color: C.white, marginBottom: 8 }}>링크를 확인해 주세요</div>
       <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>{loadError}</div>
@@ -577,7 +571,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Resume prompt ───
   if (introStep === "info" && resumeData) return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg,#202124,#292a2d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
+    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
       <div style={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
         <div style={{ fontSize: 40, marginBottom: 20 }}>💬</div>
         <div style={{ fontSize: isMobile ? 18 : 20, fontWeight: 600, color: "#fff", marginBottom: 10 }}>진행 중인 인터뷰가 있어요</div>
@@ -604,7 +598,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Warmup ───
   if (introStep === "warmup") return (
-    <div style={{ minHeight: "100vh", background: "#111827", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
+    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
       <div style={{ width: "100%", maxWidth: 420, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 28, fontWeight: 500 }}>단계 1 / 2 · 마이크 확인</div>
         <div style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: "#fff", marginBottom: 10, lineHeight: 1.2 }}>목소리가 잘 들리나요?</div>
@@ -634,7 +628,9 @@ export default function InterviewScreen({ go, shareCode }) {
 
         {warmupPhase === "done" && warmupPlayUrl && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, marginBottom: 48 }}>
-            <audio controls src={warmupPlayUrl} style={{ width: "100%", maxWidth: 320, borderRadius: 10 }} />
+            <div style={{ width: "100%", maxWidth: 320 }}>
+              <VoicePlayer audioUrl={warmupPlayUrl} dark />
+            </div>
             <button onClick={() => { if (warmupPlayUrlRef.current) { URL.revokeObjectURL(warmupPlayUrlRef.current); warmupPlayUrlRef.current = null; } setWarmupPhase("idle"); setWarmupPlayUrl(null); setWarmupBlob(null); }}
               style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer", fontFamily: F, textDecoration: "underline", padding: "10px 16px", minHeight: 44 }}>
               다시 테스트
@@ -666,7 +662,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Intro / Info ───
   if (introStep === "info") return (
-    <div style={{ minHeight: "100vh", background: "#111827", display: "flex", alignItems: "flex-start", justifyContent: "center", fontFamily: F, padding: "48px 24px 48px", overflowY: "auto" }}>
+    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", alignItems: "flex-start", justifyContent: "center", fontFamily: F, padding: "48px 24px 48px", overflowY: "auto" }}>
       <div style={{ width: "100%", maxWidth: 576 }}>
         {/* Logo row */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 36 }}>
@@ -762,7 +758,7 @@ export default function InterviewScreen({ go, shareCode }) {
   }));
 
   if (completed) return (
-    <div style={{ minHeight: "100vh", background: "#111827", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, fontFamily: F, position: "relative", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, fontFamily: F, position: "relative", overflow: "hidden" }}>
       <style>{INTERVIEW_STYLES}</style>
 
       {/* Confetti dots */}
@@ -805,7 +801,7 @@ export default function InterviewScreen({ go, shareCode }) {
             </div>
             <div style={{ width: 1, background: "rgba(255,255,255,0.1)" }} />
             <div style={{ flex: 1, textAlign: "center" }}>
-              <div style={{ fontSize: 28, fontWeight: 700, color: "#15be53", fontFeatureSettings: '"tnum"' }}>{interview.questions.length}</div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: "#15be53", fontFeatureSettings: '"tnum"' }}>{completedChats.filter(c => !c.skipped).length}</div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>제출된 응답</div>
             </div>
           </div>
@@ -842,12 +838,12 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Main interview (chat UI) ───
   return (
-    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, background: "#141d2e", display: "flex", flexDirection: "column", fontFamily: F, overflow: "hidden" }}>
+    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, background: IV_BG, display: "flex", flexDirection: "column", fontFamily: F, overflow: "hidden" }}>
       <style>{INTERVIEW_STYLES}</style>
 
       {showExitConfirm && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div style={{ background: "#292a2d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
+          <div style={{ background: IV_MODAL, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>⚠️</div>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.white, marginBottom: 8 }}>인터뷰를 종료할까요?</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>{isMobile ? "지금 나가면 답변이 저장되지 않아요." : "지금 나가면 저장된 답변이 유지되지 않을 수 있어요."}</div>
@@ -861,7 +857,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
       {showSkipConfirm && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div style={{ background: "#292a2d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
+          <div style={{ background: IV_MODAL, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>⏭️</div>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.white, marginBottom: 8 }}>이 질문을 건너뛸까요?</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>{isMobile ? "이 질문을 건너뛸 수 있어요." : "질문이 해당되지 않거나 어렵다면 건너뛸 수 있어요."}</div>
@@ -1018,7 +1014,7 @@ export default function InterviewScreen({ go, shareCode }) {
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 2, height: 14 }}>
                         {Array.from({ length: 16 }).map((_, i) => (
-                          <div key={i} style={{ width: 3, borderRadius: 2, background: C.ruby, opacity: 0.7, animation: `rec-wave-${i % 3} 0.5s ease-in-out ${(i * 0.06).toFixed(2)}s infinite alternate`, height: `${8 + (i % 3) * 4}px` }} />
+                          <div key={i} style={{ width: 3, borderRadius: 2, background: C.ruby, opacity: 0.7, animation: `wave-${i % 3} 0.5s ease-in-out ${(i * 0.06).toFixed(2)}s infinite alternate`, height: `${8 + (i % 3) * 4}px` }} />
                         ))}
                       </div>
                     </div>

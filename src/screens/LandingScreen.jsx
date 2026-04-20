@@ -4,36 +4,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, GlobalNav, VoCCarousel, HowItWorksCarousel, Footer } from "../components/shared.jsx";
 import { track } from "../lib/analytics.js";
 
-/* ── Keyframe styles injected once ── */
-const GLOBAL_STYLES = `
-@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
-@keyframes hero-gradient-shift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes badge-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(83,58,253,0.25); }
-  50%     { box-shadow: 0 0 0 6px rgba(83,58,253,0); }
-}
-@keyframes bubble-in { from { opacity:0; transform:translateY(10px) scale(0.96); } to { opacity:1; transform:none; } }
-.hero-cta:hover .ba { transform:translateX(4px); }
-.cta-btn:hover .ba { transform:translateX(4px); }
-@keyframes rec-ring { 0%{box-shadow:0 0 0 0 rgba(220,38,38,0.5)} 70%{box-shadow:0 0 0 10px rgba(220,38,38,0)} 100%{box-shadow:0 0 0 0 rgba(220,38,38,0)} }
-@keyframes wave-bar { 0%,100%{transform:scaleY(0.4)} 50%{transform:scaleY(1)} }
-@keyframes typing-dot { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-4px);opacity:1} }
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-`;
+// All keyframes moved to design.css
 
 /* ── Translations ── */
 const TRANSLATIONS = {
@@ -266,7 +237,7 @@ const CHAT_CONVOS_KO = [
   { q: "리서치가 빨라지면 팀에서 뭘 가장 먼저 바꾸고 싶으세요?", a: "훨씬 자신감 있게 출시할 수 있을 것 같아요. 유저가 뭘 원하는지 더 이상 추측하지 않아도 되니까요." },
 ];
 
-function AnimatedChatMockup({ lang = "en" }) {
+function AnimatedChatMockup({ lang = "en", fullWidth = false }) {
   const [convoIdx, setConvoIdx] = useState(0);
   const [phase, setPhase] = useState("typing"); // typing → question → recording → response
   const isKo = lang === "ko";
@@ -291,7 +262,7 @@ function AnimatedChatMockup({ lang = "en" }) {
 
   return (
     <div style={{
-      width: 460, background: "#fff",
+      width: fullWidth ? "100%" : 460, background: "#fff",
       borderRadius: 16, border: `1px solid ${C.border}`,
       boxShadow: `0 24px 64px -12px rgba(110,75,255,0.18), 0 4px 16px -4px rgba(0,0,0,0.08)`,
       overflow: "hidden", fontFamily: F,
@@ -472,8 +443,7 @@ function UseCasesSection({ isMobile, t }) {
                   background: "#fff",
                   border: `1px solid ${hovered ? "rgba(110,75,255,0.35)" : "rgba(110,75,255,0.18)"}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: hovered ? "0 2px 12px rgba(110,75,255,0.13)" : "none",
-                  transition: "border-color 0.12s ease-out, box-shadow 0.12s ease-out",
+                  transition: "border-color 0.12s ease-out",
                 }}>
                   {Ic[item.icon] && Ic[item.icon]({ s: 20, c: hovered ? "#5c35f0" : "#7c5ff5" })}
                 </div>
@@ -518,11 +488,10 @@ function FinalCtaSection({ go, isMobile, t }) {
                 background: C.white, border: "none",
                 fontSize: 15, fontWeight: 700, color: C.purple,
                 fontFamily: F, letterSpacing: "0.02em",
-                transition: "transform 0.15s, box-shadow 0.15s",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+                transition: "transform 0.12s ease-out, filter 0.12s ease-out",
               }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,0,0,0.2)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.15)"; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px) scale(1.01)"; e.currentTarget.style.filter = "brightness(1.06)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; }}
             >
               {cta1.replace(" →", "")} <span className="ba">→</span>
             </button>
@@ -585,7 +554,6 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
 
   return (
     <div className="landing-light" style={{ fontFamily: F, fontFeatureSettings: '"ss01"' }}>
-      <style>{GLOBAL_STYLES}</style>
       <GlobalNav go={go} activeTab="landing" variant={user ? "app" : "public"} isMobile={isMobile} user={user} logout={logout} lang={lang} />
 
       {/* ── Hero ── */}
@@ -640,8 +608,12 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
 
           </div>
 
-          {/* ── Right: animated interview mockup ── */}
-          {!isMobile && (
+          {/* ── Right: animated interview mockup (desktop) / below CTA (mobile) ── */}
+          {isMobile ? (
+            <div style={{ width: "100%", marginTop: 36 }}>
+              <AnimatedChatMockup lang={lang} fullWidth />
+            </div>
+          ) : (
             <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
               <AnimatedChatMockup lang={lang} />
             </div>

@@ -1,6 +1,12 @@
 import { supabase } from "./_supabase.js";
+import { rateLimit, getIp } from "./_rateLimit.js";
 
 export default async function handler(req, res) {
+  // Rate limit: 30 session operations per minute per IP
+  if (!rateLimit(`sess:${getIp(req)}`, 30)) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
   if (req.method === "POST") {
     const { interview_id, respondent } = req.body;
     if (!interview_id) return res.status(400).json({ error: "interview_id required" });
@@ -21,7 +27,7 @@ export default async function handler(req, res) {
       .select("id")
       .single();
 
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) return res.status(500).json({ error: "세션 생성에 실패했습니다." });
     return res.status(201).json({ session_id: data.id });
   }
 
@@ -48,7 +54,7 @@ export default async function handler(req, res) {
       .update(patch)
       .eq("id", session_id);
 
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) return res.status(500).json({ error: "세션 업데이트에 실패했습니다." });
     return res.status(200).json({ ok: true });
   }
 

@@ -38,7 +38,6 @@ export function ToastProvider({ children }) {
     <ToastCtx.Provider value={{ showToast }}>
       {children}
       <div style={{ position: "fixed", bottom: "calc(28px + env(safe-area-inset-bottom, 0px))", left: "50%", transform: "translateX(-50%)", zIndex: 9999, display: "flex", flexDirection: "column", gap: 8, alignItems: "center", pointerEvents: "none" }}>
-        <style>{`@keyframes toast-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
         {toasts.map(t => (
           <div key={t.id} style={{ background: bg[t.variant] ?? C.purple, color: "#fff", padding: "10px 18px", borderRadius: 10, fontSize: 13, fontFamily: F, fontWeight: 500, boxShadow: "0 4px 16px rgba(0,0,0,0.22)", whiteSpace: "nowrap", animation: "toast-in 0.22s ease", letterSpacing: "0.16px" }}>
             {t.message}
@@ -58,10 +57,7 @@ export function useToast() {
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 export function Skeleton({ width = "100%", height = 16, borderRadius = 6, style: sx = {} }) {
   return (
-    <>
-      <style>{`@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}`}</style>
-      <div style={{ width, height, borderRadius, background: "linear-gradient(90deg,#eee 25%,#f5f5f5 50%,#eee 75%)", backgroundSize: "800px 100%", animation: "shimmer 1.4s infinite linear", ...sx }} />
-    </>
+    <div style={{ width, height, borderRadius, background: "linear-gradient(90deg,#eee 25%,#f5f5f5 50%,#eee 75%)", backgroundSize: "800px 100%", animation: "shimmer 1.4s infinite linear", ...sx }} />
   );
 }
 
@@ -82,7 +78,7 @@ export function Btn({ children, variant = "primary", size = "md", onClick, disab
   const [hov, setHov] = useState(false);
   const sz = { sm: { padding: "5px 14px", fontSize: 13 }, md: { padding: "9px 20px", fontSize: 15 }, lg: { padding: "13px 32px", fontSize: 16 } };
   const vr = {
-    primary: { background: disabled ? "#a09de8" : hov ? C.purpleHover : C.purple, color: C.white, border: "none", transform: !disabled && hov ? "translateY(-1px)" : "translateY(0)", boxShadow: !disabled && hov ? "0 6px 20px rgba(110,75,255,0.35)" : "none" },
+    primary: { background: disabled ? "#a09de8" : hov ? C.purpleHover : C.purple, color: C.white, border: "none", transform: !disabled && hov ? "translateY(-1px) scale(1.01)" : "translateY(0) scale(1)", filter: !disabled && hov ? "brightness(1.06)" : "brightness(1)" },
     ghost: { background: hov ? C.purpleBg : "transparent", color: C.purple, border: `1px solid ${C.purpleLight}` },
     dark: { background: hov ? "#2a2d6a" : C.brandDark, color: C.white, border: "none" },
     white: { background: hov ? "rgba(255,255,255,0.9)" : C.white, color: C.navy, border: "none" },
@@ -95,7 +91,7 @@ export function Btn({ children, variant = "primary", size = "md", onClick, disab
   };
   return (
     <button disabled={disabled} onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, borderRadius: 9999, cursor: disabled ? "not-allowed" : "pointer", fontFamily: F, fontFeatureSettings: '"ss01"', fontWeight: 500, transition: "all 0.18s", width: full ? "100%" : "auto", ...sz[size], ...vr[variant], ...sx }}>
+      style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, borderRadius: 10, cursor: disabled ? "not-allowed" : "pointer", fontFamily: F, fontFeatureSettings: '"ss01"', fontWeight: 500, transition: "all 0.18s", width: full ? "100%" : "auto", ...sz[size], ...vr[variant], ...sx }}>
       {children}
     </button>
   );
@@ -411,9 +407,10 @@ export function VoCCarousel({ lang = "en" }) {
                 <div style={{ flex: 1, background: C.white, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 40px", border: `1px solid ${C.border}`, minHeight: 260, display: "flex", flexDirection: "column" }}>
                   <p style={{ margin: "0 0 24px", fontSize: isMobile ? 14 : 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px", flex: 1 }}>"{v.quote}"</p>
                   <div style={{ display: "flex", alignItems: "center", gap: 16, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
-                    <div style={{ width: 48, height: 48, borderRadius: "50%", background: `rgba(83,58,253,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: C.purple, fontWeight: 700, flexShrink: 0 }}>
-                      {v.name[0]}
-                    </div>
+                    {v.photo
+                      ? <img src={v.photo} alt={v.name} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} onError={e => { e.currentTarget.style.display = "none"; }} />
+                      : <div style={{ width: 48, height: 48, borderRadius: "50%", background: `rgba(83,58,253,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: C.purple, fontWeight: 700, flexShrink: 0 }}>{v.name[0]}</div>
+                    }
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}>{v.name}</div>
                       <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", marginTop: 2, letterSpacing: "0.16px" }}>{v.title} · {v.company}</div>
@@ -434,6 +431,62 @@ export function VoCCarousel({ lang = "en" }) {
         </div>
       </div>
     </section>
+  );
+}
+
+const HOW_IT_WORKS_ICONS = {
+  pencil: Ic.Pencil, users: Ic.Users, sparkle: Ic.Sparkle, barchart: Ic.BarChart,
+  search: Ic.Search, check: Ic.Check, mic: Ic.Mic, gift: Ic.Gift,
+};
+
+function HowItWorksCard({ s, isMobile, cardW }) {
+  return (
+    <div style={{
+      background: C.white, borderRadius: 14, padding: "24px 20px",
+      flex: isMobile ? `0 0 ${cardW}px` : "1 1 0",
+      border: `1px solid ${C.border}`,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {HOW_IT_WORKS_ICONS[s.icon]?.({ s: 18, c: C.purple })}
+        </div>
+        <span style={{ fontSize: 12, fontWeight: 700, color: C.purple, letterSpacing: "0.5px" }}>{s.step}</span>
+      </div>
+      <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 8, letterSpacing: "0.16px", lineHeight: 1.47 }}>{s.title}</div>
+      <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.65, letterSpacing: "0.16px" }}>{s.desc}</div>
+    </div>
+  );
+}
+
+function HowItWorksRow({ steps, title, sub, scrollRef, isMobile }) {
+  const ownRef = useRef(null);
+  const ref = scrollRef ?? ownRef;
+  const cardW = Math.min(window.innerWidth - 56, 280);
+  return (
+    <div style={{ marginBottom: isMobile ? 32 : 48 }}>
+      <div style={{ marginBottom: isMobile ? 16 : 20 }}>
+        <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 4, lineHeight: 1.47 }}>{title}</div>
+        <div style={{ fontSize: 13, color: "rgba(10,11,13,0.48)", letterSpacing: "0.16px" }}>{sub}</div>
+      </div>
+      {isMobile ? (
+        <div style={{ position: "relative" }}>
+          <div ref={ref} style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
+            {steps.map((s, i) => <HowItWorksCard key={i} s={s} isMobile={isMobile} cardW={cardW} />)}
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
+          {steps.map((s, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "stretch", flex: "1 1 0", minWidth: 0 }}>
+              <HowItWorksCard s={s} isMobile={isMobile} cardW={cardW} />
+              {i < steps.length - 1 && (
+                <div style={{ display: "flex", alignItems: "center", padding: "0 4px", flexShrink: 0, color: "rgba(10,11,13,0.2)", fontSize: 16 }}>›</div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -463,59 +516,6 @@ export function HowItWorksCarousel({ lang = "en" }) {
     { icon: "gift", step: "04", title: "Receive Your Reward", desc: "Your point reward is issued instantly after completing the interview." },
   ];
 
-  function Row({ steps, title, sub, scrollRef }) {
-    const ref = scrollRef || useRef(null);
-    const cardW = Math.min(window.innerWidth - 56, 280);
-    const scroll = (dir) => { ref.current.scrollBy({ left: dir * (cardW + 14), behavior: "smooth" }); };
-
-    const iconMap = { pencil: Ic.Pencil, users: Ic.Users, sparkle: Ic.Sparkle, barchart: Ic.BarChart, search: Ic.Search, check: Ic.Check, mic: Ic.Mic, gift: Ic.Gift };
-
-    const Card = ({ s, i }) => (
-      <div key={i} style={{
-        background: C.white, borderRadius: 14, padding: "24px 20px",
-        flex: isMobile ? `0 0 ${cardW}px` : "1 1 0",
-        border: `1px solid ${C.border}`,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(83,58,253,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            {iconMap[s.icon]?.({ s: 18, c: C.purple })}
-          </div>
-          <span style={{ fontSize: 12, fontWeight: 700, color: C.purple, letterSpacing: "0.5px" }}>{s.step}</span>
-        </div>
-        <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 8, letterSpacing: "0.16px", lineHeight: 1.47 }}>{s.title}</div>
-        <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", lineHeight: 1.65, letterSpacing: "0.16px" }}>{s.desc}</div>
-      </div>
-    );
-
-    return (
-      <div style={{ marginBottom: isMobile ? 32 : 48 }}>
-        <div style={{ marginBottom: isMobile ? 16 : 20 }}>
-          <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 4, lineHeight: 1.47 }}>{title}</div>
-          <div style={{ fontSize: 13, color: "rgba(10,11,13,0.48)", letterSpacing: "0.16px" }}>{sub}</div>
-        </div>
-
-        {isMobile ? (
-          <div style={{ position: "relative" }}>
-            <div ref={ref} style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
-              {steps.map((s, i) => <Card key={i} s={s} i={i} />)}
-            </div>
-          </div>
-        ) : (
-          <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
-            {steps.map((s, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "stretch", flex: "1 1 0", minWidth: 0 }}>
-                <Card s={s} i={i} />
-                {i < steps.length - 1 && (
-                  <div style={{ display: "flex", alignItems: "center", padding: "0 4px", flexShrink: 0, color: "rgba(10,11,13,0.2)", fontSize: 16 }}>›</div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   const rRef = useRef(null);
   const pRef = useRef(null);
 
@@ -532,8 +532,8 @@ export function HowItWorksCarousel({ lang = "en" }) {
             {isKo ? "처음부터 끝까지 모든 것을 처리하는 인터뷰 플랫폼" : "The interview platform that handles everything from start to finish"}
           </p>
         </div>
-        <Row steps={researcherSteps} title={isKo ? "인터뷰를 설계하고 진행하고 싶으신가요?" : "Want to design and run interviews?"} sub={isKo ? "질문만 작성하면 — AI가 수천 명과 대화하고 리포트를 전달합니다" : "Just write your questions — AI talks to thousands and delivers the report"} scrollRef={rRef} />
-        <Row steps={panelSteps} title={isKo ? "참여하고 보상을 받고 싶으신가요?" : "Want to participate and earn rewards?"} sub={isKo ? "짧은 음성 인터뷰에 참여하고 즉시 포인트를 받아보세요" : "Join a short voice interview and receive your points instantly"} scrollRef={pRef} />
+        <HowItWorksRow steps={researcherSteps} title={isKo ? "인터뷰를 설계하고 진행하고 싶으신가요?" : "Want to design and run interviews?"} sub={isKo ? "질문만 작성하면 — AI가 수천 명과 대화하고 리포트를 전달합니다" : "Just write your questions — AI talks to thousands and delivers the report"} scrollRef={rRef} isMobile={isMobile} />
+        <HowItWorksRow steps={panelSteps} title={isKo ? "참여하고 보상을 받고 싶으신가요?" : "Want to participate and earn rewards?"} sub={isKo ? "짧은 음성 인터뷰에 참여하고 즉시 포인트를 받아보세요" : "Join a short voice interview and receive your points instantly"} scrollRef={pRef} isMobile={isMobile} />
       </div>
     </section>
   );
@@ -959,15 +959,12 @@ export function FadeIn({ delay = 0, children }) {
     return () => clearTimeout(t);
   }, [delay]);
   return (
-    <>
-      <style>{`@keyframes fadein-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
-      <div style={{
-        opacity: visible ? 1 : 0,
-        animation: visible ? `fadein-up 0.35s ease forwards` : "none",
-        animationDelay: "0ms",
-      }}>
-        {children}
-      </div>
-    </>
+    <div style={{
+      opacity: visible ? 1 : 0,
+      animation: visible ? `fadein-up 0.35s ease forwards` : "none",
+      animationDelay: "0ms",
+    }}>
+      {children}
+    </div>
   );
 }

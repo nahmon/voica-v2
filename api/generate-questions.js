@@ -1,9 +1,23 @@
 import OpenAI from "openai";
+import { createClient } from "@supabase/supabase-js";
+import { rateLimit, getIp } from "./_rateLimit.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  // Rate limit: 10 AI generations per minute per IP
+  if (!rateLimit(`genq:${getIp(req)}`, 10)) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  // Auth required — only authenticated researchers may generate questions
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+  const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  if (authError || !user) return res.status(401).json({ error: "Unauthorized" });
 
   const { prompt } = req.body;
   if (!prompt?.trim()) return res.status(400).json({ error: "prompt required" });

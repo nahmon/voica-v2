@@ -41,7 +41,7 @@ export default async function handler(req, res) {
   try {
     transcription = await openai.audio.transcriptions.create({
       model: "whisper-1",
-      file: await toFile(fileStream, audioFile.originalFilename || "audio.webm", { type: audioFile.mimetype }),
+      file: await toFile(fileStream, "audio.webm", { type: "audio/webm" }),
       language: "ko",
     });
   } catch (e) {
