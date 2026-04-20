@@ -521,13 +521,15 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
   const isMobile = useIsMobile();
   const [liveCount, setLiveCount] = useState(247);
   const [heroIdx, setHeroIdx] = useState(0);
-  const [heroVisible, setHeroVisible] = useState(true);
+  const [heroVisible, setHeroVisible] = useState(false);
   const refParam = new URLSearchParams(window.location.search).get("ref");
   const fromInterview = refParam === "interview";
   const t = TRANSLATIONS[lang];
 
   useEffect(() => {
     if (fromInterview) track("referral_from_interview", { ref: refParam });
+    const t = setTimeout(() => setHeroVisible(true), 80);
+    return () => clearTimeout(t);
   }, []);
   useEffect(() => {
     const cycle = setInterval(() => {
@@ -575,13 +577,11 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
               fontSize: isMobile ? 32 : 52, fontWeight: 700, lineHeight: 1.2, margin: "0 0 20px",
               fontFamily: F, wordBreak: "keep-all", letterSpacing: "-0.03em",
               minHeight: isMobile ? 120 : 260, overflow: "hidden",
-              opacity: heroVisible ? 1 : 0,
-              transition: "opacity 0.4s ease",
             }}>
-              {heroMsg.line0 && <><span style={{ color: C.navy }}>{heroMsg.line0}</span><br /></>}
-              <span style={{ color: C.navy }}>{heroMsg.line1}</span>
+              {heroMsg.line0 && <><span style={{ color: C.navy, display: "inline-block", opacity: heroVisible ? 1 : 0, filter: heroVisible ? "blur(0px)" : "blur(10px)", transform: heroVisible ? "translateY(0)" : "translateY(18px)", transition: "opacity 0.7s cubic-bezier(0.16,1,0.3,1), filter 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)", transitionDelay: heroVisible ? "0ms" : "0ms" }}>{heroMsg.line0}</span><br /></>}
+              <span style={{ color: C.navy, display: "inline-block", opacity: heroVisible ? 1 : 0, filter: heroVisible ? "blur(0px)" : "blur(10px)", transform: heroVisible ? "translateY(0)" : "translateY(18px)", transition: "opacity 0.7s cubic-bezier(0.16,1,0.3,1), filter 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)", transitionDelay: heroVisible ? (heroMsg.line0 ? "130ms" : "0ms") : "0ms" }}>{heroMsg.line1}</span>
               <br />
-              <span style={{ background: `linear-gradient(135deg, ${C.purple}, #3d2ab0)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              <span style={{ display: "inline-block", background: `linear-gradient(135deg, ${C.purple}, #3d2ab0)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", opacity: heroVisible ? 1 : 0, filter: heroVisible ? "blur(0px)" : "blur(10px)", transform: heroVisible ? "translateY(0)" : "translateY(18px)", transition: "opacity 0.7s cubic-bezier(0.16,1,0.3,1), filter 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)", transitionDelay: heroVisible ? (heroMsg.line0 ? "260ms" : "130ms") : "0ms" }}>
                 {heroMsg.line2}
               </span>
             </h1>
