@@ -440,7 +440,7 @@ function UseCasesSection({ isMobile, t }) {
                 style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 10, padding: "10px 8px", transform: hovered ? "translateY(-2px)" : "none", transition: "transform 0.15s ease-out", cursor: "default", minWidth: 0, overflow: "hidden" }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-                  background: hovered ? "rgba(110,75,255,0.13)" : C.purpleBg,
+                  background: hovered ? "rgba(110,75,255,0.16)" : "rgba(110,75,255,0.10)",
                   border: "none",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   transition: "background 0.12s ease-out",
