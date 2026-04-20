@@ -192,7 +192,7 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
             <WelcomeIllustration isMobile={isMobile} />
 
             {/* Recording notice banner */}
-            <div style={{ background: "rgba(26,115,232,0.05)", border: `1px solid rgba(26,115,232,0.15)`, borderRadius: 8, padding: "14px 16px", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 10 }}>
+            <div style={{ background: "rgba(110,75,255,0.05)", border: `1px solid rgba(110,75,255,0.15)`, borderRadius: 8, padding: "14px 16px", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 10 }}>
               {Ic.Mic({ s: 18, c: C.purple })}
               <div style={{ fontSize: 13, color: C.purple, lineHeight: 1.6 }}>
                 <strong>Recording notice:</strong> This interview will be recorded. Please find a quiet environment before starting.

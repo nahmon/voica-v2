@@ -466,7 +466,7 @@ function UseCasesSection({ isMobile, t }) {
               <div key={i}
                 onMouseEnter={() => setHoveredIdx(i)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 10, padding: "10px 8px", transition: "all 0.08s ease-out", cursor: "default" }}>
+                style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 10, padding: "10px 8px", transition: "all 0.08s ease-out", cursor: "default", minWidth: 0, overflow: "hidden" }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 10, flexShrink: 0,
                   background: "#fff",
@@ -478,7 +478,7 @@ function UseCasesSection({ isMobile, t }) {
                 }}>
                   {Ic[item.icon] && Ic[item.icon]({ s: 20, c: hovered ? "#5c35f0" : "#7c5ff5" })}
                 </div>
-                <span style={{ fontSize: 14, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, color: hovered ? C.navy : C.body, transition: "color 0.08s ease-out" }}>{item.label}</span>
+                <span style={{ fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, color: hovered ? C.navy : C.body, transition: "color 0.08s ease-out", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.label}</span>
               </div>
             );
           })}
