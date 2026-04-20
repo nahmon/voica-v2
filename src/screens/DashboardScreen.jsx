@@ -104,9 +104,12 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
           { step: "2", icon: (c) => Ic.Users({ s: 20, c }), title: isKo ? "인터뷰 패널 모집" : "Recruit Panelists", desc: isKo ? "링크를 공유하거나 공개 보드에서 인터뷰 패널을 모집해요" : "Share a link or recruit panelists from the public board", action: () => go("panel_board"), actionLabel: isKo ? "보드 보기" : "View Board", color: C.success },
           { step: "3", icon: (c) => Ic.Sparkle({ s: 20, c }), title: isKo ? "AI 리포트" : "AI Report", desc: isKo ? "응답이 모이면 AI가 자동으로 인사이트 리포트를 만들어줘요" : "Once responses come in, AI automatically generates an insights report", action: null, actionLabel: null, color: C.navy },
         ].map(item => (
-          <div key={item.step} style={{ background: C.white, borderRadius: 16, padding: "20px 20px 18px", border: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 10 }}>
+          <div key={item.step}
+            style={{ background: C.white, borderRadius: 16, padding: "20px 20px 18px", border: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 10 }}
+            onMouseEnter={e => { const ic = e.currentTarget.querySelector(".qs-icon"); if (ic) ic.style.transform = "scale(1.15)"; }}
+            onMouseLeave={e => { const ic = e.currentTarget.querySelector(".qs-icon"); if (ic) ic.style.transform = "scale(1)"; }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: `rgba(${item.color === C.purple ? "83,58,253" : item.color === C.success ? "21,190,83" : "6,27,49"},0.08)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div className="qs-icon" style={{ width: 36, height: 36, borderRadius: 10, background: `rgba(${item.color === C.purple ? "83,58,253" : item.color === C.success ? "21,190,83" : "6,27,49"},0.08)`, display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.15s ease-out" }}>
                 {item.icon(item.color)}
               </div>
               <div style={{ fontSize: 11, color: C.body, fontWeight: 500 }}>STEP {item.step}</div>

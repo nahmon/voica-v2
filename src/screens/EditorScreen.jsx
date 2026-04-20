@@ -611,7 +611,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       </div>
       <div style={{ padding: "0 16px 12px" }}>
         <button onClick={() => setShowAiModal(true)} style={{ width: "100%", padding: "12px 16px", borderRadius: 10, border: `1px solid ${C.purple}`, background: C.purpleBg, color: C.purple, fontSize: 14, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-          ✨ AI로 인터뷰 쉽게 만들기
+          ✨ AI로 인터뷰 쉽게 만들기 <span className="ba">→</span>
         </button>
       </div>
       <div style={{ padding: "0 16px 24px" }}>
@@ -745,7 +745,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               style={{ position: "absolute", bottom: 48, left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg, #2d25b0, #533afd, #9b7eff, #533afd, #2d25b0)", backgroundSize: "300% 300%", border: "none", borderRadius: 24, padding: "10px 22px", color: C.white, fontFamily: F, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", boxShadow: "0 4px 18px rgba(83,58,253,0.25)", animation: "aiGradientShift 16s ease infinite" }}
             >
               <svg width="13" height="13" viewBox="0 0 16 16" fill="white"><path d="M8 0 C8 0 8.8 3.5 10.5 5.5 C12.2 7.5 16 8 16 8 C16 8 12.2 8.5 10.5 10.5 C8.8 12.5 8 16 8 16 C8 16 7.2 12.5 5.5 10.5 C3.8 8.5 0 8 0 8 C0 8 3.8 7.5 5.5 5.5 C7.2 3.5 8 0 8 0Z"/></svg>
-              AI로 인터뷰 쉽게 만들기
+              AI로 인터뷰 쉽게 만들기 <span className="ba">→</span>
             </button>
           </div>
         </div>

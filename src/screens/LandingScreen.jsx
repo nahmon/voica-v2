@@ -21,6 +21,8 @@ const GLOBAL_STYLES = `
   50%     { box-shadow: 0 0 0 6px rgba(83,58,253,0); }
 }
 @keyframes bubble-in { from { opacity:0; transform:translateY(10px) scale(0.96); } to { opacity:1; transform:none; } }
+.hero-cta:hover .ba { transform:translateX(4px); }
+.cta-btn:hover .ba { transform:translateX(4px); }
 @keyframes rec-ring { 0%{box-shadow:0 0 0 0 rgba(220,38,38,0.5)} 70%{box-shadow:0 0 0 10px rgba(220,38,38,0)} 100%{box-shadow:0 0 0 0 rgba(220,38,38,0)} }
 @keyframes wave-bar { 0%,100%{transform:scaleY(0.4)} 50%{transform:scaleY(1)} }
 @keyframes typing-dot { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-4px);opacity:1} }
@@ -64,9 +66,9 @@ const TRANSLATIONS = {
       title: (purpleLight) => <>Traditional flow vs. <span style={{ color: purpleLight }}>voicesurvey</span></>,
       subtitle: "Same research — fifty times the sample, at one-fortieth the cost.",
       metrics: [
-        { value: "×50", label: "larger sample" },
+        { value: "50x", label: "larger sample" },
         { value: "1/40", label: "the cost" },
-        { value: "×144", label: "faster to launch" },
+        { value: "144x", label: "faster to launch" },
         { value: "500+", label: "parallel panelists" },
       ],
       rows: [
@@ -85,18 +87,18 @@ const TRANSLATIONS = {
       title: "Interview for anything",
       subtitle: "Discover the numerous ways companies are using voicesurvey.",
       items: [
-        { icon: "ShoppingCart", label: "Consumer goods testing" },
-        { icon: "Pencil",       label: "Creative testing" },
-        { icon: "Chat",         label: "Message testing" },
-        { icon: "Target",       label: "Prototype testing" },
-        { icon: "Globe",        label: "Website testing" },
-        { icon: "Phone",        label: "Mobile app testing" },
-        { icon: "Sparkle",      label: "AI quality evals" },
-        { icon: "CheckCircle",  label: "Product & UX evals" },
-        { icon: "Star",         label: "Brand perception" },
-        { icon: "Map",          label: "Customer journey map" },
-        { icon: "BarChart",     label: "Customer segmentation" },
-        { icon: "Users",        label: "Employee experience" },
+        { icon: "Package",       label: "Consumer goods testing" },
+        { icon: "Palette",       label: "Creative testing" },
+        { icon: "MessageSquare", label: "Message testing" },
+        { icon: "Layers",        label: "Prototype testing" },
+        { icon: "Monitor",       label: "Website testing" },
+        { icon: "Smartphone",    label: "Mobile app testing" },
+        { icon: "Bot",           label: "AI quality evals" },
+        { icon: "Sliders",       label: "Product & UX evals" },
+        { icon: "Award",         label: "Brand perception" },
+        { icon: "Route",         label: "Customer journey map" },
+        { icon: "PieChart",      label: "Customer segmentation" },
+        { icon: "Heart",         label: "Employee experience" },
       ],
     },
     cta: {
@@ -137,9 +139,9 @@ const TRANSLATIONS = {
       title: (purpleLight) => <>기존 방식 vs. <span style={{ color: purpleLight }}>voicesurvey</span></>,
       subtitle: "같은 조사를, 50배 더 많은 표본으로, 40분의 1 비용으로.",
       metrics: [
-        { value: "×50", label: "더 큰 표본" },
+        { value: "50x", label: "더 큰 표본" },
         { value: "1/40", label: "비용 절감" },
-        { value: "×144", label: "더 빠른 출시" },
+        { value: "144x", label: "더 빠른 출시" },
         { value: "500+", label: "동시 패널 참여" },
       ],
       rows: [
@@ -158,18 +160,18 @@ const TRANSLATIONS = {
       title: "무엇이든 인터뷰할 수 있어요",
       subtitle: "다양한 기업들이 voicesurvey로 조사를 진행하는 방식을 확인해보세요.",
       items: [
-        { icon: "ShoppingCart", label: "소비재 인터뷰" },
-        { icon: "Pencil",       label: "광고·크리에이티브 테스트" },
-        { icon: "Chat",         label: "메시지 테스트" },
-        { icon: "Target",       label: "프로토타입 테스트" },
-        { icon: "Globe",        label: "웹사이트 테스트" },
-        { icon: "Phone",        label: "모바일 앱 테스트" },
-        { icon: "Sparkle",      label: "AI 품질 평가" },
-        { icon: "CheckCircle",  label: "제품·UX 평가" },
-        { icon: "Star",         label: "브랜드 인식 조사" },
-        { icon: "Map",          label: "고객 여정 분석" },
-        { icon: "BarChart",     label: "고객 세분화" },
-        { icon: "Users",        label: "직원 경험 조사" },
+        { icon: "Package",       label: "소비재 인터뷰" },
+        { icon: "Palette",       label: "광고·크리에이티브 테스트" },
+        { icon: "MessageSquare", label: "메시지 테스트" },
+        { icon: "Layers",        label: "프로토타입 테스트" },
+        { icon: "Monitor",       label: "웹사이트 테스트" },
+        { icon: "Smartphone",    label: "모바일 앱 테스트" },
+        { icon: "Bot",           label: "AI 품질 평가" },
+        { icon: "Sliders",       label: "제품·UX 평가" },
+        { icon: "Award",         label: "브랜드 인식 조사" },
+        { icon: "Route",         label: "고객 여정 분석" },
+        { icon: "PieChart",      label: "고객 세분화" },
+        { icon: "Heart",         label: "직원 경험 조사" },
       ],
     },
     cta: {
@@ -369,8 +371,18 @@ function AnimatedChatMockup({ lang = "en" }) {
 /* ── Comparison section ── */
 function BeforeAfterSection({ isMobile, t }) {
   const { label, title, subtitle, metrics, rows, headerTraditional, headerVS, recommended } = t.comparison;
+  const metricsRef = useRef(null);
+  const [metricsVisible, setMetricsVisible] = useState(false);
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setMetricsVisible(true); io.disconnect(); } },
+      { threshold: 0.2 }
+    );
+    if (metricsRef.current) io.observe(metricsRef.current);
+    return () => io.disconnect();
+  }, []);
 
-  const darkBg = "#120e2e";
+  const darkBg = "linear-gradient(160deg, #1e1154 0%, #120e2e 45%, #09071a 100%)";
 
   return (
     <FadeInSection>
@@ -386,9 +398,14 @@ function BeforeAfterSection({ isMobile, t }) {
           </div>
 
           {/* metric cards */}
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
-            {(isMobile ? metrics : metrics.slice(0, 3)).map(m => (
-              <div key={m.value} style={{ background: "rgba(110,75,255,0.12)", border: "1px solid rgba(110,75,255,0.25)", borderRadius: 12, padding: isMobile ? "20px 18px" : "28px 24px" }}>
+          <div ref={metricsRef} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
+            {(isMobile ? metrics : metrics.slice(0, 3)).map((m, i) => (
+              <div key={m.value} style={{
+                background: "rgba(110,75,255,0.12)", border: "1px solid rgba(110,75,255,0.25)", borderRadius: 12, padding: isMobile ? "20px 18px" : "28px 24px",
+                opacity: metricsVisible ? 1 : 0,
+                transform: metricsVisible ? "translateY(0)" : "translateY(10px)",
+                transition: `opacity 0.38s ease-out ${i * 70}ms, transform 0.38s ease-out ${i * 70}ms`,
+              }}>
                 <div style={{ fontSize: isMobile ? 36 : 48, fontWeight: 700, color: C.purpleLight, lineHeight: 1, fontFamily: F }}>{m.value}</div>
                 <div style={{ fontSize: 14, color: "rgba(220,210,255,0.9)", marginTop: 10 }}>{m.label}</div>
               </div>
@@ -449,9 +466,19 @@ function UseCasesSection({ isMobile, t }) {
               <div key={i}
                 onMouseEnter={() => setHoveredIdx(i)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 12px", transition: "all 0.08s ease-out", cursor: "default" }}>
-                {Ic[item.icon] && Ic[item.icon]({ s: 15, c: hovered ? C.purple : C.body })}
-                <span style={{ fontSize: 14, color: hovered ? C.navy : C.body, transition: "color 0.08s ease-out" }}>{item.label}</span>
+                style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 10, padding: "10px 8px", transition: "all 0.08s ease-out", cursor: "default" }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 10, flexShrink: 0,
+                  background: "#fff",
+                  border: `1px solid ${hovered ? "rgba(110,75,255,0.35)" : "rgba(110,75,255,0.18)"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: hovered ? "0 2px 12px rgba(110,75,255,0.13)" : "none",
+                  transform: hovered ? "scale(1.06)" : "scale(1)",
+                  transition: "border-color 0.12s ease-out, box-shadow 0.12s ease-out, transform 0.12s ease-out",
+                }}>
+                  {Ic[item.icon] && Ic[item.icon]({ s: 20, c: hovered ? "#5c35f0" : "#7c5ff5" })}
+                </div>
+                <span style={{ fontSize: 14, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, color: hovered ? C.navy : C.body, transition: "color 0.08s ease-out" }}>{item.label}</span>
               </div>
             );
           })}
@@ -485,6 +512,7 @@ function FinalCtaSection({ go, isMobile, t }) {
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button
+              className="cta-btn"
               onClick={() => go("advertiser_login")}
               style={{
                 cursor: "pointer", padding: "14px 32px", borderRadius: 12,
@@ -497,7 +525,7 @@ function FinalCtaSection({ go, isMobile, t }) {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,0,0,0.2)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.15)"; }}
             >
-              {cta1}
+              {cta1.replace(" →", "")} <span className="ba">→</span>
             </button>
             <button
               onClick={() => go("panel_entry")}
@@ -597,10 +625,11 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
 
             <div style={{ display: "flex", gap: 12, flexDirection: isMobile ? "column" : "row", marginBottom: 28, maxWidth: isMobile ? "100%" : 480 }}>
               <button onClick={() => go("advertiser_login")}
+                className="hero-cta"
                 style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: C.purple, border: "none", fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: F, transition: "background 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, flex: 1 }}
                 onMouseEnter={e => { e.currentTarget.style.background = C.purpleHover; e.currentTarget.style.transform = "translateY(-1px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = C.purple; e.currentTarget.style.transform = "none"; }}>
-                {t.hero.cta1}
+                {t.hero.cta1.replace(" →", "")} <span className="ba">→</span>
               </button>
               <button onClick={() => go("panel_entry")}
                 style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: "#fff", border: `1.5px solid ${C.purpleLight}`, fontSize: 15, fontWeight: 600, color: C.purple, fontFamily: F, transition: "border-color 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, flex: 1 }}

@@ -55,7 +55,7 @@ export default function RoleSelectScreen({ go, user }) {
             ))}
           </div>
           <div style={{ marginTop: 24, fontSize: 14, fontWeight: 600, color: C.purple }}>
-            {loading ? "Loading..." : "Get started as a Researcher →"}
+            {loading ? "Loading..." : <>Get started as a Researcher <span className="ba">→</span></>}
           </div>
         </button>
 
@@ -83,7 +83,7 @@ export default function RoleSelectScreen({ go, user }) {
             ))}
           </div>
           <div style={{ marginTop: 24, fontSize: 14, fontWeight: 600, color: C.success }}>
-            {loading ? "Loading..." : "Join as a Panelist →"}
+            {loading ? "Loading..." : <>Join as a Panelist <span className="ba">→</span></>}
           </div>
         </button>
       </div>

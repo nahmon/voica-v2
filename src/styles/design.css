@@ -115,6 +115,10 @@ a:focus-visible,
   transform: none;
 }
 
+/* Stripe-style arrow animation — sitewide for → CTAs */
+.ba { display: inline-block; transition: transform 0.2s ease-out; }
+button:hover .ba { transform: translateX(4px); }
+
 /* Dashboard interview card hover lift (Stripe pattern) */
 .dash-card {
   transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;

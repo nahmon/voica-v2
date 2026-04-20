@@ -624,7 +624,7 @@ export default function InterviewScreen({ go, shareCode }) {
           onClick={() => { setIntroStep("started"); }}
           disabled={warmupPhase === "recording"}
           style={{ width: "100%", padding: "16px", borderRadius: 12, border: "none", background: warmupPhase === "recording" ? "rgba(255,255,255,0.08)" : C.purple, color: "#fff", fontSize: 16, fontWeight: 600, fontFamily: F, cursor: warmupPhase === "recording" ? "not-allowed" : "pointer", opacity: warmupPhase === "recording" ? 0.5 : 1 }}>
-          {warmupPhase === "done" ? "마이크 확인 완료 — 인터뷰 시작 →" : "마이크 확인 건너뛰기 →"}
+          {warmupPhase === "done" ? <>마이크 확인 완료 — 인터뷰 시작 <span className="ba">→</span></> : <>마이크 확인 건너뛰기 <span className="ba">→</span></>}
         </button>
       </div>
     </div>
@@ -700,7 +700,7 @@ export default function InterviewScreen({ go, shareCode }) {
         </div>
         {nameTouched && !respondent.name.trim() && <div style={{ fontSize: 12, color: "rgba(255,100,100,0.7)", marginBottom: 10 }}>닉네임을 입력해 주세요</div>}
         <button onClick={startSession} disabled={!respondent.name.trim() || starting} style={{ width: "100%", padding: "16px", borderRadius: 12, border: "none", background: respondent.name.trim() ? C.purple : "rgba(255,255,255,0.08)", color: "#fff", fontSize: 16, fontWeight: 600, fontFamily: F, cursor: respondent.name.trim() ? "pointer" : "not-allowed", opacity: respondent.name.trim() ? 1 : 0.4 }}>
-          인터뷰 시작 →
+          인터뷰 시작 <span className="ba">→</span>
         </button>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", textAlign: "center", marginTop: 16, fontFamily: "monospace", letterSpacing: "0.05em" }}>답변은 엔드투엔드 암호화됩니다</div>
       </div>
@@ -796,7 +796,7 @@ export default function InterviewScreen({ go, shareCode }) {
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>{isMobile ? "리서치를 직접 운영해보세요 →" : "보이스로 리서치를 운영하고 싶으신가요? →"}</span>
             <button onClick={() => { track("powered_by_voice_survey_clicked", {}); window.location.href = "/"; }}
               style={{ flexShrink: 0, padding: "7px 14px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 12, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap" }}>
-              무료로 시작하기 →
+              무료로 시작하기 <span className="ba">→</span>
             </button>
           </div>
         </div>
