@@ -92,7 +92,8 @@ function AppRoutes() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user && !window.location.pathname.match(/^\/i\//)) {
+      const _exempt = /^\/(i|report|responses|editor)\//;
+      if (session?.user && !_exempt.test(window.location.pathname)) {
         const role = session.user.user_metadata?.role;
         if (!role) navigate("/role-select");
         else if (role === "panel") navigate("/panel");
@@ -103,7 +104,8 @@ function AppRoutes() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       if (event !== "SIGNED_IN") return;
-      if (session?.user && !window.location.pathname.match(/^\/i\//)) {
+      const _exempt2 = /^\/(i|report|responses|editor)\//;
+      if (session?.user && !_exempt2.test(window.location.pathname)) {
         const role = session.user.user_metadata?.role;
         if (!role) navigate("/role-select");
         else if (role === "panel") navigate("/panel");
