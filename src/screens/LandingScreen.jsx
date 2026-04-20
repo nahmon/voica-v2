@@ -502,10 +502,10 @@ function FinalCtaSection({ go, isMobile, t }) {
                 background: "transparent", border: "1.5px solid rgba(255,255,255,0.45)",
                 fontSize: 15, fontWeight: 600, color: C.white,
                 fontFamily: F, letterSpacing: "0.02em",
-                transition: "transform 0.15s, background 0.15s",
+                transition: "transform 0.12s ease-out, filter 0.12s ease-out, background 0.12s",
               }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.background = "transparent"; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.filter = "brightness(1.1)"; e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; e.currentTarget.style.background = "transparent"; }}
             >
               {cta2}
             </button>
@@ -594,14 +594,14 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
               <button onClick={() => go("advertiser_login")}
                 className="hero-cta"
                 style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: C.purple, border: "none", fontSize: 15, fontWeight: 600, color: "#fff", fontFamily: F, transition: "background 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, flex: 1 }}
-                onMouseEnter={e => { e.currentTarget.style.background = C.purpleHover; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = C.purple; e.currentTarget.style.transform = "none"; }}>
+                onMouseEnter={e => { e.currentTarget.style.background = C.purpleHover; e.currentTarget.style.transform = "scale(1.01)"; e.currentTarget.style.filter = "brightness(1.06)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = C.purple; e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; }}>
                 {t.hero.cta1.replace(" →", "")} <span className="ba">→</span>
               </button>
               <button onClick={() => go("panel_entry")}
                 style={{ cursor: "pointer", padding: "13px 24px", borderRadius: 10, background: "#fff", border: `1.5px solid ${C.purpleLight}`, fontSize: 15, fontWeight: 600, color: C.purple, fontFamily: F, transition: "border-color 0.15s, transform 0.15s", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, flex: 1 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = C.purpleLight; e.currentTarget.style.transform = "none"; }}>
+                onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.transform = "scale(1.01)"; e.currentTarget.style.filter = "brightness(1.02)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = C.purpleLight; e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; }}>
                 {t.hero.cta2}
               </button>
             </div>

@@ -35,9 +35,9 @@ export default function RoleSelectScreen({ go, user }) {
         <button
           onClick={() => !loading && handleSelect("researcher")}
           disabled={loading}
-          style={{ flex: 1, minWidth: isMobile ? "auto" : 220, maxWidth: isMobile ? "100%" : 260, background: C.white, border: `2px solid ${C.border}`, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 28px", cursor: "pointer", textAlign: "left", transition: "all 0.18s", fontFamily: F }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.boxShadow = "0 8px 32px rgba(83,58,253,0.12)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = "none"; }}
+          style={{ flex: 1, minWidth: isMobile ? "auto" : 220, maxWidth: isMobile ? "100%" : 260, background: C.white, border: `2px solid ${C.border}`, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 28px", cursor: "pointer", textAlign: "left", transition: "transform 0.12s ease-out, filter 0.12s ease-out, border-color 0.12s ease-out", fontFamily: F }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.transform = "scale(1.015)"; e.currentTarget.style.filter = "brightness(1.02)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; }}
         >
           <div style={{ width: 52, height: 52, borderRadius: 14, background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
             {Ic.BarChart({ s: 24, c: C.purple })}
@@ -63,9 +63,9 @@ export default function RoleSelectScreen({ go, user }) {
         <button
           onClick={() => !loading && handleSelect("panel")}
           disabled={loading}
-          style={{ flex: 1, minWidth: isMobile ? "auto" : 220, maxWidth: isMobile ? "100%" : 260, background: C.white, border: `2px solid ${C.border}`, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 28px", cursor: "pointer", textAlign: "left", transition: "all 0.18s", fontFamily: F }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = C.success; e.currentTarget.style.boxShadow = "0 8px 32px rgba(21,190,83,0.12)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = "none"; }}
+          style={{ flex: 1, minWidth: isMobile ? "auto" : 220, maxWidth: isMobile ? "100%" : 260, background: C.white, border: `2px solid ${C.border}`, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 28px", cursor: "pointer", textAlign: "left", transition: "transform 0.12s ease-out, filter 0.12s ease-out, border-color 0.12s ease-out", fontFamily: F }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = C.success; e.currentTarget.style.transform = "scale(1.015)"; e.currentTarget.style.filter = "brightness(1.02)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; }}
         >
           <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(21,190,83,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
             {Ic.Mic({ s: 24, c: C.success })}

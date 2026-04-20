@@ -295,10 +295,10 @@ function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, 
         borderRadius: 12,
         border: isRecommended ? `1.5px solid ${C.purpleLight}` : `1px solid ${C.border}`,
         overflow: "hidden",
-        transition: "box-shadow 0.15s",
+        transition: "transform 0.12s ease-out, filter 0.12s ease-out",
       }}
-      onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.08)"; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
+      onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.01)"; e.currentTarget.style.filter = "brightness(1.02)"; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; }}
     >
       <div style={{ padding: isMobile ? "14px 16px" : "18px 22px" }}>
 

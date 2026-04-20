@@ -91,7 +91,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
           <div
             onMouseEnter={() => setHoveredCard("pro")}
             onMouseLeave={() => setHoveredCard(null)}
-            style={{ background: C.white, border: `2px solid ${hoveredCard === "pro" ? C.purple : C.purple}`, borderRadius: 20, padding: "32px 28px", boxShadow: hoveredCard === "pro" ? "0 16px 48px rgba(83,58,253,0.28)" : S.elevated, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "pro" ? "translateY(-3px)" : "none", transition: "box-shadow 0.2s, transform 0.2s" }}>
+            style={{ background: C.white, border: `2px solid ${C.purple}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.elevated, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "pro" ? "scale(1.015)" : "scale(1)", filter: hoveredCard === "pro" ? "brightness(1.03)" : "brightness(1)", transition: "transform 0.15s ease-out, filter 0.15s ease-out" }}>
             <div style={{ position: "absolute", top: 14, right: 14 }}>
               <span style={{ fontSize: 10, fontWeight: 700, background: C.purpleBg, color: C.purple, padding: "3px 8px", borderRadius: 4 }}>{isKo ? "인기" : "Most popular"}</span>
             </div>
@@ -112,7 +112,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
           <div
             onMouseEnter={() => setHoveredCard("enterprise")}
             onMouseLeave={() => setHoveredCard(null)}
-            style={{ background: C.white, border: `${hoveredCard === "enterprise" ? "2px" : "1px"} solid ${hoveredCard === "enterprise" ? C.purple : C.border}`, borderRadius: 20, padding: "32px 28px", boxShadow: hoveredCard === "enterprise" ? "0 16px 48px rgba(83,58,253,0.28)" : S.standard, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "enterprise" ? "translateY(-3px)" : "none", transition: "box-shadow 0.2s, transform 0.2s, border-color 0.2s, border-width 0.2s" }}>
+            style={{ background: C.white, border: `1.5px solid ${hoveredCard === "enterprise" ? C.purple : C.border}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.standard, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "enterprise" ? "scale(1.015)" : "scale(1)", filter: hoveredCard === "enterprise" ? "brightness(1.03)" : "brightness(1)", transition: "transform 0.15s ease-out, filter 0.15s ease-out, border-color 0.15s ease-out" }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 8, letterSpacing: 0.5 }}>Enterprise</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: C.navy, lineHeight: 1.2, marginBottom: 4 }}>{isKo ? "맞춤 요금" : "Custom pricing"}</div>
             <div style={{ fontSize: 12, color: C.body, marginBottom: 28 }}>{isKo ? "연간 계약 · 대량 할인 가능" : "Annual contract · volume discounts available"}</div>

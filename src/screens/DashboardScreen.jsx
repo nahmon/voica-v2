@@ -183,9 +183,9 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
             { icon: "users", title: isKo ? "인터뷰 패널 모집" : "Panelist Recruiting", desc: isKo ? "지원자를 검토하고 승인해요" : "Review and approve applicants", screen: "recruiter_admin" },
             { icon: "search", title: isKo ? "모집 보드" : "Recruitment Board", desc: isKo ? "공개 모집 공고를 관리해요" : "Manage public recruitment listings", screen: "panel_board" },
           ].map(item => (
-            <div key={item.title} onClick={() => go(item.screen)} style={{ background: C.white, borderRadius: 16, padding: "16px 18px", boxShadow: S.ambient, border: "1px solid rgba(110,75,255,0.10)", cursor: "pointer", display: "flex", alignItems: "center", gap: 14, transition: "box-shadow 0.08s ease-out" }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = S.card; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = S.ambient; }}>
+            <div key={item.title} onClick={() => go(item.screen)} style={{ background: C.white, borderRadius: 16, padding: "16px 18px", boxShadow: S.ambient, border: "1px solid rgba(110,75,255,0.10)", cursor: "pointer", display: "flex", alignItems: "center", gap: 14, transition: "transform 0.12s ease-out, filter 0.12s ease-out, border-color 0.12s ease-out" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.01)"; e.currentTarget.style.filter = "brightness(1.03)"; e.currentTarget.style.borderColor = "rgba(110,75,255,0.22)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; e.currentTarget.style.borderColor = "rgba(110,75,255,0.10)"; }}>
               <div style={{ width: 40, height: 40, borderRadius: 8, background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{({users:Ic.Users,search:Ic.Search})[item.icon]?.({s:20,c:C.purple})}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>{item.title}</div>
