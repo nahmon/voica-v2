@@ -91,7 +91,7 @@ export function Btn({ children, variant = "primary", size = "md", onClick, disab
   };
   return (
     <button disabled={disabled} onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, borderRadius: 10, cursor: disabled ? "not-allowed" : "pointer", fontFamily: F, fontFeatureSettings: '"ss01"', fontWeight: 500, transition: "all 0.18s", width: full ? "100%" : "auto", ...sz[size], ...vr[variant], ...sx }}>
+      style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, borderRadius: 10, cursor: disabled ? "not-allowed" : "pointer", fontFamily: F, fontFeatureSettings: '"ss01"', fontWeight: 500, transition: "all 0.18s", width: full ? "100%" : "auto", boxShadow: "none", ...sz[size], ...vr[variant], ...sx }}>
       {children}
     </button>
   );
