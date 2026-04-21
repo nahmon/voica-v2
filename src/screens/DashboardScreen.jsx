@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { Badge, Btn, GlobalNav, Footer } from "../components/shared.jsx";
+import { Badge, Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
 
 function timeAgo(dateStr, isKo = false) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -29,6 +29,7 @@ const STATUS_LABELS_KO = ["전체", "진행 중", "초안", "완료"];
 
 export default function DashboardScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
+  const { showToast } = useToast();
   const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -52,7 +53,8 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
         `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
-      if (!error) setInterviews(data ?? []);
+      if (error) showToast("인터뷰 목록을 불러오지 못했어요.", "error");
+      else setInterviews(data ?? []);
       setLoading(false);
     })();
   }, [user]);

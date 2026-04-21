@@ -144,6 +144,7 @@ function AppRoutes() {
         <Route path="/terms"         element={<TermsScreen {...common} />} />
         <Route path="/privacy"       element={<PrivacyScreen {...common} />} />
         <Route path="/about"         element={<AboutScreen {...common} />} />
+        <Route path="*"              element={<LandingScreen {...common} />} />
       </Routes>
     </Suspense>
   );

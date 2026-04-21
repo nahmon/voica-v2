@@ -333,7 +333,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
 
       {/* Sub-header */}
       <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 24px", height: 48, display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← Dashboard</Btn>
+        <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>{isKo ? "← 대시보드" : "← Dashboard"}</Btn>
         <div style={{ width: 1, height: 16, background: C.border }} />
         <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {interview?.title ?? "Interview"}

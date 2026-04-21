@@ -482,7 +482,7 @@ export default function InterviewScreen({ go, shareCode }) {
             if (downloadUrl) audioUrl = downloadUrl;
           } else { showToast("음성 저장에 실패했어요. 답변은 기록되지만 오디오가 없을 수 있어요.", "error"); }
         } else { showToast("업로드 준비 중 오류가 발생했어요.", "error"); }
-      } catch (e) { console.error("[audio upload exception]", e); }
+      } catch (e) { console.error("[audio upload exception]", e); showToast("음성 업로드 중 오류가 발생했어요.", "error"); }
       // STT — independent of audio upload
       try {
         const fd = new FormData();
@@ -991,7 +991,7 @@ export default function InterviewScreen({ go, shareCode }) {
               )}
               {phase === "review_pass" && (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 13, color: "rgba(30,142,62,0.8)" }}>
-                  <span>✓</span><span>Saved</span>
+                  <span>✓</span><span>저장됨</span>
                 </div>
               )}
               {(phase === "ready" || phase === "recording") && (

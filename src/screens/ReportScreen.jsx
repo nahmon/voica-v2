@@ -47,10 +47,10 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   }, [interviewId]);
 
   const GEN_STEPS = [
-    { label: "Collecting data", from: 0, to: 4 },
-    { label: "AI analysis", from: 4, to: 10 },
-    { label: "Writing report", from: 10, to: 20 },
-    { label: "Done", from: 20, to: Infinity },
+    { label: "데이터 수집 중", from: 0, to: 4 },
+    { label: "AI 분석 중", from: 4, to: 10 },
+    { label: "리포트 작성 중", from: 10, to: 20 },
+    { label: "완료", from: 20, to: Infinity },
   ];
 
   const handleGenerateReport = async () => {
@@ -87,8 +87,8 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   const handleShare = () => {
     const url = `${location.origin}/report/${interviewId}`;
     navigator.clipboard.writeText(url)
-      .then(() => showToast("Report link copied", "success"))
-      .catch(() => showToast("Failed to copy link", "error"));
+      .then(() => showToast("리포트 링크가 복사됐어요", "success"))
+      .catch(() => showToast("링크 복사에 실패했어요", "error"));
   };
 
   const completedSessions = sessions.filter(s => s.status === "completed");
@@ -123,7 +123,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   })();
 
   const ratingDists = (() => {
-    const scaleQs = questions.filter(q => q.type === "scale");
+    const scaleQs = questions.filter(q => q.type === "likert");
     if (scaleQs.length === 0 || allResponses.length === 0) return [];
     return scaleQs.map(q => {
       const min = q.options?.min ?? 1;
