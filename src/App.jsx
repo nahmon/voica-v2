@@ -74,7 +74,7 @@ function AppRoutes() {
   const go = (screen, id, code) => {
     window.scrollTo(0, 0);
     if (code !== undefined) setShareCode(code);
-    if (screen === "editor")           { navigate(`/editor/${id}`); return; }
+    if (screen === "editor")           { navigate(id ? `/editor/${id}` : "/editor"); return; }
     if (screen === "interview")        { navigate(`/i/${code ?? id}`); return; }
     if (screen === "consent")          { navigate("/consent", { state: { shareCode: code ?? shareCode } }); return; }
     if (screen === "report")           { navigate(`/report/${id}`); return; }
@@ -127,6 +127,7 @@ function AppRoutes() {
         <Route path="/role-select"   element={<RoleSelectScreen go={go} user={user} />} />
         <Route path="/auth"          element={<AuthScreen go={go} lang={lang} />} />
         <Route path="/dashboard"     element={<DashboardScreen {...common} />} />
+        <Route path="/editor"        element={<EditorRoute go={go} user={user} logout={logout} />} />
         <Route path="/editor/:id"    element={<EditorRoute go={go} user={user} logout={logout} />} />
         <Route path="/panel/entry"   element={<PanelEntryScreen go={go} lang={lang} onLangChange={handleLangChange} />} />
         <Route path="/panel/mypage"  element={<PanelMyPageScreen {...common} />} />

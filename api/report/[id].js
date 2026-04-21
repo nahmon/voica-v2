@@ -76,21 +76,34 @@ export default async function handler(req, res) {
     }
 
     // Build prompt
+    // Collect unique voice questions for per-question insights
+    const voiceQMap = {};
+    sessions.forEach(s => {
+      (s.responses ?? []).forEach(r => {
+        if (r.type === "voice" && r.question_id && r.questions?.content) {
+          voiceQMap[r.question_id] = r.questions.content;
+        }
+      });
+    });
+
     const transcriptBlock = sessions.map((s, si) => {
       const answers = (s.responses ?? [])
         .sort((a, b) => (a.questions?.order_num ?? 0) - (b.questions?.order_num ?? 0))
         .map(r => {
           const q = r.questions?.content ?? "질문";
-          if (r.type === "voice") return `  Q: ${q}\n  A: ${r.transcript ?? "(음성 응답 없음)"}`;
+          if (r.type === "voice") return `  Q[${r.question_id}]: ${q}\n  A: ${r.transcript ?? "(음성 응답 없음)"}`;
           if (r.type === "multiple_choice") return `  Q: ${q}\n  A: ${Array.isArray(r.value) ? r.value.join(", ") : r.value}`;
           if (r.type === "likert") return `  Q: ${q}\n  A: ${r.value}점`;
           return "";
         }).join("\n");
-      return `[패널 ${si + 1}]\n${answers}`;
+      const demo = [s.respondent?.gender, s.respondent?.age ? `${s.respondent.age}세` : null].filter(Boolean).join(", ");
+      return `[패널 ${si + 1}${demo ? ` (${demo})` : ""}]\n${answers}`;
     }).join("\n\n");
 
+    const voiceQList = Object.entries(voiceQMap).map(([id, content]) => `{ "questionId": "${id}", "question": "${content}" }`).join(",\n    ");
+
     const systemPrompt = `당신은 전문 UX 리서치 분석가입니다. 인터뷰 데이터를 분석하여 구조화된 인사이트를 JSON 형식으로 제공하세요.`;
-    const userPrompt = `다음은 "${interview.title}" 인터뷰의 ${sessions.length}명 응답 데이터입니다:\n\n${transcriptBlock}\n\n아래 JSON 형식으로 분석해 주세요:\n{\n  "summary": "2-3문장 핵심 요약",\n  "themes": [\n    {\n      "label": "테마명",\n      "count": 언급횟수,\n      "sentiment": "positive|negative|neutral",\n      "quotes": ["대표 인용문 1", "대표 인용문 2"]\n    }\n  ],\n  "stats": {\n    "total_responses": 응답수,\n    "avg_completion_time": "평균 소요시간 추정"\n  },\n  "recommendations": ["개선 제안 1", "개선 제안 2", "개선 제안 3"]\n}`;
+    const userPrompt = `다음은 "${interview.title}" 인터뷰의 ${sessions.length}명 응답 데이터입니다:\n\n${transcriptBlock}\n\n아래 JSON 형식으로 분석해 주세요:\n{\n  "summary": "2-3문장 핵심 요약",\n  "themes": [\n    {\n      "label": "테마명",\n      "count": 언급횟수,\n      "sentiment": "positive|negative|neutral",\n      "quotes": ["대표 인용문 1", "대표 인용문 2"]\n    }\n  ],\n  "stats": {\n    "total_responses": 응답수,\n    "avg_completion_time": "평균 소요시간 추정"\n  },\n  "recommendations": [{ "title": "제안 제목", "detail": "2-3문장 상세 설명. 왜 이것이 중요한지, 어떻게 개선할 수 있는지 구체적으로 작성.", "priority": "high" }],\n  "demographicInsights": {\n    "summary": "인구통계 전반적 특징 1-2문장",\n    "groups": [{ "group": "남성", "trait": "이 그룹 응답자들의 주요 특징과 의견 패턴 요약" }]\n  },\n  "questionInsights": [\n    ${voiceQList ? voiceQList.replace(/\{[^}]+\}/g, (m) => m.replace("}", ', "insight": "이 질문에 대한 2-3문장 응답 요약 (응답자들이 공통적으로 언급한 내용, 패턴, 핵심 의견 중심으로 작성)" }')) : ''}\n  ]\n}\n\nquestionInsights의 각 insight는 해당 questionId 질문에 대한 응답자들의 발화를 종합한 2-3문장 요약입니다. 공통 패턴과 핵심 의견을 중심으로 작성하세요.`;
 
     try {
       const completion = await openai.chat.completions.create({

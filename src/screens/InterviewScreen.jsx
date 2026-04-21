@@ -694,7 +694,7 @@ export default function InterviewScreen({ go, shareCode }) {
         {/* Form fields */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 24 }}>
           {[
-            { key: "name", label: "닉네임", sub: "필수", placeholder: "예: coffee-saving-desk", required: true },
+            { key: "name", label: "닉네임", sub: "필수", placeholder: "예: 홍길동", required: true },
             { key: "age", label: "나이", sub: "선택", placeholder: "예: 29", inputMode: "numeric" },
           ].map(f => (
             <div key={f.key}>
@@ -1056,11 +1056,11 @@ export default function InterviewScreen({ go, shareCode }) {
           )}
 
           {/* Likert scale */}
-          {q.type === "likert" && q.options && phase !== "review_pass" && (
+          {q.type === "likert" && phase !== "review_pass" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center" }}>
               <div style={{ display: "flex", gap: 8, justifyContent: "center", width: "100%", flexWrap: "wrap" }}>
-                {Array.from({ length: (q.options.max ?? 5) - (q.options.min ?? 1) + 1 }, (_, i) => i + (q.options.min ?? 1)).map(n => {
-                  const count = (q.options.max ?? 5) - (q.options.min ?? 1) + 1;
+                {Array.from({ length: (q.options?.max ?? 5) - (q.options?.min ?? 1) + 1 }, (_, i) => i + (q.options?.min ?? 1)).map(n => {
+                  const count = (q.options?.max ?? 5) - (q.options?.min ?? 1) + 1;
                   return (
                     <button key={n} onClick={() => setSelectedValue(n)}
                       style={{ width: `calc((100% - ${(count - 1) * 8}px) / ${count})`, minWidth: 36, maxWidth: 56, height: 48, borderRadius: 10, border: "none", background: selectedValue === n ? C.purple : "rgba(255,255,255,0.1)", color: selectedValue === n ? C.white : "rgba(255,255,255,0.6)", fontSize: 17, fontFamily: F, cursor: "pointer", transition: "all 0.15s" }}>
@@ -1069,7 +1069,7 @@ export default function InterviewScreen({ go, shareCode }) {
                   );
                 })}
               </div>
-              {Array.isArray(q.options.labels) && q.options.labels.length >= 2 && (
+              {Array.isArray(q.options?.labels) && q.options.labels.length >= 2 && (
                 <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 300 }}>
                   <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{q.options.labels[0]}</span>
                   <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{q.options.labels[q.options.labels.length - 1]}</span>

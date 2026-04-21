@@ -86,9 +86,10 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     if (!aiPrompt.trim()) return;
     setAiGenerating(true);
     try {
+      const { data: { session: aiSession } } = await supabase.auth.getSession();
       const res = await fetch("/api/generate-questions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiSession?.access_token}` },
         body: JSON.stringify({ prompt: aiPrompt.trim() }),
       });
       const data = await res.json();
@@ -325,6 +326,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const handleSave = () => {
     if (!title.trim()) { showToast("인터뷰 제목을 입력해주세요", "error"); return; }
     if (questions.some(q => !q.content.trim())) { showToast("모든 질문 내용을 입력해주세요", "error"); return; }
+    if (questions.length > 10) { showToast("질문은 최대 10개까지 추가할 수 있어요", "error"); return; }
     if (questions.length < 10) { setShowIncompleteWarn(true); return; }
     doSave();
   };

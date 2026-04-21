@@ -260,7 +260,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
             return (
               <div key={p.id}
                 className="dash-card"
-                onClick={() => { markAsSeen(p.id, sessionCount); go(p.status === "closed" ? "report" : "editor", p.id); }}
+                onClick={() => { markAsSeen(p.id, sessionCount); go(p.status === "closed" ? "report" : sessionCount > 0 ? "responses" : "editor", p.id); }}
                 style={{ background: C.white, borderRadius: 16, padding: isMobile ? "16px" : "20px 24px", border: "1px solid rgba(110,75,255,0.10)", cursor: "pointer" }}>
                 {/* Title + status */}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
