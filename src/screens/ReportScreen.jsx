@@ -96,14 +96,15 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       const res = await fetch(`/api/storage?response_id=${responseId}`, {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
-      if (!res.ok) return;
+      if (!res.ok) { showToast(isKo ? "음성을 불러올 수 없어요" : "Failed to load audio", "error"); return; }
       const { audio_url } = await res.json();
       if (audioRef.current) audioRef.current.pause();
       audioRef.current = new Audio(audio_url);
       audioRef.current.onended = () => setPlayingId(null);
+      audioRef.current.onerror = () => { showToast(isKo ? "음성 재생 실패" : "Playback failed", "error"); setPlayingId(null); };
       audioRef.current.play();
       setPlayingId(responseId);
-    } catch {}
+    } catch { showToast(isKo ? "음성 재생 실패" : "Playback failed", "error"); }
   };
 
   const handlePrint = () => window.print();
@@ -348,7 +349,21 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
               </Btn>
             )}
             {completedSessions.length === 0 && !generating && (
-              <div style={{ fontSize: 12, color: dk.muted, marginTop: 12 }}>{isKo ? "완료된 응답이 1개 이상 있어야 생성할 수 있어요" : "Need at least 1 completed response"}</div>
+              <div style={{ marginTop: 20, padding: "16px 20px", borderRadius: 10, background: "rgba(110,75,255,0.06)", border: "1px dashed rgba(110,75,255,0.2)", textAlign: "center" }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>📤</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: dk.text, marginBottom: 6 }}>
+                  {isKo ? "아직 완료된 응답이 없어요" : "No completed responses yet"}
+                </div>
+                <div style={{ fontSize: 12, color: dk.muted, marginBottom: 12 }}>
+                  {isKo ? "인터뷰 링크를 공유하면 참여자 응답이 여기 쌓여요" : "Share your interview link to collect responses"}
+                </div>
+                <button onClick={() => {
+                  const url = `${location.origin}/i/${interview?.share_code}`;
+                  navigator.clipboard.writeText(url).then(() => showToast(isKo ? "링크 복사됨" : "Link copied", "success"));
+                }} style={{ padding: "7px 16px", borderRadius: 20, border: `1px solid rgba(110,75,255,0.4)`, background: "transparent", color: "#a78bff", fontSize: 12, cursor: "pointer", fontFamily: F }}>
+                  {isKo ? "🔗 인터뷰 링크 복사" : "🔗 Copy interview link"}
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -550,7 +565,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                                   <div style={{ fontSize: 11, color: dk.dim }}>— {name}</div>
                                   {r.audio_url && (
-                                    <button onClick={() => playAudio(r.id)} style={{ flexShrink: 0, width: 26, height: 26, borderRadius: "50%", border: `1px solid ${playingId === r.id ? C.purple : "rgba(110,75,255,0.3)"}`, background: playingId === r.id ? C.purple : "transparent", color: playingId === r.id ? "#fff" : C.purple, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, transition: "all 0.15s" }}>
+                                    <button onClick={() => playAudio(r.id)} aria-label={playingId === r.id ? "stop" : "play"} style={{ flexShrink: 0, width: 44, height: 44, borderRadius: "50%", border: `1px solid ${playingId === r.id ? C.purple : "rgba(110,75,255,0.3)"}`, background: playingId === r.id ? C.purple : "transparent", color: playingId === r.id ? "#fff" : C.purple, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, transition: "all 0.15s" }}>
                                       {playingId === r.id ? "■" : "▶"}
                                     </button>
                                   )}

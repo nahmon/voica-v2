@@ -88,7 +88,7 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
       const token = session?.access_token;
       const [bankRes, rewardRes] = await Promise.all([
         fetch("/api/participant", { headers: { Authorization: `Bearer ${token}` } }),
-        supabase.from("participant_rewards").select("id, amount, status, claimed_at, paid_at, interviews(title)").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("participant_rewards").select("id, session_id, amount, status, claimed_at, paid_at, interviews(title)").eq("user_id", user.id).order("created_at", { ascending: false }),
       ]);
       if (bankRes.ok) { const d = await bankRes.json(); setBankAccount(d.account); }
       if (!rewardRes.error) setRewards(rewardRes.data ?? []);
@@ -140,7 +140,7 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
         fetch("/api/participant?action=reward-claim", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ rewardId: r.id }),
+          body: JSON.stringify({ rewardId: r.id, sessionId: r.session_id }),
         })
       ));
       setRewards(prev => prev.map(r => r.status === "pending" ? { ...r, status: "claimed" } : r));
