@@ -172,7 +172,7 @@ export default function TermsScreen({ go, user, logout, lang = "ko", onLangChang
           <div style={{ marginTop: 40, paddingTop: 24, borderTop: `1px solid ${C.border}`, fontSize: 12, color: C.body, lineHeight: 1.8 }}>
             <strong style={{ color: C.navy }}>Voice Survey Inc.</strong><br />
             {isKo ? "사업자 등록: 진행 중" : "Business Registration: Pending"}<br />
-            Email: voica.support@gmail.com<br />
+            Email: support@voicesurvey.app<br />
             <span style={{ fontSize: 11, color: "#aaa" }}>{isKo ? "※ 사업자 정보는 등록 완료 후 업데이트될 예정입니다." : "※ Business information will be updated upon registration completion."}</span><br />
             <br />
             {isKo ? "이 이용약관은 2026년 4월 11일부터 시행됩니다." : "These Terms of Service are effective as of April 11, 2026."}

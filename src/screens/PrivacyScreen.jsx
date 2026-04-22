@@ -133,7 +133,7 @@ export default function PrivacyScreen({ go, user, logout, lang = "ko", onLangCha
                       <li>처리 제한 요구권</li>
                     </ul>
                   </li>
-                  <li>위 권리는 회사에 서면 또는 voica.support@gmail.com으로 연락하여 행사할 수 있습니다.</li>
+                  <li>위 권리는 회사에 서면 또는 support@voicesurvey.app으로 연락하여 행사할 수 있습니다.</li>
                   <li>부정확한 정보의 정정·삭제 요청 시 완료될 때까지 해당 정보를 이용하거나 제공하지 않습니다.</li>
                   <li>권리 행사는 법정대리인을 통해서도 가능하며, 이 경우 적절한 위임 서류를 제출해야 합니다.</li>
                 </>
@@ -147,7 +147,7 @@ export default function PrivacyScreen({ go, user, logout, lang = "ko", onLangCha
                       <li>Right to restriction of processing</li>
                     </ul>
                   </li>
-                  <li>These rights may be exercised by contacting the Company in writing or by email at voica.support@gmail.com. The Company will respond promptly.</li>
+                  <li>These rights may be exercised by contacting the Company in writing or by email at support@voicesurvey.app. The Company will respond promptly.</li>
                   <li>If a user requests correction or deletion of inaccurate personal information, the Company will not use or share that information until the correction or deletion is completed.</li>
                   <li>Rights may also be exercised through a legally authorized representative. In such cases, appropriate documentation of authorization must be provided.</li>
                 </>
@@ -231,7 +231,7 @@ export default function PrivacyScreen({ go, user, logout, lang = "ko", onLangCha
             <div style={{ marginTop: 12, padding: "14px 18px", background: C.bg, borderRadius: 8, fontSize: 13, color: "#3a3a3a", lineHeight: 2 }}>
               <strong>{isKo ? "개인정보 보호 책임자" : "Privacy Officer"}</strong><br />
               {isKo ? "성명: Voice Survey 운영팀" : "Name: Voice Survey Operations Team"}<br />
-              {isKo ? "이메일: voica.support@gmail.com" : "Email: voica.support@gmail.com"}<br />
+              {isKo ? "이메일: support@voicesurvey.app" : "Email: support@voicesurvey.app"}<br />
               {isKo ? "전화: 이메일로 문의 부탁드립니다" : "Phone: Please submit inquiries via email"}
             </div>
             <p style={{ marginTop: 12, fontSize: 13, color: "#3a3a3a", lineHeight: 1.8 }}>
@@ -249,7 +249,7 @@ export default function PrivacyScreen({ go, user, logout, lang = "ko", onLangCha
               <li>Federal Trade Commission (FTC): ftc.gov/privacy</li>
               <li>Internet Crime Complaint Center (IC3): ic3.gov</li>
               <li>Your state Attorney General's office</li>
-              <li>Voice Survey support: voica.support@gmail.com</li>
+              <li>Voice Survey support: support@voicesurvey.app</li>
             </ul>
           </Section>
 
@@ -261,7 +261,7 @@ export default function PrivacyScreen({ go, user, logout, lang = "ko", onLangCha
 
           <div style={{ marginTop: 40, paddingTop: 24, borderTop: `1px solid ${C.border}`, fontSize: 12, color: C.body, lineHeight: 1.8 }}>
             <strong style={{ color: C.navy }}>Voice Survey Inc.</strong><br />
-            {isKo ? "개인정보 보호 책임자 이메일: voica.support@gmail.com" : "Privacy Officer Email: voica.support@gmail.com"}<br />
+            {isKo ? "개인정보 보호 책임자 이메일: support@voicesurvey.app" : "Privacy Officer Email: support@voicesurvey.app"}<br />
             <br />
             {isKo ? "이 개인정보 처리방침은 2026년 4월 11일부터 시행됩니다." : "This Privacy Policy is effective as of April 11, 2026."}
           </div>
