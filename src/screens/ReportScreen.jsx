@@ -18,6 +18,8 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   const [genStep, setGenStep] = useState(0);
   const genTimerRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [playingId, setPlayingId] = useState(null);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     if (!interviewId) { setLoading(false); return; }
@@ -81,6 +83,24 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       clearInterval(genTimerRef.current);
       setGenerating(false);
     }
+  };
+
+  const playAudio = async (responseId) => {
+    if (playingId === responseId) {
+      audioRef.current?.pause();
+      setPlayingId(null);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/storage?response_id=${responseId}`);
+      if (!res.ok) return;
+      const { audio_url } = await res.json();
+      if (audioRef.current) audioRef.current.pause();
+      audioRef.current = new Audio(audio_url);
+      audioRef.current.onended = () => setPlayingId(null);
+      audioRef.current.play();
+      setPlayingId(responseId);
+    } catch {}
   };
 
   const handlePrint = () => window.print();
@@ -498,6 +518,16 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                           <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: C.purple, background: "rgba(110,75,255,0.12)", borderRadius: 5, padding: "2px 7px", marginTop: 1 }}>Q{qi + 1}</span>
                           <span style={{ fontSize: 13, color: dk.label, lineHeight: 1.55, fontWeight: 500 }}>{q.content}</span>
                         </div>
+                        {(() => {
+                          const insight = report.content.questionInsights?.find(qi => qi.questionId === q.id)?.insight;
+                          if (!insight) return null;
+                          return (
+                            <div style={{ background: "rgba(110,75,255,0.06)", border: "1px solid rgba(110,75,255,0.18)", borderRadius: 8, padding: "10px 14px", marginBottom: 10, display: "flex", gap: 8, alignItems: "flex-start" }}>
+                              <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: C.purple, background: "rgba(110,75,255,0.12)", borderRadius: 4, padding: "2px 6px", marginTop: 1 }}>AI</span>
+                              <span style={{ fontSize: 13, color: dk.text, lineHeight: 1.65 }}>{insight}</span>
+                            </div>
+                          );
+                        })()}
                         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : resps.length === 1 ? "1fr" : "repeat(auto-fill,minmax(240px,1fr))", gap: 8 }}>
                           {resps.map((r, i) => {
                             const session = sessions.find(s => s.id === r.session_id);
@@ -514,7 +544,14 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                                 <div style={{ fontSize: 13, color: dk.text, lineHeight: 1.65, marginBottom: 8 }}>
                                   {r.transcript.length > 180 ? r.transcript.slice(0, 180) + "..." : r.transcript}
                                 </div>
-                                <div style={{ fontSize: 11, color: dk.dim }}>— {name}</div>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                                  <div style={{ fontSize: 11, color: dk.dim }}>— {name}</div>
+                                  {r.audio_url && (
+                                    <button onClick={() => playAudio(r.id)} style={{ flexShrink: 0, width: 26, height: 26, borderRadius: "50%", border: `1px solid ${playingId === r.id ? C.purple : "rgba(110,75,255,0.3)"}`, background: playingId === r.id ? C.purple : "transparent", color: playingId === r.id ? "#fff" : C.purple, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, transition: "all 0.15s" }}>
+                                      {playingId === r.id ? "■" : "▶"}
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                             );
                           })}

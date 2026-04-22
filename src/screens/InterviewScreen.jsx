@@ -117,7 +117,7 @@ export default function InterviewScreen({ go, shareCode }) {
     try {
       let url = q.tts_url;
       if (!url) {
-        const r = await fetch("/api/tts", {
+        const r = await fetch("/api/speech?type=tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: q.content, question_id: q.id }),
@@ -168,7 +168,7 @@ export default function InterviewScreen({ go, shareCode }) {
         // Use cached URL if available, otherwise fetch
         let url = ttsCacheRef.current[q.id] || q.tts_url;
         if (!url) {
-          const r = await fetch("/api/tts", {
+          const r = await fetch("/api/speech?type=tts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text: q.content, question_id: q.id }),
@@ -304,7 +304,7 @@ export default function InterviewScreen({ go, shareCode }) {
       const qs = interview?.questions ?? [];
       prefetchTts(qs[0]);
       prefetchTts(qs[1]);
-      const res = await fetch("/api/session", {
+      const res = await fetch("/api/survey?resource=session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ interview_id: interview.id, respondent }),
@@ -331,7 +331,7 @@ export default function InterviewScreen({ go, shareCode }) {
     if (!sessionId) return;
     const q = interview.questions[qIndex];
     try {
-      const res = await fetch("/api/response", {
+      const res = await fetch("/api/survey?resource=response", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId, question_id: q.id, type: q.type, ...patch }),
@@ -371,7 +371,7 @@ export default function InterviewScreen({ go, shareCode }) {
       setTtsReadFallback(false);
     } else {
       // Complete session
-      if (sessionId) fetch("/api/session", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, status: "completed" }) });
+      if (sessionId) fetch("/api/survey?resource=session", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, status: "completed" }) });
       if (shareCode) localStorage.removeItem(`voica_session_${shareCode}`);
       track("interview_completed", { shareCode, sessionId, total: interview.questions.length });
       setCompleted(true);
@@ -382,7 +382,7 @@ export default function InterviewScreen({ go, shareCode }) {
   const playBridgeTts = async () => {
     const phrase = BRIDGE_PHRASES[Math.floor(Math.random() * BRIDGE_PHRASES.length)];
     try {
-      const r = await fetch("/api/tts", {
+      const r = await fetch("/api/speech?type=tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: phrase }),
@@ -470,7 +470,7 @@ export default function InterviewScreen({ go, shareCode }) {
       let transcript = null;
       // Upload audio via server-side signed URL (bypasses anon RLS)
       try {
-        const urlRes = await fetch("/api/upload-url", {
+        const urlRes = await fetch("/api/storage", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionId, questionId: q.id, ext }),
@@ -488,7 +488,7 @@ export default function InterviewScreen({ go, shareCode }) {
         const fd = new FormData();
         fd.append("audio", blob, `audio.${ext}`);
         fd.append("session_id", sessionId);
-        const sttRes = await fetch("/api/stt", { method: "POST", body: fd });
+        const sttRes = await fetch("/api/speech?type=stt", { method: "POST", body: fd });
         if (sttRes.ok) { const d = await sttRes.json(); transcript = d.transcript; }
         else { console.error("[stt]", sttRes.status); showToast("음성 인식에 실패했어요. 텍스트 없이 저장합니다.", "error"); }
       } catch (e) { console.error("[stt exception]", e); }

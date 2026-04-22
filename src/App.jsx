@@ -23,6 +23,7 @@ const FAQScreen            = lazy(() => import("./screens/FAQScreen.jsx"));
 const TermsScreen          = lazy(() => import("./screens/TermsScreen.jsx"));
 const PrivacyScreen        = lazy(() => import("./screens/PrivacyScreen.jsx"));
 const AboutScreen          = lazy(() => import("./screens/AboutScreen.jsx"));
+const BillingSuccessScreen = lazy(() => import("./screens/BillingSuccessScreen.jsx"));
 
 function OAuthErrorHandler() {
   const { showToast } = useToast();
@@ -143,7 +144,8 @@ function AppRoutes() {
         <Route path="/faq"           element={<FAQScreen {...common} />} />
         <Route path="/terms"         element={<TermsScreen {...common} />} />
         <Route path="/privacy"       element={<PrivacyScreen {...common} />} />
-        <Route path="/about"         element={<AboutScreen {...common} />} />
+        <Route path="/about"          element={<AboutScreen {...common} />} />
+        <Route path="/billing/success" element={<BillingSuccessScreen {...common} />} />
         <Route path="*"              element={<LandingScreen {...common} />} />
       </Routes>
     </Suspense>

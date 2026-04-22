@@ -1,17 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../_supabase.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
-
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceKey) {
-    console.error("Missing env vars:", { supabaseUrl: !!supabaseUrl, serviceKey: !!serviceKey });
-    return res.status(500).json({ error: "Server configuration error", detail: "Missing Supabase credentials" });
-  }
-
-  const supabase = createClient(supabaseUrl, serviceKey);
 
   const { code } = req.query;
   if (!code) return res.status(400).json({ error: "share_code required" });

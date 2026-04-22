@@ -1,11 +1,52 @@
 import { useState } from "react";
 import { C, S, F } from "../lib/constants.jsx";
-import { Badge, Btn, GlobalNav, Footer } from "../components/shared.jsx";
+import { Badge, Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { supabase } from "../supabase.js";
+
+const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
+
+function loadTossSDK() {
+  return new Promise((resolve, reject) => {
+    if (window.TossPayments) { resolve(window.TossPayments); return; }
+    const s = document.createElement("script");
+    s.src = "https://js.tosspayments.com/v1/payment";
+    s.onload = () => resolve(window.TossPayments);
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
 
 export default function PricingScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
+  const { showToast } = useToast();
   const [billing, setBilling] = useState("monthly");
+  const [paying, setPaying] = useState(false);
+
+  const handleProStart = async () => {
+    if (!user) { go("auth"); return; }
+    if (!TOSS_CLIENT_KEY) { showToast("결제 설정이 준비 중이에요.", "error"); return; }
+    setPaying(true);
+    try {
+      const TossPayments = await loadTossSDK();
+      const tossPayments = TossPayments(TOSS_CLIENT_KEY);
+      const amount = billing === "yearly" ? proKrwYearlyTotal : proKrwMonthly;
+      const orderId = `voica_${user.id.replace(/-/g, "").slice(0, 16)}_${Date.now()}`;
+      const origin = window.location.origin;
+      await tossPayments.requestPayment("카드", {
+        amount,
+        orderId,
+        orderName: billing === "yearly" ? "Voica Pro 연간 구독" : "Voica Pro 월간 구독",
+        customerEmail: user.email,
+        successUrl: `${origin}/billing/success?billingCycle=${billing}`,
+        failUrl: `${origin}/pricing?payFail=1`,
+      });
+    } catch (e) {
+      if (e?.code !== "USER_CANCEL") showToast(e?.message || "결제창을 여는 중 오류가 발생했어요.", "error");
+    } finally {
+      setPaying(false);
+    }
+  };
   const [hoveredCard, setHoveredCard] = useState(null);
   const isKo = lang === "ko";
 
@@ -106,7 +147,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
                 </div>
               ))}
             </div>
-            <Btn full onClick={() => go("advertiser_login")}>{isKo ? "Pro 시작하기 →" : "Start Pro →"}</Btn>
+            <Btn full onClick={handleProStart} disabled={paying}>{paying ? (isKo ? "결제창 열기..." : "Opening...") : (isKo ? "Pro 시작하기 →" : "Start Pro →")}</Btn>
           </div>
 
           <div

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { supabase } from "../supabase.js";
 
 function TossLogo({ height = 28 }) {
   return <img src="/toss-logo.svg" alt="toss" style={{ height, display: "block" }} />;
@@ -59,42 +60,95 @@ const MY_INTERVIEWS_KO = [
 export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isKo = lang === "ko";
   const isMobile = useIsMobile();
+  const { showToast } = useToast();
   const [notifInterview, setNotifInterview] = useState(true);
   const [notifReward, setNotifReward] = useState(true);
 
-  const [tossPhone, setTossPhone] = useState("");
-  const [tossSaved, setTossSaved] = useState(false);
-  const [showTossSetup, setShowTossSetup] = useState(false);
+  // Bank account state (replaces Toss phone flow)
+  const [bankAccount, setBankAccount] = useState(null);
+  const [showBankSetup, setShowBankSetup] = useState(false);
+  const [bankForm, setBankForm] = useState({ bank_name: "", account_number: "", account_holder: "" });
+  const [savingBank, setSavingBank] = useState(false);
+
+  // Rewards state
+  const [rewards, setRewards] = useState([]);
+  const [claimingAll, setClaimingAll] = useState(false);
   const [withdrawStep, setWithdrawStep] = useState(null);
 
   const STATUS_MAP = isKo ? STATUS_MAP_KO : STATUS_MAP_EN;
   const MY_INTERVIEWS = isKo ? MY_INTERVIEWS_KO : MY_INTERVIEWS_EN;
 
   const warnings = 0;
-  const totalEarned  = 3000;
-  const pending      = 9000;
-  const withdrawable = 3000;
-  const tierGoal     = 15000;
+
+  // Load bank account and rewards
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const [bankRes, rewardRes] = await Promise.all([
+        fetch("/api/participant", { headers: { Authorization: `Bearer ${token}` } }),
+        supabase.from("participant_rewards").select("id, amount, status, claimed_at, paid_at, interviews(title)").eq("user_id", user.id).order("created_at", { ascending: false }),
+      ]);
+      if (bankRes.ok) { const d = await bankRes.json(); setBankAccount(d.account); }
+      if (!rewardRes.error) setRewards(rewardRes.data ?? []);
+    })();
+  }, [user]);
+
+  const totalEarned  = rewards.filter(r => r.status === "paid").reduce((s, r) => s + r.amount, 0);
+  const pending      = rewards.filter(r => r.status === "pending").reduce((s, r) => s + r.amount, 0);
+  const withdrawable = rewards.filter(r => r.status === "pending").reduce((s, r) => s + r.amount, 0);
+  const tierGoal     = 100000;
   const tierPct      = Math.min(100, Math.round((totalEarned / tierGoal) * 100));
-  const monthlyDone  = 2;
-  const monthlyGoal  = 5;
-  const monthlyPct   = Math.round((monthlyDone / monthlyGoal) * 100);
+  const monthlyDone  = rewards.filter(r => {
+    const d = new Date(r.created_at ?? 0);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  const monthlyGoal = 5;
+  const monthlyPct  = Math.round((monthlyDone / monthlyGoal) * 100);
 
-  const formatPhone = (v) => {
-    const digits = v.replace(/\D/g, "").slice(0, 11);
-    if (digits.length <= 3)  return digits;
-    if (digits.length <= 7)  return `${digits.slice(0,3)}-${digits.slice(3)}`;
-    return `${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7)}`;
+  const handleSaveBank = async () => {
+    if (!bankForm.bank_name || !bankForm.account_number || !bankForm.account_holder) return;
+    setSavingBank(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/participant?action=bank-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify(bankForm),
+      });
+      if (res.ok) {
+        setBankAccount(bankForm);
+        setShowBankSetup(false);
+        showToast(isKo ? "계좌가 등록됐어요" : "Account registered", "success");
+      } else {
+        showToast(isKo ? "계좌 저장 실패" : "Failed to save account", "error");
+      }
+    } finally { setSavingBank(false); }
   };
 
-  const handleWithdrawClick = () => {
-    if (!tossSaved) { setShowTossSetup(true); return; }
-    setWithdrawStep("confirm");
-  };
-
-  const handleConfirmWithdraw = () => {
-    setWithdrawStep("done");
-    setTimeout(() => setWithdrawStep(null), 5000);
+  const handleClaimAll = async () => {
+    if (!bankAccount) { setShowBankSetup(true); return; }
+    const pendingRewards = rewards.filter(r => r.status === "pending");
+    if (pendingRewards.length === 0) return;
+    setClaimingAll(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      await Promise.all(pendingRewards.map(r =>
+        fetch("/api/participant?action=reward-claim", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ rewardId: r.id }),
+        })
+      ));
+      setRewards(prev => prev.map(r => r.status === "pending" ? { ...r, status: "claimed" } : r));
+      setWithdrawStep("done");
+      setTimeout(() => setWithdrawStep(null), 5000);
+    } catch {
+      showToast(isKo ? "정산 신청 중 오류가 발생했어요" : "Failed to submit claim", "error");
+    } finally { setClaimingAll(false); }
   };
 
   return (
@@ -129,14 +183,14 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
             </div>
           </div>
 
-          {tossSaved && withdrawStep === null && (
-            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(0,100,255,0.15)", borderRadius: 10, padding: "10px 14px", marginBottom: 12, border: "1px solid rgba(0,100,255,0.3)" }}>
-              <TossIcon size={28} />
+          {bankAccount && withdrawStep === null && (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", marginBottom: 12, border: "1px solid rgba(255,255,255,0.15)" }}>
+              <div style={{ fontSize: 20 }}>🏦</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{isKo ? "연결된 계좌" : "Linked account"}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{tossPhone}</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{isKo ? "등록된 계좌" : "Registered account"}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{bankAccount.bank_name} {bankAccount.account_number}</div>
               </div>
-              <button onClick={() => { setTossSaved(false); setTossPhone(""); setShowTossSetup(true); }}
+              <button onClick={() => setShowBankSetup(true)}
                 style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer", fontFamily: F }}>
                 {isKo ? "변경" : "Change"}
               </button>
@@ -145,23 +199,23 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
 
           {withdrawStep === "confirm" && (
             <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 10, padding: "14px", marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 8 }}>{isKo ? "출금 확인" : "Confirm Withdrawal"}</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 8 }}>{isKo ? "정산 신청 확인" : "Confirm Claim"}</div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{isKo ? "출금 금액" : "Amount"}</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: C.white }}>{withdrawable.toLocaleString()} pts</span>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{isKo ? "신청 금액" : "Amount"}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: C.white }}>₩{withdrawable.toLocaleString()}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{isKo ? "토스로 송금" : "Send to Toss"}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{tossPhone}</span>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{isKo ? "입금 계좌" : "Account"}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{bankAccount?.bank_name} {bankAccount?.account_number}</span>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => setWithdrawStep(null)}
                   style={{ flex: 1, padding: "10px 0", borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: F, fontSize: 13, cursor: "pointer" }}>
                   {isKo ? "취소" : "Cancel"}
                 </button>
-                <button onClick={handleConfirmWithdraw}
-                  style={{ flex: 2, padding: "10px 0", borderRadius: 8, border: "none", background: "#0064FF", color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
-                  {isKo ? "출금 확인" : "Confirm Withdrawal"}
+                <button onClick={handleClaimAll} disabled={claimingAll}
+                  style={{ flex: 2, padding: "10px 0", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                  {claimingAll ? (isKo ? "신청 중..." : "Submitting...") : (isKo ? "정산 신청" : "Submit Claim")}
                 </button>
               </div>
             </div>
@@ -178,79 +232,60 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
           )}
 
           {withdrawStep === null && (
-            <button onClick={handleWithdrawClick}
+            <button
+              onClick={() => withdrawable > 0 ? (bankAccount ? setWithdrawStep("confirm") : setShowBankSetup(true)) : null}
+              disabled={withdrawable === 0}
               style={{
                 width: "100%", padding: "13px 0", borderRadius: 10,
-                border: "none", cursor: "pointer", fontFamily: F, fontWeight: 700,
-                fontSize: 15,
-                background: tossSaved ? "#0064FF" : "rgba(255,255,255,0.12)",
-                color: C.white,
-                transition: "background 0.15s",
+                border: "none", cursor: withdrawable > 0 ? "pointer" : "not-allowed",
+                fontFamily: F, fontWeight: 700, fontSize: 15,
+                background: withdrawable > 0 ? C.purple : "rgba(255,255,255,0.12)",
+                color: C.white, transition: "background 0.15s",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               }}>
-              {tossSaved ? (
-                <>
-                  <TossIcon size={20} />
-                  {isKo ? `토스로 ${withdrawable.toLocaleString()} pts 출금하기` : `Withdraw ${withdrawable.toLocaleString()} pts via Toss`}
-                </>
-              ) : (isKo ? "토스 계좌 연결하고 출금하기 →" : "Connect Toss to withdraw →")}
+              {withdrawable > 0
+                ? (bankAccount
+                    ? (isKo ? `₩${withdrawable.toLocaleString()} 정산 신청하기 →` : `Claim ₩${withdrawable.toLocaleString()} →`)
+                    : (isKo ? "계좌 등록하고 정산 신청하기 →" : "Register account to claim →"))
+                : (isKo ? "정산 가능한 리워드가 없어요" : "No rewards available")}
             </button>
           )}
 
-          {!tossSaved && (
+          {!bankAccount && withdrawable > 0 && (
             <div style={{ marginTop: 8, fontSize: 11, color: "rgba(255,255,255,0.35)", textAlign: "center" }}>
-              {isKo ? "토스 전화번호를 등록하면 바로 출금할 수 있어요" : "Register your Toss phone number to withdraw instantly"}
+              {isKo ? "계좌를 등록하면 매주 정산돼요" : "Register your bank account for weekly payouts"}
             </div>
           )}
         </div>
 
-        {/* ── Toss Setup Card ── */}
-        {showTossSetup && !tossSaved && (
-          <div style={{ background: C.white, border: `1px solid #0064FF`, borderRadius: 12, padding: "20px 24px", marginBottom: 16, boxShadow: "0 4px 20px rgba(0,100,255,0.12)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              <TossIcon size={36} />
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>{isKo ? "토스 연결하기" : "Connect Toss"}</div>
-                <div style={{ fontSize: 12, color: C.body }}>{isKo ? "리워드를 토스 계좌로 바로 받을 수 있어요" : "Receive rewards directly to your Toss account"}</div>
+        {/* ── Bank Account Setup Card ── */}
+        {showBankSetup && (
+          <div style={{ background: C.white, border: `1.5px solid ${C.purple}`, borderRadius: 12, padding: "20px 24px", marginBottom: 16, boxShadow: "0 4px 20px rgba(83,58,253,0.1)" }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 4 }}>{isKo ? "계좌 등록" : "Register Bank Account"}</div>
+            <div style={{ fontSize: 12, color: C.body, marginBottom: 16 }}>{isKo ? "리워드 정산을 받을 계좌를 등록해 주세요" : "Enter the account to receive reward payouts"}</div>
+            {[
+              { key: "bank_name",       label: isKo ? "은행명" : "Bank",           placeholder: isKo ? "예: 카카오뱅크" : "e.g. Kakao Bank" },
+              { key: "account_number",  label: isKo ? "계좌번호" : "Account No.",   placeholder: "0000-0000-0000" },
+              { key: "account_holder",  label: isKo ? "예금주" : "Account Holder", placeholder: isKo ? "홍길동" : "Full name" },
+            ].map(({ key, label, placeholder }) => (
+              <div key={key} style={{ marginBottom: 10 }}>
+                <label style={{ fontSize: 12, color: C.body, marginBottom: 5, display: "block" }}>{label}</label>
+                <input
+                  value={bankForm[key]}
+                  onChange={e => setBankForm(prev => ({ ...prev, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 7, border: `1px solid ${bankForm[key] ? C.purple : C.border}`, fontSize: 14, fontFamily: F, color: C.navy, outline: "none", background: C.bg }}
+                />
               </div>
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, color: C.body, marginBottom: 6, display: "block" }}>{isKo ? "토스 전화번호" : "Toss Phone Number"}</label>
-              <input
-                type="tel"
-                placeholder="010-0000-0000"
-                value={tossPhone}
-                onChange={e => setTossPhone(formatPhone(e.target.value))}
-                autoFocus
-                style={{
-                  width: "100%", boxSizing: "border-box",
-                  padding: "12px 14px", borderRadius: 8,
-                  border: `1px solid ${tossPhone.length > 0 ? "#0064FF" : C.border}`,
-                  fontSize: 16, fontFamily: F, color: C.navy, outline: "none",
-                  background: C.bg, transition: "border 0.15s",
-                  letterSpacing: "0.5px",
-                }}
-              />
-              <div style={{ fontSize: 11, color: C.body, marginTop: 6 }}>
-                {isKo ? "토스 앱에 등록된 번호로 리워드가 지급돼요" : "Funds will be sent to the number registered in your Toss app"}
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setShowTossSetup(false)}
+            ))}
+            <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+              <button onClick={() => setShowBankSetup(false)}
                 style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontFamily: F, fontSize: 13, cursor: "pointer" }}>
                 {isKo ? "나중에" : "Later"}
               </button>
-              <button
-                onClick={() => { if (tossPhone.replace(/\D/g,"").length === 11) { setTossSaved(true); setShowTossSetup(false); } }}
-                disabled={tossPhone.replace(/\D/g,"").length !== 11}
-                style={{
-                  flex: 2, padding: "11px 0", borderRadius: 8, border: "none",
-                  background: tossPhone.replace(/\D/g,"").length === 11 ? "#0064FF" : C.border,
-                  color: tossPhone.replace(/\D/g,"").length === 11 ? C.white : C.body,
-                  fontFamily: F, fontSize: 14, fontWeight: 700, cursor: tossPhone.replace(/\D/g,"").length === 11 ? "pointer" : "not-allowed",
-                  transition: "background 0.15s",
-                }}>
-                {isKo ? "연결하기" : "Connect"}
+              <button onClick={handleSaveBank} disabled={savingBank || !bankForm.bank_name || !bankForm.account_number || !bankForm.account_holder}
+                style={{ flex: 2, padding: "11px 0", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                {savingBank ? (isKo ? "저장 중..." : "Saving...") : (isKo ? "등록하기" : "Register")}
               </button>
             </div>
           </div>

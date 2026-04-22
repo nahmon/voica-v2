@@ -287,6 +287,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       const payload = {
         title: title.trim(),
         incentive: rewardAmount > 0 ? `₩${rewardAmount.toLocaleString("ko-KR")}` : null,
+        reward_amount: rewardAmount,
         questions: questions.map((q, i) => ({
           id: q.id,
           order_num: i + 1,
@@ -371,7 +372,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             {[0, 1000, 3000, 5000, 10000].map(amt => (
               <button key={amt} onClick={() => {
                 setRewardAmount(amt);
-                if (editingId) supabase.from("interviews").update({ incentive: amt > 0 ? `₩${amt.toLocaleString("ko-KR")}` : null }).eq("id", editingId);
+                if (editingId) supabase.from("interviews").update({ incentive: amt > 0 ? `₩${amt.toLocaleString("ko-KR")}` : null, reward_amount: amt }).eq("id", editingId);
               }}
                 style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${rewardAmount === amt ? C.purple : C.border}`, background: rewardAmount === amt ? C.purpleBg : C.white, color: rewardAmount === amt ? C.purple : C.body, fontSize: 13, fontFamily: F, cursor: "pointer", fontWeight: rewardAmount === amt ? 600 : 400, transition: "all 0.15s" }}>
                 {amt === 0 ? "없음" : amt === 1000 ? "₩1,000" : amt === 3000 ? "₩3,000 ✦" : amt === 5000 ? "₩5,000" : "₩10,000"}
@@ -385,7 +386,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
                 <button key={inc} onClick={() => {
                   const next = rewardAmount + inc;
                   setRewardAmount(next);
-                  if (editingId) supabase.from("interviews").update({ incentive: `₩${next.toLocaleString("ko-KR")}` }).eq("id", editingId);
+                  if (editingId) supabase.from("interviews").update({ incentive: `₩${next.toLocaleString("ko-KR")}`, reward_amount: next }).eq("id", editingId);
                 }}
                   style={{ padding: "3px 9px", borderRadius: 6, border: `1px solid ${C.border}`, background: "transparent", fontSize: 11, color: C.body, cursor: "pointer", fontFamily: F }}>
                   +{inc >= 10000 ? "₩10만" : inc >= 5000 ? "₩5천" : "₩1천"}
@@ -394,7 +395,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               <button onClick={() => {
                   const next = Math.max(0, rewardAmount - 1000);
                   setRewardAmount(next);
-                  if (editingId) supabase.from("interviews").update({ incentive: next > 0 ? `₩${next.toLocaleString("ko-KR")}` : null }).eq("id", editingId);
+                  if (editingId) supabase.from("interviews").update({ incentive: next > 0 ? `₩${next.toLocaleString("ko-KR")}` : null, reward_amount: next }).eq("id", editingId);
                 }}
                 style={{ padding: "3px 9px", borderRadius: 6, border: `1px solid ${C.border}`, background: "transparent", fontSize: 11, color: C.body, cursor: "pointer", fontFamily: F }}>
                 -₩1천

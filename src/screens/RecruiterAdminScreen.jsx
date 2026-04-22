@@ -1,8 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { C, S, F } from "../lib/constants.jsx";
 import { PANEL_APPLICANTS } from "../lib/mockData.js";
-import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { supabase } from "../supabase.js";
 
 function InfoTooltip({ text }) {
   const [show, setShow] = useState(false);
@@ -34,9 +35,44 @@ function InfoTooltip({ text }) {
 export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const [filter, setFilter] = useState("All");
   const [selected, setSelected] = useState(new Set());
+  const [activeTab, setActiveTab] = useState("applicants");
+  const [rewards, setRewards] = useState([]);
+  const [rewardSelected, setRewardSelected] = useState(new Set());
+  const [payingRewards, setPayingRewards] = useState(false);
+  const { showToast } = useToast();
   const isMobile = useIsMobile();
   const filters = ["All", "Applied", "Qualified", "Unqualified", "Completed"];
   const isKo = lang === "ko";
+
+  useEffect(() => {
+    if (activeTab !== "rewards" || !user) return;
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/management?resource=admin-rewards&status=claimed", { headers: { Authorization: `Bearer ${session?.access_token}` } });
+      if (res.ok) { const d = await res.json(); setRewards(d.rewards ?? []); }
+    })();
+  }, [activeTab, user]);
+
+  const handleMarkPaid = async () => {
+    if (rewardSelected.size === 0) return;
+    setPayingRewards(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/management?resource=admin-rewards", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({ rewardIds: [...rewardSelected] }),
+      });
+      if (res.ok) {
+        setRewards(prev => prev.filter(r => !rewardSelected.has(r.id)));
+        setRewardSelected(new Set());
+        showToast(isKo ? "정산 처리 완료" : "Marked as paid", "success");
+      } else {
+        showToast(isKo ? "처리 실패" : "Failed", "error");
+      }
+    } finally { setPayingRewards(false); }
+  };
+
   const statusMap = { "All": "All", "Applied": "Applied", "Qualified": "Qualified", "Unqualified": "Not Qualified", "Completed": "Completed" };
   const statusLabel = {
     "Applied":       isKo ? "검토 중" : "Applied",
@@ -64,7 +100,54 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
         </div>
       </div>
 
+      {/* Tab switcher */}
+      <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 24px", display: "flex", gap: 0 }}>
+        {[["applicants", isKo ? "패널 지원자" : "Applicants"], ["rewards", isKo ? "리워드 정산" : "Rewards"]].map(([tab, label]) => (
+          <button key={tab} onClick={() => setActiveTab(tab)}
+            style={{ padding: "12px 16px", border: "none", background: "none", fontFamily: F, fontSize: 13, fontWeight: activeTab === tab ? 600 : 400, color: activeTab === tab ? C.purple : C.body, borderBottom: activeTab === tab ? `2px solid ${C.purple}` : "2px solid transparent", cursor: "pointer", transition: "color 0.15s" }}>
+            {label}
+            {tab === "rewards" && rewards.length > 0 && <span style={{ marginLeft: 6, fontSize: 10, background: C.ruby, color: "#fff", padding: "1px 5px", borderRadius: 8, fontWeight: 700 }}>{rewards.length}</span>}
+          </button>
+        ))}
+      </div>
+
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px", flex: 1, width: "100%" }}>
+        {activeTab === "rewards" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>{isKo ? "정산 대기 목록" : "Pending Payouts"}</div>
+                <div style={{ fontSize: 13, color: C.body, marginTop: 4 }}>{isKo ? "정산 신청한 참여자 목록이에요. 계좌이체 후 완료 처리하세요." : "Participants who claimed their reward. Mark as paid after bank transfer."}</div>
+              </div>
+              {rewardSelected.size > 0 && (
+                <Btn onClick={handleMarkPaid} disabled={payingRewards}>
+                  {payingRewards ? (isKo ? "처리 중..." : "Processing...") : (isKo ? `${rewardSelected.size}건 지급 완료 처리` : `Mark ${rewardSelected.size} as paid`)}
+                </Btn>
+              )}
+            </div>
+            {rewards.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "60px 0", color: C.body, fontSize: 14 }}>{isKo ? "정산 대기 중인 항목이 없어요" : "No pending payouts"}</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {rewards.map(r => (
+                  <div key={r.id} onClick={() => setRewardSelected(prev => { const s = new Set(prev); s.has(r.id) ? s.delete(r.id) : s.add(r.id); return s; })}
+                    style={{ background: C.white, border: `1.5px solid ${rewardSelected.has(r.id) ? C.purple : C.border}`, borderRadius: 10, padding: "14px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 14, boxShadow: S.ambient }}>
+                    <input type="checkbox" checked={rewardSelected.has(r.id)} readOnly style={{ accentColor: C.purple, width: 16, height: 16, cursor: "pointer", flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>{r.interviews?.title ?? "—"}</div>
+                      <div style={{ fontSize: 12, color: C.body }}>
+                        {r.participant_bank_accounts?.bank_name} {r.participant_bank_accounts?.account_number} · {r.participant_bank_accounts?.account_holder}
+                      </div>
+                      <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>{isKo ? "신청일" : "Claimed"}: {r.claimed_at ? new Date(r.claimed_at).toLocaleDateString("ko-KR") : "—"}</div>
+                    </div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: C.purple }}>₩{r.amount.toLocaleString()}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {activeTab === "applicants" && (<>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 28 }}>
           {[
             { label: "Total applicants", value: PANEL_APPLICANTS.length, color: C.navy },
@@ -195,7 +278,7 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
             );
           })}
         </div>
-        )}
+        )}</>)}
       </main>
       <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>

@@ -10,3 +10,4 @@ harness/.env
 harness/node_modules/
 harness/logs/
 
+.claude/settings.local.json
