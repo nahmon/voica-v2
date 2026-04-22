@@ -10,14 +10,22 @@ const supabase = createClient(
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
+    const token = req.headers.authorization?.replace("Bearer ", "");
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !user) return res.status(401).json({ error: "Unauthorized" });
+
     const { response_id } = req.query;
     if (!response_id) return res.status(400).json({ error: "response_id required" });
 
     const { data: response, error } = await supabase
       .from("responses")
-      .select("id, audio_url")
+      .select("id, audio_url, session:sessions(interview:interviews(user_id))")
       .eq("id", response_id)
       .single();
+
+    if (error || !response) return res.status(404).json({ error: "Response not found" });
+    if (response.session?.interview?.user_id !== user.id) return res.status(403).json({ error: "Forbidden" });
 
     if (error || !response) return res.status(404).json({ error: "Response not found" });
     if (!response.audio_url) return res.status(404).json({ error: "No audio for this response" });

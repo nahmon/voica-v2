@@ -92,7 +92,10 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       return;
     }
     try {
-      const res = await fetch(`/api/storage?response_id=${responseId}`);
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`/api/storage?response_id=${responseId}`, {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
       if (!res.ok) return;
       const { audio_url } = await res.json();
       if (audioRef.current) audioRef.current.pause();

@@ -371,7 +371,11 @@ export default function InterviewScreen({ go, shareCode }) {
       setTtsReadFallback(false);
     } else {
       // Complete session
-      if (sessionId) fetch("/api/survey?resource=session", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, status: "completed" }) });
+      if (sessionId) {
+        try {
+          await fetch("/api/survey?resource=session", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, status: "completed" }) });
+        } catch {}
+      }
       if (shareCode) localStorage.removeItem(`voica_session_${shareCode}`);
       track("interview_completed", { shareCode, sessionId, total: interview.questions.length });
       setCompleted(true);

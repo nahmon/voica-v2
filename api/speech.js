@@ -70,7 +70,14 @@ export default async function handler(req, res) {
     try { body = await parseJsonBody(req); } catch { return res.status(400).json({ error: "Invalid JSON" }); }
 
     const { text, question_id } = body;
-    if (!text || !question_id) return res.status(400).json({ error: "text and question_id required" });
+    if (!text) return res.status(400).json({ error: "text required" });
+
+    // No question_id = bridge phrase, skip cache
+    if (!question_id) {
+      const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "nova", input: text });
+      const buffer = Buffer.from(await mp3.arrayBuffer());
+      return res.status(200).json({ url: `data:audio/mpeg;base64,${buffer.toString("base64")}` });
+    }
 
     const { data: q } = await supabase
       .from("questions")
