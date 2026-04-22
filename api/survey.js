@@ -43,7 +43,7 @@ export default async function handler(req, res) {
 
       const { data: session } = await supabase
         .from("sessions")
-        .select("id, interview_id")
+        .select("id, interview_id, interviews(reward_amount)")
         .eq("id", session_id)
         .single();
       if (!session) return res.status(404).json({ error: "Session not found" });
@@ -57,6 +57,21 @@ export default async function handler(req, res) {
         .eq("id", session_id);
 
       if (error) return res.status(500).json({ error: "세션 업데이트에 실패했습니다." });
+
+      // Auto-create reward record when interview has reward_amount set
+      if (status === "completed") {
+        const rewardAmount = session.interviews?.reward_amount ?? 0;
+        if (rewardAmount > 0) {
+          await supabase.from("participant_rewards").upsert({
+            session_id,
+            interview_id: session.interview_id,
+            amount: rewardAmount,
+            currency: "KRW",
+            status: "pending",
+          }, { onConflict: "session_id", ignoreDuplicates: true });
+        }
+      }
+
       return res.status(200).json({ ok: true });
     }
 
@@ -89,14 +104,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid question for this session" });
     }
 
-    const { error } = await supabase.from("responses").insert({
+    const { error } = await supabase.from("responses").upsert({
       session_id,
       question_id,
       type,
       value: value ?? null,
       audio_url: audio_url ?? null,
       transcript: transcript ?? null,
-    });
+    }, { onConflict: "session_id,question_id", ignoreDuplicates: false });
 
     if (error) return res.status(500).json({ error: "응답 저장에 실패했습니다." });
     return res.status(201).json({ ok: true });

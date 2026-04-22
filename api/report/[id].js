@@ -55,6 +55,15 @@ export default async function handler(req, res) {
       .single();
     if (!interview) return res.status(404).json({ error: "Interview not found" });
 
+    // Idempotency: return existing generating report if already in progress
+    const { data: existing } = await supabase
+      .from("reports")
+      .select("id, status")
+      .eq("interview_id", id)
+      .eq("status", "generating")
+      .maybeSingle();
+    if (existing) return res.status(409).json({ error: "Report generation already in progress", report_id: existing.id });
+
     // Create pending report record
     const { data: report, error: reportErr } = await supabase
       .from("reports")

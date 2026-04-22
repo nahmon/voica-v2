@@ -21,6 +21,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "paymentKey, orderId, amount required" });
     }
 
+    const VALID_AMOUNTS = { monthly: 199000, yearly: 1908000 };
+    const expectedAmount = VALID_AMOUNTS[billingCycle];
+    if (!expectedAmount || Number(amount) !== expectedAmount) {
+      return res.status(400).json({ error: "Invalid payment amount" });
+    }
+
     const basicAuth = Buffer.from(`${TOSS_SECRET_KEY}:`).toString("base64");
     let tossData;
     try {
@@ -111,6 +117,51 @@ export default async function handler(req, res) {
     }
 
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  // Toss webhook: subscription cancellation / payment failure events
+  if (resource === "webhook") {
+    if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+    // Toss signs webhooks with secret — verify header
+    const webhookSecret = process.env.TOSS_WEBHOOK_SECRET;
+    if (webhookSecret) {
+      const sig = req.headers["toss-payments-signature"];
+      if (!sig || sig !== webhookSecret) return res.status(401).json({ error: "Invalid signature" });
+    }
+
+    const { eventType, data } = req.body ?? {};
+    if (!eventType || !data) return res.status(400).json({ error: "Invalid webhook payload" });
+
+    // Handle cancellation / expiry
+    if (eventType === "PAYMENT_STATUS_CHANGED") {
+      const { orderId, status } = data;
+      if (!orderId) return res.status(200).json({ ok: true });
+
+      if (["CANCELED", "ABORTED", "EXPIRED"].includes(status)) {
+        // Look up user_id from payment record
+        const { data: payment } = await supabase
+          .from("subscription_payments")
+          .select("user_id")
+          .eq("toss_order_id", orderId)
+          .maybeSingle();
+
+        await supabase
+          .from("subscription_payments")
+          .update({ status: "cancelled" })
+          .eq("toss_order_id", orderId);
+
+        if (payment?.user_id) {
+          await supabase
+            .from("subscriptions")
+            .update({ status: "cancelled", updated_at: new Date().toISOString() })
+            .eq("user_id", payment.user_id)
+            .eq("status", "active");
+        }
+      }
+    }
+
+    return res.status(200).json({ ok: true });
   }
 
   return res.status(400).json({ error: "resource required" });

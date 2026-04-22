@@ -39,8 +39,8 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST" && action === "reward-claim") {
-    const { rewardId } = req.body;
-    if (!rewardId) return res.status(400).json({ error: "rewardId required" });
+    const { rewardId, sessionId } = req.body;
+    if (!rewardId || !sessionId) return res.status(400).json({ error: "rewardId and sessionId required" });
 
     const { data: account } = await supabase
       .from("participant_bank_accounts")
@@ -49,12 +49,21 @@ export default async function handler(req, res) {
       .maybeSingle();
     if (!account) return res.status(400).json({ error: "계좌를 먼저 등록해 주세요" });
 
+    // Verify reward belongs to this session (ownership proof without pre-auth)
+    const { data: reward } = await supabase
+      .from("participant_rewards")
+      .select("id, user_id, status")
+      .eq("id", rewardId)
+      .eq("session_id", sessionId)
+      .maybeSingle();
+    if (!reward) return res.status(404).json({ error: "보상을 찾을 수 없습니다" });
+    if (reward.status !== "pending") return res.status(400).json({ error: "이미 신청된 보상입니다" });
+    if (reward.user_id && reward.user_id !== user.id) return res.status(403).json({ error: "Forbidden" });
+
     const { error } = await supabase
       .from("participant_rewards")
-      .update({ status: "claimed", claimed_at: new Date().toISOString() })
-      .eq("id", rewardId)
-      .eq("user_id", user.id)
-      .eq("status", "pending");
+      .update({ user_id: user.id, status: "claimed", claimed_at: new Date().toISOString() })
+      .eq("id", rewardId);
 
     if (error) return res.status(500).json({ error: "정산 신청 실패" });
     return res.status(200).json({ ok: true });
