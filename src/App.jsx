@@ -1,9 +1,25 @@
-import { Suspense, lazy, useState, useEffect } from "react";
+import { Suspense, lazy, useState, useEffect, Component } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation } from "react-router-dom";
 import { supabase } from "./supabase.js";
 import { C, F } from "./lib/constants.jsx";
 import { ToastProvider, useToast } from "./components/shared.jsx";
 import OnboardingModal from "./components/OnboardingModal.jsx";
+
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 32, fontFamily: "monospace", color: "#c00" }}>
+          <strong>Render error:</strong> {this.state.error?.message}<br />
+          <pre style={{ fontSize: 11, marginTop: 8, whiteSpace: "pre-wrap" }}>{this.state.error?.stack}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const LandingScreen        = lazy(() => import("./screens/LandingScreen.jsx"));
 const RoleSelectScreen     = lazy(() => import("./screens/RoleSelectScreen.jsx"));
@@ -138,6 +154,7 @@ function AppRoutes() {
     {showOnboarding && user && (
       <OnboardingModal user={user} go={go} onComplete={() => setShowOnboarding(false)} />
     )}
+    <ErrorBoundary>
     <Suspense fallback={null}>
       <Routes>
         <Route path="/"              element={<LandingScreen {...common} />} />
@@ -166,6 +183,7 @@ function AppRoutes() {
         <Route path="*"              element={<LandingScreen {...common} />} />
       </Routes>
     </Suspense>
+    </ErrorBoundary>
     </>
   );
 }
