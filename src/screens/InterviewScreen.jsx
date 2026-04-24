@@ -21,6 +21,8 @@ const BRIDGE_PHRASES = [
   "잘 들었습니다.",
 ];
 
+const isVoiceType = (type) => type === "voice" || type === "creative" || type === "prototype";
+
 function extractYoutubeId(url) {
   const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/);
   return m ? m[1] : null;
@@ -29,7 +31,7 @@ function extractYoutubeId(url) {
 // Estimate total interview duration in seconds
 function estimateDuration(questions) {
   return questions.reduce((sum, q) => {
-    if (q.type === "voice") return sum + 45;
+    if (isVoiceType(q.type)) return sum + 45;
     if (q.type === "multiple_choice") return sum + 10;
     if (q.type === "likert") return sum + 8;
     return sum + 20;
@@ -190,8 +192,8 @@ export default function InterviewScreen({ go, shareCode }) {
         if (url && !cancelled) {
           const audio = new Audio(url);
           audioRef.current = audio;
-          audio.onended = () => { if (!cancelled) { setTtsBlocked(false); setPhase(q.type === "voice" ? "ready" : q.type); } };
-          audio.onerror = () => { if (!cancelled) { setTtsReadFallback(true); setPhase(q.type === "voice" ? "ready" : q.type); } };
+          audio.onended = () => { if (!cancelled) { setTtsBlocked(false); setPhase(isVoiceType(q.type) ? "ready" : q.type); } };
+          audio.onerror = () => { if (!cancelled) { setTtsReadFallback(true); setPhase(isVoiceType(q.type) ? "ready" : q.type); } };
           try {
             await audio.play();
             setTtsBlocked(false);
@@ -324,7 +326,7 @@ export default function InterviewScreen({ go, shareCode }) {
         const d = await res.json();
         setSessionId(d.session_id);
         // Go to warmup if there's at least one voice question
-        const hasVoice = interview?.questions?.some(q => q.type === "voice");
+        const hasVoice = interview?.questions?.some(q => isVoiceType(q.type));
         setIntroStep(hasVoice ? "warmup" : "started");
         track("interview_info_submitted", { shareCode, sessionId: d.session_id });
       } else {
@@ -1051,6 +1053,14 @@ export default function InterviewScreen({ go, shareCode }) {
                   <video src={q.stimulus.url} controls style={{ width: "100%", maxHeight: 220, display: "block", background: "#000" }} />
                 );
               })()}
+              {q.stimulus.type === "figma" && (
+                <iframe
+                  src={`https://www.figma.com/embed?embed_host=voicesurvey&url=${encodeURIComponent(q.stimulus.url)}`}
+                  style={{ width: "100%", height: isMobile ? 260 : 360, border: "none", display: "block" }}
+                  allowFullScreen
+                  title={q.stimulus.label || "prototype"}
+                />
+              )}
               {q.stimulus.type === "url" && (
                 <a href={q.stimulus.url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", background: "rgba(255,255,255,0.05)", textDecoration: "none" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -1087,7 +1097,7 @@ export default function InterviewScreen({ go, shareCode }) {
           )}
 
           {/* Voice controls */}
-          {q.type === "voice" && (
+          {isVoiceType(q.type) && (
             <div style={{ minHeight: (phase === "ready" || phase === "recording") ? 160 : 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
               {phase === "ai_speaking" && ttsBlocked && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1095,14 +1105,14 @@ export default function InterviewScreen({ go, shareCode }) {
                     setTtsBlocked(false);
                     if (audioRef.current) {
                       try { await audioRef.current.play(); }
-                      catch { setPhase(q.type === "voice" ? "ready" : q.type); }
+                      catch { setPhase(isVoiceType(q.type) ? "ready" : q.type); }
                     } else {
-                      setPhase(q.type === "voice" ? "ready" : q.type);
+                      setPhase(isVoiceType(q.type) ? "ready" : q.type);
                     }
                   }} style={{ padding: "10px 16px", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
                     🔊 소리 켜고 다시 듣기
                   </button>
-                  <button onClick={() => { setTtsReadFallback(true); setPhase(q.type === "voice" ? "ready" : q.type); }}
+                  <button onClick={() => { setTtsReadFallback(true); setPhase(isVoiceType(q.type) ? "ready" : q.type); }}
                     style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, cursor: "pointer", fontFamily: F, padding: "8px 14px" }}>
                     📖 질문 읽고 계속하기
                   </button>

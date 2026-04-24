@@ -10,6 +10,8 @@ function newQ(type = "voice") {
   const id = Math.random().toString(36).slice(2, 10);
   if (type === "multiple_choice") return { id, type, content: "", options: ["", "", ""] };
   if (type === "likert") return { id, type, content: "", options: { min: 1, max: 5, labels: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"] } };
+  if (type === "creative") return { id, type, content: "아래 광고 소재를 보신 후, 첫 인상을 자유롭게 말씀해 주세요.", stimulus: null };
+  if (type === "prototype") return { id, type, content: "아래 화면을 살펴보신 후, 사용하면서 느낀 점을 말씀해 주세요.", stimulus: null };
   return { id, type, content: "" };
 }
 
@@ -40,9 +42,11 @@ const MAX_Q_CHARS = 200;
 
 // Question type definitions with icons and descriptions
 const Q_TYPES = [
-  { type: "voice",           icon: "🎙", label: "음성 답변",   desc: "참여자가 자유롭게 음성으로 답변해요" },
-  { type: "multiple_choice", icon: "☑",  label: "객관식",     desc: "미리 정해진 보기 중 하나를 선택해요" },
-  { type: "likert",          icon: "📊", label: "평가 척도",  desc: "1~5점 척도로 평가해요" },
+  { type: "voice",           icon: "🎙", label: "음성 답변",      desc: "참여자가 자유롭게 음성으로 답변해요" },
+  { type: "creative",        icon: "🖼", label: "광고 소재 반응",  desc: "이미지·영상 시안을 보여주고 음성 반응을 수집해요" },
+  { type: "prototype",       icon: "📱", label: "UI/UX 조사",    desc: "Figma 또는 프로토타입 링크를 보여주고 음성 피드백을 받아요" },
+  { type: "multiple_choice", icon: "☑",  label: "객관식",        desc: "미리 정해진 보기 중 하나를 선택해요" },
+  { type: "likert",          icon: "📊", label: "평가 척도",     desc: "1~5점 척도로 평가해요" },
 ];
 
 export default function EditorScreen({ go, user, logout, interviewId }) {
@@ -350,8 +354,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const typeLabel = { voice: "음성", multiple_choice: "객관식", likert: "평가" };
-  const typeVariant = { voice: "purple", multiple_choice: "success", likert: "warning" };
+  const typeLabel = { voice: "음성", creative: "광고", prototype: "UX", multiple_choice: "객관식", likert: "평가" };
+  const typeVariant = { voice: "purple", creative: "purple", prototype: "purple", multiple_choice: "success", likert: "warning" };
 
   // ─── Overlays (share success + incomplete warning) ───
   const shareUrl = shareCode ? `${window.location.origin}/i/${shareCode}` : null;
@@ -954,6 +958,72 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
               onChange={e => updateQ(idx, { options: { ...q.options, max: Number(e.target.value) } })}
               style={{ width: 48, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", textAlign: "center" }} />
           </div>
+        </div>
+      )}
+
+      {/* Creative: image/video stimulus (required) */}
+      {q.type === "creative" && (
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ fontSize: 11, fontWeight: 500, color: C.navy, display: "block", marginBottom: 6 }}>광고 소재 <span style={{ color: C.ruby }}>*</span></label>
+          {q.stimulus?.url ? (
+            <div>
+              {q.stimulus.type === "image" && <img src={q.stimulus.url} alt="" style={{ width: "100%", maxHeight: 140, objectFit: "contain", borderRadius: 6, background: "#f5f5f5", marginBottom: 6, display: "block" }} />}
+              {q.stimulus.type === "video" && (() => {
+                const ytId = q.stimulus.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/)?.[1];
+                return ytId ? (
+                  <div style={{ position: "relative", paddingBottom: "30%", height: 0, marginBottom: 6, borderRadius: 6, overflow: "hidden" }}>
+                    <iframe src={`https://www.youtube.com/embed/${ytId}`} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }} allowFullScreen />
+                  </div>
+                ) : <video src={q.stimulus.url} controls style={{ width: "100%", maxHeight: 120, borderRadius: 6, marginBottom: 6, display: "block" }} />;
+              })()}
+              <div style={{ display: "flex", gap: 6 }}>
+                <input value={q.stimulus.label ?? ""} onChange={e => updateQ(idx, { stimulus: { ...q.stimulus, label: e.target.value } })} placeholder="소재 설명 (선택)" style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }} />
+                <button onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
+              </div>
+            </div>
+          ) : (
+            <input value="" onChange={e => {
+              const url = e.target.value.trim();
+              if (!url) return;
+              const type = /youtube\.com|youtu\.be/.test(url) ? "video" : /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url) ? "image" : "video";
+              updateQ(idx, { stimulus: { type, url, label: "" } });
+            }} placeholder="이미지 URL 또는 유튜브 링크 붙여넣기" style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: `2px dashed ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box", background: C.bg }} />
+          )}
+        </div>
+      )}
+
+      {/* Prototype: Figma / URL embed (required) */}
+      {q.type === "prototype" && (
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ fontSize: 11, fontWeight: 500, color: C.navy, display: "block", marginBottom: 4 }}>프로토타입 링크 <span style={{ color: C.ruby }}>*</span></label>
+          <div style={{ fontSize: 10, color: C.body, marginBottom: 6 }}>Figma 공유 링크, 프로토타입 URL, 이미지 등 모두 가능해요</div>
+          {q.stimulus?.url ? (
+            <div>
+              {q.stimulus.type === "figma" && (
+                <div style={{ borderRadius: 6, overflow: "hidden", marginBottom: 6, border: `1px solid ${C.border}` }}>
+                  <iframe src={`https://www.figma.com/embed?embed_host=voicesurvey&url=${encodeURIComponent(q.stimulus.url)}`} style={{ width: "100%", height: 160, border: "none", display: "block" }} allowFullScreen />
+                </div>
+              )}
+              {q.stimulus.type === "image" && <img src={q.stimulus.url} alt="" style={{ width: "100%", maxHeight: 120, objectFit: "contain", borderRadius: 6, background: "#f5f5f5", marginBottom: 6, display: "block" }} />}
+              {(q.stimulus.type === "url") && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 10px", borderRadius: 6, background: C.bg, border: `1px solid ${C.border}`, marginBottom: 6 }}>
+                  <span style={{ fontSize: 14 }}>🔗</span>
+                  <span style={{ flex: 1, fontSize: 11, color: C.body, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{q.stimulus.url}</span>
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 6 }}>
+                <input value={q.stimulus.label ?? ""} onChange={e => updateQ(idx, { stimulus: { ...q.stimulus, label: e.target.value } })} placeholder="화면 설명 (예: 온보딩 1단계)" style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }} />
+                <button onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
+              </div>
+            </div>
+          ) : (
+            <input value="" onChange={e => {
+              const url = e.target.value.trim();
+              if (!url) return;
+              const type = /figma\.com/.test(url) ? "figma" : /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url) ? "image" : "url";
+              updateQ(idx, { stimulus: { type, url, label: "" } });
+            }} placeholder="Figma 공유 링크 또는 프로토타입 URL" style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: `2px dashed ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box", background: C.bg }} />
+          )}
         </div>
       )}
 
