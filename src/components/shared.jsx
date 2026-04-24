@@ -350,27 +350,27 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
 
 // ─── VoC Carousel ───
 const VOC_LIST = [
-  { quote: "Recruiting participants and coordinating schedules used to take at least a week for a single user interview. With Voice Survey, I had results from 100 interviews in a single day — and the report quality exceeded my expectations.", name: "James K.", title: "Senior Manager", company: "**Electronics MX Marketing Team", photo: "/profiles/male-1.png" },
-  { quote: "Running one focus group used to cost hundreds of thousands of dollars. Voice Survey is a fraction of the cost and delivers results far faster. I think qualitative research will never be the same.", name: "Jennifer K.", title: "Brand Manager", company: "LG** Health Brand Strategy Team", photo: "/profiles/female-1.png" },
+  { quote: "Recruiting participants and coordinating schedules used to take at least a week for a single user interview. With Voice Survey, I had results from 100 interviews in a single day — and the report quality exceeded my expectations.", name: "James K.", title: "Senior Manager", company: "** Electronics MX Marketing Team" },
+  { quote: "Running one focus group used to cost hundreds of thousands of dollars. Voice Survey is a fraction of the cost and delivers results far faster. I think qualitative research will never be the same.", name: "Jennifer K.", title: "Brand Manager", company: "** Health Brand Strategy Team" },
   { quote: "We needed consumer reactions within two weeks before a product launch. Voice Survey gave us analysis from 200 interviews in just three days. Our decision-making speed has completely changed.", name: "Patrick S.", title: "PM", company: "**kao Product Planning Team" },
   { quote: "We ran 500 simultaneous interviews for a fraction of what an agency would charge. The quality was on par with traditional methods and the AI report was outstanding.", name: "Paul H.", title: "Product Marketing Manager", company: "**aver Marketing Team" },
-  { quote: "I was skeptical that AI could conduct real interviews, but when I read the transcripts, users were opening up naturally. Without a human interviewer watching them, the answers were far more candid.", name: "Christine Y.", title: "UX Researcher", company: "**aver UX Research Lab", photo: "/profiles/female-2.png" },
+  { quote: "I was skeptical that AI could conduct real interviews, but when I read the transcripts, users were opening up naturally. Without a human interviewer watching them, the answers were far more candid.", name: "Christine Y.", title: "UX Researcher", company: "**aver UX Research Lab" },
   { quote: "Participating as a panelist was incredibly easy and the reward arrived immediately. A voice interview felt much more natural than filling out a survey form.", name: "Sarah L.", title: "Freelance Panelist", company: "Individual Participant" },
   { quote: "Before our global expansion, we needed to interview target users domestically. After setting our demographic filters, the right panelists were assembled quickly and we had the report within three business days.", name: "Justin C.", title: "Head of Business Development", company: "**s New Business Team" },
-  { quote: "Usability tests we used to run quarterly are now a monthly practice. Lower cost and time barriers mean we actually use research data in decision-making far more often.", name: "Hannah S.", title: "Service Planner", company: "**Motors Connected Car Team", photo: "/profiles/female-3.png" },
+  { quote: "Usability tests we used to run quarterly are now a monthly practice. Lower cost and time barriers mean we actually use research data in decision-making far more often.", name: "Hannah S.", title: "Service Planner", company: "**Motors Connected Car Team" },
   { quote: "Costs dropped 80% compared to an external research agency, and results came in twice as fast. Automatic theme clustering and sentiment analysis eliminated almost all manual analysis time.", name: "Owen M.", title: "Marketing Director", company: "**ang Growth Marketing Division" },
 ];
 
 const VOC_LIST_KO = [
-  { quote: "솔직히 처음엔 반신반의했어요. AI가 인터뷰를 제대로 할 수 있을까 싶었는데, 결과물 보고 생각이 완전히 바뀌었어요. 인터뷰어 없으니까 오히려 응답이 더 솔직하더라고요.", name: "김민준", title: "마케팅팀장", company: "**전자 MX사업부", photo: "/profiles/male-1.png" },
-  { quote: "분기에 한 번 하던 사용성 테스트를 이제 매달 해요. 예전엔 섭외부터 진행까지 3주 걸렸는데, 지금은 필터 설정하고 이틀이면 리포트가 나와요.", name: "박지은", title: "UX 리서처", company: "**카카오 서비스디자인팀", photo: "/profiles/female-1.png" },
-  { quote: "출시 2주 전에 급하게 유저 의견이 필요했는데, 72시간 만에 200명 분석 리포트를 받았어요. 타이밍이 딱 맞아서 런칭 결정에 바로 반영했습니다.", name: "이승우", title: "프로덕트 매니저", company: "**라인 신규사업팀" },
-  { quote: "외부 대행사 맡기면 견적부터 두 달이에요. 보이스서베이는 당일 세팅하고 다음날 결과 보고 있었어요. 비용도 10분의 1도 안 됐고요.", name: "최유나", title: "브랜드 전략 매니저", company: "LG** 뷰티 마케팅팀", photo: "/profiles/female-2.png" },
-  { quote: "설문은 답하다가 지쳐서 대충 클릭하게 되는데, 음성 인터뷰는 그냥 대화하는 느낌이라 훨씬 편했어요. 포인트도 바로 적립되고요.", name: "정다현", title: "프리랜서 인터뷰 패널", company: "개인 참여자", photo: "/profiles/female-3.png" },
-  { quote: "글로벌 진출 전에 국내 타깃 인터뷰가 필요했어요. 조건 필터 설정하니까 원하는 페르소나가 빠르게 모였고, 3영업일 만에 인사이트 정리된 리포트 받았습니다.", name: "강현석", title: "사업개발 총괄", company: "**s 신사업팀" },
-  { quote: "대행사 비용의 20%로 더 큰 표본을 뽑을 수 있다는 게 아직도 신기해요. 주제별로 자동 클러스터링이 돼서 나오니까 분석 시간도 확 줄었어요.", name: "오수빈", title: "서비스 기획자", company: "**모터스 디지털서비스팀", photo: "/profiles/female-4.png" },
-  { quote: "처음엔 정성조사를 AI가 할 수 있다는 게 믿기지 않았는데, 실제로 써보니 응답 깊이가 생각보다 훨씬 깊었어요. 팀에서 지금 정기적으로 활용하고 있어요.", name: "한지원", title: "마케팅 디렉터", company: "**앙 그로스마케팅팀" },
-  { quote: "동시에 500명 인터뷰가 가능하다는 건 기존 방식으론 상상도 못 했어요. 비용 대비 퀄리티가 너무 좋아서 이제 리서치 안 하는 게 더 이상하게 느껴져요.", name: "임채원", title: "제품 마케팅 매니저", company: "**에이버 마케팅실" },
+  { quote: "솔직히 처음엔 반신반의했어요. AI가 인터뷰를 제대로 할 수 있을까 싶었는데, 결과물 보고 생각이 완전히 바뀌었어요. 인터뷰어 없으니까 오히려 응답이 더 솔직하더라고요.", name: "김민준", title: "마케팅팀장", company: "** 전자 MX사업부" },
+  { quote: "분기에 한 번 하던 사용성 테스트를 이제 매달 해요. 예전엔 섭외부터 진행까지 3주 걸렸는데, 지금은 필터 설정하고 이틀이면 리포트가 나와요.", name: "박지은", title: "UX 리서처", company: "** 서비스디자인팀" },
+  { quote: "출시 2주 전에 급하게 유저 의견이 필요했는데, 72시간 만에 200명 분석 리포트를 받았어요. 타이밍이 딱 맞아서 런칭 결정에 바로 반영했습니다.", name: "이승우", title: "프로덕트 매니저", company: "** 신규사업팀" },
+  { quote: "외부 대행사 맡기면 견적부터 두 달이에요. 보이스서베이는 당일 세팅하고 다음날 결과 보고 있었어요. 비용도 10분의 1도 안 됐고요.", name: "최유나", title: "브랜드 전략 매니저", company: "** 뷰티 마케팅팀" },
+  { quote: "설문은 답하다가 지쳐서 대충 클릭하게 되는데, 음성 인터뷰는 그냥 대화하는 느낌이라 훨씬 편했어요. 포인트도 바로 적립되고요.", name: "정다현", title: "프리랜서 인터뷰 패널", company: "개인 참여자" },
+  { quote: "글로벌 진출 전에 국내 타깃 인터뷰가 필요했어요. 조건 필터 설정하니까 원하는 페르소나가 빠르게 모였고, 3영업일 만에 인사이트 정리된 리포트 받았습니다.", name: "강현석", title: "사업개발 총괄", company: "** 신사업팀" },
+  { quote: "대행사 비용의 20%로 더 큰 표본을 뽑을 수 있다는 게 아직도 신기해요. 주제별로 자동 클러스터링이 돼서 나오니까 분석 시간도 확 줄었어요.", name: "오수빈", title: "서비스 기획자", company: "** 디지털서비스팀" },
+  { quote: "처음엔 정성조사를 AI가 할 수 있다는 게 믿기지 않았는데, 실제로 써보니 응답 깊이가 생각보다 훨씬 깊었어요. 팀에서 지금 정기적으로 활용하고 있어요.", name: "한지원", title: "마케팅 디렉터", company: "** 그로스마케팅팀" },
+  { quote: "동시에 500명 인터뷰가 가능하다는 건 기존 방식으론 상상도 못 했어요. 비용 대비 퀄리티가 너무 좋아서 이제 리서치 안 하는 게 더 이상하게 느껴져요.", name: "임채원", title: "제품 마케팅 매니저", company: "** 마케팅실" },
 ];
 
 export function VoCCarousel({ lang = "en" }) {
@@ -407,10 +407,7 @@ export function VoCCarousel({ lang = "en" }) {
                 <div style={{ flex: 1, background: C.white, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 40px", border: `1px solid ${C.border}`, minHeight: 260, display: "flex", flexDirection: "column" }}>
                   <p style={{ margin: "0 0 24px", fontSize: isMobile ? 14 : 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px", flex: 1 }}>"{v.quote}"</p>
                   <div style={{ display: "flex", alignItems: "center", gap: 16, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
-                    {v.photo
-                      ? <img src={v.photo} alt={v.name} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} onError={e => { e.currentTarget.style.display = "none"; }} />
-                      : <div style={{ width: 48, height: 48, borderRadius: "50%", background: `rgba(83,58,253,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: C.purple, fontWeight: 700, flexShrink: 0 }}>{v.name[0]}</div>
-                    }
+                    <div style={{ width: 48, height: 48, borderRadius: "50%", background: `rgba(83,58,253,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: C.purple, fontWeight: 700, flexShrink: 0 }}>{v.name[0]}</div>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}>{v.name}</div>
                       <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", marginTop: 2, letterSpacing: "0.16px" }}>{v.title} · {v.company}</div>
