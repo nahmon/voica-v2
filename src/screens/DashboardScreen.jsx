@@ -293,7 +293,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                       onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.body; }}
                     >
                       {Ic.Users({ s: 11 })}
-                      {isKo ? "팀원" : "Team"}
+                      {isKo ? "팀원 초대" : "Invite"}
                     </button>
                   </div>
                 </div>
