@@ -71,7 +71,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [addTypeOpen, setAddTypeOpen] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
-  const [showIncompleteWarn, setShowIncompleteWarn] = useState(false);
+
   const [dragOver, setDragOver] = useState(null);
   const [stimuliDragId, setStimuliDragId] = useState(null);
   const [stimuliUploading, setStimuliUploading] = useState({});
@@ -302,7 +302,6 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   };
 
   const doSave = async () => {
-    setShowIncompleteWarn(false);
     setSaving(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -353,8 +352,6 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const handleSave = () => {
     if (!title.trim()) { showToast("인터뷰 제목을 입력해주세요", "error"); return; }
     if (questions.some(q => !q.content.trim())) { showToast("모든 질문 내용을 입력해주세요", "error"); return; }
-    if (questions.length > 10) { showToast("질문은 최대 10개까지 추가할 수 있어요", "error"); return; }
-    if (questions.length < 10) { setShowIncompleteWarn(true); return; }
     doSave();
   };
 
@@ -454,24 +451,6 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     </div>
   );
 
-  const IncompleteWarnOverlay = showIncompleteWarn && (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ background: C.white, borderRadius: 16, padding: "32px 32px 28px", maxWidth: 400, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.18) 0px 30px 60px -12px" }}>
-        <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 22 }}>✏️</div>
-        <div style={{ fontSize: 18, fontWeight: 600, color: C.navy, marginBottom: 8 }}>인터뷰가 아직 완성되지 않았어요</div>
-        <div style={{ fontSize: 13, color: C.body, marginBottom: 6, lineHeight: 1.65 }}>
-          현재 질문이 <strong style={{ color: C.navy }}>{questions.length}개</strong> 있어요.
-        </div>
-        <div style={{ fontSize: 13, color: C.body, marginBottom: 28, lineHeight: 1.65 }}>
-          의미 있는 인사이트를 얻으려면 질문이 10개 이상 있어야 해요. 계속 작성할까요?
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Btn full variant="ghost" onClick={() => setShowIncompleteWarn(false)}>계속 작성</Btn>
-          <Btn full onClick={doSave} style={{ background: "#f59e0b", border: "none" }}>그냥 공개하기</Btn>
-        </div>
-      </div>
-    </div>
-  );
 
   const AiModal = showAiModal && (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
@@ -597,7 +576,6 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   if (isMobile) return (
     <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>
       {ShareOverlay}
-      {IncompleteWarnOverlay}
       {AiModal}
       {NavBar}
       {ShareLinkBar}
@@ -672,7 +650,6 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         }
       `}</style>
       {ShareOverlay}
-      {IncompleteWarnOverlay}
       {AiModal}
       {NavBar}
       {ShareLinkBar}

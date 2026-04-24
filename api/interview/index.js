@@ -115,7 +115,10 @@ export default async function handler(req, res) {
     .select()
     .single();
 
-  if (ivError) return res.status(500).json({ error: "인터뷰 생성에 실패했습니다." });
+  if (ivError) {
+    console.error("[interview] insert error:", ivError.code, ivError.message, ivError.details);
+    return res.status(500).json({ error: "인터뷰 생성에 실패했습니다." });
+  }
 
   // Insert questions if provided
   if (questions.length > 0) {
@@ -129,7 +132,10 @@ export default async function handler(req, res) {
       followup_enabled: q.followup_enabled !== false,
     }));
     const { data: insertedQs, error: qError } = await supabase.from("questions").insert(rows).select("id, type, content");
-    if (qError) return res.status(500).json({ error: qError.message });
+    if (qError) {
+      console.error("[interview] questions insert error:", qError.code, qError.message, qError.details);
+      return res.status(500).json({ error: qError.message });
+    }
     // Pre-generate TTS for all voice questions so participants hear audio immediately
     if (insertedQs?.length) await prewarmTts(supabase, insertedQs);
   }
