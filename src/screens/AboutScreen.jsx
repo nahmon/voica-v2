@@ -51,7 +51,7 @@ export default function AboutScreen({ go, user, logout, lang = "ko", onLangChang
           <div style={{ fontSize: 14, color: C.body, marginBottom: 24, lineHeight: 1.7 }}>
             {isKo ? "voicesurvey와 함께 리서치의 미래를 만들어갈 분을 찾고 있어요." : "We're looking for people to help shape the future of research."}
           </div>
-          <a href="mailto:20morn@gmail.com" style={{ textDecoration: "none" }}>
+          <a href="mailto:voica.support@gmail.com" style={{ textDecoration: "none" }}>
             <Btn>{isKo ? "팀에 합류하고 싶어요 →" : "Join our team →"}</Btn>
           </a>
           <div style={{ marginTop: 28, paddingTop: 20, borderTop: `1px solid ${C.border}`, display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>

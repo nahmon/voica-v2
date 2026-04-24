@@ -27,7 +27,7 @@ export default function SupportScreen({ go, user, logout, lang = "ko", onLangCha
             </div>
             <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 10 }}>{isKo ? "메시지를 받았습니다!" : "Message received!"}</div>
             <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 28 }}>
-              {isKo ? <>이메일로 1~2 영업일 내에 답변드려요.<br />급한 문의는 <span style={{ color: C.purple }}>support@voicesurvey.app</span> 으로 직접 연락해 주세요.</> : <>We'll reply to your email within 1–2 business days.<br />For urgent matters, reach us directly at <span style={{ color: C.purple }}>support@voicesurvey.app</span></>}
+              {isKo ? <>이메일로 1~2 영업일 내에 답변드려요.<br />급한 문의는 <span style={{ color: C.purple }}>voica.support@gmail.com</span> 으로 직접 연락해 주세요.</> : <>We'll reply to your email within 1–2 business days.<br />For urgent matters, reach us directly at <span style={{ color: C.purple }}>voica.support@gmail.com</span></>}
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
               <Btn onClick={() => go(user ? "dashboard" : "landing")}>{isKo ? (user ? "대시보드로 돌아가기" : "홈으로 돌아가기") : (user ? "Back to dashboard" : "Back to home")}</Btn>
@@ -109,7 +109,7 @@ export default function SupportScreen({ go, user, logout, lang = "ko", onLangCha
             </Btn>
 
             <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 12, lineHeight: 1.6 }}>
-              {isKo ? "직접 이메일로도 문의하실 수 있어요:" : "Or email us directly:"} <a href="mailto:support@voicesurvey.app" style={{ color: C.purple }}>support@voicesurvey.app</a>
+              {isKo ? "직접 이메일로도 문의하실 수 있어요:" : "Or email us directly:"} <a href="mailto:voica.support@gmail.com" style={{ color: C.purple }}>voica.support@gmail.com</a>
             </div>
           </div>
         </div>
