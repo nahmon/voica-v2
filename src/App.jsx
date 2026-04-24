@@ -109,7 +109,7 @@ function AppRoutes() {
         }
       }
       setAuthLoading(false);
-    });
+    }).catch(() => setAuthLoading(false));
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       if (event !== "SIGNED_IN") return;
