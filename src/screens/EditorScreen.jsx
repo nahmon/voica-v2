@@ -126,7 +126,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           if (iv.share_code) setShareCode(iv.share_code);
         }
         if (qs && qs.length > 0) {
-          const loaded = qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options }));
+          const loaded = qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options, stimulus: q.stimulus }));
           setQuestions(loaded);
           setSavedQuestions(loaded);
           setSelectedIdx(0);
@@ -294,6 +294,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           type: q.type,
           content: q.content,
           options: q.options ?? null,
+          stimulus: q.stimulus ?? null,
         })),
       };
       if (editingId) payload.id = editingId;
@@ -784,6 +785,35 @@ function PreviewCard({ q, idx, total, updateQ }) {
           <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,0.25)" }}>Q{idx + 1}/{total}</span>
         </div>
 
+        {/* Stimulus (image / video / url) */}
+        {q?.stimulus?.url && (() => {
+          const { type, url, label } = q.stimulus;
+          if (type === "image") {
+            return <img src={url} alt={label || "자료"} style={{ width: "100%", maxHeight: 160, objectFit: "cover", borderRadius: 8, marginBottom: 12 }} />;
+          }
+          if (type === "video") {
+            const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+            const videoId = ytMatch?.[1];
+            if (!videoId) return null;
+            return (
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}`}
+                style={{ width: "100%", height: 160, borderRadius: 8, border: "none", marginBottom: 12 }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            );
+          }
+          // type === "url"
+          return (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)", marginBottom: 12 }}>
+              <span style={{ fontSize: 16 }}>🔗</span>
+              <span style={{ flex: 1, fontSize: 12, color: "rgba(255,255,255,0.7)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label || url}</span>
+              <a href={url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "#b9b9f9", textDecoration: "none", flexShrink: 0 }}>↗ 열기</a>
+            </div>
+          );
+        })()}
+
         {/* Question text — editable textarea or static */}
         {editable ? (
           <textarea
@@ -925,6 +955,58 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
           </div>
         </div>
       )}
+
+      {/* Stimulus attachment */}
+      <div style={{ marginBottom: 14 }}>
+        <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>자료 첨부 (선택)</label>
+        {q.stimulus?.url ? (
+          <div>
+            {/* Preview */}
+            {q.stimulus.type === "image" && (
+              <img src={q.stimulus.url} alt={q.stimulus.label || "미리보기"} style={{ width: "100%", maxHeight: 100, objectFit: "cover", borderRadius: 6, marginBottom: 6 }} />
+            )}
+            {q.stimulus.type === "video" && (() => {
+              const ytMatch = q.stimulus.url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+              const videoId = ytMatch?.[1];
+              return videoId ? (
+                <div style={{ position: "relative", paddingBottom: "30%", height: 0, marginBottom: 6, borderRadius: 6, overflow: "hidden" }}>
+                  <iframe src={`https://www.youtube.com/embed/${videoId}`} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }} allowFullScreen />
+                </div>
+              ) : null;
+            })()}
+            {q.stimulus.type === "url" && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 6, border: `1px solid ${C.border}`, background: C.bg, marginBottom: 6 }}>
+                <span style={{ fontSize: 13 }}>🔗</span>
+                <span style={{ flex: 1, fontSize: 11, color: C.body, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{q.stimulus.label || q.stimulus.url}</span>
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <input
+                value={q.stimulus.label ?? ""}
+                onChange={e => updateQ(idx, { stimulus: { ...q.stimulus, label: e.target.value } })}
+                placeholder="자료 설명 (선택)"
+                style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box" }}
+              />
+              <button onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
+            </div>
+          </div>
+        ) : (
+          <input
+            value=""
+            onChange={e => {
+              const url = e.target.value.trim();
+              if (!url) return;
+              let type = "url";
+              if (/youtube\.com|youtu\.be/.test(url)) type = "video";
+              else if (/figma\.com/.test(url)) type = "url";
+              else if (/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)) type = "image";
+              updateQ(idx, { stimulus: { type, url, label: "" } });
+            }}
+            placeholder="이미지 URL, 유튜브, Figma 링크 등"
+            style={{ width: "100%", padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box" }}
+          />
+        )}
+      </div>
     </div>
   );
 }
