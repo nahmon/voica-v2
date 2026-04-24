@@ -42,11 +42,11 @@ const MAX_Q_CHARS = 200;
 
 // Question type definitions with icons and descriptions
 const Q_TYPES = [
-  { type: "voice",           icon: "🎙", label: "음성 답변",      desc: "참여자가 자유롭게 음성으로 답변해요" },
-  { type: "creative",        icon: "🖼", label: "광고 소재 반응",  desc: "이미지·영상 시안을 보여주고 음성 반응을 수집해요" },
-  { type: "prototype",       icon: "📱", label: "UI/UX 조사",    desc: "Figma 또는 프로토타입 링크를 보여주고 음성 피드백을 받아요" },
-  { type: "multiple_choice", icon: "☑",  label: "객관식",        desc: "미리 정해진 보기 중 하나를 선택해요" },
-  { type: "likert",          icon: "📊", label: "평가 척도",     desc: "1~5점 척도로 평가해요" },
+  { type: "voice",           icon: Ic.Mic({s:15}),      label: "음성 답변",      desc: "참여자가 자유롭게 음성으로 답변해요" },
+  { type: "creative",        icon: Ic.Image({s:15}),    label: "광고 소재 반응",  desc: "이미지·영상 시안을 보여주고 음성 반응을 수집해요" },
+  { type: "prototype",       icon: Ic.Phone({s:15}),    label: "UI/UX 조사",    desc: "Figma 또는 프로토타입 링크를 보여주고 음성 피드백을 받아요" },
+  { type: "multiple_choice", icon: Ic.Check({s:15}),    label: "객관식",        desc: "미리 정해진 보기 중 하나를 선택해요" },
+  { type: "likert",          icon: Ic.BarChart({s:15}), label: "평가 척도",     desc: "1~5점 척도로 평가해요" },
 ];
 
 export default function EditorScreen({ go, user, logout, interviewId }) {
@@ -639,8 +639,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 100 }}>
               {Q_TYPES.map(({ type, icon, label }) => (
                 <div key={type} onClick={() => addQuestion(type)}
-                  style={{ padding: "10px 16px", fontSize: 13, color: C.navy, cursor: "pointer", whiteSpace: "nowrap", borderBottom: `1px solid ${C.border}` }}>
-                  {icon} {label}
+                  style={{ padding: "10px 16px", fontSize: 13, color: C.navy, cursor: "pointer", whiteSpace: "nowrap", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 7 }}>
+                  {icon}{label}
                 </div>
               ))}
             </div>
@@ -691,7 +691,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
                     style={{ padding: "10px 14px", cursor: "pointer", borderBottom: `1px solid ${C.border}` }}
                     onMouseEnter={e => e.currentTarget.style.background = C.bg}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    <div style={{ fontSize: 13, color: C.navy, fontWeight: 500, marginBottom: 2 }}>{icon} {label}</div>
+                    <div style={{ fontSize: 13, color: C.navy, fontWeight: 500, marginBottom: 2, display: "flex", alignItems: "center", gap: 7 }}>{icon}{label}</div>
                     <div style={{ fontSize: 11, color: C.body }}>{desc}</div>
                   </div>
                 ))}

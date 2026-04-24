@@ -27,6 +27,7 @@ export const F = `'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif`;
 // ─── Icon System — Stripe-style line icons ───
 export const Ic = {
   Mic:       (p={}) => <svg width={p.s||20} height={p.s||20} viewBox="0 0 20 20" fill="none" stroke={p.c||"currentColor"} strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="1" width="6" height="11" rx="3"/><path d="M3.5 10a6.5 6.5 0 0013 0"/><line x1="10" y1="16.5" x2="10" y2="19"/><line x1="7" y1="19" x2="13" y2="19"/></svg>,
+  Image:     (p={}) => <svg width={p.s||20} height={p.s||20} viewBox="0 0 20 20" fill="none" stroke={p.c||"currentColor"} strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round"><rect x="1.5" y="3.5" width="17" height="13" rx="2"/><circle cx="6.5" cy="8" r="1.5"/><path d="M1.5 14.5l4.5-4.5 3 3 2.5-3 4.5 4.5"/></svg>,
   Stop:      (p={}) => <svg width={p.s||20} height={p.s||20} viewBox="0 0 20 20" fill={p.c||"currentColor"}><rect x="4" y="4" width="12" height="12" rx="2.5"/></svg>,
   Target:    (p={}) => <svg width={p.s||20} height={p.s||20} viewBox="0 0 20 20" fill="none" stroke={p.c||"currentColor"} strokeWidth="1.65" strokeLinecap="round"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="10" r="4"/><circle cx="10" cy="10" r="1.5" fill={p.c||"currentColor"} stroke="none"/></svg>,
   Pencil:    (p={}) => <svg width={p.s||20} height={p.s||20} viewBox="0 0 20 20" fill="none" stroke={p.c||"currentColor"} strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 3.5l2 2L7 15H5v-2L14.5 3.5z"/></svg>,
