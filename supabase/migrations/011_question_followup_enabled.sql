@@ -1,0 +1,1 @@
+ALTER TABLE questions ADD COLUMN IF NOT EXISTS followup_enabled BOOLEAN NOT NULL DEFAULT true;

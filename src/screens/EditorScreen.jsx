@@ -126,7 +126,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           if (iv.share_code) setShareCode(iv.share_code);
         }
         if (qs && qs.length > 0) {
-          const loaded = qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options, stimulus: q.stimulus }));
+          const loaded = qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options, stimulus: q.stimulus, followup_enabled: q.followup_enabled !== false }));
           setQuestions(loaded);
           setSavedQuestions(loaded);
           setSelectedIdx(0);
@@ -295,6 +295,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           content: q.content,
           options: q.options ?? null,
           stimulus: q.stimulus ?? null,
+          followup_enabled: q.followup_enabled !== false,
         })),
       };
       if (editingId) payload.id = editingId;
@@ -953,6 +954,21 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
               onChange={e => updateQ(idx, { options: { ...q.options, max: Number(e.target.value) } })}
               style={{ width: 48, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", textAlign: "center" }} />
           </div>
+        </div>
+      )}
+
+      {/* Follow-up toggle (voice only) */}
+      {q.type === "voice" && (
+        <div style={{ marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 500, color: C.navy, marginBottom: 2 }}>AI 후속 질문</div>
+            <div style={{ fontSize: 10, color: C.body }}>답변 내용을 바탕으로 AI가 자동으로 추가 질문해요</div>
+          </div>
+          <button
+            onClick={() => updateQ(idx, { followup_enabled: q.followup_enabled === false ? true : false })}
+            style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: q.followup_enabled === false ? C.border : C.purple, position: "relative", flexShrink: 0, transition: "background 0.2s" }}>
+            <span style={{ position: "absolute", top: 2, left: q.followup_enabled === false ? 2 : 20, width: 18, height: 18, borderRadius: "50%", background: "white", transition: "left 0.2s", display: "block" }} />
+          </button>
         </div>
       )}
 

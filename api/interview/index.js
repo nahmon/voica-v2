@@ -73,7 +73,7 @@ export default async function handler(req, res) {
     for (const q of incomingWithDbId) {
       await supabase.from("questions").update({
         order_num: questions.indexOf(q) + 1,
-        type: q.type, content: q.content, options: q.options ?? null, stimulus: q.stimulus ?? null,
+        type: q.type, content: q.content, options: q.options ?? null, stimulus: q.stimulus ?? null, followup_enabled: q.followup_enabled !== false,
       }).eq("id", q.id);
     }
     if (incomingNew.length > 0) {
@@ -81,7 +81,7 @@ export default async function handler(req, res) {
         incomingNew.map(q => ({
           interview_id: id,
           order_num: questions.indexOf(q) + 1,
-          type: q.type, content: q.content, options: q.options ?? null, stimulus: q.stimulus ?? null,
+          type: q.type, content: q.content, options: q.options ?? null, stimulus: q.stimulus ?? null, followup_enabled: q.followup_enabled !== false,
         }))
       ).select("id, type, content");
       if (newQs?.length) prewarmTts(supabase, newQs);
@@ -126,6 +126,7 @@ export default async function handler(req, res) {
       content: q.content,
       options: q.options ?? null,
       stimulus: q.stimulus ?? null,
+      followup_enabled: q.followup_enabled !== false,
     }));
     const { data: insertedQs, error: qError } = await supabase.from("questions").insert(rows).select("id, type, content");
     if (qError) return res.status(500).json({ error: qError.message });

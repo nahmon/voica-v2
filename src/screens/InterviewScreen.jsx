@@ -565,8 +565,8 @@ export default function InterviewScreen({ go, shareCode }) {
         return;
       }
 
-      // Main answer — fetch follow-up while bridge TTS plays
-      const followupFetchPromise = fetch("/api/followup", {
+      // Main answer — fetch follow-up while bridge TTS plays (if enabled)
+      const followupFetchPromise = q.followup_enabled !== false ? fetch("/api/followup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -575,7 +575,7 @@ export default function InterviewScreen({ go, shareCode }) {
           interview_title: interview.title,
           session_id: sessionId,
         }),
-      }).then(r => r.ok ? r.json() : null).catch(() => null);
+      }).then(r => r.ok ? r.json() : null).catch(() => null) : Promise.resolve(null);
 
       await playBridgeTts();
       const followupData = await followupFetchPromise;
