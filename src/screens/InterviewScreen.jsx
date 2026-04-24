@@ -815,7 +815,7 @@ export default function InterviewScreen({ go, shareCode }) {
               <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>· 선택</span>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              {["남성", "여성", "기타"].map(g => (
+              {["남성", "여성"].map(g => (
                 <button key={g} onClick={() => setRespondent(r => ({ ...r, gender: g }))}
                   style={{ flex: 1, padding: "11px 8px", borderRadius: 10, border: `1px solid ${respondent.gender === g ? C.purple : "rgba(255,255,255,0.08)"}`, background: respondent.gender === g ? "rgba(83,58,253,0.18)" : "rgba(255,255,255,0.04)", color: respondent.gender === g ? "#fff" : "rgba(255,255,255,0.45)", fontSize: 13, cursor: "pointer", fontFamily: F, fontWeight: respondent.gender === g ? 500 : 400 }}>
                   {g}
