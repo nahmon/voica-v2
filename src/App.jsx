@@ -8,8 +8,19 @@ import OnboardingModal from "./components/OnboardingModal.jsx";
 class ErrorBoundary extends Component {
   constructor(props) { super(props); this.state = { error: null }; }
   static getDerivedStateFromError(error) { return { error }; }
+  componentDidCatch(error) {
+    // Stale chunk after new deploy — reload to get fresh assets
+    if (error?.message?.includes("Failed to fetch dynamically imported module") ||
+        error?.message?.includes("Importing a module script failed") ||
+        error?.message?.includes("Loading chunk")) {
+      window.location.reload();
+    }
+  }
   render() {
     if (this.state.error) {
+      const isChunkError = this.state.error?.message?.includes("Failed to fetch dynamically imported module") ||
+        this.state.error?.message?.includes("Importing a module script failed");
+      if (isChunkError) return null; // reloading
       return (
         <div style={{ padding: 32, fontFamily: "monospace", color: "#c00" }}>
           <strong>Render error:</strong> {this.state.error?.message}<br />

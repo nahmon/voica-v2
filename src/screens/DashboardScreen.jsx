@@ -274,28 +274,28 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                 onClick={() => { markAsSeen(p.id, sessionCount); go(p.status === "closed" ? "report" : sessionCount > 0 ? "responses" : "editor", p.id); }}
                 style={{ background: C.white, borderRadius: 16, padding: isMobile ? "16px" : "20px 24px", border: "1px solid rgba(110,75,255,0.10)", cursor: "pointer" }}>
                 {/* Title + status */}
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
-                  <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 6 }}>
+                  <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                     <span style={{ fontFamily: "monospace", fontSize: 11, color: C.body, letterSpacing: "0.04em", opacity: 0.6, flexShrink: 0 }}>VCS-{String(interviews.findIndex(i => i.id === p.id) + 1).padStart(3, "0")}</span>
                     <span style={{ fontSize: 15, fontWeight: 500, color: C.navy, fontFeatureSettings: '"ss01"', flex: 1, minWidth: 0 }}>{p.title}</span>
                     {newResponses > 0 && (
-                      <span style={{ fontSize: 11, fontWeight: 600, color: C.white, background: C.ruby, borderRadius: 20, padding: "2px 8px", letterSpacing: "0.1px" }}>{isKo ? `${newResponses}개의 새 응답` : `${newResponses} new response${newResponses !== 1 ? "s" : ""}`}</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: C.white, background: C.ruby, borderRadius: 20, padding: "2px 8px", letterSpacing: "0.1px", flexShrink: 0 }}>{isKo ? `${newResponses}개의 새 응답` : `${newResponses} new response${newResponses !== 1 ? "s" : ""}`}</span>
                     )}
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 20, background: "rgba(0,0,0,0.04)" }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 20, background: "rgba(0,0,0,0.04)", flexShrink: 0 }}>
                       <span style={{ width: 6, height: 6, borderRadius: "50%", background: st.dot, display: "inline-block", flexShrink: 0 }} />
                       <span style={{ fontSize: 11, color: C.body, fontWeight: 500 }}>{label}</span>
                     </span>
+                    {/* Team invite button — inline with badges */}
+                    <button
+                      onClick={e => { e.stopPropagation(); setMembersModal({ id: p.id, title: p.title }); }}
+                      style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 20, border: `1px solid ${C.border}`, background: "transparent", cursor: "pointer", color: C.body, fontSize: 11, fontWeight: 500, fontFamily: F, transition: "all 0.15s", lineHeight: 1.4 }}
+                      onMouseEnter={e => { e.currentTarget.style.background = C.purpleBg; e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.color = C.purple; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.body; }}
+                    >
+                      {Ic.Users({ s: 11 })}
+                      {isKo ? "팀원" : "Team"}
+                    </button>
                   </div>
-                  {/* Team invite icon button */}
-                  <button
-                    title={isKo ? "팀원 초대" : "Invite members"}
-                    onClick={e => { e.stopPropagation(); setMembersModal({ id: p.id, title: p.title }); }}
-                    style={{ flexShrink: 0, width: 28, height: 28, borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.body, transition: "all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = C.purpleBg; e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.color = C.purple; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.body; }}
-                  >
-                    {Ic.Users({ s: 14 })}
-                  </button>
                 </div>
                 <div style={{ fontSize: 12, color: C.body, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
                   <span>{isKo ? `질문 ${questionCount}개` : `${questionCount} question${questionCount !== 1 ? "s" : ""}`}</span>
