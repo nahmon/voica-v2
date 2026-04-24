@@ -51,7 +51,8 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
         .select(`
           id, title, status, share_code, created_at,
           questions(count),
-          sessions(count)
+          sessions(count),
+          interview_members(count)
         `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -264,6 +265,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
           {filteredInterviews.map(p => {
             const sessionCount = p.sessions?.[0]?.count ?? 0;
             const questionCount = p.questions?.[0]?.count ?? 0;
+            const memberCount = p.interview_members?.[0]?.count ?? 0;
             const label = statusLabel[p.status] ?? p.status;
             const st = statusStyle[label] ?? { variant: "neutral", dot: C.body };
             const seenCount = parseInt(localStorage.getItem(`voica_seen_${p.id}`) ?? "0", 10);
@@ -301,6 +303,15 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                   <span>{isKo ? `질문 ${questionCount}개` : `${questionCount} question${questionCount !== 1 ? "s" : ""}`}</span>
                   <span style={{ color: C.border }}>·</span>
                   <span>{timeAgo(p.created_at, isKo)}</span>
+                  {memberCount > 0 && (
+                    <>
+                      <span style={{ color: C.border }}>·</span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: C.purple, fontWeight: 500 }}>
+                        {Ic.Users({ s: 11, c: C.purple })}
+                        {isKo ? `팀원 ${memberCount}명` : `${memberCount} member${memberCount !== 1 ? "s" : ""}`}
+                      </span>
+                    </>
+                  )}
                 </div>
                 {/* Response count */}
                 <div style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
