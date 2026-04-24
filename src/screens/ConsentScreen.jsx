@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { supabase } from "../supabase.js";
 
 const STEPS = ["Overview", "Consent", "Start"];
 
@@ -116,10 +117,94 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
   const [agreed3, setAgreed3] = useState(false);
   const [open, setOpen] = useState(null);
   const [faqOpen, setFaqOpen] = useState(null);
+  const [expertGate, setExpertGate] = useState(null); // null=loading, false=no gate, true=gated
+  const [userExpertStatus, setUserExpertStatus] = useState("none");
+
+  useEffect(() => {
+    if (!shareCode) { setExpertGate(false); return; }
+    (async () => {
+      try {
+        const r = await fetch(`/api/survey?resource=interview&code=${shareCode}`);
+        const data = r.ok ? await r.json() : null;
+        if (!data?.expert_only) { setExpertGate(false); return; }
+        // expert_only interview — check user status
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        if (!token) { setExpertGate(true); setUserExpertStatus("none"); return; }
+        const pr = await fetch("/api/expert-verify", { headers: { Authorization: `Bearer ${token}` } });
+        const profile = pr.ok ? await pr.json() : { expert_status: "none" };
+        setUserExpertStatus(profile.expert_status ?? "none");
+        setExpertGate(profile.expert_status !== "verified");
+      } catch {
+        setExpertGate(false);
+      }
+    })();
+  }, [shareCode]);
 
   const allRequired = agreed1 && agreed2;
 
   const toggle = (k) => setOpen(p => p === k ? null : k);
+
+  // Expert gate loading
+  if (expertGate === null) {
+    return (
+      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
+        <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ fontSize: 13, color: C.body }}>확인 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Expert gate screen
+  if (expertGate === true) {
+    const statusInfo = {
+      pending:  { label: "심사 중",   color: "#92650a",     bg: "rgba(251,191,36,0.12)", msg: "심사 중입니다. 보통 1-3 영업일 내 결과를 알려드려요." },
+      rejected: { label: "심사 반려", color: C.ruby,         bg: "rgba(217,48,37,0.08)", msg: "심사가 반려됐어요. 다시 신청하거나 고객 지원에 문의해 주세요." },
+      none:     { label: "인증 필요", color: C.body,         bg: C.bg,                   msg: null },
+    };
+    const si = statusInfo[userExpertStatus] ?? statusInfo.none;
+    return (
+      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
+        <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
+        <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
+          <div style={{ width: "100%", maxWidth: 480, textAlign: "center" }}>
+            <div style={{ width: 64, height: 64, borderRadius: "50%", background: C.purpleBg, border: `1.5px solid ${C.purpleLight}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.purple} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
+              </svg>
+            </div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, marginBottom: 10 }}>전문가 패널 전용 인터뷰입니다</div>
+            <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 20 }}>
+              이 인터뷰는 전문가 인증을 완료한 패널 회원만 참여할 수 있어요.
+            </div>
+            {userExpertStatus !== "none" && (
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 20, background: si.bg, color: si.color, fontSize: 13, fontWeight: 600, marginBottom: 16, border: `1px solid ${si.color}33` }}>
+                {si.label}
+              </div>
+            )}
+            {si.msg && (
+              <div style={{ fontSize: 13, color: C.body, background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px", marginBottom: 20, lineHeight: 1.65 }}>
+                {si.msg}
+              </div>
+            )}
+            {userExpertStatus !== "pending" && (
+              <Btn full size="lg" onClick={() => go("expert_verify")}>
+                전문가 인증 신청하기 →
+              </Btn>
+            )}
+            <div style={{ marginTop: 12 }}>
+              <button onClick={() => go("panel_board")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: C.body, fontFamily: F, textDecoration: "underline" }}>
+                다른 인터뷰 둘러보기
+              </button>
+            </div>
+          </div>
+        </div>
+        <Footer go={go} lang={lang} onLangChange={onLangChange} />
+      </div>
+    );
+  }
 
   const REQUIRED = [
     {

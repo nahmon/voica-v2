@@ -80,18 +80,22 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
 
   const warnings = 0;
 
-  // Load bank account and rewards
+  const [expertStatus, setExpertStatus] = useState("none");
+
+  // Load bank account, rewards, and expert status
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-      const [bankRes, rewardRes] = await Promise.all([
+      const [bankRes, rewardRes, expertRes] = await Promise.all([
         fetch("/api/participant", { headers: { Authorization: `Bearer ${token}` } }),
         supabase.from("participant_rewards").select("id, session_id, amount, status, claimed_at, paid_at, interviews(title)").eq("user_id", user.id).order("created_at", { ascending: false }),
+        fetch("/api/expert-verify", { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       if (bankRes.ok) { const d = await bankRes.json(); setBankAccount(d.account); }
       if (!rewardRes.error) setRewards(rewardRes.data ?? []);
+      if (expertRes.ok) { const d = await expertRes.json(); setExpertStatus(d.expert_status ?? "none"); }
     })();
   }, [user]);
 
@@ -288,6 +292,34 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
                 {savingBank ? (isKo ? "저장 중..." : "Saving...") : (isKo ? "등록하기" : "Register")}
               </button>
             </div>
+          </div>
+        )}
+
+        {/* ── Expert status ── */}
+        {expertStatus === "verified" ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, background: C.successBg, border: `1px solid ${C.successBorder}`, borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
+            <span style={{ fontSize: 16 }}>🏅</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.successText }}>{isKo ? "전문가 인증 완료" : "Expert Verified"}</div>
+              <div style={{ fontSize: 11, color: C.successText, opacity: 0.8, marginTop: 1 }}>{isKo ? "전문가 전용 인터뷰에 참여할 수 있어요" : "You can join expert-only interviews"}</div>
+            </div>
+          </div>
+        ) : expertStatus === "pending" ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.4)", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
+            <span style={{ fontSize: 16 }}>⏳</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#92650a" }}>{isKo ? "전문가 인증 심사 중" : "Expert Review Pending"}</div>
+              <div style={{ fontSize: 11, color: "#92650a", opacity: 0.8, marginTop: 1 }}>{isKo ? "보통 1-3 영업일 내 결과를 알려드려요" : "Usually 1–3 business days"}</div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
+            <span style={{ fontSize: 16 }}>🔓</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: C.navy }}>{isKo ? "전문가 인증을 받아보세요" : "Get expert verified"}</div>
+              <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{isKo ? "더 많은 인터뷰와 높은 보상을 받을 수 있어요" : "Access more interviews and higher rewards"}</div>
+            </div>
+            <Btn size="sm" onClick={() => go("expert_verify")}>{isKo ? "신청하기" : "Apply"}</Btn>
           </div>
         )}
 

@@ -9,6 +9,19 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: "Too many requests. Please try again later." });
   }
 
+  // Interview meta fetch (GET) — used by ConsentScreen to check expert_only
+  if (resource === "interview" && req.method === "GET") {
+    const { code } = req.query;
+    if (!code) return res.status(400).json({ error: "code required" });
+    const { data, error } = await supabase
+      .from("interviews")
+      .select("id, title, expert_only, status")
+      .eq("share_code", code)
+      .single();
+    if (error || !data) return res.status(404).json({ error: "Interview not found" });
+    return res.status(200).json({ id: data.id, title: data.title, expert_only: data.expert_only ?? false, status: data.status });
+  }
+
   // Session create (POST) and update (PATCH)
   if (resource === "session") {
     if (req.method === "POST") {

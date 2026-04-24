@@ -54,6 +54,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   // Restore draft from localStorage only when creating new (no interviewId)
   const savedDraft = !interviewId ? (() => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; } })() : null;
   const [title, setTitle] = useState(savedDraft?.title ?? "");
+  const [expertOnly, setExpertOnly] = useState(false);
   const [incentive, setIncentive] = useState(savedDraft?.incentive ?? "");
   const [rewardAmount, setRewardAmount] = useState(() => {
     const m = (savedDraft?.incentive ?? "").match(/(\d[\d,]*)/);
@@ -117,7 +118,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     (async () => {
       try {
         const [{ data: iv }, { data: qs }] = await Promise.all([
-          supabase.from("interviews").select("id, title, incentive, share_code").eq("id", interviewId).single(),
+          supabase.from("interviews").select("id, title, incentive, share_code, expert_only").eq("id", interviewId).single(),
           supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
         ]);
         if (iv) {
@@ -128,6 +129,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           const rwMatch = (iv.incentive ?? "").match(/(\d[\d,]*)/);
           if (rwMatch) setRewardAmount(parseInt(rwMatch[1].replace(/,/g, "")));
           if (iv.share_code) setShareCode(iv.share_code);
+          setExpertOnly(iv.expert_only ?? false);
         }
         if (qs && qs.length > 0) {
           const loaded = qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options, stimulus: q.stimulus, followup_enabled: q.followup_enabled !== false }));
@@ -290,6 +292,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       const token = session?.access_token;
       const payload = {
         title: title.trim(),
+        expert_only: expertOnly,
         incentive: rewardAmount > 0 ? `₩${rewardAmount.toLocaleString("ko-KR")}` : null,
         reward_amount: rewardAmount,
         questions: questions.map((q, i) => ({
@@ -589,6 +592,18 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           placeholder="인터뷰 제목을 입력하세요"
           style={{ width: "100%", border: "none", outline: "none", fontSize: 18, fontFamily: F, fontWeight: 600, color: C.navy, background: "transparent", boxSizing: "border-box" }}
         />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10, padding: "10px 12px", borderRadius: 8, border: `1px solid ${expertOnly ? "rgba(110,75,255,0.3)" : C.border}`, background: expertOnly ? C.purpleBg : "transparent" }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: C.navy }}>전문가 패널 전용</div>
+            <div style={{ fontSize: 10, color: C.body, marginTop: 1 }}>전문가 인증 완료 회원만 참여</div>
+          </div>
+          <button
+            onClick={() => setExpertOnly(v => !v)}
+            style={{ width: 38, height: 20, borderRadius: 10, border: "none", cursor: "pointer", background: expertOnly ? C.purple : C.border, position: "relative", flexShrink: 0, transition: "background 0.2s" }}
+          >
+            <span style={{ position: "absolute", top: 2, left: expertOnly ? 18 : 2, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s", display: "block" }} />
+          </button>
+        </div>
       </div>
       {/* Question tabs */}
       <div style={{ display: "flex", gap: 6, padding: "10px 16px", overflowX: "auto", background: C.white, borderBottom: `1px solid ${C.border}` }}>
@@ -738,6 +753,19 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               onFocus={e => e.target.style.borderBottomColor = C.purple}
               onBlur={e => e.target.style.borderBottomColor = title ? C.purple : C.border}
             />
+            {/* Expert-only toggle */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 14, padding: "12px 14px", borderRadius: 8, border: `1px solid ${expertOnly ? "rgba(110,75,255,0.3)" : C.border}`, background: expertOnly ? C.purpleBg : "transparent", transition: "all 0.15s" }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: C.navy }}>전문가 패널 전용</div>
+                <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>전문가 인증을 완료한 패널 회원만 참여할 수 있어요</div>
+              </div>
+              <button
+                onClick={() => setExpertOnly(v => !v)}
+                style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: expertOnly ? C.purple : C.border, position: "relative", flexShrink: 0, transition: "background 0.2s" }}
+              >
+                <span style={{ position: "absolute", top: 2, left: expertOnly ? 20 : 2, width: 18, height: 18, borderRadius: "50%", background: "white", transition: "left 0.2s", display: "block" }} />
+              </button>
+            </div>
           </div>
 
           {/* Preview card */}

@@ -39,6 +39,9 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
   const [rewards, setRewards] = useState([]);
   const [rewardSelected, setRewardSelected] = useState(new Set());
   const [payingRewards, setPayingRewards] = useState(false);
+  const [expertVerifications, setExpertVerifications] = useState([]);
+  const [expertLoading, setExpertLoading] = useState(false);
+  const [expertActioning, setExpertActioning] = useState(null); // user_id being actioned
   const { showToast } = useToast();
   const isMobile = useIsMobile();
   const filters = ["All", "Applied", "Qualified", "Unqualified", "Completed"];
@@ -52,6 +55,36 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
       if (res.ok) { const d = await res.json(); setRewards(d.rewards ?? []); }
     })();
   }, [activeTab, user]);
+
+  useEffect(() => {
+    if (activeTab !== "expert_verify" || !user) return;
+    setExpertLoading(true);
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch("/api/expert-verify?admin=true", { headers: { Authorization: `Bearer ${session?.access_token}` } });
+        if (res.ok) { const d = await res.json(); setExpertVerifications(d.verifications ?? []); }
+      } finally { setExpertLoading(false); }
+    })();
+  }, [activeTab, user]);
+
+  const handleExpertAction = async (userId, status) => {
+    setExpertActioning(userId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/expert-verify", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({ user_id: userId, status }),
+      });
+      if (res.ok) {
+        setExpertVerifications(prev => prev.filter(v => v.id !== userId));
+        showToast(status === "verified" ? (isKo ? "승인됐어요" : "Approved") : (isKo ? "반려됐어요" : "Rejected"), "success");
+      } else {
+        showToast(isKo ? "처리 실패" : "Failed", "error");
+      }
+    } finally { setExpertActioning(null); }
+  };
 
   const handleMarkPaid = async () => {
     if (rewardSelected.size === 0) return;
@@ -102,7 +135,11 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
 
       {/* Tab switcher */}
       <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 24px", display: "flex", gap: 0 }}>
-        {[["applicants", isKo ? "패널 지원자" : "Applicants"], ["rewards", isKo ? "리워드 정산" : "Rewards"]].map(([tab, label]) => (
+        {[
+          ["applicants", isKo ? "패널 지원자" : "Applicants"],
+          ["rewards", isKo ? "리워드 정산" : "Rewards"],
+          ["expert_verify", isKo ? "전문가 인증 심사" : "Expert Verification"],
+        ].map(([tab, label]) => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             style={{ padding: "12px 16px", border: "none", background: "none", fontFamily: F, fontSize: 13, fontWeight: activeTab === tab ? 600 : 400, color: activeTab === tab ? C.purple : C.body, borderBottom: activeTab === tab ? `2px solid ${C.purple}` : "2px solid transparent", cursor: "pointer", transition: "color 0.15s" }}>
             {label}
@@ -112,6 +149,57 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
       </div>
 
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px", flex: 1, width: "100%" }}>
+        {activeTab === "expert_verify" && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>{isKo ? "전문가 인증 심사" : "Expert Verification Review"}</div>
+              <div style={{ fontSize: 13, color: C.body, marginTop: 4 }}>{isKo ? "심사 대기 중인 전문가 인증 신청 목록이에요." : "Pending expert verification requests."}</div>
+            </div>
+            {expertLoading ? (
+              <div style={{ textAlign: "center", padding: "60px 0", color: C.body, fontSize: 14 }}>{isKo ? "불러오는 중…" : "Loading…"}</div>
+            ) : expertVerifications.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "60px 0", color: C.body, fontSize: 14 }}>{isKo ? "심사 대기 중인 신청이 없어요" : "No pending verifications"}</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {expertVerifications.map(v => (
+                  <div key={v.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 16 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 4 }}>{v.id}</div>
+                      <div style={{ fontSize: 12, color: C.body, marginBottom: 4 }}>
+                        {isKo ? "방법" : "Method"}: <span style={{ fontWeight: 500, color: C.navy }}>{v.expert_verify_method ?? "—"}</span>
+                      </div>
+                      {v.expert_verify_data?.submitted_at && (
+                        <div style={{ fontSize: 11, color: C.body }}>
+                          {isKo ? "신청일" : "Submitted"}: {new Date(v.expert_verify_data.submitted_at).toLocaleDateString("ko-KR")}
+                        </div>
+                      )}
+                      {v.expert_verify_data?.email && (
+                        <div style={{ fontSize: 12, color: C.body, marginTop: 4 }}>Email: {v.expert_verify_data.email}</div>
+                      )}
+                      {v.expert_verify_data?.file_name && (
+                        <div style={{ fontSize: 12, color: C.body, marginTop: 4 }}>{isKo ? "파일" : "File"}: {v.expert_verify_data.file_name}</div>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                      <button
+                        disabled={expertActioning === v.id}
+                        onClick={() => handleExpertAction(v.id, "verified")}
+                        style={{ padding: "6px 14px", fontSize: 12, borderRadius: 6, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F, fontWeight: 500, opacity: expertActioning === v.id ? 0.6 : 1 }}>
+                        {isKo ? "승인" : "Approve"}
+                      </button>
+                      <button
+                        disabled={expertActioning === v.id}
+                        onClick={() => handleExpertAction(v.id, "rejected")}
+                        style={{ padding: "6px 14px", fontSize: 12, borderRadius: 6, border: "1px solid rgba(217,48,37,0.25)", background: "rgba(217,48,37,0.06)", color: C.ruby, cursor: "pointer", fontFamily: F, fontWeight: 500, opacity: expertActioning === v.id ? 0.6 : 1 }}>
+                        {isKo ? "반려" : "Reject"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         {activeTab === "rewards" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
