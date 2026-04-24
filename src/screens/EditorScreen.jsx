@@ -656,7 +656,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         </button>
       </div>
       <div style={{ padding: "0 16px 24px" }}>
-        <QuestionSettings q={q} idx={selectedIdx} updateQ={updateQ} typeLabel={typeLabel} />
+        <QuestionSettings q={q} idx={selectedIdx} updateQ={updateQ} typeLabel={typeLabel} stimuliDragId={stimuliDragId} setStimuliDragId={setStimuliDragId} stimuliUploading={stimuliUploading} setStimuliUploading={setStimuliUploading} uploadStimulusImage={uploadStimulusImage} />
       </div>
     </div>
   );
@@ -807,7 +807,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         {/* Right: settings */}
         <div style={{ width: 260, borderLeft: `1px solid ${C.border}`, background: C.white, padding: 18, overflowY: "auto", flexShrink: 0, display: "flex", flexDirection: "column" }}>
           <div style={{ flex: 1 }}>
-            <QuestionSettings q={q} idx={selectedIdx} updateQ={updateQ} typeLabel={typeLabel} />
+            <QuestionSettings q={q} idx={selectedIdx} updateQ={updateQ} typeLabel={typeLabel} stimuliDragId={stimuliDragId} setStimuliDragId={setStimuliDragId} stimuliUploading={stimuliUploading} setStimuliUploading={setStimuliUploading} uploadStimulusImage={uploadStimulusImage} />
           </div>
           {logout && (
             <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 12, marginTop: 12 }}>
@@ -930,7 +930,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
   );
 }
 
-function QuestionSettings({ q, idx, updateQ, typeLabel }) {
+function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimuliDragId, stimuliUploading, setStimuliUploading, uploadStimulusImage }) {
   if (!q) return null;
 
   const currentTypeDef = Q_TYPES.find(t => t.type === q.type);
