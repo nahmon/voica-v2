@@ -23,18 +23,20 @@ export default async function handler(req, res) {
   if (!prompt?.trim()) return res.status(400).json({ error: "prompt required" });
   if (prompt.length > 600) return res.status(400).json({ error: "prompt too long" });
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
-    response_format: { type: "json_object" },
-    temperature: 0.8,
-    messages: [
-      {
-        role: "system",
-        content: `You are an expert UX researcher and voice interview designer. Create professional interview question sets in Korean. Return ONLY valid JSON.`,
-      },
-      {
-        role: "user",
-        content: `Research goal: ${prompt.trim()}
+  let completion;
+  try {
+    completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      temperature: 0.8,
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert UX researcher and voice interview designer. Create professional interview question sets in Korean. Return ONLY valid JSON.`,
+        },
+        {
+          role: "user",
+          content: `Research goal: ${prompt.trim()}
 
 Generate 10-12 interview questions as JSON: { "questions": [...] }
 
@@ -51,9 +53,14 @@ Structure:
 5. 1 final voice (open reflection or wish)
 
 Make questions specific to the research goal. Voice questions should invite storytelling.`,
-      },
-    ],
-  });
+        },
+      ],
+    });
+  } catch (e) {
+    console.error("[generate-questions] OpenAI error:", e?.message);
+    const msg = e?.status === 429 ? "AI 할당량 초과. 잠시 후 다시 시도해주세요." : "AI 서비스 연결 실패. 잠시 후 다시 시도해주세요.";
+    return res.status(502).json({ error: msg });
+  }
 
   let questions;
   try {
