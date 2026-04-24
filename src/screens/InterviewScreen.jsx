@@ -21,6 +21,11 @@ const BRIDGE_PHRASES = [
   "잘 들었습니다.",
 ];
 
+function extractYoutubeId(url) {
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/);
+  return m ? m[1] : null;
+}
+
 // Estimate total interview duration in seconds
 function estimateDuration(questions) {
   return questions.reduce((sum, q) => {
@@ -99,6 +104,12 @@ export default function InterviewScreen({ go, shareCode }) {
   const audioRef = useRef(null);
   const ttsCacheRef = useRef({});
   const warmupPlayUrlRef = useRef(null);
+
+  // Follow-up question state
+  const [followupQ, setFollowupQ] = useState(null);
+  const [inFollowup, setInFollowup] = useState(false);
+  const inFollowupRef = useRef(false);
+  const followupRef = useRef(null);
 
   // Cleanup all media resources on unmount
   useEffect(() => {
@@ -347,7 +358,7 @@ export default function InterviewScreen({ go, shareCode }) {
     }
   };
 
-  const advanceOrComplete = (skipped = false) => {
+  const advanceOrComplete = async (skipped = false) => {
     const q = interview.questions[qIndex];
     const qType = q?.type;
     // Archive current Q&A to chat history
@@ -390,6 +401,26 @@ export default function InterviewScreen({ go, shareCode }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: phrase }),
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      if (!d.url) return;
+      const audio = new Audio(d.url);
+      audioRef.current = audio;
+      await new Promise(resolve => {
+        audio.onended = resolve;
+        audio.onerror = resolve;
+        audio.play().catch(resolve);
+      });
+    } catch {}
+  };
+
+  const playTtsText = async (text) => {
+    try {
+      const r = await fetch("/api/speech?type=tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
       });
       if (!r.ok) return;
       const d = await r.json();
@@ -498,9 +529,75 @@ export default function InterviewScreen({ go, shareCode }) {
       } catch (e) { console.error("[stt exception]", e); }
       await saveResponse({ audio_url: audioUrl, transcript });
       lastTranscriptRef.current = transcript;
-      setPhase("review_pass");
+
+      const currentlyInFollowup = inFollowupRef.current;
+      const savedFollowupText = followupRef.current;
+
+      if (currentlyInFollowup) {
+        inFollowupRef.current = false;
+        followupRef.current = null;
+        setInFollowup(false);
+        setFollowupQ(null);
+        setCompletedChats(prev => [...prev, {
+          qText: savedFollowupText,
+          qType: "voice",
+          aText: transcript,
+          isFollowup: true,
+          qIdx: qIndex,
+        }]);
+        lastTranscriptRef.current = null;
+        lastSelectedRef.current = null;
+        setPhase("review_pass");
+        await playBridgeTts();
+        if (qIndex < interview.questions.length - 1) {
+          setQIndex(i => i + 1);
+          setQAnimKey(k => k + 1);
+          setPhase("ai_speaking");
+          setRecordTime(0);
+          setSelectedValue(null);
+          setTtsReadFallback(false);
+        } else {
+          if (sessionId) { try { await fetch("/api/survey?resource=session", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, status: "completed" }) }); } catch {} }
+          if (shareCode) localStorage.removeItem(`voica_session_${shareCode}`);
+          track("interview_completed", { shareCode, sessionId, total: interview.questions.length });
+          setCompleted(true);
+        }
+        return;
+      }
+
+      // Main answer — fetch follow-up while bridge TTS plays
+      const followupFetchPromise = fetch("/api/followup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question_content: q.content,
+          transcript: transcript || "",
+          interview_title: interview.title,
+          session_id: sessionId,
+        }),
+      }).then(r => r.ok ? r.json() : null).catch(() => null);
+
       await playBridgeTts();
-      advanceOrComplete();
+      const followupData = await followupFetchPromise;
+      const followupText = followupData?.followup || null;
+
+      if (followupText) {
+        setCompletedChats(prev => [...prev, {
+          qText: q.content,
+          qType: q.type,
+          aText: transcript,
+          qIdx: qIndex,
+        }]);
+        followupRef.current = followupText;
+        inFollowupRef.current = true;
+        setFollowupQ(followupText);
+        setInFollowup(true);
+        await playTtsText(followupText);
+        setPhase("ready");
+      } else {
+        setPhase("review_pass");
+        advanceOrComplete();
+      }
     };
     mr.stop();
   };
@@ -940,6 +1037,33 @@ export default function InterviewScreen({ go, shareCode }) {
       <div style={{ flexShrink: 0, position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.07)", padding: isMobile ? "16px 16px calc(28px + env(safe-area-inset-bottom,0px))" : "20px 32px calc(28px + env(safe-area-inset-bottom,0px))" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
 
+          {/* Stimulus / creative material */}
+          {q.stimulus?.url && (
+            <div style={{ marginBottom: 14, borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)" }}>
+              {q.stimulus.type === "image" && (
+                <img src={q.stimulus.url} alt={q.stimulus.label || "자료"} style={{ width: "100%", maxHeight: 240, objectFit: "contain", background: "#000", display: "block" }} />
+              )}
+              {q.stimulus.type === "video" && (() => {
+                const ytId = extractYoutubeId(q.stimulus.url);
+                return ytId ? (
+                  <iframe width="100%" height="220" src={`https://www.youtube.com/embed/${ytId}`} frameBorder="0" allowFullScreen style={{ display: "block" }} title={q.stimulus.label || "video"} />
+                ) : (
+                  <video src={q.stimulus.url} controls style={{ width: "100%", maxHeight: 220, display: "block", background: "#000" }} />
+                );
+              })()}
+              {q.stimulus.type === "url" && (
+                <a href={q.stimulus.url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", background: "rgba(255,255,255,0.05)", textDecoration: "none" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{q.stimulus.label || q.stimulus.url}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              )}
+              {q.stimulus.label && q.stimulus.type !== "url" && (
+                <div style={{ padding: "8px 12px", background: "rgba(0,0,0,0.3)", fontSize: 12, color: "rgba(255,255,255,0.45)" }}>{q.stimulus.label}</div>
+              )}
+            </div>
+          )}
+
           {/* AI avatar row + current question */}
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14 }}>
             <div style={{ width: 32, height: 32, borderRadius: 8, background: "#6E4BFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: phase === "ai_speaking" ? "0 0 14px rgba(110,75,255,0.5)" : "none", transition: "box-shadow 0.4s" }}>
@@ -949,7 +1073,7 @@ export default function InterviewScreen({ go, shareCode }) {
               <div style={{ fontSize: 11, color: C.purpleLight, marginBottom: 5, display: "flex", alignItems: "center", gap: 6 }}>
                 {phase === "ai_speaking" ? <WaveAnimation active /> : <span style={{ color: "rgba(255,255,255,0.3)" }}>AI 인터뷰어</span>}
               </div>
-              <p key={qAnimKey} style={{ margin: 0, fontSize: isMobile ? 15 : 17, color: C.white, lineHeight: 1.65, animation: "q-fade-in 0.35s ease forwards", wordBreak: "keep-all" }}>{q.content}</p>
+              <p key={qAnimKey} style={{ margin: 0, fontSize: isMobile ? 15 : 17, color: C.white, lineHeight: 1.65, animation: "q-fade-in 0.35s ease forwards", wordBreak: "keep-all" }}>{inFollowup ? followupQ : q.content}</p>
             </div>
           </div>
 
