@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation } fro
 import { supabase } from "./supabase.js";
 import { C, F } from "./lib/constants.jsx";
 import { ToastProvider, useToast } from "./components/shared.jsx";
+import OnboardingModal from "./components/OnboardingModal.jsx";
 
 const LandingScreen        = lazy(() => import("./screens/LandingScreen.jsx"));
 const RoleSelectScreen     = lazy(() => import("./screens/RoleSelectScreen.jsx"));
@@ -69,6 +70,7 @@ function AppRoutes() {
   const [authLoading, setAuthLoading] = useState(true);
   const [shareCode, setShareCode] = useState(null);
   const [lang, setLang] = useState(() => localStorage.getItem("voica_lang") ?? "ko");
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const navigate = useNavigate();
 
   const handleLangChange = (code) => { setLang(code); localStorage.setItem("voica_lang", code); };
@@ -100,7 +102,11 @@ function AppRoutes() {
         const role = session.user.user_metadata?.role;
         if (!role) navigate("/role-select");
         else if (role === "panel") navigate("/panel");
-        else navigate("/dashboard");
+        else {
+          navigate("/dashboard");
+          supabase.from("profiles").select("onboarding_completed_at").eq("id", session.user.id).maybeSingle()
+            .then(({ data: profile }) => { if (!profile?.onboarding_completed_at) setShowOnboarding(true); });
+        }
       }
       setAuthLoading(false);
     });
@@ -112,7 +118,11 @@ function AppRoutes() {
         const role = session.user.user_metadata?.role;
         if (!role) navigate("/role-select");
         else if (role === "panel") navigate("/panel");
-        else navigate("/dashboard");
+        else {
+          navigate("/dashboard");
+          supabase.from("profiles").select("onboarding_completed_at").eq("id", session.user.id).maybeSingle()
+            .then(({ data: profile }) => { if (!profile?.onboarding_completed_at) setShowOnboarding(true); });
+        }
       }
     });
     return () => subscription.unsubscribe();
@@ -124,6 +134,10 @@ function AppRoutes() {
   if (authLoading) return null;
 
   return (
+    <>
+    {showOnboarding && user && (
+      <OnboardingModal user={user} go={go} onComplete={() => setShowOnboarding(false)} />
+    )}
     <Suspense fallback={null}>
       <Routes>
         <Route path="/"              element={<LandingScreen {...common} />} />
@@ -152,6 +166,7 @@ function AppRoutes() {
         <Route path="*"              element={<LandingScreen {...common} />} />
       </Routes>
     </Suspense>
+    </>
   );
 }
 

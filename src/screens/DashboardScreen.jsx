@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
+import MembersModal from "../components/MembersModal.jsx";
 
 function timeAgo(dateStr, isKo = false) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -36,6 +37,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredCard, setHoveredCard] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
+  const [membersModal, setMembersModal] = useState(null);
 
   const isKo = lang === "ko";
 
@@ -131,6 +133,13 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
+      {membersModal && (
+        <MembersModal
+          interviewId={membersModal.id}
+          interviewTitle={membersModal.title}
+          onClose={() => setMembersModal(null)}
+        />
+      )}
       <style>{`
         @keyframes cardLift {
           to { transform: translateY(-3px); }
@@ -296,6 +305,9 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                   {p.status !== "closed" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("editor", p.id); }}>{isKo ? "수정" : "Edit"}</Btn>}
                   {sessionCount > 0 && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("responses", p.id); }}>{isKo ? "응답 보기" : "View Responses"}</Btn>}
                   {p.status === "closed" && <Btn size="sm" onClick={e => { e.stopPropagation(); go("report", p.id); }}>{isKo ? "리포트" : "Report"}</Btn>}
+                  <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); setMembersModal({ id: p.id, title: p.title }); }}>
+                    {isKo ? "팀원" : "Members"}
+                  </Btn>
                 </div>
               </div>
             );

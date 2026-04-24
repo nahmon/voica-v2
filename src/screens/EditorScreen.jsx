@@ -73,6 +73,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [templateOpen, setTemplateOpen] = useState(false);
   const [showIncompleteWarn, setShowIncompleteWarn] = useState(false);
   const [dragOver, setDragOver] = useState(null);
+  const [stimuliDragId, setStimuliDragId] = useState(null);
+  const [stimuliUploading, setStimuliUploading] = useState({});
   const [savedTitle, setSavedTitle] = useState(savedDraft?.title ?? "");
   const [savedIncentive, setSavedIncentive] = useState(savedDraft?.incentive ?? "");
   const [savedQuestions, setSavedQuestions] = useState(savedDraft?.questions ?? [newQ("voice")]);
@@ -250,6 +252,21 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
   const updateQ = (idx, patch) =>
     setQuestions(qs => qs.map((item, i) => i === idx ? { ...item, ...patch } : item));
+
+  const uploadStimulusImage = async (file) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+      const path = `${session.user.id}/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("stimuli").upload(path, file, { cacheControl: "3600", upsert: false });
+      if (error) return null;
+      const { data: { publicUrl } } = supabase.storage.from("stimuli").getPublicUrl(path);
+      return publicUrl;
+    } catch {
+      return null;
+    }
+  };
 
   const addQuestion = (type) => {
     const next = [...questions, newQ(type)];
@@ -1010,12 +1027,63 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
               </div>
             </div>
           ) : (
-            <input value="" onChange={e => {
-              const url = e.target.value.trim();
-              if (!url) return;
-              const type = /youtube\.com|youtu\.be/.test(url) ? "video" : /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url) ? "image" : "video";
-              updateQ(idx, { stimulus: { type, url, label: "" } });
-            }} placeholder="이미지 URL 또는 유튜브 링크 붙여넣기" style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: `2px dashed ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box", background: C.bg }} />
+            <div
+              onDragOver={e => { e.preventDefault(); setStimuliDragId(q.id + "_c"); }}
+              onDragLeave={() => setStimuliDragId(null)}
+              onDrop={async e => {
+                e.preventDefault();
+                setStimuliDragId(null);
+                const file = e.dataTransfer.files?.[0];
+                if (!file) return;
+                if (!file.type.startsWith("image/")) { showToast("이미지 파일만 첨부 가능해요", "error"); return; }
+                setStimuliUploading(prev => ({ ...prev, [q.id + "_c"]: true }));
+                const url = await uploadStimulusImage(file);
+                setStimuliUploading(prev => ({ ...prev, [q.id + "_c"]: false }));
+                if (url) updateQ(idx, { stimulus: { type: "image", url, label: "" } });
+                else showToast("업로드에 실패했어요", "error");
+              }}
+              style={{ width: "100%", borderRadius: 8, border: `2px dashed ${stimuliDragId === q.id + "_c" ? C.purple : C.border}`, background: stimuliDragId === q.id + "_c" ? C.purpleBg : C.bg, boxSizing: "border-box", padding: "14px 12px", transition: "all 0.15s" }}>
+              {stimuliUploading[q.id + "_c"] ? (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: C.purple, height: 48 }}>
+                  <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+                  <div style={{ width: 14, height: 14, border: `2px solid ${C.purple}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                  <span style={{ fontSize: 12, fontFamily: F }}>업로드 중...</span>
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 10, color: stimuliDragId === q.id + "_c" ? C.purple : C.body }}>
+                    <span style={{ fontSize: 20 }}>🖼</span>
+                    <span style={{ fontSize: 12, fontFamily: F }}>이미지를 여기에 드래그하거나</span>
+                    <label style={{ fontSize: 12, color: C.purple, fontFamily: F, cursor: "pointer", textDecoration: "underline", fontWeight: 500 }}>
+                      파일 선택
+                      <input type="file" accept="image/*" style={{ display: "none" }} onChange={async e => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        e.target.value = "";
+                        setStimuliUploading(prev => ({ ...prev, [q.id + "_c"]: true }));
+                        const url = await uploadStimulusImage(file);
+                        setStimuliUploading(prev => ({ ...prev, [q.id + "_c"]: false }));
+                        if (url) updateQ(idx, { stimulus: { type: "image", url, label: "" } });
+                        else showToast("업로드에 실패했어요", "error");
+                      }} />
+                    </label>
+                  </div>
+                  <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 10 }}>
+                    <input
+                      value=""
+                      onChange={e => {
+                        const url = e.target.value.trim();
+                        if (!url) return;
+                        const type = /youtube\.com|youtu\.be/.test(url) ? "video" : /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url) ? "image" : "video";
+                        updateQ(idx, { stimulus: { type, url, label: "" } });
+                      }}
+                      placeholder="또는 이미지 URL / 유튜브 링크 붙여넣기"
+                      style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box", background: "#fff" }}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -1105,20 +1173,59 @@ function QuestionSettings({ q, idx, updateQ, typeLabel }) {
             </div>
           </div>
         ) : (
-          <input
-            value=""
-            onChange={e => {
-              const url = e.target.value.trim();
-              if (!url) return;
-              let type = "url";
-              if (/youtube\.com|youtu\.be/.test(url)) type = "video";
-              else if (/figma\.com/.test(url)) type = "url";
-              else if (/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)) type = "image";
-              updateQ(idx, { stimulus: { type, url, label: "" } });
+          <div
+            onDragOver={e => { e.preventDefault(); setStimuliDragId(q.id + "_s"); }}
+            onDragLeave={() => setStimuliDragId(null)}
+            onDrop={async e => {
+              e.preventDefault();
+              setStimuliDragId(null);
+              const file = e.dataTransfer.files?.[0];
+              if (!file) return;
+              if (!file.type.startsWith("image/")) { showToast("이미지 파일만 첨부 가능해요", "error"); return; }
+              setStimuliUploading(prev => ({ ...prev, [q.id + "_s"]: true }));
+              const url = await uploadStimulusImage(file);
+              setStimuliUploading(prev => ({ ...prev, [q.id + "_s"]: false }));
+              if (url) updateQ(idx, { stimulus: { type: "image", url, label: "" } });
+              else showToast("업로드에 실패했어요", "error");
             }}
-            placeholder="이미지 URL, 유튜브, Figma 링크 등"
-            style={{ width: "100%", padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box" }}
-          />
+            style={{ width: "100%", borderRadius: 6, border: `1px dashed ${stimuliDragId === q.id + "_s" ? C.purple : C.border}`, background: stimuliDragId === q.id + "_s" ? C.purpleBg : "#fff", boxSizing: "border-box", transition: "all 0.15s", overflow: "hidden" }}>
+            {stimuliUploading[q.id + "_s"] ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: C.purple, padding: "8px 10px" }}>
+                <div style={{ width: 12, height: 12, border: `2px solid ${C.purple}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                <span style={{ fontSize: 12, fontFamily: F }}>업로드 중...</span>
+              </div>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                <input
+                  value=""
+                  onChange={e => {
+                    const url = e.target.value.trim();
+                    if (!url) return;
+                    let type = "url";
+                    if (/youtube\.com|youtu\.be/.test(url)) type = "video";
+                    else if (/figma\.com/.test(url)) type = "url";
+                    else if (/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)) type = "image";
+                    updateQ(idx, { stimulus: { type, url, label: "" } });
+                  }}
+                  placeholder="이미지 URL, 유튜브, Figma 링크 등"
+                  style={{ flex: 1, padding: "6px 8px", border: "none", fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box", background: "transparent" }}
+                />
+                <label style={{ padding: "4px 8px", fontSize: 11, color: C.purple, fontFamily: F, cursor: "pointer", borderLeft: `1px solid ${C.border}`, whiteSpace: "nowrap", flexShrink: 0 }}>
+                  📎 이미지
+                  <input type="file" accept="image/*" style={{ display: "none" }} onChange={async e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    e.target.value = "";
+                    setStimuliUploading(prev => ({ ...prev, [q.id + "_s"]: true }));
+                    const url = await uploadStimulusImage(file);
+                    setStimuliUploading(prev => ({ ...prev, [q.id + "_s"]: false }));
+                    if (url) updateQ(idx, { stimulus: { type: "image", url, label: "" } });
+                    else showToast("업로드에 실패했어요", "error");
+                  }} />
+                </label>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
