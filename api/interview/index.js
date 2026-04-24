@@ -71,18 +71,21 @@ export default async function handler(req, res) {
       await supabase.from("questions").delete().in("id", toDelete);
     }
     for (const q of incomingWithDbId) {
-      await supabase.from("questions").update({
-        order_num: questions.indexOf(q) + 1,
-        type: q.type, content: q.content, options: q.options ?? null, stimulus: q.stimulus ?? null, followup_enabled: q.followup_enabled !== false,
-      }).eq("id", q.id);
+      const upd = { order_num: questions.indexOf(q) + 1, type: q.type, content: q.content };
+      if (q.options != null) upd.options = q.options;
+      if (q.stimulus != null) upd.stimulus = q.stimulus;
+      if (q.followup_enabled === false) upd.followup_enabled = false;
+      await supabase.from("questions").update(upd).eq("id", q.id);
     }
     if (incomingNew.length > 0) {
       const { data: newQs } = await supabase.from("questions").insert(
-        incomingNew.map(q => ({
-          interview_id: id,
-          order_num: questions.indexOf(q) + 1,
-          type: q.type, content: q.content, options: q.options ?? null, stimulus: q.stimulus ?? null, followup_enabled: q.followup_enabled !== false,
-        }))
+        incomingNew.map(q => {
+          const row = { interview_id: id, order_num: questions.indexOf(q) + 1, type: q.type, content: q.content };
+          if (q.options != null) row.options = q.options;
+          if (q.stimulus != null) row.stimulus = q.stimulus;
+          if (q.followup_enabled === false) row.followup_enabled = false;
+          return row;
+        })
       ).select("id, type, content");
       if (newQs?.length) prewarmTts(supabase, newQs);
     }
@@ -122,15 +125,13 @@ export default async function handler(req, res) {
 
   // Insert questions if provided
   if (questions.length > 0) {
-    const rows = questions.map((q, i) => ({
-      interview_id: interview.id,
-      order_num: i + 1,
-      type: q.type,
-      content: q.content,
-      options: q.options ?? null,
-      stimulus: q.stimulus ?? null,
-      followup_enabled: q.followup_enabled !== false,
-    }));
+    const rows = questions.map((q, i) => {
+      const row = { interview_id: interview.id, order_num: i + 1, type: q.type, content: q.content };
+      if (q.options != null) row.options = q.options;
+      if (q.stimulus != null) row.stimulus = q.stimulus;
+      if (q.followup_enabled === false) row.followup_enabled = false;
+      return row;
+    });
     const { data: insertedQs, error: qError } = await supabase.from("questions").insert(rows).select("id, type, content");
     if (qError) {
       console.error("[interview] questions insert error:", qError.code, qError.message, qError.details);
