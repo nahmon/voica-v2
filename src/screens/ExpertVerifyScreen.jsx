@@ -5,6 +5,80 @@ import { supabase } from "../supabase.js";
 
 const MAX_FILE_BYTES = 2 * 1024 * 1024; // 2 MB
 
+function FilePreview({ fileInfo, onRemove }) {
+  const ext = fileInfo.name.split(".").pop().toLowerCase();
+  const sizeKb = fileInfo.sizeBytes ? Math.round(fileInfo.sizeBytes / 1024) : null;
+  const iconColor = ext === "pdf" ? C.ruby : C.purple;
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 10,
+      background: "rgba(21,190,83,0.06)", border: `1px solid ${C.successBorder}`,
+      borderRadius: 8, padding: "10px 14px",
+    }}>
+      <div style={{ width: 32, height: 32, borderRadius: 6, background: `${iconColor}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: iconColor, textTransform: "uppercase" }}>{ext}</span>
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: C.navy, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{fileInfo.name}</div>
+        {sizeKb !== null && <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{sizeKb} KB</div>}
+      </div>
+      {Ic.CheckCircle({ s: 16, c: C.success })}
+      <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: C.body, flexShrink: 0, display: "flex", alignItems: "center" }}>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <line x1="3" y1="3" x2="11" y2="11" /><line x1="11" y1="3" x2="3" y2="11" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+function UploadSpinner() {
+  return (
+    <span style={{
+      display: "inline-block", width: 16, height: 16,
+      border: `2px solid rgba(110,75,255,0.2)`, borderTopColor: C.purple,
+      borderRadius: "50%", animation: "spin 0.7s linear infinite",
+    }} />
+  );
+}
+
+const globalStyles = `
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes evs-ripple {
+    0% { transform: scale(0.85); opacity: 0.6; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+  @keyframes evs-check-draw {
+    0% { stroke-dashoffset: 40; opacity: 0; }
+    40% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  @keyframes evs-fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes evs-clock-tick {
+    0%,100% { transform: rotate(0deg); }
+    25% { transform: rotate(90deg); }
+    50% { transform: rotate(180deg); }
+    75% { transform: rotate(270deg); }
+  }
+  @keyframes evs-pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(245,158,11,0.35); }
+    70% { box-shadow: 0 0 0 10px rgba(245,158,11,0); }
+    100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+  }
+`;
+if (typeof document !== "undefined") {
+  const existing = document.getElementById("__evs_styles");
+  if (!existing) {
+    const s = document.createElement("style");
+    s.id = "__evs_styles";
+    s.textContent = globalStyles;
+    document.head.appendChild(s);
+  }
+}
+
 const T = {
   ko: {
     title: "전문가 인증",
@@ -104,9 +178,26 @@ function StatusCard({ status, lang, note, onReApply, go }) {
   if (status === "pending") {
     return (
       <div style={{ textAlign: "center", maxWidth: 400, margin: "0 auto" }}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>⏳</div>
+        <div style={{ position: "relative", width: 64, height: 64, margin: "0 auto 20px" }}>
+          <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#f59e0b" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="14" cy="14" r="11" />
+              <path d="M14 8v6l4 2" />
+            </svg>
+          </div>
+          <span style={{
+            position: "absolute", top: 2, right: 2,
+            width: 12, height: 12, borderRadius: "50%",
+            background: "#f59e0b", border: "2px solid white",
+            animation: "pulse-dot 1.4s ease-in-out infinite",
+          }} />
+        </div>
+        <style>{`@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.75)} }`}</style>
         <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, marginBottom: 10 }}>{t.pendingTitle}</div>
-        <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 28 }}>{t.pendingDesc}</div>
+        <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 16 }}>{t.pendingDesc}</div>
+        <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 8, padding: "10px 16px", marginBottom: 28, fontSize: 12, color: "#92650a" }}>
+          {lang === "ko" ? "결과는 이메일로 안내드려요 · 보통 1–3 영업일 소요" : "We'll email you the result · usually 1–3 business days"}
+        </div>
         <Btn onClick={() => go("panel_board")}>{t.backToPanel}</Btn>
       </div>
     );
@@ -128,16 +219,24 @@ function StatusCard({ status, lang, note, onReApply, go }) {
   if (status === "rejected") {
     return (
       <div style={{ textAlign: "center", maxWidth: 400, margin: "0 auto" }}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(234,34,97,0.08)", border: "1px solid rgba(234,34,97,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>✕</div>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(234,34,97,0.08)", border: "1px solid rgba(234,34,97,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke={C.ruby} strokeWidth="2" strokeLinecap="round">
+            <circle cx="14" cy="14" r="11" />
+            <line x1="9" y1="9" x2="19" y2="19" /><line x1="19" y1="9" x2="9" y2="19" />
+          </svg>
+        </div>
         <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, marginBottom: 10 }}>{t.rejectedTitle}</div>
-        <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: note ? 12 : 28 }}>{t.rejectedDesc}</div>
+        <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 12 }}>{t.rejectedDesc}</div>
         {note && (
-          <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8, padding: "12px 16px", marginBottom: 28, textAlign: "left" }}>
-            <div style={{ fontSize: 11, fontWeight: 500, color: C.label, marginBottom: 4 }}>{t.note}</div>
+          <div style={{ background: "rgba(234,34,97,0.04)", border: "1px solid rgba(234,34,97,0.2)", borderRadius: 8, padding: "12px 16px", marginBottom: 16, textAlign: "left" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: C.ruby, marginBottom: 4 }}>{t.note}</div>
             <div style={{ fontSize: 13, color: C.body }}>{note}</div>
           </div>
         )}
-        <Btn onClick={onReApply}>{t.reApply}</Btn>
+        <div style={{ background: C.purpleBg, border: `1px solid ${C.purpleLight}`, borderRadius: 8, padding: "10px 16px", marginBottom: 20, fontSize: 12, color: C.purple }}>
+          {lang === "ko" ? "다른 서류를 준비해서 다시 신청할 수 있어요" : "You can re-apply with a different document"}
+        </div>
+        <Btn full onClick={onReApply}>{t.reApply}</Btn>
       </div>
     );
   }
@@ -153,7 +252,8 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
   const [reviewerNote, setReviewerNote] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [emailValue, setEmailValue] = useState("");
-  const [fileInfo, setFileInfo] = useState(null); // { name, dataUrl }
+  const [fileInfo, setFileInfo] = useState(null); // { name, sizeBytes, dataUrl }
+  const [fileReading, setFileReading] = useState(false);
   const [fileError, setFileError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -196,8 +296,16 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
       return;
     }
     setFileError(null);
+    setFileReading(true);
     const reader = new FileReader();
-    reader.onload = (ev) => setFileInfo({ name: file.name, dataUrl: ev.target.result });
+    reader.onload = (ev) => {
+      setFileInfo({ name: file.name, sizeBytes: file.size, dataUrl: ev.target.result });
+      setFileReading(false);
+    };
+    reader.onerror = () => {
+      setFileError(isKo ? "파일을 읽는 중 오류가 발생했어요" : "Error reading file");
+      setFileReading(false);
+    };
     reader.readAsDataURL(file);
   }
 
@@ -387,30 +495,39 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
                       <label style={{ fontSize: 12, fontWeight: 500, color: C.label, display: "block", marginBottom: 6 }}>
                         {t.methods[selectedMethod].label} <span style={{ color: "#ea2261" }}>*</span>
                       </label>
-                      <div
-                        onClick={() => fileInputRef.current?.click()}
-                        style={{
-                          border: `1.5px dashed ${fileError ? "#ea2261" : fileInfo ? C.success : C.border}`,
-                          borderRadius: 8,
-                          padding: "24px 16px",
-                          textAlign: "center",
-                          cursor: "pointer",
-                          background: fileInfo ? C.successBg : C.bg,
-                          transition: "all 0.15s",
-                        }}
-                      >
-                        {fileInfo ? (
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                            {Ic.Check({ s: 16, c: C.success })}
-                            <span style={{ fontSize: 13, color: C.successText, fontWeight: 500 }}>{fileInfo.name}</span>
-                          </div>
-                        ) : (
-                          <>
-                            <div style={{ fontSize: 13, color: C.body, marginBottom: 4 }}>{t.methods[selectedMethod].uploadPrompt}</div>
-                            <div style={{ fontSize: 11, color: C.body, opacity: 0.7 }}>{t.methods[selectedMethod].uploadHint}</div>
-                          </>
-                        )}
-                      </div>
+                      {fileInfo ? (
+                        <FilePreview fileInfo={fileInfo} onRemove={() => { setFileInfo(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} />
+                      ) : (
+                        <div
+                          onClick={() => !fileReading && fileInputRef.current?.click()}
+                          style={{
+                            border: `1.5px dashed ${fileError ? "#ea2261" : C.border}`,
+                            borderRadius: 8,
+                            padding: "28px 16px",
+                            textAlign: "center",
+                            cursor: fileReading ? "default" : "pointer",
+                            background: "#fafbfc",
+                            transition: "all 0.15s",
+                          }}
+                          onMouseEnter={e => { if (!fileReading) e.currentTarget.style.borderColor = C.purpleLight; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = fileError ? "#ea2261" : C.border; }}
+                        >
+                          {fileReading ? (
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                              <UploadSpinner />
+                              <div style={{ fontSize: 12, color: C.body }}>{isKo ? "파일 읽는 중…" : "Reading file…"}</div>
+                            </div>
+                          ) : (
+                            <>
+                              <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }}>
+                                {Ic.Clip({ s: 20, c: C.body })}
+                              </div>
+                              <div style={{ fontSize: 13, color: C.navy, fontWeight: 500, marginBottom: 4 }}>{t.methods[selectedMethod].uploadPrompt}</div>
+                              <div style={{ fontSize: 11, color: C.body, opacity: 0.8 }}>PDF, JPG, PNG · {isKo ? "최대 2MB · 3개월 이내 발급본" : "Max 2 MB · Issued within 3 months"}</div>
+                            </>
+                          )}
+                        </div>
+                      )}
                       {fileError && <div style={{ fontSize: 11, color: "#ea2261", marginTop: 6 }}>{fileError}</div>}
                       <input
                         ref={fileInputRef}

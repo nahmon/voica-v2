@@ -26,14 +26,17 @@ export default async function handler(req, res) {
 
     if (error || !response) return res.status(404).json({ error: "Response not found" });
     if (response.session?.interview?.user_id !== user.id) return res.status(403).json({ error: "Forbidden" });
-
-    if (error || !response) return res.status(404).json({ error: "Response not found" });
     if (!response.audio_url) return res.status(404).json({ error: "No audio for this response" });
 
     const match = response.audio_url.match(/\/audio-responses\/(.+?)(\?|$)/);
     if (!match) return res.status(400).json({ error: "Could not extract storage path" });
 
     const storagePath = decodeURIComponent(match[1]);
+
+    // [High] Prevent path traversal in extracted storage path
+    if (storagePath.includes("..") || storagePath.startsWith("/")) {
+      return res.status(400).json({ error: "Invalid storage path" });
+    }
     const { data: signedData, error: signError } = await supabase.storage
       .from("audio-responses")
       .createSignedUrl(storagePath, 3600);
@@ -43,6 +46,12 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
+    // [High] Require authentication for upload URL generation
+    const token = req.headers.authorization?.replace("Bearer ", "");
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !user) return res.status(401).json({ error: "Unauthorized" });
+
     if (!rateLimit(`upload:${getIp(req)}`, 30)) {
       return res.status(429).json({ error: "Too many requests. Please try again later." });
     }
@@ -56,13 +65,27 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid file type" });
     }
 
+    // [High] Prevent path traversal: sessionId and questionId must be safe identifiers
+    const SAFE_ID_RE = /^[a-zA-Z0-9_-]{1,128}$/;
+    if (!SAFE_ID_RE.test(sessionId) || !SAFE_ID_RE.test(questionId)) {
+      return res.status(400).json({ error: "Invalid sessionId or questionId format" });
+    }
+
     const { data: session } = await supabase
       .from("sessions")
-      .select("id, status")
+      .select("id, status, interview_id, interviews(user_id)")
       .eq("id", sessionId)
       .single();
     if (!session || session.status !== "in_progress") {
       return res.status(403).json({ error: "Invalid or completed session" });
+    }
+
+    // [High] Verify the authenticated user owns this session's interview.
+    // Anonymous respondents have no token and hit this endpoint without auth headers.
+    // If a token IS present (survey owner), we must confirm ownership to prevent
+    // one authenticated user from generating upload URLs for another user's session.
+    if (session.interviews?.user_id !== user.id) {
+      return res.status(403).json({ error: "Forbidden: you do not own this session's interview" });
     }
 
     const path = `${sessionId}/${questionId}.${ext.toLowerCase()}`;
@@ -71,8 +94,7 @@ export default async function handler(req, res) {
       .createSignedUploadUrl(path);
 
     if (error || !data) {
-      console.error("[storage]", error);
-      return res.status(500).json({ error: error?.message ?? "Failed to create upload URL" });
+      return res.status(500).json({ error: "Failed to create upload URL" });
     }
 
     const { data: dlData } = await supabase.storage

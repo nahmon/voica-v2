@@ -56,10 +56,15 @@ export default async function handler(req, res) {
 
       const { data: session } = await supabase
         .from("sessions")
-        .select("id, interview_id, interviews(reward_amount)")
+        .select("id, status, interview_id, interviews(reward_amount)")
         .eq("id", session_id)
         .single();
       if (!session) return res.status(404).json({ error: "Session not found" });
+
+      // [High] Prevent replaying completed/abandoned sessions
+      if (session.status !== "in_progress") {
+        return res.status(409).json({ error: "Session is already finalized" });
+      }
 
       const patch = { status };
       if (status === "completed") patch.completed_at = new Date().toISOString();
@@ -96,6 +101,20 @@ export default async function handler(req, res) {
     const { session_id, question_id, type, value, audio_url, transcript } = req.body;
     if (!session_id || !question_id || !type) {
       return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // [Low] Validate response type to prevent unexpected values being stored
+    const VALID_RESPONSE_TYPES = new Set(["voice", "multiple_choice", "likert"]);
+    if (!VALID_RESPONSE_TYPES.has(type)) {
+      return res.status(400).json({ error: "type must be one of: voice, multiple_choice, likert" });
+    }
+
+    // [Medium] Validate audio_url is a Supabase storage URL, not an arbitrary external URL
+    if (audio_url !== undefined && audio_url !== null) {
+      const supabaseHost = process.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
+      if (typeof audio_url !== "string" || !audio_url.startsWith(`${supabaseHost}/storage/`)) {
+        return res.status(400).json({ error: "Invalid audio_url: must be a Supabase storage URL" });
+      }
     }
 
     const { data: session } = await supabase

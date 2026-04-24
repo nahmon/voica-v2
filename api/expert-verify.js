@@ -1,6 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 import { rateLimit, getIp } from "./_rateLimit.js";
 
+// Max base64 file size: 5MB (base64 overhead ~33%, so raw limit ~3.75MB)
+const MAX_FILE_DATA_B64_LEN = 5 * 1024 * 1024;
+
+// Allowed MIME types for verification documents
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+]);
+
+// Allowed fields in verifyData to prevent unexpected field injection
+const ALLOWED_VERIFY_FIELDS = new Set(["file_data", "mime_type", "file_name"]);
+
 function getServiceClient() {
   return createClient(
     process.env.VITE_SUPABASE_URL,
@@ -15,6 +29,22 @@ async function getAuthUser(req) {
   const { data: { user }, error } = await supabase.auth.getUser(token);
   if (error || !user) return null;
   return user;
+}
+
+// Double-check admin status against DB profiles table, not just JWT metadata
+async function isAdminUser(supabase, userId) {
+  // Primary check: DB-stored role (authoritative)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .maybeSingle();
+  if (profile?.role === "admin") return true;
+
+  // Fallback: JWT user_metadata (only if DB record missing)
+  // Note: user_metadata can be set by service role, so we keep this as
+  // secondary signal but do NOT rely on it alone.
+  return false;
 }
 
 export default async function handler(req, res) {
@@ -33,7 +63,7 @@ export default async function handler(req, res) {
 
     // Admin: list all pending verifications
     if (req.query.admin === "true") {
-      if (user.user_metadata?.admin !== true) {
+      if (!(await isAdminUser(supabase, user.id))) {
         return res.status(403).json({ error: "Forbidden" });
       }
       const { data, error } = await supabase
@@ -78,6 +108,31 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "data.file_data is required" });
     }
 
+    // [High] Enforce base64 size limit (~3.75MB raw)
+    if (typeof verifyData.file_data !== "string" || verifyData.file_data.length > MAX_FILE_DATA_B64_LEN) {
+      return res.status(400).json({ error: "file_data exceeds maximum allowed size (5MB)" });
+    }
+
+    // [High] Validate MIME type from base64 data URI header
+    const mimeMatch = verifyData.file_data.match(/^data:([a-zA-Z0-9][a-zA-Z0-9!#$&\-^_]+\/[a-zA-Z0-9][a-zA-Z0-9!#$&\-^_]+);base64,/);
+    if (!mimeMatch || !ALLOWED_MIME_TYPES.has(mimeMatch[1])) {
+      return res.status(400).json({ error: "Invalid file type. Allowed: JPEG, PNG, WebP, PDF" });
+    }
+
+    // [Medium] Whitelist allowed fields — strip unexpected keys before storing
+    const safeVerifyData = {};
+    for (const key of ALLOWED_VERIFY_FIELDS) {
+      if (verifyData[key] !== undefined) safeVerifyData[key] = verifyData[key];
+    }
+
+    // [Medium] Enforce mime_type from data URI header (prevent client-supplied mismatch)
+    safeVerifyData.mime_type = mimeMatch[1];
+
+    // [Low] Sanitize file_name: strip null bytes, limit length
+    if (safeVerifyData.file_name !== undefined) {
+      safeVerifyData.file_name = String(safeVerifyData.file_name).replace(/\0/g, "").slice(0, 255);
+    }
+
     const { error: upsertError } = await supabase
       .from("profiles")
       .upsert({
@@ -85,7 +140,7 @@ export default async function handler(req, res) {
         expert_status: "pending",
         expert_verify_method: method,
         expert_verify_data: {
-          ...verifyData,
+          ...safeVerifyData,
           submitted_at: new Date().toISOString(),
         },
         updated_at: new Date().toISOString(),
@@ -101,7 +156,7 @@ export default async function handler(req, res) {
     const user = await getAuthUser(req);
     if (!user) return res.status(401).json({ error: "Unauthorized" });
 
-    if (user.user_metadata?.admin !== true) {
+    if (!(await isAdminUser(supabase, user.id))) {
       return res.status(403).json({ error: "Forbidden" });
     }
 

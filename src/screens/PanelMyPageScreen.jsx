@@ -296,28 +296,57 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
         )}
 
         {/* ── Expert status ── */}
+        <style>{`@keyframes expert-blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }`}</style>
         {expertStatus === "verified" ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, background: C.successBg, border: `1px solid ${C.successBorder}`, borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
-            <span style={{ fontSize: 16 }}>🏅</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, background: C.successBg, border: `1px solid ${C.successBorder}`, borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(21,190,83,0.15)", border: `1.5px solid ${C.successBorder}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {Ic.CheckCircle({ s: 18, c: C.success })}
+            </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: C.successText }}>{isKo ? "전문가 인증 완료" : "Expert Verified"}</div>
-              <div style={{ fontSize: 11, color: C.successText, opacity: 0.8, marginTop: 1 }}>{isKo ? "전문가 전용 인터뷰에 참여할 수 있어요" : "You can join expert-only interviews"}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: C.successText }}>{isKo ? "전문가 인증 완료" : "Expert Verified"}</span>
+                <span style={{ fontSize: 10, fontWeight: 600, background: C.success, color: "#fff", borderRadius: 4, padding: "1px 6px" }}>VERIFIED</span>
+              </div>
+              <div style={{ fontSize: 11, color: C.successText, opacity: 0.85 }}>{isKo ? "전문가 전용 인터뷰에 우선 참여할 수 있어요" : "Priority access to expert-only interviews"}</div>
             </div>
           </div>
         ) : expertStatus === "pending" ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.4)", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
-            <span style={{ fontSize: 16 }}>⏳</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.35)", borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
+            <div style={{ position: "relative", width: 36, height: 36, flexShrink: 0 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(245,158,11,0.12)", border: "1.5px solid rgba(245,158,11,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="#f59e0b" strokeWidth="1.6" strokeLinecap="round">
+                  <circle cx="8.5" cy="8.5" r="7" /><path d="M8.5 5v3.5l2.5 1.5" />
+                </svg>
+              </div>
+              <span style={{ position: "absolute", top: 0, right: 0, width: 9, height: 9, borderRadius: "50%", background: "#f59e0b", border: "1.5px solid white", animation: "expert-blink 1.4s ease-in-out infinite" }} />
+            </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "#92650a" }}>{isKo ? "전문가 인증 심사 중" : "Expert Review Pending"}</div>
-              <div style={{ fontSize: 11, color: "#92650a", opacity: 0.8, marginTop: 1 }}>{isKo ? "보통 1-3 영업일 내 결과를 알려드려요" : "Usually 1–3 business days"}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#92650a", marginBottom: 2 }}>{isKo ? "전문가 인증 심사 중" : "Expert Review Pending"}</div>
+              <div style={{ fontSize: 11, color: "#92650a", opacity: 0.85 }}>{isKo ? "보통 1–3 영업일 내 이메일로 결과를 알려드려요" : "Result sent by email, usually 1–3 business days"}</div>
             </div>
           </div>
-        ) : (
-          <div style={{ display: "flex", alignItems: "center", gap: 10, background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
-            <span style={{ fontSize: 16 }}>🔓</span>
+        ) : expertStatus === "rejected" ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(234,34,97,0.05)", border: "1px solid rgba(234,34,97,0.25)", borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(234,34,97,0.08)", border: "1.5px solid rgba(234,34,97,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke={C.ruby} strokeWidth="1.7" strokeLinecap="round">
+                <circle cx="8.5" cy="8.5" r="7" />
+                <line x1="5.5" y1="5.5" x2="11.5" y2="11.5" /><line x1="11.5" y1="5.5" x2="5.5" y2="11.5" />
+              </svg>
+            </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: C.navy }}>{isKo ? "전문가 인증을 받아보세요" : "Get expert verified"}</div>
-              <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{isKo ? "더 많은 인터뷰와 높은 보상을 받을 수 있어요" : "Access more interviews and higher rewards"}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.ruby, marginBottom: 2 }}>{isKo ? "인증이 반려됐어요" : "Verification Rejected"}</div>
+              <div style={{ fontSize: 11, color: C.ruby, opacity: 0.8 }}>{isKo ? "다른 서류로 다시 신청할 수 있어요" : "You can re-apply with a different document"}</div>
+            </div>
+            <Btn size="sm" onClick={() => go("expert_verify")}>{isKo ? "재신청" : "Re-apply"}</Btn>
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 12, background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.purpleBg, border: `1.5px solid ${C.purpleLight}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {Ic.Award({ s: 18, c: C.purple })}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 2 }}>{isKo ? "전문가 인증을 받아보세요" : "Get expert verified"}</div>
+              <div style={{ fontSize: 11, color: C.body }}>{isKo ? "전문가 전용 인터뷰 + 최대 2배 높은 보상" : "Expert-only interviews + up to 2× higher rewards"}</div>
             </div>
             <Btn size="sm" onClick={() => go("expert_verify")}>{isKo ? "신청하기" : "Apply"}</Btn>
           </div>

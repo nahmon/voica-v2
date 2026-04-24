@@ -159,44 +159,113 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
 
   // Expert gate screen
   if (expertGate === true) {
+    const isKo = lang === "ko";
     const statusInfo = {
-      pending:  { label: "심사 중",   color: "#92650a",     bg: "rgba(251,191,36,0.12)", msg: "심사 중입니다. 보통 1-3 영업일 내 결과를 알려드려요." },
-      rejected: { label: "심사 반려", color: C.ruby,         bg: "rgba(217,48,37,0.08)", msg: "심사가 반려됐어요. 다시 신청하거나 고객 지원에 문의해 주세요." },
-      none:     { label: "인증 필요", color: C.body,         bg: C.bg,                   msg: null },
+      pending: {
+        color: "#92650a", bg: "rgba(251,191,36,0.10)", border: "rgba(251,191,36,0.4)",
+        label: isKo ? "심사 진행 중" : "Under Review",
+        msg: isKo ? "심사 중이에요. 보통 1–3 영업일 내 이메일로 결과를 알려드려요." : "Your application is under review. We'll email you the result within 1–3 business days.",
+        icon: (
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#f59e0b" strokeWidth="1.8" strokeLinecap="round">
+            <circle cx="14" cy="14" r="11" /><path d="M14 8v6l4 2" />
+          </svg>
+        ),
+      },
+      rejected: {
+        color: "#b91c1c", bg: "rgba(234,34,97,0.06)", border: "rgba(234,34,97,0.3)",
+        label: isKo ? "인증 반려됨" : "Verification Rejected",
+        msg: isKo ? "이번 인증이 반려됐어요. 다른 서류로 다시 신청해 보세요." : "Your verification was rejected. Please re-apply with a different document.",
+        icon: (
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#ea2261" strokeWidth="1.8" strokeLinecap="round">
+            <circle cx="14" cy="14" r="11" />
+            <line x1="9" y1="9" x2="19" y2="19" /><line x1="19" y1="9" x2="9" y2="19" />
+          </svg>
+        ),
+      },
+      none: {
+        color: C.purple, bg: C.purpleBg, border: C.purpleLight,
+        label: isKo ? "인증 필요" : "Verification Required",
+        msg: null,
+        icon: (
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke={C.purple} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="6" y="13" width="16" height="11" rx="2.5" />
+            <path d="M10 13V9a4 4 0 018 0v4" />
+            <circle cx="14" cy="19" r="1.5" fill={C.purple} stroke="none" />
+          </svg>
+        ),
+      },
     };
     const si = statusInfo[userExpertStatus] ?? statusInfo.none;
     return (
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
         <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
-        <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
-          <div style={{ width: "100%", maxWidth: 480, textAlign: "center" }}>
-            <div style={{ width: 64, height: 64, borderRadius: "50%", background: C.purpleBg, border: `1.5px solid ${C.purpleLight}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.purple} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
-              </svg>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 24px 48px" }}>
+          <div style={{ width: "100%", maxWidth: 420, textAlign: "center" }}>
+            {/* Lock icon */}
+            <div style={{ width: 72, height: 72, borderRadius: "50%", background: si.bg, border: `2px solid ${si.border}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+              {si.icon}
             </div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, marginBottom: 10 }}>전문가 패널 전용 인터뷰입니다</div>
-            <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 20 }}>
-              이 인터뷰는 전문가 인증을 완료한 패널 회원만 참여할 수 있어요.
-            </div>
+
+            {/* Status badge */}
             {userExpertStatus !== "none" && (
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 20, background: si.bg, color: si.color, fontSize: 13, fontWeight: 600, marginBottom: 16, border: `1px solid ${si.color}33` }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 20, background: si.bg, color: si.color, fontSize: 12, fontWeight: 700, marginBottom: 14, border: `1px solid ${si.border}`, letterSpacing: "0.02em" }}>
                 {si.label}
               </div>
             )}
+
+            <div style={{ fontSize: 22, fontWeight: 700, color: C.navy, marginBottom: 10 }}>
+              {isKo ? "전문가 패널 전용 인터뷰입니다" : "Expert Panelists Only"}
+            </div>
+            <div style={{ fontSize: 14, color: C.body, lineHeight: 1.75, marginBottom: si.msg ? 16 : 28 }}>
+              {isKo
+                ? "이 인터뷰는 전문가 인증을 완료한 패널 회원만 참여할 수 있어요."
+                : "This interview is available only to verified expert panel members."}
+            </div>
+
+            {/* Status message card */}
             {si.msg && (
-              <div style={{ fontSize: 13, color: C.body, background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px", marginBottom: 20, lineHeight: 1.65 }}>
+              <div style={{ background: si.bg, border: `1px solid ${si.border}`, borderRadius: 10, padding: "14px 18px", marginBottom: 24, fontSize: 13, color: si.color, lineHeight: 1.65, textAlign: "left" }}>
                 {si.msg}
               </div>
             )}
-            {userExpertStatus !== "pending" && (
+
+            {/* Benefits list (only when none) */}
+            {userExpertStatus === "none" && (
+              <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "16px 20px", marginBottom: 24, textAlign: "left" }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  {isKo ? "전문가 인증 혜택" : "Expert Benefits"}
+                </div>
+                {[
+                  isKo ? "전문가 전용 인터뷰 우선 참여" : "Priority access to expert-only interviews",
+                  isKo ? "일반 대비 최대 2배 높은 보상" : "Up to 2× higher rewards",
+                  isKo ? "커리어 분야 맞춤 매칭" : "Career-matched interview pairing",
+                ].map((point, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: i < 2 ? 8 : 0 }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {Ic.Check({ s: 10, c: C.purple })}
+                    </div>
+                    <span style={{ fontSize: 13, color: C.navy }}>{point}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* CTA */}
+            {userExpertStatus === "pending" ? (
+              <div style={{ fontSize: 13, color: C.body, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: "12px 16px", marginBottom: 16 }}>
+                {isKo ? "심사가 완료되면 이 인터뷰에 참여할 수 있어요." : "Once your review is complete, you'll be able to join this interview."}
+              </div>
+            ) : (
               <Btn full size="lg" onClick={() => go("expert_verify")}>
-                전문가 인증 신청하기 →
+                {isKo
+                  ? (userExpertStatus === "rejected" ? "다른 서류로 재신청하기 →" : "전문가 인증 신청하기 →")
+                  : (userExpertStatus === "rejected" ? "Re-apply with New Document →" : "Apply for Expert Verification →")}
               </Btn>
             )}
-            <div style={{ marginTop: 12 }}>
+
+            <div style={{ marginTop: 14 }}>
               <button onClick={() => go("panel_board")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: C.body, fontFamily: F, textDecoration: "underline" }}>
-                다른 인터뷰 둘러보기
+                {isKo ? "다른 인터뷰 둘러보기" : "Browse other interviews"}
               </button>
             </div>
           </div>
