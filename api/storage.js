@@ -46,12 +46,6 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
-    // [High] Require authentication for upload URL generation
-    const token = req.headers.authorization?.replace("Bearer ", "");
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
-    const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
-    if (authErr || !user) return res.status(401).json({ error: "Unauthorized" });
-
     if (!rateLimit(`upload:${getIp(req)}`, 30)) {
       return res.status(429).json({ error: "Too many requests. Please try again later." });
     }
@@ -80,12 +74,15 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: "Invalid or completed session" });
     }
 
-    // [High] Verify the authenticated user owns this session's interview.
-    // Anonymous respondents have no token and hit this endpoint without auth headers.
-    // If a token IS present (survey owner), we must confirm ownership to prevent
-    // one authenticated user from generating upload URLs for another user's session.
-    if (session.interviews?.user_id !== user.id) {
-      return res.status(403).json({ error: "Forbidden: you do not own this session's interview" });
+    // If a token is present (authenticated user), verify ownership to prevent
+    // one user from generating upload URLs for another user's session.
+    // Anonymous respondents (no token) are allowed through — session in_progress is sufficient.
+    const token = req.headers.authorization?.replace("Bearer ", "");
+    if (token) {
+      const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+      if (!authErr && user && session.interviews?.user_id !== user.id) {
+        return res.status(403).json({ error: "Forbidden: you do not own this session's interview" });
+      }
     }
 
     const path = `${sessionId}/${questionId}.${ext.toLowerCase()}`;
