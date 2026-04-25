@@ -107,12 +107,6 @@ export default function InterviewScreen({ go, shareCode }) {
   const ttsCacheRef = useRef({});
   const warmupPlayUrlRef = useRef(null);
 
-  // Follow-up question state
-  const [followupQ, setFollowupQ] = useState(null);
-  const [inFollowup, setInFollowup] = useState(false);
-  const inFollowupRef = useRef(false);
-  const followupRef = useRef(null);
-
   // Cleanup all media resources on unmount
   useEffect(() => {
     return () => {
@@ -532,74 +526,9 @@ export default function InterviewScreen({ go, shareCode }) {
       await saveResponse({ audio_url: audioUrl, transcript });
       lastTranscriptRef.current = transcript;
 
-      const currentlyInFollowup = inFollowupRef.current;
-      const savedFollowupText = followupRef.current;
-
-      if (currentlyInFollowup) {
-        inFollowupRef.current = false;
-        followupRef.current = null;
-        setInFollowup(false);
-        setFollowupQ(null);
-        setCompletedChats(prev => [...prev, {
-          qText: savedFollowupText,
-          qType: "voice",
-          aText: transcript,
-          isFollowup: true,
-          qIdx: qIndex,
-        }]);
-        lastTranscriptRef.current = null;
-        lastSelectedRef.current = null;
-        setPhase("review_pass");
-        await playBridgeTts();
-        if (qIndex < interview.questions.length - 1) {
-          setQIndex(i => i + 1);
-          setQAnimKey(k => k + 1);
-          setPhase("ai_speaking");
-          setRecordTime(0);
-          setSelectedValue(null);
-          setTtsReadFallback(false);
-        } else {
-          if (sessionId) { try { await fetch("/api/survey?resource=session", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId, status: "completed" }) }); } catch {} }
-          if (shareCode) localStorage.removeItem(`voica_session_${shareCode}`);
-          track("interview_completed", { shareCode, sessionId, total: interview.questions.length });
-          setCompleted(true);
-        }
-        return;
-      }
-
-      // Main answer — fetch follow-up while bridge TTS plays (if enabled)
-      const followupFetchPromise = q.followup_enabled !== false ? fetch("/api/followup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          question_content: q.content,
-          transcript: transcript || "",
-          interview_title: interview.title,
-          session_id: sessionId,
-        }),
-      }).then(r => r.ok ? r.json() : null).catch(() => null) : Promise.resolve(null);
-
       await playBridgeTts();
-      const followupData = await followupFetchPromise;
-      const followupText = followupData?.followup || null;
-
-      if (followupText) {
-        setCompletedChats(prev => [...prev, {
-          qText: q.content,
-          qType: q.type,
-          aText: transcript,
-          qIdx: qIndex,
-        }]);
-        followupRef.current = followupText;
-        inFollowupRef.current = true;
-        setFollowupQ(followupText);
-        setInFollowup(true);
-        await playTtsText(followupText);
-        setPhase("ready");
-      } else {
-        setPhase("review_pass");
-        advanceOrComplete();
-      }
+      setPhase("review_pass");
+      advanceOrComplete();
     };
     mr.stop();
   };
@@ -1083,7 +1012,7 @@ export default function InterviewScreen({ go, shareCode }) {
               <div style={{ fontSize: 11, color: C.purpleLight, marginBottom: 5, display: "flex", alignItems: "center", gap: 6 }}>
                 {phase === "ai_speaking" ? <WaveAnimation active /> : <span style={{ color: "rgba(255,255,255,0.3)" }}>AI 인터뷰어</span>}
               </div>
-              <p key={qAnimKey} style={{ margin: 0, fontSize: isMobile ? 15 : 17, color: C.white, lineHeight: 1.65, animation: "q-fade-in 0.35s ease forwards", wordBreak: "keep-all" }}>{inFollowup ? followupQ : q.content}</p>
+              <p key={qAnimKey} style={{ margin: 0, fontSize: isMobile ? 15 : 17, color: C.white, lineHeight: 1.65, animation: "q-fade-in 0.35s ease forwards", wordBreak: "keep-all" }}>{q.content}</p>
             </div>
           </div>
 
