@@ -491,19 +491,23 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
             {generating ? (
               <GeneratingProgress steps={GEN_STEPS} currentStep={genStep} elapsed={genElapsed} />
             ) : (
-              <Btn onClick={handleGenerateReport} disabled={completedSessions.length === 0}
-                style={completedSessions.length === 0 ? { background: "rgba(110,75,255,0.3)", color: "rgba(255,255,255,0.4)", cursor: "not-allowed" } : {}}>
+              <Btn onClick={handleGenerateReport} disabled={completedSessions.length < 10}
+                style={completedSessions.length < 10 ? { background: "rgba(110,75,255,0.3)", color: "rgba(255,255,255,0.4)", cursor: "not-allowed" } : {}}>
                 {isKo ? "리포트 생성 →" : "Generate Report →"}
               </Btn>
             )}
-            {completedSessions.length === 0 && !generating && (
+            {completedSessions.length < 10 && !generating && (
               <div style={{ marginTop: 20, padding: "16px 20px", borderRadius: 10, background: "rgba(110,75,255,0.06)", border: "1px dashed rgba(110,75,255,0.2)", textAlign: "center" }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>📤</div>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>{completedSessions.length === 0 ? "📤" : "📊"}</div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: dk.text, marginBottom: 6 }}>
-                  {isKo ? "아직 완료된 응답이 없어요" : "No completed responses yet"}
+                  {completedSessions.length === 0
+                    ? (isKo ? "아직 완료된 응답이 없어요" : "No completed responses yet")
+                    : (isKo ? `응답 ${completedSessions.length}개 수집됨` : `${completedSessions.length} responses collected`)}
                 </div>
                 <div style={{ fontSize: 12, color: dk.muted, marginBottom: 12 }}>
-                  {isKo ? "인터뷰 링크를 공유하면 참여자 응답이 여기 쌓여요" : "Share your interview link to collect responses"}
+                  {isKo
+                    ? `응답이 최소 10개 이상 쌓여야 리포트를 생성할 수 있어요. (${completedSessions.length}/10)`
+                    : `At least 10 responses required to generate a report. (${completedSessions.length}/10)`}
                 </div>
                 <button onClick={() => {
                   const url = `${location.origin}/i/${interview?.share_code}`;
