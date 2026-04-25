@@ -45,7 +45,8 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
         card: { useEscrow: false, flowMode: "DEFAULT", useCardPoint: false, useAppCardOnly: false },
       });
     } catch (e) {
-      if (e?.code !== "USER_CANCEL") showToast(e?.message || "결제창을 여는 중 오류가 발생했어요.", "error");
+      console.error("[Toss] error:", e?.code, e?.message, e);
+      if (e?.code !== "USER_CANCEL") showToast(`[${e?.code || "?"}] ${e?.message || "결제창을 여는 중 오류가 발생했어요."}`, "error");
     } finally {
       setPaying(false);
     }
