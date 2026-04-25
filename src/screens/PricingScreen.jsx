@@ -10,7 +10,7 @@ function loadTossSDK() {
   return new Promise((resolve, reject) => {
     if (window.TossPayments) { resolve(window.TossPayments); return; }
     const s = document.createElement("script");
-    s.src = "https://js.tosspayments.com/v1/payment";
+    s.src = "https://js.tosspayments.com/v2/standard";
     s.onload = () => resolve(window.TossPayments);
     s.onerror = reject;
     document.head.appendChild(s);
@@ -33,13 +33,16 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
       const amount = billing === "yearly" ? proKrwYearlyTotal : proKrwMonthly;
       const orderId = `voica_${user.id.replace(/-/g, "").slice(0, 16)}_${Date.now()}`;
       const origin = window.location.origin;
-      await tossPayments.requestPayment("카드", {
-        amount,
+      const payment = tossPayments.payment({ customerKey: user.id });
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: amount },
         orderId,
         orderName: billing === "yearly" ? "Voica Pro 연간 구독" : "Voica Pro 월간 구독",
         customerEmail: user.email,
         successUrl: `${origin}/billing/success?billingCycle=${billing}`,
         failUrl: `${origin}/pricing?payFail=1`,
+        card: { useEscrow: false, flowMode: "DEFAULT", useCardPoint: false, useAppCardOnly: false },
       });
     } catch (e) {
       if (e?.code !== "USER_CANCEL") showToast(e?.message || "결제창을 여는 중 오류가 발생했어요.", "error");
