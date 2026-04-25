@@ -73,12 +73,10 @@ const TRANSLATIONS = {
       ],
     },
     cta: {
-      badge: "Start today",
-      title: "Get started for free",
-      subtitleDesktop: <>No credit card needed — start right away.<br />Your first interview project is completely free.</>,
-      subtitleMobile: "No credit card required.",
-      cta1: "Start as researcher →",
-      cta2: "Join as panelist",
+      title: "Start your first interview\ntoday.",
+      subtitle: "100 voice interviews free. No credit card required.",
+      cta1: "Start free →",
+      cta2: "Contact sales",
     },
   },
   ko: {
@@ -146,12 +144,10 @@ const TRANSLATIONS = {
       ],
     },
     cta: {
-      badge: "지금 시작하기",
-      title: "무료로 시작하세요",
-      subtitleDesktop: <>신용카드 없이 바로 시작할 수 있어요.<br />첫 번째 인터뷰 프로젝트는 완전 무료예요.</>,
-      subtitleMobile: "빠르게 인터뷰를 시작해보세요.",
-      cta1: "리서치 시작하기 →",
-      cta2: "패널로 참여하기",
+      title: "오늘 오후에 첫 인터뷰를\n돌려보세요.",
+      subtitle: "음성 인터뷰 100건 무료. 카드 등록 불필요.",
+      cta1: "무료로 시작 →",
+      cta2: "영업팀 문의",
     },
   },
 };
@@ -459,56 +455,46 @@ function UseCasesSection({ isMobile, t }) {
 
 /* ── Final CTA section ── */
 function FinalCtaSection({ go, isMobile, t }) {
-  const { badge: badgeText, title, subtitleDesktop, subtitleMobile, cta1, cta2 } = t.cta;
+  const { title, subtitle, cta1, cta2 } = t.cta;
   return (
     <FadeInSection>
-      <section style={{
-        background: `linear-gradient(135deg, ${C.navy} 0%, #1c1e54 50%, ${C.purple} 100%)`,
-        backgroundSize: "200% 200%",
-        animation: "hero-gradient-shift 8s ease infinite",
-        padding: isMobile ? "72px 20px" : "100px 24px",
-        textAlign: "center",
-      }}>
-        <div style={{ maxWidth: 600, margin: "0 auto" }}>
-          <Badge variant="purple" style={{ marginBottom: 20, background: "rgba(255,255,255,0.12)", color: C.white, border: "1px solid rgba(255,255,255,0.2)" }}>
-            {badgeText}
-          </Badge>
-          <h2 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 700, color: C.white, margin: "0 0 16px", fontFamily: F, lineHeight: 1.15, letterSpacing: "-0.03em" }}>
-            {title}
-          </h2>
-          <p style={{ fontSize: isMobile ? 15 : 17, color: "rgba(255,255,255,0.72)", margin: "0 0 44px", lineHeight: 1.6 }}>
-            {isMobile ? subtitleMobile : subtitleDesktop}
-          </p>
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-            <button
-              className="cta-btn"
-              onClick={() => go("advertiser_login")}
-              style={{
-                cursor: "pointer", padding: "14px 32px", borderRadius: 12,
-                background: C.white, border: "none",
-                fontSize: 15, fontWeight: 700, color: C.purple,
-                fontFamily: F, letterSpacing: "0.02em",
-                transition: "transform 0.12s ease-out, filter 0.12s ease-out",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px) scale(1.01)"; e.currentTarget.style.filter = "brightness(1.06)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; }}
-            >
-              {cta1.replace(" →", "")} <span className="ba">→</span>
-            </button>
-            <button
-              onClick={() => go("panel_entry")}
-              style={{
-                cursor: "pointer", padding: "14px 32px", borderRadius: 12,
-                background: "transparent", border: "1.5px solid rgba(255,255,255,0.45)",
-                fontSize: 15, fontWeight: 600, color: C.white,
-                fontFamily: F, letterSpacing: "0.02em",
-                transition: "transform 0.12s ease-out, filter 0.12s ease-out, background 0.12s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.filter = "brightness(1.1)"; e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; e.currentTarget.style.background = "transparent"; }}
-            >
-              {cta2}
-            </button>
+      <section style={{ background: C.bg, padding: isMobile ? "48px 20px" : "72px 40px" }}>
+        <div style={{ maxWidth: 1160, margin: "0 auto" }}>
+          <div style={{
+            background: "linear-gradient(135deg, #18104a 0%, #2d1b8c 45%, #5a3bdd 100%)",
+            borderRadius: 20,
+            padding: isMobile ? "44px 28px" : "56px 60px",
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: isMobile ? "flex-start" : "center",
+            justifyContent: "space-between",
+            gap: isMobile ? 32 : 40,
+            position: "relative",
+            overflow: "hidden",
+          }}>
+            <div style={{ position: "absolute", top: -100, right: "15%", width: 360, height: 360, borderRadius: "50%", background: "rgba(110,75,255,0.35)", filter: "blur(90px)", pointerEvents: "none" }} />
+            <div style={{ position: "relative", maxWidth: isMobile ? "100%" : 520 }}>
+              <h2 style={{ fontSize: isMobile ? 26 : 38, fontWeight: 700, color: "#fff", margin: "0 0 12px", lineHeight: 1.2, letterSpacing: "-0.025em", fontFamily: F, whiteSpace: "pre-line" }}>
+                {title}
+              </h2>
+              <p style={{ fontSize: isMobile ? 14 : 15, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.6 }}>
+                {subtitle}
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: 12, flexShrink: 0, flexWrap: "wrap", position: "relative" }}>
+              <button onClick={() => go("support")}
+                style={{ padding: "12px 22px", borderRadius: 10, border: "1.5px solid rgba(255,255,255,0.35)", background: "transparent", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F, transition: "background 0.15s, border-color 0.15s" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.6)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)"; }}>
+                {cta2}
+              </button>
+              <button onClick={() => go("advertiser_login")}
+                style={{ padding: "12px 22px", borderRadius: 10, border: "none", background: "#fff", color: "#3b22c8", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: F, transition: "transform 0.12s, filter 0.12s" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.filter = "brightness(1.05)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; }}>
+                {cta1}
+              </button>
+            </div>
           </div>
         </div>
       </section>

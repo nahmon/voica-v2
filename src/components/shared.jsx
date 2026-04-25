@@ -374,57 +374,74 @@ const VOC_LIST_KO = [
 ];
 
 export function VoCCarousel({ lang = "en" }) {
-  const [idx, setIdx] = useState(0);
-  const [paused, setPaused] = useState(false);
   const isMobile = useIsMobile();
-  const list = lang === "ko" ? VOC_LIST_KO : VOC_LIST;
-  const total = list.length;
+  const isKo = lang === "ko";
+  const list = isKo ? VOC_LIST_KO : VOC_LIST;
   const trackRef = useRef(null);
+  const GAP = 16;
 
-  useEffect(() => {
-    if (paused) return;
-    const t = setInterval(() => setIdx(i => (i + 1) % total), 4200);
-    return () => clearInterval(t);
-  }, [total, paused]);
+  const scrollStep = (dir) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const cardW = isMobile
+      ? el.clientWidth * 0.85
+      : (el.clientWidth - 3 * GAP) / 4;
+    el.scrollBy({ left: dir * (cardW + GAP), behavior: "smooth" });
+  };
 
-  useEffect(() => {
-    if (trackRef.current) {
-      trackRef.current.style.transform = `translateX(-${idx * 100}%)`;
-    }
-  }, [idx]);
+  const dk = {
+    bg: "#0f1117", card: "#181d2a",
+    text: "#e2e8f0", muted: "rgba(255,255,255,0.45)",
+    border: "rgba(255,255,255,0.07)",
+  };
 
   return (
-    <section style={{ background: "#ffffff", padding: "72px 0", overflow: "hidden" }}>
-      <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 10 }}>{lang === "ko" ? "고객 리뷰" : "Customer Reviews"}</div>
-          <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.14, textAlign: "center", margin: "0", fontFamily: F }}>{lang === "ko" ? "사용자들의 이야기" : "What our users are saying"}</h2>
+    <section style={{ background: dk.bg, padding: isMobile ? "56px 0" : "72px 0" }}>
+      <style>{`.voc-track::-webkit-scrollbar{display:none}`}</style>
+      <div style={{ maxWidth: 1240, margin: "0 auto", paddingLeft: isMobile ? 20 : 40 }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36, paddingRight: isMobile ? 20 : 40 }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: dk.muted, marginBottom: 10 }}>
+              {isKo ? "고객 후기" : "Customer Stories"}
+            </div>
+            <h2 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 700, color: dk.text, margin: 0, lineHeight: 1.18, letterSpacing: "-0.025em", fontFamily: F }}>
+              {isKo ? <>가장 빠른 팀들의<br />리서치 방식.</> : <>How the fastest<br />teams research.</>}
+            </h2>
+          </div>
+          {!isMobile && (
+            <div style={{ display: "flex", gap: 8, flexShrink: 0, paddingRight: 40 }}>
+              {[-1, 1].map(dir => (
+                <button key={dir} onClick={() => scrollStep(dir)}
+                  style={{ width: 38, height: 38, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.06)", color: dk.text, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, lineHeight: 1, transition: "background 0.15s, border-color 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)"; }}>
+                  {dir === -1 ? "‹" : "›"}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-        <div style={{ overflow: "hidden" }} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-          <div ref={trackRef} style={{ display: "flex", transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)" }}>
-            {list.map((v, i) => (
-              <div key={i} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box", display: "flex" }}>
-                <div style={{ flex: 1, background: C.white, borderRadius: 16, padding: isMobile ? "24px 20px" : "36px 40px", border: `1px solid ${C.border}`, minHeight: 260, display: "flex", flexDirection: "column" }}>
-                  <p style={{ margin: "0 0 24px", fontSize: isMobile ? 14 : 17, fontWeight: 400, color: C.navy, lineHeight: 1.7, letterSpacing: "0.16px", flex: 1 }}>"{v.quote}"</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 16, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
-                    <div style={{ width: 48, height: 48, borderRadius: "50%", background: `rgba(83,58,253,0.1)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: C.purple, fontWeight: 700, flexShrink: 0 }}>{v.name[0]}</div>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, letterSpacing: "0.16px" }}>{v.name}</div>
-                      <div style={{ fontSize: 13, color: "rgba(10,11,13,0.56)", marginTop: 2, letterSpacing: "0.16px" }}>{v.title} · {v.company}</div>
-                    </div>
+
+        {/* Track */}
+        <div ref={trackRef} className="voc-track"
+          style={{ display: "flex", gap: GAP, overflowX: "auto", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory", paddingRight: isMobile ? 20 : 40 }}>
+          {list.map((v, i) => (
+            <div key={i} style={{ flex: `0 0 ${isMobile ? "calc(85% - 16px)" : "calc(25% - 12px)"}`, scrollSnapAlign: "start", minWidth: 0 }}>
+              <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 16, padding: isMobile ? "22px 18px" : "28px 24px", height: "100%", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
+                <div style={{ fontSize: 28, color: "#a78bff", lineHeight: 1, marginBottom: 14, opacity: 0.6, fontFamily: "Georgia, 'Times New Roman', serif" }}>"</div>
+                <p style={{ margin: "0 0 auto", fontSize: 13, color: dk.text, lineHeight: 1.72, flex: 1, paddingBottom: 20 }}>{v.quote}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 16, borderTop: `1px solid ${dk.border}` }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(110,75,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#a78bff", fontWeight: 700, flexShrink: 0 }}>{v.name[0]}</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: dk.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.name}</div>
+                    <div style={{ fontSize: 11, color: dk.muted, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.title} · {v.company}</div>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 0, marginTop: 24 }}>
-          {list.map((_, i) => (
-            <button key={i} onClick={() => setIdx(i)} aria-label={`Go to review ${i + 1}`}
-              style={{ background: "none", border: "none", cursor: "pointer", padding: "10px 6px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <span style={{ display: "block", width: i === idx ? 18 : 6, height: 6, borderRadius: 3, background: i === idx ? C.purple : "rgba(23,23,23,0.3)", transition: "all 0.3s", flexShrink: 0 }} />
-            </button>
+            </div>
           ))}
+          <div style={{ flex: "0 0 24px" }} />
         </div>
       </div>
     </section>
