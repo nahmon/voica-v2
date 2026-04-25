@@ -33,7 +33,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
       const amount = billing === "yearly" ? proKrwYearlyTotal : proKrwMonthly;
       const orderId = `voica_${user.id.replace(/-/g, "").slice(0, 16)}_${Date.now()}`;
       const origin = window.location.origin;
-      const payment = tossPayments.payment({ customerKey: `voica_${user.id.replace(/-/g, "")}` });
+      const payment = tossPayments.payment({ customerKey: "ANONYMOUS" });
       await payment.requestPayment({
         method: "CARD",
         amount: { currency: "KRW", value: amount },
@@ -42,7 +42,6 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
         customerEmail: user.email,
         successUrl: `${origin}/billing/success?billingCycle=${billing}`,
         failUrl: `${origin}/pricing?payFail=1`,
-        card: { useEscrow: false, flowMode: "DEFAULT", useCardPoint: false, useAppCardOnly: false },
       });
     } catch (e) {
       console.error("[Toss] error:", e?.code, e?.message, e);
