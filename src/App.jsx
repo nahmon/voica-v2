@@ -53,6 +53,8 @@ const PrivacyScreen        = lazy(() => import("./screens/PrivacyScreen.jsx"));
 const AboutScreen          = lazy(() => import("./screens/AboutScreen.jsx"));
 const BillingSuccessScreen = lazy(() => import("./screens/BillingSuccessScreen.jsx"));
 const ExpertVerifyScreen   = lazy(() => import("./screens/ExpertVerifyScreen.jsx"));
+const PaymentScreen        = lazy(() => import("./screens/PaymentScreen.jsx"));
+const PaymentSuccessScreen = lazy(() => import("./screens/PaymentSuccessScreen.jsx"));
 
 function OAuthErrorHandler() {
   const { showToast } = useToast();
@@ -114,7 +116,7 @@ function AppRoutes() {
       landing: "/", dashboard: "/dashboard", role_select: "/role-select",
       advertiser_login: "/auth", panel_board: "/panel", panel_entry: "/panel/entry",
       panel_mypage: "/panel/mypage", recruiter_admin: "/admin",
-      pricing: "/pricing", support: "/support", faq: "/faq",
+      pricing: "/pricing", payment_subscribe: "/payment/subscribe", support: "/support", faq: "/faq",
       terms: "/terms", privacy: "/privacy", about: "/about",
       expert_verify: "/panel/expert-verify",
     };
@@ -190,6 +192,8 @@ function AppRoutes() {
         <Route path="/privacy"       element={<PrivacyScreen {...common} />} />
         <Route path="/about"          element={<AboutScreen {...common} />} />
         <Route path="/billing/success" element={<BillingSuccessScreen {...common} />} />
+        <Route path="/payment/subscribe" element={<PaymentScreen {...common} />} />
+        <Route path="/payment/success"   element={<PaymentSuccessScreen {...common} />} />
         <Route path="/panel/expert-verify" element={<ExpertVerifyScreen {...common} />} />
         <Route path="*"              element={<LandingScreen {...common} />} />
       </Routes>

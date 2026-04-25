@@ -1,68 +1,35 @@
 import { useState } from "react";
+import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { C, S, F } from "../lib/constants.jsx";
 import { Badge, Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
 
-const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
+const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
 
-function loadTossSDK() {
-  return new Promise((resolve, reject) => {
-    if (window.TossPayments) { resolve(window.TossPayments); return; }
-    const s = document.createElement("script");
-    s.src = "https://js.tosspayments.com/v2/standard";
-    s.onload = () => resolve(window.TossPayments);
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
+const CREDIT_PACKAGES = [
+  { id: "credit_100k",  label: "100,000원", amount: 100000,  credits: "100,000크레딧" },
+  { id: "credit_300k",  label: "300,000원", amount: 300000,  credits: "300,000크레딧", badge: "인기" },
+  { id: "credit_1m",    label: "1,000,000원", amount: 1000000, credits: "1,000,000크레딧", badge: "대용량" },
+];
 
 export default function PricingScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
   const { showToast } = useToast();
   const [billing, setBilling] = useState("monthly");
-  const [paying, setPaying] = useState(false);
+  const [paying, setPaying] = useState(null); // null | "pro" | packageId
 
-  const handleProStart = async () => {
-    if (!user) { go("auth"); return; }
-    if (!TOSS_CLIENT_KEY) { showToast("결제 설정이 준비 중이에요.", "error"); return; }
-    setPaying(true);
-    try {
-      const TossPayments = await loadTossSDK();
-      const tossPayments = TossPayments(TOSS_CLIENT_KEY);
-      const amount = billing === "yearly" ? proKrwYearlyTotal : proKrwMonthly;
-      const orderId = `voica_${user.id.replace(/-/g, "").slice(0, 16)}_${Date.now()}`;
-      const origin = window.location.origin;
-      const payment = tossPayments.payment({ customerKey: "ANONYMOUS" });
-      await payment.requestPayment({
-        method: "CARD",
-        amount: { currency: "KRW", value: amount },
-        orderId,
-        orderName: billing === "yearly" ? "Voica Pro 연간 구독" : "Voica Pro 월간 구독",
-        customerEmail: user.email,
-        successUrl: `${origin}/billing/success?billingCycle=${billing}`,
-        failUrl: `${origin}/pricing?payFail=1`,
-      });
-    } catch (e) {
-      console.error("[Toss] error:", e?.code, e?.message, e);
-      if (e?.code !== "USER_CANCEL") showToast(`[${e?.code || "?"}] ${e?.message || "결제창을 여는 중 오류가 발생했어요."}`, "error");
-    } finally {
-      setPaying(false);
-    }
-  };
-  const [hoveredCard, setHoveredCard] = useState(null);
   const isKo = lang === "ko";
 
-  const proMonthly = 149;
-  const proYearlyMonthly = Math.round(proMonthly * 0.8);
-  const proYearlyTotal = proYearlyMonthly * 12;
   const proKrwMonthly = 199000;
   const proKrwYearlyMonthly = 159000;
   const proKrwYearlyTotal = proKrwYearlyMonthly * 12;
+  const proMonthly = 149;
+  const proYearlyMonthly = Math.round(proMonthly * 0.8);
+  const proYearlyTotal = proYearlyMonthly * 12;
+
   const proDisplayPrice = isKo
-    ? (billing === "yearly"
-        ? `₩${proKrwYearlyMonthly.toLocaleString("ko-KR")}/월`
-        : `₩${proKrwMonthly.toLocaleString("ko-KR")}/월`)
+    ? (billing === "yearly" ? `₩${proKrwYearlyMonthly.toLocaleString("ko-KR")}/월` : `₩${proKrwMonthly.toLocaleString("ko-KR")}/월`)
     : (billing === "yearly" ? `$${proYearlyMonthly}/mo` : `$${proMonthly}/mo`);
   const proDisplaySub = billing === "yearly"
     ? (isKo ? `연 ₩${proKrwYearlyTotal.toLocaleString("ko-KR")} 결제 · 20% 절약` : `$${proYearlyTotal} billed annually · save 20%`)
@@ -87,20 +54,56 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
   ];
 
   const enterpriseFeatures = isKo ? [
-    "무제한 인터뷰",
-    "전담 CSM",
-    "맞춤 리포트",
-    "99.9% SLA",
-    "PPT 슬라이드 자동 생성",
-    "Slack & Notion 연동",
+    "무제한 인터뷰", "전담 CSM", "맞춤 리포트",
+    "99.9% SLA", "PPT 슬라이드 자동 생성", "Slack & Notion 연동",
   ] : [
-    "Unlimited interviews",
-    "Dedicated CSM",
-    "Custom reports",
-    "99.9% SLA",
-    "Auto-generated PPT slides",
-    "Slack & Notion integration",
+    "Unlimited interviews", "Dedicated CSM", "Custom reports",
+    "99.9% SLA", "Auto-generated PPT slides", "Slack & Notion integration",
   ];
+
+  const handleProStart = () => {
+    if (!user) { go("auth"); return; }
+    go("payment_subscribe");
+  };
+
+  const handleCreditPurchase = async (pkg) => {
+    if (!user) { go("auth"); return; }
+    if (!VITE_TOSS_CLIENT_KEY) { showToast("결제 설정이 준비 중이에요.", "error"); return; }
+    setPaying(pkg.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) { go("auth"); return; }
+
+      // 서버에서 주문 생성
+      const prepRes = await fetch("/api/payments/prepare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ packageId: pkg.id }),
+      });
+      const { orderId, amount, orderName, error: prepError } = await prepRes.json();
+      if (!prepRes.ok) throw new Error(prepError || "주문 생성 실패");
+
+      // 토스 결제창 오픈
+      const tossPayments = await loadTossPayments(VITE_TOSS_CLIENT_KEY);
+      const payment = tossPayments.payment({ customerKey: "ANONYMOUS" });
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: amount },
+        orderId,
+        orderName,
+        customerEmail: user.email ?? "",
+        successUrl: `${window.location.origin}/payment/success?type=credit`,
+        failUrl: `${window.location.origin}/pricing`,
+      });
+    } catch (e) {
+      if (e?.code !== "USER_CANCEL") showToast(e?.message || "결제 오류가 발생했어요.", "error");
+    } finally {
+      setPaying(null);
+    }
+  };
+
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, fontFeatureSettings: '"ss01"', display: "flex", flexDirection: "column" }}>
@@ -118,6 +121,8 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
       </div>
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 24px 80px", flex: 1 }}>
+
+        {/* 구독 플랜 */}
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 36 }}>
           <div style={{ display: "inline-flex", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 3, gap: 2 }}>
             {[["monthly", isKo ? "월간" : "Monthly"], ["yearly", isKo ? "연간" : "Annually"]].map(([val, label]) => (
@@ -130,11 +135,9 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2,1fr)", gap: 20, alignItems: "stretch", maxWidth: 780, margin: "0 auto" }}>
-
-          <div
-            onMouseEnter={() => setHoveredCard("pro")}
-            onMouseLeave={() => setHoveredCard(null)}
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2,1fr)", gap: 20, alignItems: "stretch", maxWidth: 780, margin: "0 auto 60px" }}>
+          {/* Pro */}
+          <div onMouseEnter={() => setHoveredCard("pro")} onMouseLeave={() => setHoveredCard(null)}
             style={{ background: C.white, border: `2px solid ${C.purple}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.elevated, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "pro" ? "scale(1.015)" : "scale(1)", filter: hoveredCard === "pro" ? "brightness(1.03)" : "brightness(1)", transition: "transform 0.15s ease-out, filter 0.15s ease-out" }}>
             <div style={{ position: "absolute", top: 14, right: 14 }}>
               <span style={{ fontSize: 10, fontWeight: 700, background: C.purpleBg, color: C.purple, padding: "3px 8px", borderRadius: 4 }}>{isKo ? "인기" : "Most popular"}</span>
@@ -150,12 +153,13 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
                 </div>
               ))}
             </div>
-            <Btn full onClick={handleProStart} disabled={paying}>{paying ? (isKo ? "결제창 열기..." : "Opening...") : (isKo ? "Pro 시작하기 →" : "Start Pro →")}</Btn>
+            <Btn full onClick={handleProStart} disabled={paying === "pro"}>
+              {paying === "pro" ? (isKo ? "연결 중..." : "Loading...") : (isKo ? "Pro 구독 시작하기 →" : "Start Pro →")}
+            </Btn>
           </div>
 
-          <div
-            onMouseEnter={() => setHoveredCard("enterprise")}
-            onMouseLeave={() => setHoveredCard(null)}
+          {/* Enterprise */}
+          <div onMouseEnter={() => setHoveredCard("enterprise")} onMouseLeave={() => setHoveredCard(null)}
             style={{ background: C.white, border: `1.5px solid ${hoveredCard === "enterprise" ? C.purple : C.border}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.standard, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "enterprise" ? "scale(1.015)" : "scale(1)", filter: hoveredCard === "enterprise" ? "brightness(1.03)" : "brightness(1)", transition: "transform 0.15s ease-out, filter 0.15s ease-out, border-color 0.15s ease-out" }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 8, letterSpacing: 0.5 }}>Enterprise</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: C.navy, lineHeight: 1.2, marginBottom: 4 }}>{isKo ? "맞춤 요금" : "Custom pricing"}</div>
@@ -170,8 +174,43 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
             </div>
             <Btn full onClick={() => go("support")}>{isKo ? "영업팀 문의 →" : "Contact sales →"}</Btn>
           </div>
-
         </div>
+
+        {/* 크레딧 추가 구매 */}
+        <div style={{ maxWidth: 780, margin: "0 auto" }}>
+          <div style={{ marginBottom: 24, textAlign: "center" }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: C.navy, margin: "0 0 8px" }}>
+              {isKo ? "크레딧 추가 구매" : "Buy more credits"}
+            </h2>
+            <p style={{ fontSize: 13, color: C.body, margin: 0 }}>
+              {isKo ? "일회성 결제로 크레딧을 충전하세요. 구독과 별개로 사용할 수 있어요." : "One-time purchase, use anytime alongside your subscription."}
+            </p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16 }}>
+            {CREDIT_PACKAGES.map(pkg => (
+              <div key={pkg.id}
+                style={{ background: C.white, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "24px 20px", display: "flex", flexDirection: "column", gap: 4, position: "relative" }}>
+                {pkg.badge && (
+                  <span style={{ position: "absolute", top: 12, right: 12, fontSize: 10, fontWeight: 700, background: C.purpleBg, color: C.purple, padding: "2px 7px", borderRadius: 4 }}>
+                    {pkg.badge}
+                  </span>
+                )}
+                <div style={{ fontSize: 11, fontWeight: 600, color: C.body, letterSpacing: 0.4, marginBottom: 4 }}>
+                  {isKo ? "크레딧 충전" : "Credit Pack"}
+                </div>
+                <div style={{ fontSize: 26, fontWeight: 800, color: C.navy }}>{pkg.label}</div>
+                <div style={{ fontSize: 12, color: C.body, marginBottom: 16 }}>{pkg.credits}</div>
+                <button
+                  disabled={!!paying}
+                  onClick={() => handleCreditPurchase(pkg)}
+                  style={{ padding: "10px 0", borderRadius: 8, border: `1.5px solid ${C.purple}`, background: paying === pkg.id ? C.purpleBg : "transparent", color: C.purple, fontSize: 13, fontWeight: 600, cursor: paying ? "wait" : "pointer", fontFamily: F, transition: "background 0.15s" }}>
+                  {paying === pkg.id ? (isKo ? "결제창 열기..." : "Opening...") : (isKo ? "충전하기" : "Buy now")}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
       <Footer go={go} lang={lang} onLangChange={onLangChange} />
     </div>
