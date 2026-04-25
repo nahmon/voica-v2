@@ -74,7 +74,7 @@ export default async function handler(req, res) {
 
     // No question_id = bridge phrase, skip cache
     if (!question_id) {
-      const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "nova", input: text });
+      const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "shimmer", input: text });
       const buffer = Buffer.from(await mp3.arrayBuffer());
       return res.status(200).json({ url: `data:audio/mpeg;base64,${buffer.toString("base64")}` });
     }
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
     if (!q) return res.status(404).json({ error: "Question not found" });
     if (q.tts_url) return res.status(200).json({ url: q.tts_url });
 
-    const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "nova", input: text });
+    const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "shimmer", input: text });
     const buffer = Buffer.from(await mp3.arrayBuffer());
 
     const path = `${question_id}.mp3`;

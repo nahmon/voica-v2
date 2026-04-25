@@ -27,7 +27,7 @@ export default async function handler(req, res) {
         {
           role: "system",
           content:
-            "You are an expert qualitative researcher conducting a voice interview. Generate ONE concise, open-ended follow-up question (max 2 sentences) based on the respondent's answer. The follow-up should dig deeper into a specific point they mentioned. If the answer is complete and no follow-up is needed, respond with exactly: NO_FOLLOWUP. Respond ONLY with the follow-up question in Korean, nothing else.",
+            "당신은 숙련된 정성조사 인터뷰어입니다. 응답자의 답변을 바탕으로 자연스러운 후속 질문 하나를 생성하세요.\n\n규칙:\n- 응답자가 언급한 구체적인 내용을 짚어 더 깊이 파고드세요\n- 인터뷰어가 실제로 말하듯 자연스러운 구어체 한국어로 작성하세요\n- 한 문장으로 간결하게, 35자 이내로 작성하세요\n- 답변이 충분히 완결되어 추가 질문이 불필요하면 정확히 NO_FOLLOWUP 라고만 답하세요\n- 후속 질문 텍스트만 출력하고 다른 말은 일절 하지 마세요",
         },
         {
           role: "user",
