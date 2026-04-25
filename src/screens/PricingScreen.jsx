@@ -33,7 +33,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
       const amount = billing === "yearly" ? proKrwYearlyTotal : proKrwMonthly;
       const orderId = `voica_${user.id.replace(/-/g, "").slice(0, 16)}_${Date.now()}`;
       const origin = window.location.origin;
-      const payment = tossPayments.payment({ customerKey: user.id });
+      const payment = tossPayments.payment({ customerKey: `voica_${user.id.replace(/-/g, "")}` });
       await payment.requestPayment({
         method: "CARD",
         amount: { currency: "KRW", value: amount },
