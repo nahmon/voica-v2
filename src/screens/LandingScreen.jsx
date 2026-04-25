@@ -630,7 +630,7 @@ export default function LandingScreen({ go, user, logout, lang = "ko", onLangCha
 
       <div style={{ display: "flex", justifyContent: "center" }}><div style={{ width: "70%", borderTop: `1px solid ${C.border}` }} /></div>
 
-      {/* ── Carousels ── */}
+      {/* ── VoC Carousel ── */}
       <FadeInSection>
         <VoCCarousel lang={lang} />
       </FadeInSection>

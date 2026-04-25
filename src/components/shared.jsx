@@ -389,23 +389,23 @@ export function VoCCarousel({ lang = "en" }) {
     el.scrollBy({ left: dir * (cardW + GAP), behavior: "smooth" });
   };
 
-  const dk = {
-    bg: "#0f1117", card: "#181d2a",
-    text: "#e2e8f0", muted: "rgba(255,255,255,0.45)",
-    border: "rgba(255,255,255,0.07)",
+  const lt = {
+    bg: "#fff", card: "#f6f5fc",
+    text: "#18143a", muted: "rgba(60,50,110,0.5)",
+    border: "rgba(110,75,255,0.13)",
   };
 
   return (
-    <section style={{ background: dk.bg, padding: isMobile ? "56px 0" : "72px 0" }}>
+    <section style={{ background: lt.bg, padding: isMobile ? "56px 0" : "72px 0" }}>
       <style>{`.voc-track::-webkit-scrollbar{display:none}`}</style>
       <div style={{ maxWidth: 1240, margin: "0 auto", paddingLeft: isMobile ? 20 : 40 }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36, paddingRight: isMobile ? 20 : 40 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: dk.muted, marginBottom: 10 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: C.purple, marginBottom: 10 }}>
               {isKo ? "고객 후기" : "Customer Stories"}
             </div>
-            <h2 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 700, color: dk.text, margin: 0, lineHeight: 1.18, letterSpacing: "-0.025em", fontFamily: F }}>
+            <h2 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 700, color: lt.text, margin: 0, lineHeight: 1.18, letterSpacing: "-0.025em", fontFamily: F }}>
               {isKo ? <>가장 빠른 팀들의<br />리서치 방식.</> : <>How the fastest<br />teams research.</>}
             </h2>
           </div>
@@ -413,9 +413,9 @@ export function VoCCarousel({ lang = "en" }) {
             <div style={{ display: "flex", gap: 8, flexShrink: 0, paddingRight: 40 }}>
               {[-1, 1].map(dir => (
                 <button key={dir} onClick={() => scrollStep(dir)}
-                  style={{ width: 38, height: 38, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.06)", color: dk.text, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, lineHeight: 1, transition: "background 0.15s, border-color 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)"; }}>
+                  style={{ width: 38, height: 38, borderRadius: "50%", border: `1px solid ${lt.border}`, background: "rgba(110,75,255,0.06)", color: C.purple, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, lineHeight: 1, transition: "background 0.15s, border-color 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(110,75,255,0.12)"; e.currentTarget.style.borderColor = "rgba(110,75,255,0.3)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(110,75,255,0.06)"; e.currentTarget.style.borderColor = lt.border; }}>
                   {dir === -1 ? "‹" : "›"}
                 </button>
               ))}
@@ -428,14 +428,14 @@ export function VoCCarousel({ lang = "en" }) {
           style={{ display: "flex", gap: GAP, overflowX: "auto", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory", paddingRight: isMobile ? 20 : 40 }}>
           {list.map((v, i) => (
             <div key={i} style={{ flex: `0 0 ${isMobile ? "calc(85% - 16px)" : "calc(25% - 12px)"}`, scrollSnapAlign: "start", minWidth: 0 }}>
-              <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 16, padding: isMobile ? "22px 18px" : "28px 24px", height: "100%", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
-                <div style={{ fontSize: 28, color: "#a78bff", lineHeight: 1, marginBottom: 14, opacity: 0.6, fontFamily: "Georgia, 'Times New Roman', serif" }}>"</div>
-                <p style={{ margin: "0 0 auto", fontSize: 13, color: dk.text, lineHeight: 1.72, flex: 1, paddingBottom: 20 }}>{v.quote}</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 16, borderTop: `1px solid ${dk.border}` }}>
-                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(110,75,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#a78bff", fontWeight: 700, flexShrink: 0 }}>{v.name[0]}</div>
+              <div style={{ background: lt.card, border: `1px solid ${lt.border}`, borderRadius: 16, padding: isMobile ? "22px 18px" : "28px 24px", height: "100%", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
+                <div style={{ fontSize: 28, color: C.purple, lineHeight: 1, marginBottom: 14, opacity: 0.5, fontFamily: "Georgia, 'Times New Roman', serif" }}>"</div>
+                <p style={{ margin: "0 0 auto", fontSize: 13, color: lt.text, lineHeight: 1.72, flex: 1, paddingBottom: 20 }}>{v.quote}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 16, borderTop: `1px solid ${lt.border}` }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(110,75,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: C.purple, fontWeight: 700, flexShrink: 0 }}>{v.name[0]}</div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: dk.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.name}</div>
-                    <div style={{ fontSize: 11, color: dk.muted, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.title} · {v.company}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: lt.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.name}</div>
+                    <div style={{ fontSize: 11, color: lt.muted, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.title} · {v.company}</div>
                   </div>
                 </div>
               </div>
