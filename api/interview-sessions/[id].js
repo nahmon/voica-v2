@@ -1,8 +1,12 @@
 import { supabase } from "../_supabase.js";
-
+import { rateLimit, getIp } from "../_rateLimit.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+
+  if (!rateLimit(`interview-sessions:${getIp(req)}`, 30)) {
+    return res.status(429).json({ error: "Too many requests" });
+  }
 
   const { id: interviewId } = req.query;
   if (!interviewId) return res.status(400).json({ error: "interviewId required" });

@@ -1,4 +1,5 @@
 import { supabase } from "./_supabase.js";
+import { rateLimit, getIp } from "./_rateLimit.js";
 
 async function getUser(req) {
   const token = req.headers.authorization?.replace("Bearer ", "");
@@ -9,6 +10,10 @@ async function getUser(req) {
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  if (!rateLimit(`participant:${getIp(req)}`, 20)) {
+    return res.status(429).json({ error: "Too many requests" });
+  }
 
   const user = await getUser(req);
   if (!user) return res.status(401).json({ error: "Unauthorized" });

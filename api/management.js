@@ -1,10 +1,15 @@
 import { supabase } from "./_supabase.js";
+import { rateLimit, getIp } from "./_rateLimit.js";
 
 const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY;
 const ADMIN_IDS = (process.env.ADMIN_USER_IDS ?? "").split(",").map(s => s.trim()).filter(Boolean);
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  if (!rateLimit(`management:${getIp(req)}`, 15)) {
+    return res.status(429).json({ error: "Too many requests" });
+  }
 
   const resource = req.query.resource;
 

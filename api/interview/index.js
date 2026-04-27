@@ -2,6 +2,7 @@
 import { randomBytes } from "crypto";
 import OpenAI from "openai";
 import { supabase } from "../_supabase.js";
+import { rateLimit, getIp } from "../_rateLimit.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -29,6 +30,10 @@ function nanoid(len = 10) {
 export default async function handler(req, res) {
   if (req.method !== "POST" && req.method !== "PUT") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  if (!rateLimit(`interview-write:${getIp(req)}`, 30)) {
+    return res.status(429).json({ error: "Too many requests" });
   }
 
   // Verify auth
