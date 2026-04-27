@@ -142,7 +142,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           setSelectedIdx(0);
         }
       } catch (e) {
-        console.error("[EditorScreen load]", e);
+        showToast("인터뷰를 불러오지 못했어요. 다시 시도해 주세요.", "error");
       } finally {
         setLoadingExisting(false);
       }

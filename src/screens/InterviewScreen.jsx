@@ -345,11 +345,9 @@ export default function InterviewScreen({ go, shareCode }) {
       });
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
-        console.error("[saveResponse]", res.status, errBody);
         showToast(`응답 저장 실패 (${res.status}): ${errBody.error ?? "알 수 없는 오류"}`, "error");
       }
     } catch (e) {
-      console.error("[saveResponse exception]", e);
       showToast("응답을 저장하지 못했어요. 연결 상태를 확인해 주세요.", "error");
     }
   };
@@ -513,7 +511,7 @@ export default function InterviewScreen({ go, shareCode }) {
             if (downloadUrl) audioUrl = downloadUrl;
           } else { showToast("음성 저장에 실패했어요. 답변은 기록되지만 오디오가 없을 수 있어요.", "error"); }
         } else { showToast("업로드 준비 중 오류가 발생했어요.", "error"); }
-      } catch (e) { console.error("[audio upload exception]", e); showToast("음성 업로드 중 오류가 발생했어요.", "error"); }
+      } catch (e) { showToast("음성 업로드 중 오류가 발생했어요.", "error"); }
       // STT — independent of audio upload
       try {
         const fd = new FormData();
@@ -521,8 +519,8 @@ export default function InterviewScreen({ go, shareCode }) {
         fd.append("session_id", sessionId);
         const sttRes = await fetch("/api/speech?type=stt", { method: "POST", body: fd });
         if (sttRes.ok) { const d = await sttRes.json(); transcript = d.transcript; }
-        else { console.error("[stt]", sttRes.status); showToast("음성 인식에 실패했어요. 텍스트 없이 저장합니다.", "error"); }
-      } catch (e) { console.error("[stt exception]", e); }
+        else { showToast("음성 인식에 실패했어요. 텍스트 없이 저장합니다.", "error"); }
+      } catch (e) { /* STT failed — continue saving audio without transcript */ }
       await saveResponse({ audio_url: audioUrl, transcript });
       lastTranscriptRef.current = transcript;
 

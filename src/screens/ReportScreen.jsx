@@ -68,7 +68,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
         setSessions(ss);
         setAllResponses(ss.flatMap(s => s.responses ?? []));
       } catch (e) {
-        console.error("[ReportScreen load]", e);
+        showToast(isKo ? "리포트 데이터를 불러오지 못했어요." : "Failed to load report data.", "error");
       } finally {
         setLoading(false);
       }

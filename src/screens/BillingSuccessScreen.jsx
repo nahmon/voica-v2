@@ -37,7 +37,6 @@ export default function BillingSuccessScreen({ go, user, logout, lang = "ko" }) 
         setPeriodEnd(data.periodEnd);
         setStatus("done");
       } catch (e) {
-        console.error("[BillingSuccess]", e);
         setErrMsg(isKo ? "네트워크 오류가 발생했어요." : "Network error.");
         setStatus("error");
       }
