@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { PANEL_JOBS, PANEL_JOBS_KO, MOCK_PANEL_PROFILE, getMatchScore } from "../lib/mockData.js";
-import { GlobalNav, Footer } from "../components/shared.jsx";
+import { GlobalNav, Footer, EmptyState } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { supabase } from "../supabase.js";
 
-const APPLY_STEPS = ["none", "applied", "ai_screening", "confirmed"];
+const APPLY_STATE_KEY = "voica_apply_state";
+function loadApplyState() {
+  try { return JSON.parse(localStorage.getItem(APPLY_STATE_KEY) || "{}"); }
+  catch { return {}; }
+}
+function saveApplyState(state) {
+  try { localStorage.setItem(APPLY_STATE_KEY, JSON.stringify(state)); } catch {}
+}
+
 const SORT_OPTIONS_EN = [
   { key: "recommended", label: "Best Match" },
   { key: "newest", label: "Newest" },
@@ -18,10 +27,6 @@ const SORT_OPTIONS_KO = [
 
 function parseReward(r) {
   return parseInt((r || "0").replace(/[^0-9]/g, ""), 10) || 0;
-}
-
-function matchPct(score) {
-  return Math.min(100, Math.round((score / 8) * 100));
 }
 
 const RECENTLY_VIEWED_KEY = "voica_recently_viewed";
@@ -38,17 +43,68 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
   const isKo = lang === "ko";
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [catFilter, setCatFilter] = useState("All");
   const [sortKey, setSortKey] = useState("recommended");
   const [mobileSortOpen, setMobileSortOpen] = useState(false);
-  const [applyState, setApplyState] = useState({});
+  const [applyState, setApplyState] = useState(loadApplyState);
   const [recentIds, setRecentIds] = useState(getRecentlyViewed);
+  const [userProfile, setUserProfile] = useState(null);
+  const debounceRef = useRef(null);
+
+  // Debounce search input
+  useEffect(() => {
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setDebouncedSearch(search), 280);
+    return () => clearTimeout(debounceRef.current);
+  }, [search]);
+
+  // Fetch real user profile for match scoring
+  useEffect(() => {
+    if (!user?.id) return;
+    supabase
+      .from("profiles")
+      .select("region, gender, age_group, job, income, interests")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => { if (data) setUserProfile(data); });
+  }, [user?.id]);
 
   const SORT_OPTIONS = isKo ? SORT_OPTIONS_KO : SORT_OPTIONS_EN;
   const CATEGORY_KEYS = ["All", "Recommended", "Expert", "Tech", "Beauty", "Media", "Food", "Finance", "Education"];
   const CATEGORY_LABELS_KO = { All: "전체", Recommended: "추천", Expert: "전문직", Tech: "테크", Beauty: "뷰티", Media: "미디어", Food: "식음료", Finance: "금융", Education: "교육" };
   const catLabel = (key) => isKo ? (CATEGORY_LABELS_KO[key] ?? key) : key;
-  const profile = MOCK_PANEL_PROFILE;
+
+  // Map Korean profile values to English for getMatchScore compatibility
+  const INTEREST_MAP = {
+    "테크/IT": "Tech/IT", "뷰티/패션": "Beauty/Fashion", "식음료": "Food/Dining",
+    "금융/투자": "Finance/Investment", "헬스케어/의료": "Medical/Healthcare",
+    "교육": "Education", "여행/레저": "Travel/Leisure",
+    "미디어/엔터테인먼트": "Media/Entertainment", "부동산": "Real Estate",
+    "자동차/모빌리티": "Auto/Mobility", "쇼핑/리테일": "Shopping/Retail",
+    "스포츠/피트니스": "Sports/Fitness", "환경/지속가능성": "Environment/Sustainability",
+    "법률/세금": "Legal/Tax",
+  };
+  const JOB_MAP = {
+    "대기업/중견기업": "Corporate employee (large/mid-size)",
+    "중소기업": "Corporate employee (small/medium)",
+    "프리랜서/자영업": "Freelancer/Self-employed",
+    "전문직 (의사, 변호사, 회계사 등)": "Professional (doctor/lawyer/accountant)",
+    "공공기관/공무원": "Government/Public sector",
+    "학생": "Student", "주부": "Homemaker", "구직 중": "Job seeking", "기타": "Other",
+  };
+  const GENDER_MAP = { "남성": "Male", "여성": "Female" };
+  const AGE_MAP = { "10대": "10", "20대": "20", "30대": "30", "40대": "40", "50대": "50", "60대 이상": "60" };
+
+  // Use real profile for scoring if available, fall back to mock
+  const profile = userProfile
+    ? {
+        interests: (userProfile.interests ?? []).map(i => INTEREST_MAP[i] ?? i),
+        job: JOB_MAP[userProfile.job] ?? userProfile.job ?? "",
+        gender: GENDER_MAP[userProfile.gender] ?? userProfile.gender ?? "",
+        age: AGE_MAP[userProfile.age_group] ?? "",
+      }
+    : MOCK_PANEL_PROFILE;
 
   const jobsWithScore = (isKo ? PANEL_JOBS_KO : PANEL_JOBS).map(j => ({ ...j, _matchScore: getMatchScore(j, profile) }));
   const MATCH_THRESHOLD = 4;
@@ -56,17 +112,25 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
   const filtered = jobsWithScore
     .filter(j =>
       (catFilter === "All" || catFilter === "Recommended" || j.category === catFilter) &&
-      (search === "" || j.title.includes(search) || j.company.includes(search))
+      (debouncedSearch === "" || j.title.includes(debouncedSearch) || j.company.includes(debouncedSearch))
     )
     .filter(j => catFilter === "Recommended" ? j._matchScore >= MATCH_THRESHOLD : true)
     .sort((a, b) => {
-      if (sortKey === "newest") return a.id - b.id;
+      if (sortKey === "newest") return b.id - a.id;
       if (sortKey === "reward") return parseReward(b.reward) - parseReward(a.reward);
       return b._matchScore - a._matchScore;
     });
 
   const recommendedCount = jobsWithScore.filter(j => j._matchScore >= MATCH_THRESHOLD).length;
   const recentJobs = recentIds.map(id => jobsWithScore.find(j => j.id === id)).filter(Boolean);
+
+  const updateApplyState = useCallback((jobId, nextStatus) => {
+    setApplyState(prev => {
+      const next = { ...prev, [jobId]: nextStatus };
+      saveApplyState(next);
+      return next;
+    });
+  }, []);
 
   function handleView(jobId) {
     addRecentlyViewed(jobId);
@@ -107,6 +171,7 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={isKo ? "주제나 기업명으로 검색해 보세요…" : "Search by topic or company…"}
+              aria-label={isKo ? "인터뷰 검색" : "Search interviews"}
               style={{
                 width: "100%", padding: "13px 16px 13px 42px",
                 borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)",
@@ -239,11 +304,13 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
         {/* Job cards */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {filtered.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "60px 0", color: C.body }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
-              <div style={{ fontSize: 15, fontWeight: 500, color: C.navy, marginBottom: 6 }}>{isKo ? "인터뷰를 찾을 수 없어요" : "No interviews found"}</div>
-              <div style={{ fontSize: 13 }}>{isKo ? "다른 검색어나 필터를 써보세요" : "Try a different search or filter"}</div>
-            </div>
+            <EmptyState
+              icon="🔍"
+              title={isKo ? "인터뷰를 찾을 수 없어요" : "No interviews found"}
+              description={isKo ? "다른 검색어나 필터를 써보세요" : "Try a different search or filter"}
+              action={debouncedSearch ? (isKo ? "검색 초기화" : "Clear search") : undefined}
+              onAction={debouncedSearch ? () => setSearch("") : undefined}
+            />
           ) : filtered.map(job => (
             <JobCard
               key={job.id}
@@ -252,12 +319,8 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
               isRecommended={job._matchScore >= MATCH_THRESHOLD}
               isMobile={isMobile}
               isKo={isKo}
-              onApply={() => { setApplyState(prev => ({ ...prev, [job.id]: "applied" })); handleView(job.id); }}
+              onApply={() => { updateApplyState(job.id, "applied"); handleView(job.id); }}
               onView={() => handleView(job.id)}
-              onCycleDemo={() => {
-                const idx = APPLY_STEPS.indexOf(applyState[job.id] || "none");
-                setApplyState(prev => ({ ...prev, [job.id]: APPLY_STEPS[Math.min(idx + 1, APPLY_STEPS.length - 1)] }));
-              }}
               go={go}
             />
           ))}

@@ -114,14 +114,15 @@ export function NavTab({ label, onClick, active, dark = false }) {
   );
 }
 
-export function Input({ label, type = "text", placeholder, value, onChange, helper, required }) {
+export function Input({ label, type = "text", placeholder, value, onChange, onBlur, helper, required }) {
   const [focused, setFocused] = useState(false);
   return (
     <div>
       {label && <label style={{ display: "block", fontSize: 14, fontWeight: 400, color: C.navy, marginBottom: 6, fontFamily: F, letterSpacing: "0.16px" }}>{label}{required && <span style={{ color: "#ea2261", marginLeft: 3 }}>*</span>}</label>}
       <input
         type={type} placeholder={placeholder} value={value} onChange={onChange}
-        onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+        onFocus={() => setFocused(true)}
+        onBlur={e => { setFocused(false); onBlur?.(e); }}
         style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: `1px solid ${focused ? C.purple : C.border}`, fontSize: 17, fontFamily: F, color: C.navy, outline: focused ? `2px solid ${C.purple}` : "none", outlineOffset: 2, boxSizing: "border-box", background: C.white, transition: "border-color 0.15s", letterSpacing: "0.16px" }}
       />
       {helper && <div style={{ fontSize: 12, color: C.body, marginTop: 4, fontFamily: F, letterSpacing: "0.16px" }}>{helper}</div>}

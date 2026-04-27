@@ -2,7 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { randomBytes } from "crypto";
 import { issueBillingKey, chargeBillingKey } from "../lib/toss.js";
-import { PRO_PLAN } from "../lib/plans.js";
+import { PRO_PLAN, PRO_PLAN_YEARLY } from "../lib/plans.js";
 
 const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -20,8 +20,9 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: "Unauthorized" });
 
-  const { authKey, customerKey } = req.body ?? {};
+  const { authKey, customerKey, billing } = req.body ?? {};
   if (!authKey || !customerKey) return res.status(400).json({ error: "authKey, customerKey 필요" });
+  const plan = billing === "yearly" ? PRO_PLAN_YEARLY : PRO_PLAN;
 
   // customerKey는 반드시 user.id여야 함
   if (customerKey !== user.id) return res.status(400).json({ error: "Invalid customerKey" });
@@ -31,9 +32,9 @@ export default async function handler(req, res) {
     .from("subscriptions").select("id, status").eq("user_id", user.id).single();
   if (existing?.status === "active") return res.status(409).json({ error: "이미 활성 구독이 있습니다." });
 
-  let billing;
+  let billingResult;
   try {
-    billing = await issueBillingKey(authKey, customerKey);
+    billingResult = await issueBillingKey(authKey, customerKey);
   } catch (e) {
     return res.status(400).json({ error: `빌링키 발급 실패: ${e.message}` });
   }
@@ -46,11 +47,11 @@ export default async function handler(req, res) {
   let charge;
   try {
     charge = await chargeBillingKey({
-      billingKey: billing.billingKey,
+      billingKey: billingResult.billingKey,
       customerKey,
       orderId,
-      orderName: PRO_PLAN.name,
-      amount: PRO_PLAN.amount,
+      orderName: plan.name,
+      amount: plan.amount,
       customerEmail: user.email ?? "",
     });
   } catch (e) {
@@ -59,8 +60,8 @@ export default async function handler(req, res) {
 
   await supabase.from("subscriptions").upsert({
     user_id: user.id,
-    plan_id: PRO_PLAN.id,
-    billing_key: billing.billingKey,
+    plan_id: plan.id,
+    billing_key: billingResult.billingKey,
     customer_key: customerKey,
     status: "active",
     amount: PRO_PLAN.amount,
@@ -74,7 +75,7 @@ export default async function handler(req, res) {
   await supabase.from("payment_attempts").insert({
     user_id: user.id,
     order_id: orderId,
-    amount: PRO_PLAN.amount,
+    amount: plan.amount,
     status: "succeeded",
     toss_payment_key: charge.paymentKey,
   });
