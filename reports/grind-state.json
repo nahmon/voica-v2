@@ -1,6 +1,6 @@
 {
-  "cycle": 37,
-  "domain_index": 2,
+  "cycle": 85,
+  "domain_index": 0,
   "domains": [
     "engineering",
     "security",
@@ -8,8 +8,8 @@
     "accessibility",
     "performance"
   ],
-  "fixed_total": 107,
+  "fixed_total": 171,
   "started_at": "2026-04-27T15:16:43Z",
-  "last_run": "2026-04-27T16:38:31Z",
-  "last_cycle_summary": "Cycle 37: Security clean \u2014 cancel/cron endpoints verified, RecruiterAdminScreen UX solid. 107 total fixes."
+  "last_run": "2026-04-27T20:30:00Z",
+  "last_cycle_summary": "Cycle 85: Performance clean pass \u2014 all screens lazy-loaded, no client console.log, bundle splits in place."
 }

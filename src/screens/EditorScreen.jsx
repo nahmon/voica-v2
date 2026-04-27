@@ -208,6 +208,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <input
+            aria-label="AI 초안 프롬프트"
             value={aiPrompt}
             onChange={e => setAiPrompt(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") { setShowAiModal(true); } }}
@@ -382,8 +383,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const shareUrl = shareCode ? `${window.location.origin}/i/${shareCode}` : null;
 
   const ShareOverlay = showShareOverlay && shareCode && (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ background: C.white, borderRadius: 20, padding: "40px 36px", maxWidth: 440, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px", animation: "fadeInUp 0.2s ease" }}>
+    <div role="presentation" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div role="dialog" aria-modal="true" aria-label="링크 공유" style={{ background: C.white, borderRadius: 20, padding: "40px 36px", maxWidth: 440, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px", animation: "fadeInUp 0.2s ease" }}>
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(21,190,83,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
           {Ic.CheckCircle({ s: 28, c: C.success })}
         </div>
@@ -457,9 +458,9 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
 
   const AiModal = showAiModal && (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+    <div role="presentation" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
       onClick={e => { if (e.target === e.currentTarget) setShowAiModal(false); }}>
-      <div style={{ background: C.white, borderRadius: 20, padding: "36px 32px 28px", maxWidth: 480, width: "100%", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px" }}>
+      <div role="dialog" aria-modal="true" aria-label="AI 초안 생성" style={{ background: C.white, borderRadius: 20, padding: "36px 32px 28px", maxWidth: 480, width: "100%", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M8 0 C8 0 8.8 3.5 10.5 5.5 C12.2 7.5 16 8 16 8 C16 8 12.2 8.5 10.5 10.5 C8.8 12.5 8 16 8 16 C8 16 7.2 12.5 5.5 10.5 C3.8 8.5 0 8 0 8 C0 8 3.8 7.5 5.5 5.5 C7.2 3.5 8 0 8 0Z"/></svg>
@@ -495,7 +496,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const NavBar = isMobile ? (
     <>
       <div style={{ padding: "0 12px", height: 52, background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 50 }}>
-        <button onClick={() => go("dashboard")} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", fontSize: 22, color: C.navy, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
+        <button aria-label="대시보드로 돌아가기" onClick={() => go("dashboard")} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", fontSize: 22, color: C.navy, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
         <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20, background: questions.length >= 10 ? "rgba(30,142,62,0.1)" : "rgba(180,120,0,0.08)", color: questions.length >= 10 ? C.successText : "rgba(140,90,0,0.9)" }}>
           {questions.length}/10
         </span>
@@ -503,7 +504,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           <Btn size="sm" onClick={handleSave} disabled={saving}>
             {saving ? "저장 중…" : editingId ? "저장" : "링크 생성"}
           </Btn>
-          <button onClick={() => setShowMobileMenu(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", fontSize: 20, color: C.navy, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>⋯</button>
+          <button aria-label="추가 메뉴" aria-expanded={showMobileMenu} onClick={() => setShowMobileMenu(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", fontSize: 20, color: C.navy, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>⋯</button>
         </div>
       </div>
       {showMobileMenu && (
@@ -597,6 +598,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       {/* Title area */}
       <div style={{ background: C.white, padding: "16px 16px 12px", borderBottom: `1px solid ${C.border}` }}>
         <input
+          aria-label="인터뷰 제목"
           value={title}
           onChange={e => setTitle(e.target.value)}
           placeholder="인터뷰 제목을 입력하세요"
@@ -608,6 +610,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             <div style={{ fontSize: 10, color: C.body, marginTop: 1 }}>전문가 인증 완료 회원만 참여</div>
           </div>
           <button
+            role="switch" aria-checked={expertOnly} aria-label="전문가 패널 전용 토글"
             onClick={() => setExpertOnly(v => !v)}
             style={{ width: 38, height: 20, borderRadius: 10, border: "none", cursor: "pointer", background: expertOnly ? C.purple : C.border, position: "relative", flexShrink: 0, transition: "background 0.2s" }}
           >
@@ -624,7 +627,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           </button>
         ))}
         <div style={{ position: "relative" }}>
-          <button onClick={() => setAddTypeOpen(v => !v)}
+          <button aria-label="질문 추가" aria-expanded={addTypeOpen} onClick={() => setAddTypeOpen(v => !v)}
             style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: `1px dashed ${C.border}`, background: "transparent", color: C.body, whiteSpace: "nowrap" }}>
             +
           </button>
@@ -742,6 +745,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "20px 40px 16px" }}>
             <div style={{ fontSize: 11, color: C.body, marginBottom: 6, letterSpacing: 0.5 }}>인터뷰 제목</div>
             <input
+              aria-label="인터뷰 제목"
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="예: 신제품 사용성 인터뷰 — 2026 Q2"
@@ -769,6 +773,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
                 <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>전문가 인증을 완료한 패널 회원만 참여할 수 있어요</div>
               </div>
               <button
+                role="switch" aria-checked={expertOnly} aria-label="전문가 패널 전용 토글"
                 onClick={() => setExpertOnly(v => !v)}
                 style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: expertOnly ? C.purple : C.border, position: "relative", flexShrink: 0, transition: "background 0.2s" }}
               >
@@ -887,6 +892,7 @@ function PreviewCard({ q, idx, total, updateQ }) {
             {q.options.map((opt, i) => editable ? (
               <input
                 key={i}
+                aria-label={`보기 ${i + 1}`}
                 value={opt}
                 onChange={e => { const next = [...q.options]; next[i] = e.target.value; updateQ(idx, { options: next }); }}
                 placeholder={`보기 ${i + 1}`}
@@ -968,13 +974,14 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
           {q.options.map((opt, i) => (
             <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6 }}>
               <input
+                aria-label={`보기 ${i + 1}`}
                 value={opt}
                 onChange={e => { const next = [...q.options]; next[i] = e.target.value; updateQ(idx, { options: next }); }}
                 placeholder={`Option ${i + 1}`}
                 style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }}
               />
               {q.options.length > 2 && (
-                <button onClick={() => updateQ(idx, { options: q.options.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14 }}>✕</button>
+                <button aria-label={`보기 ${i + 1} 삭제`} onClick={() => updateQ(idx, { options: q.options.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14 }}>✕</button>
               )}
             </div>
           ))}
@@ -1015,7 +1022,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
               })()}
               <div style={{ display: "flex", gap: 6 }}>
                 <input value={q.stimulus.label ?? ""} onChange={e => updateQ(idx, { stimulus: { ...q.stimulus, label: e.target.value } })} placeholder="소재 설명 (선택)" style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }} />
-                <button onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
+                <button aria-label="소재 제거" onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
               </div>
             </div>
           ) : (
@@ -1062,6 +1069,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
                   </div>
                   <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 10 }}>
                     <input
+                      aria-label="이미지 URL 또는 유튜브 링크"
                       value=""
                       onChange={e => {
                         const url = e.target.value.trim();
@@ -1101,7 +1109,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
               )}
               <div style={{ display: "flex", gap: 6 }}>
                 <input value={q.stimulus.label ?? ""} onChange={e => updateQ(idx, { stimulus: { ...q.stimulus, label: e.target.value } })} placeholder="화면 설명 (예: 온보딩 1단계)" style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }} />
-                <button onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
+                <button aria-label="소재 제거" onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
               </div>
             </div>
           ) : (
@@ -1161,7 +1169,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
                 placeholder="자료 설명 (선택)"
                 style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box" }}
               />
-              <button onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
+              <button aria-label="소재 제거" onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
             </div>
           </div>
         ) : (
@@ -1189,6 +1197,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
                 <input
+                  aria-label="이미지 URL, 유튜브, Figma 링크"
                   value=""
                   onChange={e => {
                     const url = e.target.value.trim();

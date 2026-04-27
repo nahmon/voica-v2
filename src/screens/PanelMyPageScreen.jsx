@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer, useToast, Skeleton } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
@@ -107,16 +107,16 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
     })();
   }, [user]);
 
-  const totalEarned  = rewards.filter(r => r.status === "paid").reduce((s, r) => s + r.amount, 0);
-  const pending      = rewards.filter(r => r.status === "pending").reduce((s, r) => s + r.amount, 0);
-  const withdrawable = rewards.filter(r => r.status === "pending").reduce((s, r) => s + r.amount, 0);
+  const totalEarned = useMemo(() => rewards.filter(r => r.status === "paid").reduce((s, r) => s + r.amount, 0), [rewards]);
+  const pending = useMemo(() => rewards.filter(r => r.status === "pending").reduce((s, r) => s + r.amount, 0), [rewards]);
+  const withdrawable = pending;
   const tierGoal     = 100000;
-  const tierPct      = Math.min(100, Math.round((totalEarned / tierGoal) * 100));
-  const monthlyDone  = rewards.filter(r => {
+  const tierPct      = useMemo(() => Math.min(100, Math.round((totalEarned / tierGoal) * 100)), [totalEarned]);
+  const monthlyDone  = useMemo(() => rewards.filter(r => {
     const d = new Date(r.created_at ?? 0);
     const now = new Date();
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  }).length;
+  }).length, [rewards]);
   const monthlyGoal = 5;
   const monthlyPct  = Math.round((monthlyDone / monthlyGoal) * 100);
 

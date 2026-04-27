@@ -61,7 +61,7 @@ export default function MembersModal({ interviewId, interviewTitle, onClose }) {
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
           <div style={{ fontSize: 18, fontWeight: 700, color: C.navy, fontFamily: F }}>팀원 초대</div>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+          <button aria-label="닫기" onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
             {Ic.X({ s: 18, c: C.body })}
           </button>
         </div>
@@ -70,6 +70,7 @@ export default function MembersModal({ interviewId, interviewTitle, onClose }) {
         {/* Invite input */}
         <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
           <input
+            aria-label="초대할 이메일 주소"
             value={email}
             onChange={e => setEmail(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleInvite()}
@@ -97,7 +98,7 @@ export default function MembersModal({ interviewId, interviewTitle, onClose }) {
                   {m.user_id ? "가입됨" : "미가입 (초대 대기)"}
                 </div>
               </div>
-              <button onClick={() => handleRemove(m.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+              <button aria-label="팀원 제거" onClick={() => handleRemove(m.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
                 {Ic.X({ s: 14, c: C.body })}
               </button>
             </div>

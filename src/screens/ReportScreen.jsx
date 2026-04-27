@@ -150,7 +150,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       if (!res.ok) throw new Error(data.error || "Failed to create link");
       setPublicToken(data.public_report_token);
       const url = `${location.origin}/report/public/${data.public_report_token}`;
-      await navigator.clipboard.writeText(url);
+      navigator.clipboard.writeText(url).catch(() => { const el = document.createElement("textarea"); el.value = url; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); });
       showToast(isKo ? "공개 링크가 생성되어 클립보드에 복사됐어요" : "Public link created and copied", "success");
     } catch (e) {
       showToast(e.message, "error");
@@ -162,12 +162,8 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   const handleCopyPublicLink = async () => {
     if (!publicToken) return;
     const url = `${location.origin}/report/public/${publicToken}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      showToast(isKo ? "공개 링크가 복사됐어요" : "Link copied", "success");
-    } catch {
-      showToast(isKo ? "복사에 실패했어요" : "Copy failed", "error");
-    }
+    navigator.clipboard.writeText(url).catch(() => { const el = document.createElement("textarea"); el.value = url; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); });
+    showToast(isKo ? "공개 링크가 복사됐어요" : "Link copied", "success");
   };
 
   const handleRevokePublicLink = async () => {
@@ -223,9 +219,8 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   const handlePrint = () => window.print();
   const handleShare = () => {
     const url = `${location.origin}/report/${interviewId}`;
-    navigator.clipboard.writeText(url)
-      .then(() => showToast("리포트 링크가 복사됐어요", "success"))
-      .catch(() => showToast("링크 복사에 실패했어요", "error"));
+    navigator.clipboard.writeText(url).catch(() => { const el = document.createElement("textarea"); el.value = url; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); });
+    showToast(isKo ? "리포트 링크가 복사됐어요" : "Report link copied", "success");
   };
 
   const completedSessions = useMemo(() => sessions.filter(s => s.status === "completed"), [sessions]);
@@ -239,14 +234,14 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
 
   const totalSessions = sessions.length;
   const completionRate = totalSessions > 0 ? Math.round((completedSessions.length / totalSessions) * 100) : 0;
-  const avgDurationMin = (() => {
+  const avgDurationMin = useMemo(() => {
     const timed = completedSessions.filter(s => s.completed_at && s.started_at);
     if (timed.length === 0) return null;
     const avg = timed.reduce((sum, s) => sum + (new Date(s.completed_at) - new Date(s.started_at)), 0) / timed.length;
     return Math.round(avg / 60000);
-  })();
+  }, [completedSessions]);
 
-  const sentimentDist = (() => {
+  const sentimentDist = useMemo(() => {
     const themes = report?.content?.themes ?? [];
     if (themes.length === 0) return null;
     const pos = themes.filter(t => t.sentiment === "positive").length;
@@ -258,9 +253,9 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       neutral: Math.round(neu / total * 100),
       negative: Math.round(neg / total * 100),
     } : null;
-  })();
+  }, [report]);
 
-  const ratingDists = (() => {
+  const ratingDists = useMemo(() => {
     const scaleQs = questions.filter(q => q.type === "likert");
     if (scaleQs.length === 0 || allResponses.length === 0) return [];
     return scaleQs.map(q => {
@@ -276,9 +271,9 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
         : null;
       return { question: q, dist, min, max, maxCount, avg, total: resps.length };
     }).filter(d => d.total > 0);
-  })();
+  }, [questions, allResponses]);
 
-  const mcDists = (() => {
+  const mcDists = useMemo(() => {
     const mcQs = questions.filter(q => q.type === "multiple_choice");
     if (mcQs.length === 0 || allResponses.length === 0) return [];
     return mcQs.map(q => {
@@ -298,12 +293,12 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       const maxCount = Math.max(...entries.map(e => e[1]), 1);
       return { question: q, entries, maxCount, total: resps.length };
     }).filter(d => d.total > 0);
-  })();
+  }, [questions, allResponses]);
 
   const questionInsights = report?.content?.questionInsights ?? [];
   const demographicInsights = report?.content?.demographicInsights ?? null;
 
-  const genderDist = (() => {
+  const genderDist = useMemo(() => {
     const counts = {};
     sessions.forEach(s => {
       const g = s.respondent?.gender?.trim();
@@ -311,9 +306,9 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       counts[g] = (counts[g] ?? 0) + 1;
     });
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  })();
+  }, [sessions]);
 
-  const ageBuckets = (() => {
+  const ageBuckets = useMemo(() => {
     const buckets = isKo
       ? { "10대": 0, "20대": 0, "30대": 0, "40대": 0, "50대+": 0 }
       : { "10s": 0, "20s": 0, "30s": 0, "40s": 0, "50s+": 0 };
@@ -328,9 +323,9 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       else buckets[keys[4]]++;
     });
     return Object.entries(buckets).filter(([, v]) => v > 0);
-  })();
+  }, [sessions, isKo]);
 
-  const dateRange = (() => {
+  const dateRange = useMemo(() => {
     const starts = sessions.map(s => new Date(s.started_at)).filter(d => !isNaN(d));
     const ends = sessions.map(s => s.completed_at && new Date(s.completed_at)).filter(Boolean).filter(d => !isNaN(d));
     if (starts.length === 0) return null;
@@ -338,9 +333,9 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
     const maxDate = ends.length > 0 ? new Date(Math.max(...ends)) : new Date();
     const fmt = d => d.toLocaleDateString(isKo ? "ko-KR" : "en-US", { month: "short", day: "numeric", year: "numeric" });
     return `${fmt(minDate)} – ${fmt(maxDate)}`;
-  })();
+  }, [sessions, isKo]);
 
-  const durationBuckets = (() => {
+  const durationBuckets = useMemo(() => {
     const buckets = isKo
       ? { "~3분": 0, "3~5분": 0, "5~10분": 0, "10분+": 0 }
       : { "~3m": 0, "3~5m": 0, "5~10m": 0, "10m+": 0 };
@@ -354,7 +349,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       else buckets[keys[3]]++;
     });
     return Object.entries(buckets).filter(([, v]) => v > 0);
-  })();
+  }, [completedSessions, isKo]);
 
   if (loading) return (
     <div style={{ minHeight: "100vh", background: dk.bg, fontFamily: F, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
@@ -373,7 +368,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
 
   const hasReport = report?.status === "completed" && report.content;
 
-  const voiceClips = (() => {
+  const voiceClips = useMemo(() => {
     if (!hasReport) return [];
     return questions
       .filter(q => ["voice", "creative", "prototype"].includes(q.type))
@@ -385,9 +380,9 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
           .slice(0, 5),
       }))
       .filter(({ resps }) => resps.length > 0);
-  })();
+  }, [hasReport, questions, allResponses]);
 
-  const sn = (() => {
+  const sn = useMemo(() => {
     let n = 0;
     const num = () => String(++n).padStart(2, "0");
     const maybe = (cond) => cond ? num() : null;
@@ -406,7 +401,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       demoInsights: maybe(hasReport && !!demographicInsights && (genderDist.length > 0 || ageBuckets.length > 0)),
       actions: maybe(hasReport && report?.content?.recommendations?.length > 0),
     };
-  })();
+  }, [hasReport, report, questions, allResponses, mcDists, ratingDists, questionInsights, voiceClips, sentimentDist, demographicInsights, genderDist, ageBuckets]);
 
   return (
     <div style={{ background: dk.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
@@ -441,7 +436,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
           )}
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
-          <button onClick={() => go("dashboard")} style={{ background: "none", border: "none", padding: "6px 10px", color: dk.muted, fontSize: 13, cursor: "pointer", fontFamily: F }}>
+          <button aria-label={isKo ? "대시보드로 돌아가기" : "Back to dashboard"} onClick={() => go("dashboard")} style={{ background: "none", border: "none", padding: "6px 10px", color: dk.muted, fontSize: 13, cursor: "pointer", fontFamily: F }}>
             ← {isMobile ? "" : (isKo ? "대시보드" : "Dashboard")}
           </button>
           {hasReport && (
@@ -780,7 +775,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                           const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
                           return (
                             <div key={r.id || ri} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: dk.card2, borderRadius: 8, border: `1px solid ${isPlaying ? "rgba(110,75,255,0.3)" : dk.border}`, transition: "border-color 0.15s" }}>
-                              <button onClick={() => playAudio(r.id)} style={{ flexShrink: 0, width: 30, height: 30, borderRadius: "50%", border: `1px solid ${isPlaying ? C.purple : "rgba(110,75,255,0.35)"}`, background: isPlaying ? C.purple : "transparent", color: isPlaying ? "#fff" : C.purple, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, transition: "all 0.15s" }}>
+                              <button aria-label={isPlaying ? (isKo ? "정지" : "Stop") : (isKo ? "재생" : "Play")} onClick={() => playAudio(r.id)} style={{ flexShrink: 0, width: 30, height: 30, borderRadius: "50%", border: `1px solid ${isPlaying ? C.purple : "rgba(110,75,255,0.35)"}`, background: isPlaying ? C.purple : "transparent", color: isPlaying ? "#fff" : C.purple, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, transition: "all 0.15s" }}>
                                 {isPlaying ? "■" : "▶"}
                               </button>
                               <div style={{ flex: 1, minWidth: 0 }}>

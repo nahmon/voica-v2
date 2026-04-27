@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, createContext, useContext, useCallback } from "react";
+import { useState, useEffect, useRef, createContext, useContext, useCallback, useId } from "react";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 
 function LogoMark({ size = 20, dark = false }) {
@@ -116,11 +116,12 @@ export function NavTab({ label, onClick, active, dark = false }) {
 
 export function Input({ label, type = "text", placeholder, value, onChange, onBlur, helper, required }) {
   const [focused, setFocused] = useState(false);
+  const id = useId();
   return (
     <div>
-      {label && <label style={{ display: "block", fontSize: 14, fontWeight: 400, color: C.navy, marginBottom: 6, fontFamily: F, letterSpacing: "0.16px" }}>{label}{required && <span style={{ color: "#ea2261", marginLeft: 3 }}>*</span>}</label>}
+      {label && <label htmlFor={id} style={{ display: "block", fontSize: 14, fontWeight: 400, color: C.navy, marginBottom: 6, fontFamily: F, letterSpacing: "0.16px" }}>{label}{required && <span style={{ color: "#ea2261", marginLeft: 3 }}>*</span>}</label>}
       <input
-        type={type} placeholder={placeholder} value={value} onChange={onChange}
+        id={id} type={type} placeholder={placeholder} value={value} onChange={onChange}
         onFocus={() => setFocused(true)}
         onBlur={e => { setFocused(false); onBlur?.(e); }}
         style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: `1px solid ${focused ? C.purple : C.border}`, fontSize: 17, fontFamily: F, color: C.navy, outline: focused ? `2px solid ${C.purple}` : "none", outlineOffset: 2, boxSizing: "border-box", background: C.white, transition: "border-color 0.15s", letterSpacing: "0.16px" }}
@@ -565,163 +566,6 @@ export function WaveAnimation({ active }) {
   );
 }
 
-export function MockAppScreen({ screenType }) {
-  const screens = {
-    splash: (
-      <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg,#1a73e8,#174ea6)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderRadius: 16, gap: 10 }}>
-        <div style={{ width: 48, height: 48, borderRadius: 8, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>✦</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", letterSpacing: -0.5 }}>AppName</div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>v2.1.0</div>
-      </div>
-    ),
-    signup: (
-      <div style={{ width: "100%", height: "100%", background: "#fff", borderRadius: 16, padding: "20px 16px", boxSizing: "border-box" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", marginBottom: 16 }}>Sign Up</div>
-        {["Name", "Email", "Password"].map(f => (
-          <div key={f} style={{ height: 32, borderRadius: 6, border: "1px solid #dadce0", marginBottom: 8, padding: "0 10px", display: "flex", alignItems: "center" }}>
-            <span style={{ fontSize: 10, color: "#aab" }}>{f}</span>
-          </div>
-        ))}
-        <div style={{ height: 32, borderRadius: 6, background: "#1a73e8", display: "flex", alignItems: "center", justifyContent: "center", marginTop: 12 }}>
-          <span style={{ fontSize: 11, color: "#fff", fontWeight: 600 }}>Create Account</span>
-        </div>
-      </div>
-    ),
-    home: (
-      <div style={{ width: "100%", height: "100%", background: "#ffffff", borderRadius: 16, padding: "14px 12px", boxSizing: "border-box" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f" }}>Home</span>
-          <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(0,0,0,0.1)" }} />
-        </div>
-        {[0.7, 0.5, 0.85].map((w, i) => (
-          <div key={i} style={{ height: 52, borderRadius: 8, background: "#fff", border: "1px solid #dadce0", marginBottom: 8, padding: "8px 10px" }}>
-            <div style={{ height: 8, borderRadius: 4, background: "rgba(0,0,0,0.1)", width: `${w * 100}%`, marginBottom: 5 }} />
-            <div style={{ height: 6, borderRadius: 4, background: "#e8eaed", width: "50%" }} />
-          </div>
-        ))}
-      </div>
-    ),
-    dashboard: (
-      <div style={{ width: "100%", height: "100%", background: "#ffffff", borderRadius: 16, padding: "14px 12px", boxSizing: "border-box" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f", marginBottom: 10 }}>Dashboard</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 8 }}>
-          {[["#1a73e8", "38%"], ["#1e8e3e", "New"], ["#ea2261", "↓12%"], ["#f59e0b", "94%"]].map(([c, v], i) => (
-            <div key={i} style={{ height: 40, borderRadius: 6, background: "#fff", border: "1px solid #dadce0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: c }}>{v}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{ height: 60, borderRadius: 8, background: "#fff", border: "1px solid #dadce0", padding: "8px 10px" }}>
-          <div style={{ display: "flex", gap: 2, alignItems: "flex-end", height: "100%" }}>
-            {[40, 60, 45, 80, 55, 90, 70].map((h, i) => (
-              <div key={i} style={{ flex: 1, borderRadius: 2, background: i === 5 ? "#1a73e8" : "rgba(0,0,0,0.1)", height: `${h}%` }} />
-            ))}
-          </div>
-        </div>
-      </div>
-    ),
-  };
-  return screens[screenType] || screens.home;
-}
-
-export function PaymentModal({ plan, billing, onClose, onDone }) {
-  const [method, setMethod] = useState(null);
-  const [processing, setProcessing] = useState(false);
-  const [done, setDone] = useState(false);
-  const price = plan.price[billing];
-
-  const methods = [
-    { id: "naverpay",  label: "Naver Pay",           color: "#03C75A", hint: "Redirecting to Naver app...",  icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z"/></svg> },
-
-    { id: "kakaopay",  label: "Kakao Pay",           color: "#FEE500", hint: "Redirecting to Kakao app...", icon: <span style={{ fontSize: 11, fontWeight: 800, color: "#191919" }}>kakao pay</span> },
-    { id: "stripe",    label: "Credit / Debit Card (Stripe)", color: "#635bff", hint: null, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg> },
-  ];
-
-  const selectedMethod = methods.find(m => m.id === method);
-
-  const confirm = () => {
-    if (!method) return;
-    setProcessing(true);
-    setTimeout(() => { setProcessing(false); setDone(true); }, 2000);
-  };
-
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(32,33,36,0.6)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ background: C.white, borderRadius: 8, padding: "32px", width: "100%", maxWidth: 440, boxShadow: S.elevated, position: "relative" }}>
-        <button onClick={onClose} aria-label="닫기" style={{ position: "absolute", top: 16, right: 16, background: "transparent", border: "none", fontSize: 18, cursor: "pointer", color: C.body, lineHeight: 1 }}>✕</button>
-
-        {done ? (
-          <div style={{ textAlign: "center", padding: "16px 0" }}>
-            <div style={{ width: 56, height: 56, borderRadius: "50%", background: C.successBg, border: `1px solid ${C.successBorder}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 24 }}>✓</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Payment Complete!</div>
-            <div style={{ fontSize: 14, color: C.body, marginBottom: 4 }}>{plan.name} Plan · {billing === "annual" ? "Annual billing" : "Monthly billing"}</div>
-            <div style={{ fontSize: 13, color: C.body, marginBottom: 4 }}>${price.toLocaleString()} charged</div>
-            <div style={{ fontSize: 12, color: C.body, marginBottom: 24 }}>A receipt has been sent to your email</div>
-            <Btn full onClick={() => { onClose(); onDone(); }}>Go to Dashboard</Btn>
-          </div>
-        ) : (
-          <>
-            <div style={{ background: C.purpleBg, border: `1px solid ${C.purpleLight}`, borderRadius: 8, padding: "14px 16px", marginBottom: 24 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{plan.name} Plan · {billing === "annual" ? "Annual billing" : "Monthly billing"}</div>
-                  <div style={{ fontSize: 12, color: C.body, marginTop: 3 }}>{plan.interviews ? `${plan.interviews.toLocaleString()} slots/mo` : "Unlimited interviews"} · {plan.report} report</div>
-                </div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: C.purple, fontFeatureSettings: '"tnum"' }}>₩{price.toLocaleString()}</div>
-              </div>
-            </div>
-
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.label, marginBottom: 12 }}>Select Payment Method</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
-              {methods.map(m => (
-                <div key={m.id} onClick={() => setMethod(m.id)}
-                  style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 8, border: `2px solid ${method === m.id ? m.color : C.border}`, cursor: "pointer", background: method === m.id ? `${m.color}08` : C.white, transition: "all 0.15s" }}>
-                  <div style={{ width: 40, height: 26, borderRadius: 6, background: m.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    {m.icon}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <span style={{ fontSize: 14, color: C.navy, fontWeight: method === m.id ? 500 : 400 }}>{m.label}</span>
-                    <div style={{ fontSize: 10, color: C.body, marginTop: 1 }}>Test mode — no real charge</div>
-                  </div>
-                  <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${method === m.id ? m.color : C.border}`, background: method === m.id ? m.color : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    {method === m.id && <span style={{ color: C.white, fontSize: 10 }}>✓</span>}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {method && selectedMethod && (
-              <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: `${selectedMethod.color}10`, border: `1px solid ${selectedMethod.color}30`, fontSize: 13, color: C.navy }}>
-                {selectedMethod.hint ? selectedMethod.hint : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ fontSize: 12, color: C.body, marginBottom: 2 }}>Enter card details (simulation)</div>
-                    <input placeholder="Card number 0000 0000 0000 0000" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, width: "100%", boxSizing: "border-box", cursor: "default" }} />
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <input placeholder="MM / YY" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, flex: 1, cursor: "default" }} />
-                      <input placeholder="CVC" readOnly style={{ padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, color: C.navy, background: C.white, flex: 1, cursor: "default" }} />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginBottom: 8, padding: "6px 12px", background: "rgba(251,191,36,0.08)", borderRadius: 6, border: "1px solid rgba(251,191,36,0.2)" }}>
-              ⚠️ Test mode — no real charges will be made.
-            </div>
-
-            <Btn full size="lg" disabled={!method || processing} onClick={confirm}>
-              {processing ? "Processing..." : `Pay $${price.toLocaleString()}`}
-            </Btn>
-            <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 10 }}>
-              SSL encrypted · Cancel anytime
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // ─── Footer — shared across all pages ───
 export function Footer({ go, lang = "en", onLangChange, tagline }) {
   const isMobile = useIsMobile();
@@ -868,38 +712,6 @@ export function VoicePlayer({ audioUrl, transcript, dark = false }) {
   );
 }
 
-// ─── ProgressSteps ─────────────────────────────────────────────────────────
-// Shows numbered step progress with a thin bar. Props: current (1-based), total, color.
-export function ProgressSteps({ current, total, color = C.purple }) {
-  const pct = total > 0 ? Math.min((current / total) * 100, 100) : 0;
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", gap: 6 }}>
-          {Array.from({ length: total }, (_, i) => (
-            <div key={i} style={{
-              width: 24, height: 24, borderRadius: "50%",
-              background: i < current ? color : "transparent",
-              border: `1.5px solid ${i < current ? color : C.border}`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 11, fontWeight: 600, fontFamily: F,
-              color: i < current ? "#fff" : C.body,
-              transition: "all 0.2s",
-            }}>
-              {i < current - 1 ? "✓" : i + 1}
-            </div>
-          ))}
-        </div>
-        <span style={{ fontSize: 12, color: C.body, fontFamily: F, fontFeatureSettings: '"tnum"' }}>
-          {current} / {total}
-        </span>
-      </div>
-      <div style={{ height: 3, background: C.border, borderRadius: 2 }}>
-        <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 2, transition: "width 0.4s ease" }} />
-      </div>
-    </div>
-  );
-}
 
 // ─── EmptyState ─────────────────────────────────────────────────────────────
 // Centered placeholder with icon, title, description, optional CTA.
@@ -926,60 +738,3 @@ export function EmptyState({ icon, title, description, action, onAction }) {
   );
 }
 
-// ─── Tooltip ────────────────────────────────────────────────────────────────
-// Simple hover tooltip. Props: text, children, position ("top"|"bottom").
-export function Tooltip({ text, children, position = "top" }) {
-  const [visible, setVisible] = useState(false);
-  const isTop = position !== "bottom";
-  return (
-    <div style={{ position: "relative", display: "inline-flex" }}
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}>
-      {children}
-      {visible && (
-        <div style={{
-          position: "absolute",
-          [isTop ? "bottom" : "top"]: "calc(100% + 6px)",
-          left: "50%", transform: "translateX(-50%)",
-          background: C.navy, color: "#fff",
-          fontSize: 12, fontFamily: F, fontWeight: 400,
-          padding: "5px 10px", borderRadius: 6,
-          whiteSpace: "nowrap", pointerEvents: "none",
-          boxShadow: S.float, zIndex: 9000,
-          letterSpacing: "0.16px",
-        }}>
-          {text}
-          <div style={{
-            position: "absolute",
-            [isTop ? "top" : "bottom"]: "100%",
-            left: "50%", transform: "translateX(-50%)",
-            width: 0, height: 0,
-            borderLeft: "5px solid transparent",
-            borderRight: "5px solid transparent",
-            [isTop ? "borderBottom" : "borderTop"]: `5px solid ${C.navy}`,
-          }} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── FadeIn ──────────────────────────────────────────────────────────────────
-// Wraps children in a subtle fade + slide-up animation on mount.
-// Props: delay (ms, default 0), children.
-export function FadeIn({ delay = 0, children }) {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(t);
-  }, [delay]);
-  return (
-    <div style={{
-      opacity: visible ? 1 : 0,
-      animation: visible ? `fadein-up 0.35s ease forwards` : "none",
-      animationDelay: "0ms",
-    }}>
-      {children}
-    </div>
-  );
-}

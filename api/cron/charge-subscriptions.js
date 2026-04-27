@@ -1,14 +1,9 @@
 // GET /api/cron/charge-subscriptions
 // Vercel Cron: 매일 UTC 00:00 (한국 09:00) 자동 실행
-import { randomBytes } from "crypto";
 import { supabase } from "../_supabase.js";
 import { chargeBillingKey } from "../lib/toss.js";
 import { PRO_PLAN, getPlanById } from "../lib/plans.js";
-
-function nanoid(len = 12) {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  return Array.from(randomBytes(len), b => chars[b % chars.length]).join("");
-}
+import { nanoid } from "../lib/nanoid.js";
 
 export default async function handler(req, res) {
   // Cron 보호: CRON_SECRET 검증

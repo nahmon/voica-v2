@@ -3,7 +3,7 @@ import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { C, F } from "../lib/constants.jsx";
 import { GlobalNav } from "../components/shared.jsx";
 
-const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || "test_ck_ma60RZblrqzZEv0P4E1z8wzYWBn1";
+const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
 
 export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
   const [error, setError] = useState(null);
@@ -15,6 +15,7 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
   }, [user]);
 
   const startBillingAuth = async () => {
+    if (!VITE_TOSS_CLIENT_KEY) { setError(isKo ? "결제 설정이 준비 중이에요." : "Payment not configured."); return; }
     try {
       const tossPayments = await loadTossPayments(VITE_TOSS_CLIENT_KEY);
       // customerKey = user.id (UUID) — 서버에서 검증

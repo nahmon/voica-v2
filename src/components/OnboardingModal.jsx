@@ -49,14 +49,14 @@ export default function OnboardingModal({ user, onComplete, go }) {
   };
 
   return (
-    <div style={{
+    <div role="presentation" style={{
       position: "fixed", inset: 0, zIndex: 1000,
       background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)",
       display: "flex", alignItems: "center", justifyContent: "center",
       padding: 24,
       opacity: closing ? 0 : 1, transition: "opacity 0.3s",
     }}>
-      <div style={{
+      <div role="dialog" aria-modal="true" aria-label={current.title} style={{
         background: C.white, borderRadius: 20, padding: "40px 36px",
         maxWidth: 420, width: "100%", textAlign: "center",
         boxShadow: "0 24px 64px rgba(0,0,0,0.18)",

@@ -1,14 +1,9 @@
 // POST /api/subscription/start — 빌링키 발급 + 첫 결제 + 구독 레코드 생성
-import { randomBytes } from "crypto";
 import { supabase } from "../_supabase.js";
 import { rateLimit, getIp } from "../_rateLimit.js";
 import { issueBillingKey, chargeBillingKey } from "../lib/toss.js";
 import { PRO_PLAN, PRO_PLAN_YEARLY } from "../lib/plans.js";
-
-function nanoid(len = 12) {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  return Array.from(randomBytes(len), b => chars[b % chars.length]).join("");
-}
+import { nanoid } from "../lib/nanoid.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });

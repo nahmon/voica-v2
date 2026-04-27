@@ -254,6 +254,7 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
             </button>
           ) : (
             <select
+              aria-label={isKo ? "정렬 기준" : "Sort by"}
               value={sortKey}
               onChange={e => setSortKey(e.target.value)}
               style={{

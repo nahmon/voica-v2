@@ -1,13 +1,8 @@
 // POST /api/payments/prepare — 일회성 크레딧 주문 생성 (PENDING)
-import { randomBytes } from "crypto";
 import { supabase } from "../_supabase.js";
 import { rateLimit, getIp } from "../_rateLimit.js";
 import { getCreditPackageById } from "../lib/plans.js";
-
-function nanoid(len = 12) {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  return Array.from(randomBytes(len), b => chars[b % chars.length]).join("");
-}
+import { nanoid } from "../lib/nanoid.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });

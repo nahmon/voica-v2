@@ -210,6 +210,12 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
     sessions.filter(s => s.status === "completed").length,
     [sessions]);
 
+  const respCountMap = useMemo(() => {
+    const map = new Map();
+    allResponses.forEach(r => map.set(r.session_id, (map.get(r.session_id) ?? 0) + 1));
+    return map;
+  }, [allResponses]);
+
   if (loading) return (
     <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
@@ -238,7 +244,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
       <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg }}>
         <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
         <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 16px", height: 48, display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={() => setSelectedSession(null)}
+          <button aria-label={isKo ? "응답 목록으로 돌아가기" : "Back to responses"} onClick={() => setSelectedSession(null)}
             style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: C.navy, padding: "0 4px", lineHeight: 1 }}>←</button>
           <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {selectedSession.panelist_name || (isKo ? `참여자 ${sessionIdx}` : `Respondent ${sessionIdx}`)}
@@ -293,7 +299,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
               <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 6 }}>{isKo ? "아직 응답이 없어요" : "No responses yet"}</div>
               <div style={{ fontSize: 13, color: C.body, marginBottom: interview?.share_code ? 20 : 0 }}>{isKo ? "인터뷰 링크를 공유해서 응답을 받아보세요" : "Share the interview link to start collecting responses"}</div>
               {interview?.share_code && (
-                <button onClick={() => { navigator.clipboard.writeText(`${location.origin}/i/${interview.share_code}`); }}
+                <button onClick={() => { const url = `${location.origin}/i/${interview.share_code}`; navigator.clipboard.writeText(url).catch(() => { const el = document.createElement("textarea"); el.value = url; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); }); }}
                   style={{ padding: "8px 18px", borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, fontSize: 13, color: C.purple, fontFamily: F, cursor: "pointer", fontWeight: 500 }}>
                   {isKo ? "🔗 링크 복사" : "🔗 Copy link"}
                 </button>
@@ -305,7 +311,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
             const dt = s.completed_at
               ? new Date(s.completed_at).toLocaleString(isKo ? "ko-KR" : "en-US", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
               : (isKo ? "진행 중" : "In progress");
-            const respCount = allResponses.filter(r => r.session_id === s.id).length;
+            const respCount = respCountMap.get(s.id) ?? 0;
             return (
               <div key={s.id} onClick={() => setSelectedSession(s)}
                 style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px", marginBottom: 8, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, boxShadow: S.ambient }}>
@@ -386,7 +392,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
                 <div style={{ fontSize: 14, fontWeight: 600, color: C.navy, marginBottom: 6 }}>{isKo ? "아직 응답이 없어요" : "No responses yet"}</div>
                 <div style={{ fontSize: 12, color: C.body, marginBottom: interview?.share_code ? 16 : 0 }}>{isKo ? "인터뷰 링크를 공유해서 응답을 받아보세요" : "Share the interview link to start collecting responses"}</div>
                 {interview?.share_code && (
-                  <button onClick={() => navigator.clipboard.writeText(`${location.origin}/i/${interview.share_code}`)}
+                  <button onClick={() => { const url = `${location.origin}/i/${interview.share_code}`; navigator.clipboard.writeText(url).catch(() => { const el = document.createElement("textarea"); el.value = url; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); }); }}
                     style={{ padding: "7px 16px", borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, fontSize: 12, color: C.purple, fontFamily: F, cursor: "pointer" }}>
                     {isKo ? "🔗 링크 복사" : "🔗 Copy link"}
                   </button>
@@ -399,7 +405,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
               const dt = s.completed_at
                 ? new Date(s.completed_at).toLocaleString(isKo ? "ko-KR" : "en-US", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
                 : (isKo ? "진행 중" : "In progress");
-              const respCount = allResponses.filter(r => r.session_id === s.id).length;
+              const respCount = respCountMap.get(s.id) ?? 0;
               const durMin = s.completed_at && s.started_at
                 ? Math.round((new Date(s.completed_at) - new Date(s.started_at)) / 60000)
                 : null;

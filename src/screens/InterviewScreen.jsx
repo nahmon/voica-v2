@@ -638,7 +638,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
         {warmupPhase === "idle" && (
           <>
-            <button onClick={startWarmup}
+            <button aria-label="마이크 테스트 시작" onClick={startWarmup}
               style={{ width: 128, height: 128, borderRadius: "50%", border: "none", cursor: "pointer", background: C.purple, boxShadow: "0 0 0 12px rgba(83,58,253,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
               {Ic.Mic({ s: 40, c: "white" })}
             </button>
@@ -648,7 +648,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
         {warmupPhase === "recording" && (
           <>
-            <button onClick={stopWarmup}
+            <button aria-label="녹음 중지" onClick={stopWarmup}
               style={{ width: 128, height: 128, borderRadius: "50%", border: "none", cursor: "pointer", background: C.ruby, boxShadow: "0 0 0 12px rgba(217,48,37,0.15),0 0 0 24px rgba(217,48,37,0.07)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", animation: "rec-pulse 1.2s ease-in-out infinite" }}>
               {Ic.Stop({ s: 36, c: "white" })}
             </button>
@@ -774,7 +774,7 @@ export default function InterviewScreen({ go, shareCode }) {
     if (navigator.share) {
       navigator.share({ title: "voicesurvey 인터뷰 완료!", text: "AI 음성 인터뷰를 완료했어요. 한번 해보세요!", url: "https://voicesurvey.ai" }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(shareText).then(() => { setShareCopied(true); setTimeout(() => setShareCopied(false), 2500); }).catch(() => {});
+      navigator.clipboard.writeText(shareText).catch(() => { const el = document.createElement("textarea"); el.value = shareText; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); }).then(() => { setShareCopied(true); setTimeout(() => setShareCopied(false), 2500); });
     }
   };
 
@@ -872,8 +872,8 @@ export default function InterviewScreen({ go, shareCode }) {
       <style>{INTERVIEW_STYLES}</style>
 
       {showExitConfirm && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div style={{ background: IV_MODAL, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
+        <div role="presentation" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div role="dialog" aria-modal="true" aria-label="인터뷰 종료 확인" style={{ background: IV_MODAL, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>⚠️</div>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.white, marginBottom: 8 }}>인터뷰를 종료할까요?</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>{isMobile ? "지금 나가면 답변이 저장되지 않아요." : "지금 나가면 저장된 답변이 유지되지 않을 수 있어요."}</div>
@@ -886,8 +886,8 @@ export default function InterviewScreen({ go, shareCode }) {
       )}
 
       {showSkipConfirm && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div style={{ background: IV_MODAL, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
+        <div role="presentation" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div role="dialog" aria-modal="true" aria-label="질문 건너뛰기 확인" style={{ background: IV_MODAL, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "28px 24px", width: "100%", maxWidth: 360, textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>⏭️</div>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.white, marginBottom: 8 }}>이 질문을 건너뛸까요?</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 24 }}>{isMobile ? "이 질문을 건너뛸 수 있어요." : "질문이 해당되지 않거나 어렵다면 건너뛸 수 있어요."}</div>

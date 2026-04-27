@@ -5,7 +5,7 @@ import { Badge, Btn, GlobalNav, Footer, useToast } from "../components/shared.js
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
 
-const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || "test_ck_ma60RZblrqzZEv0P4E1z8wzYWBn1";
+const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
 
 const CREDIT_PACKAGES = [
   { id: "credit_100k",  label: "100,000원", labelEn: "$75",  amount: 100000,  credits: "100,000크레딧", creditsEn: "100,000 credits" },

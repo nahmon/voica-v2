@@ -134,13 +134,13 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
       </div>
 
       {/* Tab switcher */}
-      <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 24px", display: "flex", gap: 0 }}>
+      <div role="tablist" style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 24px", display: "flex", gap: 0 }}>
         {[
           ["applicants", isKo ? "패널 지원자" : "Applicants"],
           ["rewards", isKo ? "리워드 정산" : "Rewards"],
           ["expert_verify", isKo ? "전문가 인증 심사" : "Expert Verification"],
         ].map(([tab, label]) => (
-          <button key={tab} onClick={() => setActiveTab(tab)}
+          <button key={tab} role="tab" aria-selected={activeTab === tab} onClick={() => setActiveTab(tab)}
             style={{ padding: "12px 16px", border: "none", background: "none", fontFamily: F, fontSize: 13, fontWeight: activeTab === tab ? 600 : 400, color: activeTab === tab ? C.purple : C.body, borderBottom: activeTab === tab ? `2px solid ${C.purple}` : "2px solid transparent", cursor: "pointer", transition: "color 0.15s" }}>
             {label}
             {tab === "rewards" && rewards.length > 0 && <span style={{ marginLeft: 6, fontSize: 10, background: C.ruby, color: "#fff", padding: "1px 5px", borderRadius: 8, fontWeight: 700 }}>{rewards.length}</span>}

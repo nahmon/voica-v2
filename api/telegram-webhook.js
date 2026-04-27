@@ -4,9 +4,9 @@ import { supabase } from "./_supabase.js";
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false })
 
-  // Verify request is from Telegram using the webhook secret token
+  // Verify request is from Telegram using the webhook secret token (fail-closed)
   const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
-  if (secret && req.headers['x-telegram-bot-api-secret-token'] !== secret) {
+  if (!secret || req.headers['x-telegram-bot-api-secret-token'] !== secret) {
     return res.status(403).json({ ok: false });
   }
 

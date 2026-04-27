@@ -1,8 +1,8 @@
 // POST /api/interview — create interview + questions atomically
-import { randomBytes } from "crypto";
 import OpenAI from "openai";
 import { supabase } from "../_supabase.js";
 import { rateLimit, getIp } from "../_rateLimit.js";
+import { nanoid } from "../lib/nanoid.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -21,11 +21,6 @@ async function prewarmTts(supabase, questions) {
   }));
 }
 
-function nanoid(len = 10) {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  const bytes = randomBytes(len);
-  return Array.from(bytes, b => chars[b % chars.length]).join("");
-}
 
 export default async function handler(req, res) {
   if (req.method !== "POST" && req.method !== "PUT") {

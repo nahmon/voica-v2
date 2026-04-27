@@ -360,6 +360,7 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
                 {FAQ_ITEMS.map((item, i) => (
                   <div key={i} style={{ background: C.white, border: `1px solid ${faqOpen === i ? "rgba(83,58,253,0.2)" : C.border}`, borderRadius: 8, overflow: "hidden", transition: "border-color 0.15s" }}>
                     <button
+                      aria-expanded={faqOpen === i}
                       onClick={() => setFaqOpen(p => p === i ? null : i)}
                       style={{
                         width: "100%", padding: "13px 16px", background: "none", border: "none", cursor: "pointer",
@@ -429,7 +430,7 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
                       {item.label}
                       <span style={{ fontSize: 11, color: C.ruby, marginLeft: 5 }}>Required</span>
                     </span>
-                    <button onClick={() => toggle(item.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center", color: C.body, transform: open === item.id ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                    <button aria-label={open === item.id ? "약관 접기" : "약관 펼치기"} aria-expanded={open === item.id} onClick={() => toggle(item.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center", color: C.body, transform: open === item.id ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
                       {Ic.ChevronDown({ s: 16, c: C.body })}
                     </button>
                   </div>
