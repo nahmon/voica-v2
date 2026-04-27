@@ -45,7 +45,11 @@ export default async function handler(req, res) {
   const orderId = `voica_sub_${nanoid(12)}_${Date.now()}`;
   const now = new Date();
   const periodEnd = new Date(now);
-  periodEnd.setMonth(periodEnd.getMonth() + 1);
+  if (plan.id === "pro_yearly") {
+    periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+  } else {
+    periodEnd.setMonth(periodEnd.getMonth() + 1);
+  }
 
   let charge;
   try {
@@ -67,7 +71,7 @@ export default async function handler(req, res) {
     billing_key: billingResult.billingKey,
     customer_key: customerKey,
     status: "active",
-    amount: PRO_PLAN.amount,
+    amount: plan.amount,
     current_period_start: now.toISOString(),
     current_period_end: periodEnd.toISOString(),
     cancel_at_period_end: false,

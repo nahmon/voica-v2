@@ -229,6 +229,8 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
           {isMobile ? (
             <button
               onClick={() => setMobileSortOpen(v => !v)}
+              aria-label={isKo ? "정렬 기준 선택" : "Sort options"}
+              aria-expanded={mobileSortOpen}
               style={{
                 padding: "6px 10px", borderRadius: 8, border: `1px solid ${mobileSortOpen ? C.purple : C.border}`,
                 background: mobileSortOpen ? C.purpleBg : "#fff", color: mobileSortOpen ? C.purple : C.body,

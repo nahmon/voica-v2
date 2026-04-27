@@ -58,7 +58,7 @@ export default function PaymentSuccessScreen({ go, user, logout, lang = "ko" }) 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <GlobalNav go={go} activeTab="pricing" variant={user ? "app" : "public"} user={user} logout={logout} lang={lang} />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, padding: 40 }}>
+      <div aria-live="polite" aria-atomic="true" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, padding: 40 }}>
         {status === "processing" && (
           <p style={{ color: C.body, fontSize: 15 }}>{isKo ? "결제를 확인하는 중..." : "Confirming payment..."}</p>
         )}

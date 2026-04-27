@@ -41,7 +41,11 @@ export default async function handler(req, res) {
     const orderId = `voica_sub_${nanoid(12)}_${Date.now()}`;
     const newStart = new Date(sub.current_period_end);
     const newEnd = new Date(newStart);
-    newEnd.setMonth(newEnd.getMonth() + 1);
+    if (sub.plan_id === "pro_yearly") {
+      newEnd.setFullYear(newEnd.getFullYear() + 1);
+    } else {
+      newEnd.setMonth(newEnd.getMonth() + 1);
+    }
 
     // 이메일 조회 (Toss API 필요)
     const { data: { user: authUser } } = await supabase.auth.admin.getUserById(sub.user_id);

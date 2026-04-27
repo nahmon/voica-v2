@@ -55,7 +55,7 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
       <GlobalNav go={go} activeTab="pricing" variant="app" user={user} logout={logout} lang={lang} />
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: C.body, fontSize: 14 }}>{isKo ? "결제창을 여는 중..." : "Opening payment..."}</p>
+        <p role="status" style={{ color: C.body, fontSize: 14 }}>{isKo ? "결제창을 여는 중..." : "Opening payment..."}</p>
       </div>
     </div>
   );
