@@ -14,9 +14,11 @@ export default async function handler(req, res) {
   const { question_content, transcript, interview_title, session_id } = req.body;
 
   if (!question_content?.trim()) return res.status(400).json({ error: "question_content required" });
+  if (question_content.length > 500) return res.status(400).json({ error: "question_content too long" });
   if (!transcript?.trim() || transcript.trim().length < 10) {
     return res.status(400).json({ error: "transcript must be at least 10 characters" });
   }
+  if (transcript.length > 3000) return res.status(400).json({ error: "transcript too long" });
 
   try {
     const completion = await openai.chat.completions.create({
