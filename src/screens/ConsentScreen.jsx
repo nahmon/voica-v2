@@ -514,10 +514,10 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
             </div>
 
             <Btn full size="lg" onClick={() => go(shareCode ? "interview" : "panel_board")}>
-              {Ic.Mic({ s: 16, c: "white" })} {shareCode ? "Start Interview" : "Go to Recruitment Board"}
+              {Ic.Mic({ s: 16, c: "white" })} {shareCode ? (lang === "ko" ? "인터뷰 시작하기" : "Start Interview") : (lang === "ko" ? "모집 보드 보기" : "Go to Recruitment Board")}
             </Btn>
             <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 10 }}>
-              {shareCode ? "Your AI interview will begin immediately" : "Find an interview to participate in on the recruitment board"}
+              {shareCode ? (lang === "ko" ? "AI 인터뷰가 바로 시작돼요" : "Your AI interview will begin immediately") : (lang === "ko" ? "모집 보드에서 인터뷰를 찾아보세요" : "Find an interview to participate in on the recruitment board")}
             </div>
           </div>
         </div>

@@ -572,6 +572,17 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     </div>
   );
 
+  // ─── Loading guard for edit mode ───
+  if (loadingExisting) return (
+    <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+        <div style={{ width: 32, height: 32, border: `3px solid ${C.border}`, borderTopColor: C.purple, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ fontSize: 13, color: C.body }}>불러오는 중…</div>
+      </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+    </div>
+  );
+
   // ─── Mobile layout ───
   if (isMobile) return (
     <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>

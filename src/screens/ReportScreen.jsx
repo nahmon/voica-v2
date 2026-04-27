@@ -531,6 +531,23 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
               {dateRange && <div style={{ fontSize: 13, color: dk.muted }}>{dateRange}</div>}
             </div>
 
+            {/* Executive Summary */}
+            {report.content.summary && (
+              <div style={{ marginBottom: 28, padding: "20px 24px", borderRadius: 10, background: "rgba(110,75,255,0.06)", border: "1px solid rgba(110,75,255,0.15)" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: C.purple, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
+                  {isKo ? "핵심 요약" : "Executive Summary"}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {report.content.summary.split(/•/).filter(s => s.trim()).map((line, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                      <div style={{ width: 5, height: 5, borderRadius: "50%", background: C.purple, flexShrink: 0, marginTop: 7 }} />
+                      <div style={{ fontSize: 14, color: dk.text, lineHeight: 1.65 }}>{line.trim()}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* 01 리서치 개요 */}
             <Section number={sn.overview} title={isKo ? "리서치 개요" : "Research Overview"} dk={dk}>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(5,1fr)", gap: 1, background: dk.border, borderRadius: 8, overflow: "hidden" }}>
@@ -832,7 +849,11 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                           <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 52px 52px 52px 40px", gap: 4, padding: "10px 4px", borderBottom: isLast ? "none" : `1px solid ${dk.border}`, alignItems: "center" }}>
                             <div>
                               <div style={{ fontSize: 13, fontWeight: 500, color: dk.text }}>{theme.label}</div>
-                              {theme.quotes?.[0] && <div style={{ fontSize: 11, color: dk.muted, marginTop: 2, fontStyle: "italic", lineHeight: 1.4 }}>"{theme.quotes[0].slice(0, 48)}{theme.quotes[0].length > 48 ? "…" : ""}"</div>}
+                              {(theme.key_quote || theme.quotes?.[0]) && (
+                                <div style={{ fontSize: 11, color: dk.muted, marginTop: 2, fontStyle: "italic", lineHeight: 1.4 }}>
+                                  "{(theme.key_quote || theme.quotes[0]).slice(0, 72)}{(theme.key_quote || theme.quotes[0]).length > 72 ? "…" : ""}"
+                                </div>
+                              )}
                             </div>
                             {sentCfg.map(({ val, color, bg, dom }, ci) => (
                               <div key={ci} style={{ textAlign: "center", padding: "3px 4px", borderRadius: 5, background: dom ? bg : "transparent" }}>

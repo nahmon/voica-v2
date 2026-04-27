@@ -25,10 +25,11 @@ export default function PaymentSuccessScreen({ go, user, logout, lang = "ko" }) 
       if (type === "subscription") {
         const authKey = searchParams.get("authKey");
         const customerKey = searchParams.get("customerKey");
+        const billing = searchParams.get("billing") || "monthly";
         const res = await fetch("/api/subscription/start", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ authKey, customerKey }),
+          body: JSON.stringify({ authKey, customerKey, billing }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "구독 시작 실패");

@@ -38,10 +38,56 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
   const [hoveredCard, setHoveredCard] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
   const [membersModal, setMembersModal] = useState(null);
+  const [creditBalance, setCreditBalance] = useState(null);
+  const [isPro, setIsPro] = useState(false);
+  const [subscription, setSubscription] = useState(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [canceling, setCanceling] = useState(false);
 
   const isKo = lang === "ko";
 
   const STATUS_LABELS = isKo ? STATUS_LABELS_KO : STATUS_LABELS_EN;
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("credits").select("balance").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => setCreditBalance(data?.balance ?? 0));
+    supabase.from("subscriptions").select("status, cancel_at_period_end, current_period_end").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => { setIsPro(data?.status === "active"); setSubscription(data); });
+  }, [user]);
+
+  const handleCancelSubscription = async () => {
+    setCanceling(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/subscription/cancel", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "취소 실패");
+      setSubscription(prev => ({ ...prev, cancel_at_period_end: true, current_period_end: json.periodEnd }));
+      setShowCancelModal(false);
+      showToast(isKo ? "구독이 기간 종료 후 해지됩니다." : "Subscription will cancel at period end.", "success");
+    } catch (e) {
+      showToast(e.message, "error");
+    } finally {
+      setCanceling(false);
+    }
+  };
+
+  const handleStatusChange = async (e, interviewId, newStatus) => {
+    e.stopPropagation();
+    const { error } = await supabase.from("interviews").update({ status: newStatus }).eq("id", interviewId);
+    if (error) { showToast(isKo ? "상태 변경에 실패했어요." : "Failed to update status.", "error"); return; }
+    setInterviews(prev => prev.map(i => i.id === interviewId ? { ...i, status: newStatus } : i));
+  };
+
+  const handleNewProject = () => {
+    if (!isPro && interviews.length >= 3) { setShowUpgradeModal(true); return; }
+    go("editor");
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -105,7 +151,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
       <div style={{ fontSize: 14, fontWeight: 400, color: C.label, marginBottom: 12 }}>{isKo ? "시작하는 방법" : "How to get started"}</div>
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 12 }}>
         {[
-          { step: "1", icon: (c) => Ic.Pencil({ s: 20, c }), title: isKo ? "질문 설계" : "Design Questions", desc: isKo ? "음성 및 객관식 질문을 만들어 인터뷰를 구성해요" : "Create voice and multiple-choice questions to build your interview", action: () => go("editor"), actionLabel: isKo ? "시작하기" : "Get Started", color: C.purple },
+          { step: "1", icon: (c) => Ic.Pencil({ s: 20, c }), title: isKo ? "질문 설계" : "Design Questions", desc: isKo ? "음성 및 객관식 질문을 만들어 인터뷰를 구성해요" : "Create voice and multiple-choice questions to build your interview", action: handleNewProject, actionLabel: isKo ? "시작하기" : "Get Started", color: C.purple },
           { step: "2", icon: (c) => Ic.Users({ s: 20, c }), title: isKo ? "인터뷰 패널 모집" : "Recruit Panelists", desc: isKo ? "링크를 공유하거나 공개 보드에서 인터뷰 패널을 모집해요" : "Share a link or recruit panelists from the public board", action: () => go("panel_board"), actionLabel: isKo ? "보드 보기" : "View Board", color: C.success },
           { step: "3", icon: (c) => Ic.Sparkle({ s: 20, c }), title: isKo ? "AI 리포트" : "AI Report", desc: isKo ? "응답이 모이면 AI가 자동으로 인사이트 리포트를 만들어줘요" : "Once responses come in, AI automatically generates an insights report", action: null, actionLabel: null, color: C.navy },
         ].map(item => (
@@ -141,6 +187,54 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
           onClose={() => setMembersModal(null)}
         />
       )}
+      {showCancelModal && (
+        <div onClick={() => setShowCancelModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: "36px 32px", maxWidth: 400, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.18)", textAlign: "center" }}>
+            <div style={{ fontSize: 36, marginBottom: 12 }}>💳</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>
+              {isKo ? "구독을 해지할까요?" : "Cancel subscription?"}
+            </div>
+            <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 24 }}>
+              {subscription?.current_period_end
+                ? (isKo
+                    ? `${new Date(subscription.current_period_end).toLocaleDateString("ko-KR")}까지 Pro 기능을 계속 사용할 수 있어요. 이후에는 무료 플랜으로 전환됩니다.`
+                    : `You'll keep Pro access until ${new Date(subscription.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. After that, you'll be on the free plan.`)
+                : (isKo ? "기간 종료 후 무료 플랜으로 전환됩니다." : "You'll be moved to the free plan at period end.")}
+            </div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <button onClick={() => setShowCancelModal(false)} style={{ padding: "10px 20px", borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
+                {isKo ? "유지하기" : "Keep Pro"}
+              </button>
+              <button onClick={handleCancelSubscription} disabled={canceling} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontSize: 13, fontWeight: 600, fontFamily: F, cursor: canceling ? "not-allowed" : "pointer", opacity: canceling ? 0.7 : 1 }}>
+                {canceling ? (isKo ? "처리 중..." : "Processing...") : (isKo ? "해지하기" : "Cancel subscription")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showUpgradeModal && (
+        <div onClick={() => setShowUpgradeModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: "36px 32px", maxWidth: 400, width: "100%", boxShadow: S.elevated, textAlign: "center" }}>
+            <div style={{ fontSize: 36, marginBottom: 12 }}>🚀</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>
+              {isKo ? "Pro 플랜으로 업그레이드하세요" : "Upgrade to Pro"}
+            </div>
+            <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 24 }}>
+              {isKo
+                ? "무료 플랜은 인터뷰를 3개까지 만들 수 있어요.\nPro로 업그레이드하면 무제한으로 인터뷰를 만들 수 있어요."
+                : "Free plan allows up to 3 interviews.\nUpgrade to Pro for unlimited interviews."}
+            </div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <button onClick={() => setShowUpgradeModal(false)} style={{ padding: "10px 20px", borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
+                {isKo ? "취소" : "Cancel"}
+              </button>
+              <button onClick={() => { setShowUpgradeModal(false); go("pricing"); }} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 13, fontWeight: 600, fontFamily: F, cursor: "pointer" }}>
+                {isKo ? "Pro 시작하기 →" : "Start Pro →"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <style>{`
         @keyframes cardLift {
           to { transform: translateY(-3px); }
@@ -166,7 +260,31 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
               }
             </div>
           </div>
-          <Btn onClick={() => go("editor")}>{isKo ? "+ 새 프로젝트" : "+ New Project"}</Btn>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {creditBalance !== null && creditBalance > 0 && (
+              <div onClick={() => go("pricing")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, background: C.purpleBg, border: `1px solid rgba(83,58,253,0.15)`, cursor: "pointer" }}>
+                <span style={{ fontSize: 13 }}>🪙</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: C.purple }}>{isKo ? `${creditBalance.toLocaleString()}원` : `$${(creditBalance / 1300).toFixed(0)}`}</span>
+              </div>
+            )}
+            {isPro && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 20, background: "linear-gradient(135deg,#6e4bff,#a78bfa)", color: "#fff", fontSize: 12, fontWeight: 600 }}>
+                  ✦ Pro
+                </div>
+                {subscription?.cancel_at_period_end ? (
+                  <div style={{ fontSize: 11, color: C.body }}>
+                    {isKo ? `${new Date(subscription.current_period_end).toLocaleDateString("ko-KR")} 종료` : `Ends ${new Date(subscription.current_period_end).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}
+                  </div>
+                ) : (
+                  <button onClick={() => setShowCancelModal(true)} style={{ padding: "5px 10px", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 11, fontFamily: F, cursor: "pointer" }}>
+                    {isKo ? "구독 관리" : "Manage"}
+                  </button>
+                )}
+              </div>
+            )}
+            <Btn onClick={handleNewProject}>{isKo ? "+ 새 프로젝트" : "+ New Project"}</Btn>
+          </div>
         </div>
 
         {/* Stats cards */}
@@ -254,7 +372,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
               <div style={{ fontSize: 13, color: C.body, marginBottom: 20, lineHeight: 1.6 }}>
                 {isKo ? "질문을 설계하면 AI가 자동으로 인터뷰를 진행해줘요." : "Design your questions and let AI conduct interviews automatically."}
               </div>
-              <Btn onClick={() => go("editor")}>{isKo ? "+ 새 프로젝트" : "+ New Project"}</Btn>
+              <Btn onClick={handleNewProject}>{isKo ? "+ 새 프로젝트" : "+ New Project"}</Btn>
             </div>
           )}
           {!loading && interviews.length > 0 && filteredInterviews.length === 0 && (
@@ -325,7 +443,9 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                       {copiedId === p.share_code ? (isKo ? "복사됨 ✓" : "Copied ✓") : (isKo ? "링크 복사" : "Copy Link")}
                     </Btn>
                   )}
+                  {p.status === "draft" && <Btn size="sm" onClick={e => handleStatusChange(e, p.id, "active")}>{isKo ? "공개하기" : "Publish"}</Btn>}
                   {p.status !== "closed" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("editor", p.id); }}>{isKo ? "수정" : "Edit"}</Btn>}
+                  {p.status === "active" && <Btn variant="ghost" size="sm" onClick={e => handleStatusChange(e, p.id, "closed")}>{isKo ? "마감" : "Close"}</Btn>}
                   {sessionCount > 0 && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("responses", p.id); }}>{isKo ? "응답 보기" : "View Responses"}</Btn>}
                   {p.status === "closed" && <Btn size="sm" onClick={e => { e.stopPropagation(); go("report", p.id); }}>{isKo ? "리포트" : "Report"}</Btn>}
                 </div>

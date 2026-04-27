@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { C, S, F } from "../lib/constants.jsx";
 import { Badge, Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
 
-const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
+const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || "test_ck_ma60RZblrqzZEv0P4E1z8wzYWBn1";
 
 const CREDIT_PACKAGES = [
-  { id: "credit_100k",  label: "100,000원", amount: 100000,  credits: "100,000크레딧" },
-  { id: "credit_300k",  label: "300,000원", amount: 300000,  credits: "300,000크레딧", badge: "인기" },
-  { id: "credit_1m",    label: "1,000,000원", amount: 1000000, credits: "1,000,000크레딧", badge: "대용량" },
+  { id: "credit_100k",  label: "100,000원", labelEn: "$75",  amount: 100000,  credits: "100,000크레딧", creditsEn: "100,000 credits" },
+  { id: "credit_300k",  label: "300,000원", labelEn: "$220", amount: 300000,  credits: "300,000크레딧", creditsEn: "300,000 credits", badge: "인기", badgeEn: "Popular" },
+  { id: "credit_1m",    label: "1,000,000원", labelEn: "$750", amount: 1000000, credits: "1,000,000크레딧", creditsEn: "1,000,000 credits", badge: "대용량", badgeEn: "Bulk" },
 ];
 
 export default function PricingScreen({ go, user, logout, lang = "ko", onLangChange }) {
@@ -18,8 +18,16 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
   const { showToast } = useToast();
   const [billing, setBilling] = useState("monthly");
   const [paying, setPaying] = useState(null); // null | "pro" | packageId
+  const [isPro, setIsPro] = useState(false);
 
   const isKo = lang === "ko";
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("subscriptions")
+      .select("status").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => setIsPro(data?.status === "active"));
+  }, [user]);
 
   const proKrwMonthly = 199000;
   const proKrwYearlyMonthly = 159000;
@@ -63,6 +71,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
 
   const handleProStart = () => {
     if (!user) { go("auth"); return; }
+    sessionStorage.setItem("voica_billing", billing);
     go("payment_subscribe");
   };
 
@@ -153,8 +162,13 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
                 </div>
               ))}
             </div>
-            <Btn full onClick={handleProStart} disabled={paying === "pro"}>
-              {paying === "pro" ? (isKo ? "연결 중..." : "Loading...") : (isKo ? "Pro 구독 시작하기 →" : "Start Pro →")}
+            <Btn full
+              onClick={isPro ? undefined : handleProStart}
+              disabled={isPro || paying === "pro"}
+              style={isPro ? { background: C.success, cursor: "default" } : {}}>
+              {isPro
+                ? (isKo ? "✓ Pro 구독 중" : "✓ Subscribed")
+                : paying === "pro" ? (isKo ? "연결 중..." : "Loading...") : (isKo ? "Pro 구독 시작하기 →" : "Start Pro →")}
             </Btn>
           </div>
 
@@ -190,16 +204,16 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
             {CREDIT_PACKAGES.map(pkg => (
               <div key={pkg.id}
                 style={{ background: C.white, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "24px 20px", display: "flex", flexDirection: "column", gap: 4, position: "relative" }}>
-                {pkg.badge && (
+                {(isKo ? pkg.badge : pkg.badgeEn) && (
                   <span style={{ position: "absolute", top: 12, right: 12, fontSize: 10, fontWeight: 700, background: C.purpleBg, color: C.purple, padding: "2px 7px", borderRadius: 4 }}>
-                    {pkg.badge}
+                    {isKo ? pkg.badge : pkg.badgeEn}
                   </span>
                 )}
                 <div style={{ fontSize: 11, fontWeight: 600, color: C.body, letterSpacing: 0.4, marginBottom: 4 }}>
                   {isKo ? "크레딧 충전" : "Credit Pack"}
                 </div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: C.navy }}>{pkg.label}</div>
-                <div style={{ fontSize: 12, color: C.body, marginBottom: 16 }}>{pkg.credits}</div>
+                <div style={{ fontSize: 26, fontWeight: 800, color: C.navy }}>{isKo ? pkg.label : pkg.labelEn}</div>
+                <div style={{ fontSize: 12, color: C.body, marginBottom: 16 }}>{isKo ? pkg.credits : pkg.creditsEn}</div>
                 <button
                   disabled={!!paying}
                   onClick={() => handleCreditPurchase(pkg)}

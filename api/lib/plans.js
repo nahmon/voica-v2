@@ -4,6 +4,12 @@ export const PRO_PLAN = {
   amount: 199000,
 };
 
+export const PRO_PLAN_YEARLY = {
+  id: "pro_yearly",
+  name: "Voica Pro 연간 구독",
+  amount: 1908000, // 159,000 × 12
+};
+
 export const CREDIT_PACKAGES = [
   { id: "credit_100k",  name: "크레딧 100,000원",   amount: 100000,  credits: 100000 },
   { id: "credit_300k",  name: "크레딧 300,000원",   amount: 300000,  credits: 300000 },

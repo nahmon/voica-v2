@@ -3,7 +3,7 @@ import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { C, F } from "../lib/constants.jsx";
 import { GlobalNav } from "../components/shared.jsx";
 
-const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
+const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || "test_ck_ma60RZblrqzZEv0P4E1z8wzYWBn1";
 
 export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
   const [error, setError] = useState(null);
@@ -18,10 +18,11 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
     try {
       const tossPayments = await loadTossPayments(VITE_TOSS_CLIENT_KEY);
       // customerKey = user.id (UUID) — 서버에서 검증
+      const billing = sessionStorage.getItem("voica_billing") || "monthly";
       const payment = tossPayments.payment({ customerKey: user.id });
       await payment.requestBillingAuth({
         method: "CARD",
-        successUrl: `${window.location.origin}/payment/success?type=subscription`,
+        successUrl: `${window.location.origin}/payment/success?type=subscription&billing=${billing}`,
         failUrl: `${window.location.origin}/pricing`,
         customerEmail: user.email ?? "",
       });
