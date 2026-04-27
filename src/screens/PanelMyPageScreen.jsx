@@ -99,6 +99,8 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
         if (bankRes.ok) { const d = await bankRes.json(); setBankAccount(d.account); }
         if (!rewardRes.error) setRewards(rewardRes.data ?? []);
         if (expertRes.ok) { const d = await expertRes.json(); setExpertStatus(d.expert_status ?? "none"); }
+      } catch {
+        showToast(isKo ? "데이터를 불러오지 못했어요. 다시 시도해주세요." : "Failed to load data. Please try again.", "error");
       } finally {
         setDataLoading(false);
       }

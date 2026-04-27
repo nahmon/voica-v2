@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, VoicePlayer, Skeleton, useToast } from "../components/shared.jsx";
@@ -196,17 +196,19 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
     showToast("CSV file downloaded", "success");
   };
 
-  const filteredSessions = sessions.filter(s => {
+  const filteredSessions = useMemo(() => sessions.filter(s => {
     if (filterStatus === "completed") return s.status === "completed";
     if (filterStatus === "in_progress") return s.status !== "completed";
     return true;
-  });
+  }), [sessions, filterStatus]);
 
-  const responses = selectedSession
-    ? allResponses.filter(r => r.session_id === selectedSession.id)
-    : [];
+  const responses = useMemo(() =>
+    selectedSession ? allResponses.filter(r => r.session_id === selectedSession.id) : [],
+    [allResponses, selectedSession]);
 
-  const completedCount = sessions.filter(s => s.status === "completed").length;
+  const completedCount = useMemo(() =>
+    sessions.filter(s => s.status === "completed").length,
+    [sessions]);
 
   if (loading) return (
     <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>

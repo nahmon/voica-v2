@@ -48,9 +48,9 @@ export default async function handler(req, res) {
 
   const { data: questions } = await supabase
     .from("questions")
-    .select("id, order_index, text, type")
+    .select("id, order_num, content, type")
     .eq("interview_id", id)
-    .order("order_index", { ascending: true });
+    .order("order_num", { ascending: true });
 
   if (!sessions?.length) {
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
     "session_id", "panelist_name", "panelist_email", "completed_at",
     ...sortedQIds.map(qid => {
       const q = qMap[qid];
-      return `Q${q?.order_index ?? "?"}: ${(q?.text ?? "").slice(0, 40)}`;
+      return `Q${q?.order_num ?? "?"}: ${(q?.content ?? "").slice(0, 40)}`;
     }),
   ];
 

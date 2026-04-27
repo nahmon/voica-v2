@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
-import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
 import { supabase } from "../supabase.js";
 
 const MAX_FILE_BYTES = 2 * 1024 * 1024; // 2 MB
@@ -23,7 +23,7 @@ function FilePreview({ fileInfo, onRemove }) {
         {sizeKb !== null && <div style={{ fontSize: 11, color: C.body, marginTop: 1 }}>{sizeKb} KB</div>}
       </div>
       {Ic.CheckCircle({ s: 16, c: C.success })}
-      <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: C.body, flexShrink: 0, display: "flex", alignItems: "center" }}>
+      <button aria-label="파일 제거" onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: C.body, flexShrink: 0, display: "flex", alignItems: "center" }}>
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
           <line x1="3" y1="3" x2="11" y2="11" /><line x1="11" y1="3" x2="3" y2="11" />
         </svg>
@@ -247,6 +247,7 @@ function StatusCard({ status, lang, note, onReApply, go }) {
 export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange }) {
   const t = T[lang] ?? T.ko;
   const isKo = lang === "ko";
+  const { showToast } = useToast();
 
   const [profileStatus, setProfileStatus] = useState(null); // null = loading
   const [reviewerNote, setReviewerNote] = useState(null);
@@ -344,7 +345,7 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
       setSubmitted(true);
       setProfileStatus("pending");
     } catch {
-      // silently allow retry
+      showToast(isKo ? "제출 중 오류가 발생했어요. 다시 시도해주세요." : "Submission failed. Please try again.", "error");
     } finally {
       setSubmitting(false);
     }
@@ -500,7 +501,11 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
                         <FilePreview fileInfo={fileInfo} onRemove={() => { setFileInfo(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} />
                       ) : (
                         <div
+                          role="button"
+                          tabIndex={fileReading ? -1 : 0}
+                          aria-label={isKo ? "파일 업로드 영역, 클릭하여 파일 선택" : "File upload area, click to select file"}
                           onClick={() => !fileReading && fileInputRef.current?.click()}
+                          onKeyDown={e => (e.key === "Enter" || e.key === " ") && !fileReading && fileInputRef.current?.click()}
                           style={{
                             border: `1.5px dashed ${fileError ? "#ea2261" : C.border}`,
                             borderRadius: 8,

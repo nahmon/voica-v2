@@ -36,6 +36,9 @@ export default async function handler(req, res) {
     if (!bank_name || !account_number || !account_holder) {
       return res.status(400).json({ error: "bank_name, account_number, account_holder required" });
     }
+    if (bank_name.length > 50 || account_number.length > 30 || account_holder.length > 50) {
+      return res.status(400).json({ error: "입력값이 너무 깁니다" });
+    }
     const { error } = await supabase
       .from("participant_bank_accounts")
       .upsert({ user_id: user.id, bank_name, account_number, account_holder, updated_at: new Date().toISOString() }, { onConflict: "user_id" });

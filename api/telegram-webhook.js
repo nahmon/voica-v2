@@ -12,6 +12,7 @@ export default async function handler(req, res) {
 
   const { message } = req.body ?? {}
   if (!message?.text) return res.status(200).end()
+  if (message.text.length > 4000) return res.status(200).end()
 
   // Telegram 3초 타임아웃 방지: 먼저 응답, 그 다음 삽입
   res.status(200).json({ ok: true })

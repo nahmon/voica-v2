@@ -19,3 +19,8 @@ export const CREDIT_PACKAGES = [
 export function getCreditPackageById(id) {
   return CREDIT_PACKAGES.find(p => p.id === id) ?? null;
 }
+
+const ALL_PLANS = [PRO_PLAN, PRO_PLAN_YEARLY];
+export function getPlanById(id) {
+  return ALL_PLANS.find(p => p.id === id) ?? null;
+}

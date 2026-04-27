@@ -3,7 +3,7 @@
 import { randomBytes } from "crypto";
 import { supabase } from "../_supabase.js";
 import { chargeBillingKey } from "../lib/toss.js";
-import { PRO_PLAN } from "../lib/plans.js";
+import { PRO_PLAN, getPlanById } from "../lib/plans.js";
 
 function nanoid(len = 12) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -56,7 +56,7 @@ export default async function handler(req, res) {
         billingKey: sub.billing_key,
         customerKey: sub.customer_key,
         orderId,
-        orderName: PRO_PLAN.name,
+        orderName: getPlanById(sub.plan_id)?.name ?? PRO_PLAN.name,
         amount: sub.amount,
         customerEmail,
       });

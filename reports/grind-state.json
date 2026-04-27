@@ -1,6 +1,6 @@
 {
-  "cycle": 1,
-  "domain_index": 1,
+  "cycle": 19,
+  "domain_index": 4,
   "domains": [
     "engineering",
     "security",
@@ -8,8 +8,8 @@
     "accessibility",
     "performance"
   ],
-  "fixed_total": 17,
+  "fixed_total": 84,
   "started_at": "2026-04-27T15:16:43Z",
-  "last_run": "2026-04-27T15:27:32Z",
-  "last_cycle_summary": "Cycle 1: Engineering+Security+UX+Accessibility (panel screens, billing bug, real user profile matching)"
+  "last_run": "2026-04-28T05:50:00Z",
+  "last_cycle_summary": "Cycle 19: Accessibility — ExpertVerifyScreen remove button aria-label, file upload zone keyboard nav"
 }

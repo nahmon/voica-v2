@@ -189,9 +189,9 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
       )}
       {showCancelModal && (
         <div onClick={() => setShowCancelModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: "36px 32px", maxWidth: 400, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.18)", textAlign: "center" }}>
+          <div role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title" onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: "36px 32px", maxWidth: 400, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.18)", textAlign: "center" }}>
             <div style={{ fontSize: 36, marginBottom: 12 }}>💳</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>
+            <div id="cancel-modal-title" style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>
               {isKo ? "구독을 해지할까요?" : "Cancel subscription?"}
             </div>
             <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 24 }}>
@@ -214,9 +214,9 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
       )}
       {showUpgradeModal && (
         <div onClick={() => setShowUpgradeModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: "36px 32px", maxWidth: 400, width: "100%", boxShadow: S.elevated, textAlign: "center" }}>
+          <div role="dialog" aria-modal="true" aria-labelledby="upgrade-modal-title" onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: "36px 32px", maxWidth: 400, width: "100%", boxShadow: S.elevated, textAlign: "center" }}>
             <div style={{ fontSize: 36, marginBottom: 12 }}>🚀</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>
+            <div id="upgrade-modal-title" style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>
               {isKo ? "Pro 플랜으로 업그레이드하세요" : "Upgrade to Pro"}
             </div>
             <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 24 }}>
@@ -262,7 +262,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {creditBalance !== null && creditBalance > 0 && (
-              <div onClick={() => go("pricing")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, background: C.purpleBg, border: `1px solid rgba(83,58,253,0.15)`, cursor: "pointer" }}>
+              <div role="button" tabIndex={0} onClick={() => go("pricing")} onKeyDown={e => (e.key === "Enter" || e.key === " ") && go("pricing")} aria-label={isKo ? "크레딧 충전하기" : "Add credits"} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, background: C.purpleBg, border: `1px solid rgba(83,58,253,0.15)`, cursor: "pointer" }}>
                 <span style={{ fontSize: 13 }}>🪙</span>
                 <span style={{ fontSize: 12, fontWeight: 600, color: C.purple }}>{isKo ? `${creditBalance.toLocaleString()}원` : `$${(creditBalance / 1300).toFixed(0)}`}</span>
               </div>

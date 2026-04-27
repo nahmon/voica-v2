@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Badge, Btn, GlobalNav, VoicePlayer, Footer, Skeleton, useToast } from "../components/shared.jsx";
@@ -228,7 +228,8 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       .catch(() => showToast("링크 복사에 실패했어요", "error"));
   };
 
-  const completedSessions = sessions.filter(s => s.status === "completed");
+  const completedSessions = useMemo(() => sessions.filter(s => s.status === "completed"), [sessions]);
+  const sessionMap = useMemo(() => new Map(sessions.map((s, i) => [s.id, { session: s, idx: i }])), [sessions]);
 
   const dk = {
     bg: "#0d1117", card: "#161b22", card2: "#1c2230",
@@ -717,8 +718,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                         })()}
                         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : resps.length === 1 ? "1fr" : "repeat(auto-fill,minmax(240px,1fr))", gap: 8 }}>
                           {resps.map((r, i) => {
-                            const session = sessions.find(s => s.id === r.session_id);
-                            const sIdx = sessions.indexOf(session);
+                            const { session, idx: sIdx } = sessionMap.get(r.session_id) ?? { session: null, idx: -1 };
                             const name = session?.respondent?.name || (isKo ? `응답자 ${sIdx + 1}` : `R${sIdx + 1}`);
                             const ts = (() => {
                               if (!session?.started_at || !r.created_at) return null;
@@ -772,8 +772,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                         {resps.map((r, ri) => {
-                          const sess = sessions.find(s => s.id === r.session_id);
-                          const sIdx = sessions.indexOf(sess);
+                          const { session: sess, idx: sIdx } = sessionMap.get(r.session_id) ?? { session: null, idx: -1 };
                           const name = sess?.respondent?.name || (isKo ? `응답자 ${sIdx + 1}` : `R${sIdx + 1}`);
                           const isPlaying = playingId === r.id;
                           const prog = audioProgress?.id === r.id ? audioProgress : null;
