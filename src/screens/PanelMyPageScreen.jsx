@@ -283,8 +283,9 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
               { key: "account_holder",  label: isKo ? "예금주" : "Account Holder", placeholder: isKo ? "홍길동" : "Full name" },
             ].map(({ key, label, placeholder }) => (
               <div key={key} style={{ marginBottom: 10 }}>
-                <label style={{ fontSize: 12, color: C.body, marginBottom: 5, display: "block" }}>{label}</label>
+                <label htmlFor={`bank-${key}`} style={{ fontSize: 12, color: C.body, marginBottom: 5, display: "block" }}>{label}</label>
                 <input
+                  id={`bank-${key}`}
                   value={bankForm[key]}
                   onChange={e => setBankForm(prev => ({ ...prev, [key]: e.target.value }))}
                   placeholder={placeholder}

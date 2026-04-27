@@ -1062,6 +1062,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
               ))}
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
                 <input
+                  aria-label={isKo ? "팀 메모 입력" : "Add team note"}
                   value={commentText}
                   onChange={e => setCommentText(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && !e.shiftKey && handleAddComment()}

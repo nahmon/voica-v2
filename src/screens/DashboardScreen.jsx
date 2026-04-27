@@ -338,6 +338,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
               <input
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
+                aria-label={isKo ? "프로젝트 검색" : "Search projects"}
                 placeholder={isKo ? "프로젝트 검색..." : "Search projects..."}
                 style={{ width: "100%", padding: "8px 10px 8px 32px", borderRadius: 10, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, background: C.white, outline: "none", boxSizing: "border-box" }}
               />

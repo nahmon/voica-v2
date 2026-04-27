@@ -729,10 +729,10 @@ export default function InterviewScreen({ go, shareCode }) {
           ].map(f => (
             <div key={f.key}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 6 }}>
-                <label style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>{f.label}</label>
+                <label htmlFor={`respondent-${f.key}`} style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>{f.label}</label>
                 <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>· {f.sub}</span>
               </div>
-              <input value={respondent[f.key]} onChange={e => setRespondent(r => ({ ...r, [f.key]: e.target.value }))} onBlur={() => { if (f.key === "name") setNameTouched(true); }} placeholder={f.placeholder} inputMode={f.inputMode}
+              <input id={`respondent-${f.key}`} value={respondent[f.key]} onChange={e => setRespondent(r => ({ ...r, [f.key]: e.target.value }))} onBlur={() => { if (f.key === "name") setNameTouched(true); }} placeholder={f.placeholder} inputMode={f.inputMode}
                 style={{ width: "100%", padding: "13px 16px", borderRadius: 10, border: `1px solid ${f.required && nameTouched && !respondent[f.key].trim() ? "rgba(255,80,80,0.4)" : "rgba(255,255,255,0.08)"}`, background: "rgba(255,255,255,0.04)", fontSize: 16, fontFamily: F, color: "#fff", outline: "none", boxSizing: "border-box" }} />
             </div>
           ))}
@@ -1019,7 +1019,7 @@ export default function InterviewScreen({ go, shareCode }) {
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: 8, background: "rgba(255,200,50,0.08)", border: "1px solid rgba(255,200,50,0.2)", marginBottom: 12, fontSize: 12, color: "rgba(255,200,50,0.9)" }}>
               <span>⚠️</span>
               <span style={{ flex: 1 }}>{recordingWarning}</span>
-              <button onClick={() => setRecordingWarning(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", fontSize: 14, cursor: "pointer", padding: 0, flexShrink: 0 }}>✕</button>
+              <button aria-label="경고 닫기" onClick={() => setRecordingWarning(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", fontSize: 14, cursor: "pointer", padding: 0, flexShrink: 0 }}>✕</button>
             </div>
           )}
 
@@ -1063,6 +1063,7 @@ export default function InterviewScreen({ go, shareCode }) {
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                   {/* Big centered mic button */}
                   <button
+                    aria-label={phase === "recording" ? "녹음 중지" : "녹음 시작"}
                     onClick={() => phase === "ready" ? startRecording() : stopRecording()}
                     style={{ width: 72, height: 72, borderRadius: "50%", border: "none", cursor: "pointer", background: phase === "recording" ? C.ruby : C.purple, boxShadow: phase === "recording" ? "0 0 0 8px rgba(217,48,37,0.2),0 0 0 16px rgba(217,48,37,0.07)" : "0 0 0 8px rgba(83,58,253,0.2),0 0 0 16px rgba(83,58,253,0.07)", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.25s", animation: phase === "recording" ? "rec-pulse 1.2s ease-in-out infinite" : "none" }}>
                     {phase === "recording" ? Ic.Stop({ s: 28, c: "white" }) : Ic.Mic({ s: 28, c: "white" })}

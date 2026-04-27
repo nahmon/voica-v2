@@ -466,10 +466,11 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
                 <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "20px 20px", marginBottom: 20 }}>
                   {selectedMethod === "email" ? (
                     <div>
-                      <label style={{ fontSize: 12, fontWeight: 500, color: C.label, display: "block", marginBottom: 6 }}>
+                      <label htmlFor="expert-email" style={{ fontSize: 12, fontWeight: 500, color: C.label, display: "block", marginBottom: 6 }}>
                         {t.methods.email.label} <span style={{ color: "#ea2261" }}>*</span>
                       </label>
                       <input
+                        id="expert-email"
                         type="email"
                         placeholder={t.methods.email.placeholder}
                         value={emailValue}
