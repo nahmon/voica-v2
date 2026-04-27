@@ -104,9 +104,15 @@ export default async function handler(req, res) {
     }
 
     // [Low] Validate response type to prevent unexpected values being stored
-    const VALID_RESPONSE_TYPES = new Set(["voice", "multiple_choice", "likert"]);
+    const VALID_RESPONSE_TYPES = new Set(["voice", "multiple_choice", "likert", "creative", "prototype"]);
     if (!VALID_RESPONSE_TYPES.has(type)) {
-      return res.status(400).json({ error: "type must be one of: voice, multiple_choice, likert" });
+      return res.status(400).json({ error: "type must be one of: voice, multiple_choice, likert, creative, prototype" });
+    }
+    if (transcript != null && (typeof transcript !== "string" || transcript.length > 5000)) {
+      return res.status(400).json({ error: "transcript too long or invalid" });
+    }
+    if (value != null && typeof value === "string" && value.length > 500) {
+      return res.status(400).json({ error: "value too long" });
     }
 
     // [Medium] Validate audio_url is a Supabase storage URL, not an arbitrary external URL
