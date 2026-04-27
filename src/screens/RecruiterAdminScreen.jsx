@@ -218,7 +218,9 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {rewards.map(r => (
-                  <div key={r.id} onClick={() => setRewardSelected(prev => { const s = new Set(prev); s.has(r.id) ? s.delete(r.id) : s.add(r.id); return s; })}
+                  <div key={r.id} role="checkbox" aria-checked={rewardSelected.has(r.id)} tabIndex={0}
+                    onClick={() => setRewardSelected(prev => { const s = new Set(prev); s.has(r.id) ? s.delete(r.id) : s.add(r.id); return s; })}
+                    onKeyDown={e => (e.key === " " || e.key === "Enter") && setRewardSelected(prev => { const s = new Set(prev); s.has(r.id) ? s.delete(r.id) : s.add(r.id); return s; })}
                     style={{ background: C.white, border: `1.5px solid ${rewardSelected.has(r.id) ? C.purple : C.border}`, borderRadius: 10, padding: "14px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 14, boxShadow: S.ambient }}>
                     <input type="checkbox" checked={rewardSelected.has(r.id)} readOnly style={{ accentColor: C.purple, width: 16, height: 16, cursor: "pointer", flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>

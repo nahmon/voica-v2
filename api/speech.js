@@ -71,6 +71,7 @@ export default async function handler(req, res) {
 
     const { text, question_id } = body;
     if (!text) return res.status(400).json({ error: "text required" });
+    if (text.length > 1000) return res.status(400).json({ error: "text too long" });
 
     // No question_id = bridge phrase, skip cache
     if (!question_id) {
