@@ -245,7 +245,7 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
               </>
             )}
             {isMobile && (
-              <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", color: C.navy, fontSize: 20, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
+              <button aria-label={isKo ? "메뉴 열기" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", color: C.navy, fontSize: 20, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
             )}
           </div>
         </div>
@@ -255,10 +255,10 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
       {menuOpen && (
         <>
           <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100dvh", background: "rgba(0,0,0,0.4)", zIndex: 200, backdropFilter: "blur(2px)" }} />
-          <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 280, background: C.white, zIndex: 201, boxShadow: S.card, display: "flex", flexDirection: "column", fontFamily: F }}>
+          <div role="dialog" aria-modal="true" aria-label={isKo ? "메뉴" : "Navigation menu"} style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 280, background: C.white, zIndex: 201, boxShadow: S.card, display: "flex", flexDirection: "column", fontFamily: F }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", height: 56, borderBottom: `1px solid rgba(0,0,0,0.08)` }}>
               <LogoMark />
-              <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: C.body, lineHeight: 1, padding: 10 }}>✕</button>
+              <button aria-label={isKo ? "메뉴 닫기" : "Close menu"} onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: C.body, lineHeight: 1, padding: 10 }}>✕</button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "12px 0" }}>
               {variant === "app" ? (
