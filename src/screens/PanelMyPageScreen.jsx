@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { C, S, F, Ic } from "../lib/constants.jsx";
-import { Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
+import { Btn, GlobalNav, Footer, useToast, Skeleton } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
 
@@ -81,21 +81,27 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
   const warnings = 0;
 
   const [expertStatus, setExpertStatus] = useState("none");
+  const [dataLoading, setDataLoading] = useState(true);
 
   // Load bank account, rewards, and expert status
   useEffect(() => {
     if (!user) return;
+    setDataLoading(true);
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      const [bankRes, rewardRes, expertRes] = await Promise.all([
-        fetch("/api/participant", { headers: { Authorization: `Bearer ${token}` } }),
-        supabase.from("participant_rewards").select("id, session_id, amount, status, claimed_at, paid_at, interviews(title)").eq("user_id", user.id).order("created_at", { ascending: false }),
-        fetch("/api/expert-verify", { headers: { Authorization: `Bearer ${token}` } }),
-      ]);
-      if (bankRes.ok) { const d = await bankRes.json(); setBankAccount(d.account); }
-      if (!rewardRes.error) setRewards(rewardRes.data ?? []);
-      if (expertRes.ok) { const d = await expertRes.json(); setExpertStatus(d.expert_status ?? "none"); }
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        const [bankRes, rewardRes, expertRes] = await Promise.all([
+          fetch("/api/participant", { headers: { Authorization: `Bearer ${token}` } }),
+          supabase.from("participant_rewards").select("id, session_id, amount, status, claimed_at, paid_at, interviews(title)").eq("user_id", user.id).order("created_at", { ascending: false }),
+          fetch("/api/expert-verify", { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        if (bankRes.ok) { const d = await bankRes.json(); setBankAccount(d.account); }
+        if (!rewardRes.error) setRewards(rewardRes.data ?? []);
+        if (expertRes.ok) { const d = await expertRes.json(); setExpertStatus(d.expert_status ?? "none"); }
+      } finally {
+        setDataLoading(false);
+      }
     })();
   }, [user]);
 
@@ -169,12 +175,16 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
             {isKo ? "출금 가능 포인트" : "Available to Withdraw"}
           </div>
           <div style={{ fontSize: 36, fontWeight: 800, marginBottom: 2, letterSpacing: "-1px" }}>
-            {withdrawable.toLocaleString()}<span style={{ fontSize: 20, fontWeight: 600, marginLeft: 4 }}>pts</span>
+            {dataLoading
+              ? <Skeleton width={120} height={36} borderRadius={8} style={{ background: "rgba(255,255,255,0.15)", marginBottom: 2 }} />
+              : <>{withdrawable.toLocaleString()}<span style={{ fontSize: 20, fontWeight: 600, marginLeft: 4 }}>pts</span></>}
           </div>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 20 }}>
-            {isKo
-              ? `총 적립 ${totalEarned.toLocaleString()} · 대기 중 ${pending.toLocaleString()}`
-              : `Total earned ${totalEarned.toLocaleString()} · Pending ${pending.toLocaleString()}`}
+            {dataLoading
+              ? <Skeleton width={200} height={14} borderRadius={4} style={{ background: "rgba(255,255,255,0.12)" }} />
+              : (isKo
+                ? `총 적립 ${totalEarned.toLocaleString()} · 대기 중 ${pending.toLocaleString()}`
+                : `Total earned ${totalEarned.toLocaleString()} · Pending ${pending.toLocaleString()}`)}
           </div>
 
           <div style={{ marginBottom: 20 }}>

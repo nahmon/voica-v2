@@ -1,0 +1,15 @@
+{
+  "cycle": 1,
+  "domain_index": 1,
+  "domains": [
+    "engineering",
+    "security",
+    "ux",
+    "accessibility",
+    "performance"
+  ],
+  "fixed_total": 17,
+  "started_at": "2026-04-27T15:16:43Z",
+  "last_run": "2026-04-27T15:27:32Z",
+  "last_cycle_summary": "Cycle 1: Engineering+Security+UX+Accessibility (panel screens, billing bug, real user profile matching)"
+}
