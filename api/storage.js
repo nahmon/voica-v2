@@ -1,12 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "./_supabase.js";
 import { rateLimit, getIp } from "./_rateLimit.js";
 
 const ALLOWED_AUDIO_EXT = new Set(["webm", "mp3", "ogg", "wav", "m4a", "mp4"]);
-
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
 
 export default async function handler(req, res) {
   if (req.method === "GET") {

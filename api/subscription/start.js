@@ -1,10 +1,8 @@
 // POST /api/subscription/start — 빌링키 발급 + 첫 결제 + 구독 레코드 생성
-import { createClient } from "@supabase/supabase-js";
 import { randomBytes } from "crypto";
+import { supabase } from "../_supabase.js";
 import { issueBillingKey, chargeBillingKey } from "../lib/toss.js";
 import { PRO_PLAN, PRO_PLAN_YEARLY } from "../lib/plans.js";
-
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 function nanoid(len = 12) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";

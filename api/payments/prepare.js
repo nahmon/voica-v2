@@ -1,9 +1,6 @@
 // POST /api/payments/prepare — 일회성 크레딧 주문 생성 (PENDING)
-import { createClient } from "@supabase/supabase-js";
 import { randomBytes } from "crypto";
 import { getCreditPackageById } from "../lib/plans.js";
-
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 function nanoid(len = 12) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";

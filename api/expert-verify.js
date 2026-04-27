@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "./_supabase.js";
 import { rateLimit, getIp } from "./_rateLimit.js";
 
 // Max base64 file size: 5MB (base64 overhead ~33%, so raw limit ~3.75MB)
@@ -15,17 +15,9 @@ const ALLOWED_MIME_TYPES = new Set([
 // Allowed fields in verifyData to prevent unexpected field injection
 const ALLOWED_VERIFY_FIELDS = new Set(["file_data", "mime_type", "file_name"]);
 
-function getServiceClient() {
-  return createClient(
-    process.env.VITE_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
-}
-
 async function getAuthUser(req) {
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return null;
-  const supabase = getServiceClient();
   const { data: { user }, error } = await supabase.auth.getUser(token);
   if (error || !user) return null;
   return user;
@@ -53,8 +45,6 @@ export default async function handler(req, res) {
   if (!rateLimit(`expert-verify:${getIp(req)}`, 10)) {
     return res.status(429).json({ error: "Too many requests" });
   }
-
-  const supabase = getServiceClient();
 
   // ── GET: return current user's profile (or admin list) ──────────────────
   if (req.method === "GET") {

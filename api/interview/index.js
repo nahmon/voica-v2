@@ -1,5 +1,4 @@
 // POST /api/interview — create interview + questions atomically
-import { createClient } from "@supabase/supabase-js";
 import { randomBytes } from "crypto";
 import OpenAI from "openai";
 
@@ -36,7 +35,7 @@ export default async function handler(req, res) {
   if (!supabaseUrl || !serviceKey) {
     return res.status(500).json({ error: "Server configuration error" });
   }
-  const supabase = createClient(supabaseUrl, serviceKey);
+  
 
   // Verify auth
   const token = req.headers.authorization?.replace("Bearer ", "");

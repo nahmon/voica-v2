@@ -1,8 +1,5 @@
 // POST /api/payments/confirm — 토스 결제 승인 + 크레딧 적립
-import { createClient } from "@supabase/supabase-js";
 import { confirmPayment } from "../lib/toss.js";
-
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });

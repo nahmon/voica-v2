@@ -1,11 +1,8 @@
 // GET /api/cron/charge-subscriptions
 // Vercel Cron: 매일 UTC 00:00 (한국 09:00) 자동 실행
-import { createClient } from "@supabase/supabase-js";
 import { randomBytes } from "crypto";
 import { chargeBillingKey } from "../lib/toss.js";
 import { PRO_PLAN } from "../lib/plans.js";
-
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 function nanoid(len = 12) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";

@@ -1,5 +1,5 @@
+import { supabase } from "./_supabase.js";
 import OpenAI from "openai";
-import { createClient } from "@supabase/supabase-js";
 import { rateLimit, getIp } from "./_rateLimit.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   // Auth required — only authenticated researchers may generate questions
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return res.status(401).json({ error: "Unauthorized" });
-  const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+  
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: "Unauthorized" });
 
