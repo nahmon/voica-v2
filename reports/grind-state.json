@@ -1,6 +1,6 @@
 {
-  "cycle": 34,
-  "domain_index": 4,
+  "cycle": 37,
+  "domain_index": 2,
   "domains": [
     "engineering",
     "security",
@@ -8,8 +8,8 @@
     "accessibility",
     "performance"
   ],
-  "fixed_total": 103,
+  "fixed_total": 107,
   "started_at": "2026-04-27T15:16:43Z",
-  "last_run": "2026-04-27T16:34:56Z",
-  "last_cycle_summary": "Cycles 32-33: Security env vars clean, UX all payment/success screens properly handled. 103 total fixes."
+  "last_run": "2026-04-27T16:38:31Z",
+  "last_cycle_summary": "Cycle 37: Security clean \u2014 cancel/cron endpoints verified, RecruiterAdminScreen UX solid. 107 total fixes."
 }
