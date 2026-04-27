@@ -987,11 +987,11 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
         <div style={{ marginBottom: 14 }}>
           <label style={{ fontSize: 11, color: C.body, display: "block", marginBottom: 6 }}>척도 범위</label>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <input type="number" value={q.options?.min ?? 1} min={1} max={4}
+            <input type="number" aria-label="최솟값" value={q.options?.min ?? 1} min={1} max={4}
               onChange={e => updateQ(idx, { options: { ...q.options, min: Number(e.target.value) } })}
               style={{ width: 48, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", textAlign: "center" }} />
             <span style={{ fontSize: 12, color: C.body }}>~</span>
-            <input type="number" value={q.options?.max ?? 5} min={2} max={10}
+            <input type="number" aria-label="최댓값" value={q.options?.max ?? 5} min={2} max={10}
               onChange={e => updateQ(idx, { options: { ...q.options, max: Number(e.target.value) } })}
               style={{ width: 48, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", textAlign: "center" }} />
           </div>
