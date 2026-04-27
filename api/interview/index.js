@@ -1,6 +1,7 @@
 // POST /api/interview — create interview + questions atomically
 import { randomBytes } from "crypto";
 import OpenAI from "openai";
+import { supabase } from "../_supabase.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -29,13 +30,6 @@ export default async function handler(req, res) {
   if (req.method !== "POST" && req.method !== "PUT") {
     return res.status(405).json({ error: "Method not allowed" });
   }
-
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceKey) {
-    return res.status(500).json({ error: "Server configuration error" });
-  }
-  
 
   // Verify auth
   const token = req.headers.authorization?.replace("Bearer ", "");

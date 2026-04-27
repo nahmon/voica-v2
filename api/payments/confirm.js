@@ -1,8 +1,14 @@
 // POST /api/payments/confirm — 토스 결제 승인 + 크레딧 적립
+import { supabase } from "../_supabase.js";
+import { rateLimit, getIp } from "../_rateLimit.js";
 import { confirmPayment } from "../lib/toss.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  if (!rateLimit(`payments-confirm:${getIp(req)}`, 10)) {
+    return res.status(429).json({ error: "Too many requests" });
+  }
 
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return res.status(401).json({ error: "Unauthorized" });

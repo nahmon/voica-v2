@@ -1,6 +1,7 @@
 // GET /api/cron/charge-subscriptions
 // Vercel Cron: 매일 UTC 00:00 (한국 09:00) 자동 실행
 import { randomBytes } from "crypto";
+import { supabase } from "../_supabase.js";
 import { chargeBillingKey } from "../lib/toss.js";
 import { PRO_PLAN } from "../lib/plans.js";
 
