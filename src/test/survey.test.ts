@@ -71,7 +71,7 @@ describe("survey API — session flow", () => {
 
   it("PATCH session: completes session and returns ok", async () => {
     mockSingle
-      .mockResolvedValueOnce({ data: { id: "sess1", interview_id: "iv1", interviews: { reward_amount: 0 } }, error: null });
+      .mockResolvedValueOnce({ data: { id: "sess1", status: "in_progress", interview_id: "iv1", interviews: { reward_amount: 0 } }, error: null });
     mockUpdate.mockReturnValue({ eq: () => ({ error: null }) });
 
     const { default: handler } = await import("../../api/survey.js");

@@ -15,7 +15,7 @@ const renderLanding = async () => {
   const { default: LandingScreen } = await import('../screens/LandingScreen.jsx');
   return render(
     <MemoryRouter>
-      <LandingScreen />
+      <LandingScreen lang="en" />
     </MemoryRouter>
   );
 };

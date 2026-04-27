@@ -10,7 +10,7 @@ async function prewarmTts(supabase, questions) {
   const voiceQs = questions.filter(q => q.type === "voice" && q.content?.trim());
   await Promise.all(voiceQs.map(async (q) => {
     try {
-      const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "nova", input: q.content });
+      const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "shimmer", input: q.content });
       const buffer = Buffer.from(await mp3.arrayBuffer());
       const { error } = await supabase.storage.from("tts-cache").upload(`${q.id}.mp3`, buffer, { contentType: "audio/mpeg", upsert: true });
       if (!error) {
