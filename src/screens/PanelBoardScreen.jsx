@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { PANEL_JOBS, PANEL_JOBS_KO, MOCK_PANEL_PROFILE, getMatchScore } from "../lib/mockData.js";
 import { GlobalNav, Footer, EmptyState } from "../components/shared.jsx";
@@ -97,19 +97,26 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
   const AGE_MAP = { "10대": "10", "20대": "20", "30대": "30", "40대": "40", "50대": "50", "60대 이상": "60" };
 
   // Use real profile for scoring if available, fall back to mock
-  const profile = userProfile
+  const profile = useMemo(() => userProfile
     ? {
         interests: (userProfile.interests ?? []).map(i => INTEREST_MAP[i] ?? i),
         job: JOB_MAP[userProfile.job] ?? userProfile.job ?? "",
         gender: GENDER_MAP[userProfile.gender] ?? userProfile.gender ?? "",
         age: AGE_MAP[userProfile.age_group] ?? "",
       }
-    : MOCK_PANEL_PROFILE;
+    : MOCK_PANEL_PROFILE,
+  [userProfile]);
 
-  const jobsWithScore = (isKo ? PANEL_JOBS_KO : PANEL_JOBS).map(j => ({ ...j, _matchScore: getMatchScore(j, profile) }));
   const MATCH_THRESHOLD = 4;
 
-  const filtered = jobsWithScore
+  // Memoize scoring — expensive O(jobs×criteria), only recompute when lang or profile changes
+  const jobsWithScore = useMemo(
+    () => (isKo ? PANEL_JOBS_KO : PANEL_JOBS).map(j => ({ ...j, _matchScore: getMatchScore(j, profile) })),
+    [isKo, profile]
+  );
+
+  // Memoize filtered list — recompute only when filter/sort/search state changes
+  const filtered = useMemo(() => jobsWithScore
     .filter(j =>
       (catFilter === "All" || catFilter === "Recommended" || j.category === catFilter) &&
       (debouncedSearch === "" || j.title.includes(debouncedSearch) || j.company.includes(debouncedSearch))
@@ -119,10 +126,17 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
       if (sortKey === "newest") return b.id - a.id;
       if (sortKey === "reward") return parseReward(b.reward) - parseReward(a.reward);
       return b._matchScore - a._matchScore;
-    });
+    }),
+  [jobsWithScore, catFilter, debouncedSearch, sortKey]);
 
-  const recommendedCount = jobsWithScore.filter(j => j._matchScore >= MATCH_THRESHOLD).length;
-  const recentJobs = recentIds.map(id => jobsWithScore.find(j => j.id === id)).filter(Boolean);
+  const recommendedCount = useMemo(
+    () => jobsWithScore.filter(j => j._matchScore >= MATCH_THRESHOLD).length,
+    [jobsWithScore]
+  );
+  const recentJobs = useMemo(
+    () => recentIds.map(id => jobsWithScore.find(j => j.id === id)).filter(Boolean),
+    [recentIds, jobsWithScore]
+  );
 
   const updateApplyState = useCallback((jobId, nextStatus) => {
     setApplyState(prev => {
