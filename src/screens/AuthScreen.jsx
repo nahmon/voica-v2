@@ -103,6 +103,8 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
             <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
               {[["researcher", "리서처 / 기업", "인터뷰 설계 · 리포트"], ["panel", "인터뷰 패널", "인터뷰 참여 · 리워드 수령"]].map(([v, label, desc]) => (
                 <div key={v} onClick={() => setRole(v)}
+                  role="radio" aria-checked={role === v} tabIndex={0}
+                  onKeyDown={e => (e.key === " " || e.key === "Enter") && setRole(v)}
                   style={{ flex: 1, padding: "14px 16px", borderRadius: 10, border: `2px solid ${role === v ? C.purple : C.border}`, background: role === v ? C.purpleBg : C.white, cursor: "pointer", transition: "all 0.15s" }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: role === v ? C.purple : C.navy, marginBottom: 3 }}>{label}</div>
                   <div style={{ fontSize: 12, color: role === v ? C.purple : C.body, opacity: role === v ? 0.8 : 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{desc}</div>
@@ -131,7 +133,7 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
                     비밀번호를 잊으셨나요?
                   </a>
                 </div>
-                {authError && <div style={{ marginTop: 12, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
+                {authError && <div role="alert" style={{ marginTop: 12, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
                 <Btn full size="lg" style={{ marginTop: 20 }} disabled={loading || !email || !pw} onClick={handleLogin}>{loading ? "로그인 중..." : "로그인"}</Btn>
                 <Divider label="또는" />
                 <div style={{ display: "flex", flexDirection: "column", gap: 9, marginTop: 4 }}>
@@ -154,7 +156,7 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
                   </div>
                 ) : (
                   <>
-                    {authError && <div style={{ marginTop: 10, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
+                    {authError && <div role="alert" style={{ marginTop: 10, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
                     <Btn full size="lg" style={{ marginTop: 14 }} disabled={loading || !email} onClick={handleResetPassword}>
                       {loading ? "전송 중..." : "재설정 링크 보내기"}
                     </Btn>
@@ -177,7 +179,7 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
                   <Input label="비밀번호" type="password" placeholder="8자 이상" value={pw} onChange={e => setPw(e.target.value)} helper="영문, 숫자, 특수문자 포함 8자 이상" />
                 </div>
 
-                {authError && <div style={{ marginBottom: 12, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
+                {authError && <div role="alert" style={{ marginBottom: 12, padding: "8px 12px", borderRadius: 6, background: "rgba(217,48,37,0.08)", color: C.ruby, fontSize: 13 }}>{authError}</div>}
                 <Btn full size="lg" disabled={loading || !email || !pw || !name} onClick={handleSignup}>{loading ? "계정 생성 중..." : role === "panel" ? "인터뷰 패널로 참여하기" : "계정 만들기"}</Btn>
                 <div style={{ fontSize: 11, color: C.body, textAlign: "center", marginTop: 12, lineHeight: 1.6 }}>
                   회원가입 시 <a href="#" onClick={e => { e.preventDefault(); go("terms"); }} style={{ color: C.purple }}>이용약관</a> 및 <a href="#" onClick={e => { e.preventDefault(); go("privacy"); }} style={{ color: C.purple }}>개인정보처리방침</a>에 동의하는 것으로 간주돼요.
