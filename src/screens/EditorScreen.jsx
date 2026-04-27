@@ -84,6 +84,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiGenerating, setAiGenerating] = useState(false);
   const dragIdx = useRef(null);
+  const saveDraftRef = useRef(null);
+  const handleSaveRef = useRef(null);
   const isMobile = useIsMobile();
 
   // Track whether there are unsaved changes
@@ -152,6 +154,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     setDraftSaved(true);
     setTimeout(() => setDraftSaved(false), 1500);
   };
+  saveDraftRef.current = saveDraft;
 
   // Debounce auto-save on change (new interviews only)
   useEffect(() => {
@@ -160,23 +163,23 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     return () => clearTimeout(timer);
   }, [title, questions, editingId]);
 
-  // 3-minute interval auto-save (all interviews)
+  // 3-minute interval auto-save (all interviews) — stable ref so timer never resets on keystrokes
   useEffect(() => {
-    const interval = setInterval(saveDraft, 3 * 60 * 1000);
+    const interval = setInterval(() => saveDraftRef.current?.(), 3 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [title, incentive, questions]);
+  }, []);
 
-  // Keyboard shortcut: Cmd+S / Ctrl+S to save
+  // Keyboard shortcut: Cmd+S / Ctrl+S to save — stable ref so listener registers only once
   useEffect(() => {
     const handler = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
-        handleSave();
+        handleSaveRef.current?.();
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  });
+  }, []);
 
   const loadTemplate = () => {
     const hasContent = title.trim() || questions.some(q => q.content.trim());
@@ -354,6 +357,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     if (questions.some(q => !q.content.trim())) { showToast("모든 질문 내용을 입력해주세요", "error"); return; }
     doSave();
   };
+  handleSaveRef.current = handleSave;
 
   const handleCopy = async () => {
     const url = `${window.location.origin}/i/${shareCode}`;
