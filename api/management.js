@@ -112,6 +112,9 @@ export default async function handler(req, res) {
       if (!Array.isArray(rewardIds) || rewardIds.length === 0) {
         return res.status(400).json({ error: "rewardIds array required" });
       }
+      if (note != null && (typeof note !== "string" || note.length > 500)) {
+        return res.status(400).json({ error: "note too long" });
+      }
       const { error } = await supabase
         .from("participant_rewards")
         .update({ status: "paid", paid_at: new Date().toISOString(), note: note ?? null })
@@ -128,12 +131,11 @@ export default async function handler(req, res) {
   if (resource === "webhook") {
     if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-    // Toss signs webhooks with secret — verify header
+    // Toss signs webhooks with secret — verify header (fail closed if not configured)
     const webhookSecret = process.env.TOSS_WEBHOOK_SECRET;
-    if (webhookSecret) {
-      const sig = req.headers["toss-payments-signature"];
-      if (!sig || sig !== webhookSecret) return res.status(401).json({ error: "Invalid signature" });
-    }
+    if (!webhookSecret) return res.status(503).json({ error: "Webhook not configured" });
+    const sig = req.headers["toss-payments-signature"];
+    if (!sig || sig !== webhookSecret) return res.status(401).json({ error: "Invalid signature" });
 
     const { eventType, data } = req.body ?? {};
     if (!eventType || !data) return res.status(400).json({ error: "Invalid webhook payload" });
