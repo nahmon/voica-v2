@@ -723,8 +723,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
                   <Badge variant={selectedIdx === i ? typeVariant[qq.type] : "neutral"} style={{ fontSize: 10 }}>{typeLabel[qq.type]}</Badge>
                   <div style={{ marginLeft: "auto", display: "flex", gap: 2 }}>
                     {/* Duplicate button */}
-                    <button onClick={e => duplicateQ(i, e)} title="Duplicate" style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px", opacity: 0.6 }}>⧉</button>
-                    <button onClick={e => { e.stopPropagation(); removeQ(i); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px" }}>✕</button>
+                    <button onClick={e => duplicateQ(i, e)} title="Duplicate" aria-label="질문 복제" style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px", opacity: 0.6 }}>⧉</button>
+                    <button onClick={e => { e.stopPropagation(); removeQ(i); }} aria-label="질문 삭제" style={{ background: "none", border: "none", cursor: "pointer", color: C.body, fontSize: 10, padding: "0 2px" }}>✕</button>
                   </div>
                 </div>
                 <div style={{ fontSize: 12, color: selectedIdx === i ? C.navy : C.body, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>

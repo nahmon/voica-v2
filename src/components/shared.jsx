@@ -648,7 +648,7 @@ export function PaymentModal({ plan, billing, onClose, onDone }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(32,33,36,0.6)", backdropFilter: "blur(4px)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ background: C.white, borderRadius: 8, padding: "32px", width: "100%", maxWidth: 440, boxShadow: S.elevated, position: "relative" }}>
-        <button onClick={onClose} style={{ position: "absolute", top: 16, right: 16, background: "transparent", border: "none", fontSize: 18, cursor: "pointer", color: C.body, lineHeight: 1 }}>✕</button>
+        <button onClick={onClose} aria-label="닫기" style={{ position: "absolute", top: 16, right: 16, background: "transparent", border: "none", fontSize: 18, cursor: "pointer", color: C.body, lineHeight: 1 }}>✕</button>
 
         {done ? (
           <div style={{ textAlign: "center", padding: "16px 0" }}>
