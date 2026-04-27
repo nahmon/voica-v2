@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
@@ -137,13 +137,16 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
   };
 
   const userName = user?.user_metadata?.name || user?.email?.split("@")[0] || "there";
-  const totalSessions = interviews.reduce((s, i) => s + (i.sessions?.[0]?.count ?? 0), 0);
+  const totalSessions = useMemo(() => interviews.reduce((s, i) => s + (i.sessions?.[0]?.count ?? 0), 0), [interviews]);
+  const activeCount = useMemo(() => interviews.filter(i => i.status === "active").length, [interviews]);
+  const closedCount = useMemo(() => interviews.filter(i => i.status === "closed").length, [interviews]);
+  const interviewIndexMap = useMemo(() => new Map(interviews.map((iv, idx) => [iv.id, idx])), [interviews]);
 
-  const filteredInterviews = interviews.filter(p => {
+  const filteredInterviews = useMemo(() => interviews.filter(p => {
     const matchStatus = statusFilter === "all" || p.status === statusFilter;
     const matchSearch = !searchQuery.trim() || p.title.toLowerCase().includes(searchQuery.trim().toLowerCase());
     return matchStatus && matchSearch;
-  });
+  }), [interviews, statusFilter, searchQuery]);
 
   // Quick start steps — shown only when 0 interviews
   const QuickStart = !loading && interviews.length === 0 && (
@@ -255,8 +258,8 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
             <div style={{ fontSize: 26, fontWeight: 500, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.12, marginBottom: 4, fontFeatureSettings: '"ss01"' }}>{isKo ? `안녕하세요, ${userName} 👋` : `Hello, ${userName} 👋`}</div>
             <div style={{ fontSize: 14, color: C.body }}>
               {isKo
-                ? <><strong style={{ fontWeight: 400, color: C.navy }}>{interviews.filter(i => i.status === "active").length}</strong>개 진행 중인 인터뷰 · 전체 응답 <strong style={{ fontWeight: 400, color: C.navy }}>{totalSessions}</strong>개</>
-                : <><strong style={{ fontWeight: 400, color: C.navy }}>{interviews.filter(i => i.status === "active").length}</strong> active interviews, <strong style={{ fontWeight: 400, color: C.navy }}>{totalSessions}</strong> total responses</>
+                ? <><strong style={{ fontWeight: 400, color: C.navy }}>{activeCount}</strong>개 진행 중인 인터뷰 · 전체 응답 <strong style={{ fontWeight: 400, color: C.navy }}>{totalSessions}</strong>개</>
+                : <><strong style={{ fontWeight: 400, color: C.navy }}>{activeCount}</strong> active interviews, <strong style={{ fontWeight: 400, color: C.navy }}>{totalSessions}</strong> total responses</>
               }
             </div>
           </div>
@@ -292,8 +295,8 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
           {[
             { label: isKo ? "전체 프로젝트" : "Total Projects", value: loading ? "—" : String(interviews.length), sub: isKo ? "생성된 인터뷰" : "Interviews created", color: C.purple, iconIdx: 0 },
             { label: isKo ? "전체 응답" : "Total Responses", value: loading ? "—" : String(totalSessions), sub: isKo ? "인터뷰 패널 응답" : "Panelist responses", color: C.success, iconIdx: 1 },
-            { label: isKo ? "진행 중" : "In Progress", value: loading ? "—" : String(interviews.filter(i => i.status === "active").length), sub: isKo ? "진행 중인 인터뷰" : "Active interviews", color: C.navy, iconIdx: 2 },
-            { label: isKo ? "완료" : "Completed", value: loading ? "—" : String(interviews.filter(i => i.status === "closed").length), sub: isKo ? "마감된 인터뷰" : "Closed interviews", color: C.body, iconIdx: 3 },
+            { label: isKo ? "진행 중" : "In Progress", value: loading ? "—" : String(activeCount), sub: isKo ? "진행 중인 인터뷰" : "Active interviews", color: C.navy, iconIdx: 2 },
+            { label: isKo ? "완료" : "Completed", value: loading ? "—" : String(closedCount), sub: isKo ? "마감된 인터뷰" : "Closed interviews", color: C.body, iconIdx: 3 },
           ].map(stat => (
             <div key={stat.label} style={{ background: C.white, borderRadius: 16, padding: "20px 20px", boxShadow: S.standard, border: `1px solid ${C.border}` }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
@@ -397,7 +400,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                 {/* Title + status */}
                 <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 6 }}>
                   <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                    <span style={{ fontFamily: "monospace", fontSize: 11, color: C.body, letterSpacing: "0.04em", opacity: 0.6, flexShrink: 0 }}>VCS-{String(interviews.findIndex(i => i.id === p.id) + 1).padStart(3, "0")}</span>
+                    <span style={{ fontFamily: "monospace", fontSize: 11, color: C.body, letterSpacing: "0.04em", opacity: 0.6, flexShrink: 0 }}>VCS-{String((interviewIndexMap.get(p.id) ?? -1) + 1).padStart(3, "0")}</span>
                     <span style={{ fontSize: 15, fontWeight: 500, color: C.navy, fontFeatureSettings: '"ss01"', flex: 1, minWidth: 0 }}>{p.title}</span>
                     {newResponses > 0 && (
                       <span style={{ fontSize: 11, fontWeight: 600, color: C.white, background: C.ruby, borderRadius: 20, padding: "2px 8px", letterSpacing: "0.1px", flexShrink: 0 }}>{isKo ? `${newResponses}개의 새 응답` : `${newResponses} new response${newResponses !== 1 ? "s" : ""}`}</span>
