@@ -76,7 +76,7 @@ export function Badge({ children, variant = "neutral", style: sx = {} }) {
 
 export function Btn({ children, variant = "primary", size = "md", onClick, disabled, full, style: sx = {} }) {
   const [hov, setHov] = useState(false);
-  const sz = { sm: { padding: "6px 14px", fontSize: 13 }, md: { padding: "9px 20px", fontSize: 15, minHeight: 44 }, lg: { padding: "13px 32px", fontSize: 16, minHeight: 44 } };
+  const sz = { sm: { padding: "0 14px", height: 32, minHeight: 32, fontSize: 13 }, md: { padding: "9px 20px", fontSize: 15, minHeight: 44 }, lg: { padding: "13px 32px", fontSize: 16, minHeight: 44 } };
   const vr = {
     primary: { background: disabled ? "#a09de8" : hov ? C.purpleHover : C.purple, color: C.white, border: "none", transform: !disabled && hov ? "scale(1.02)" : "scale(1)", filter: !disabled && hov ? "brightness(1.05)" : "brightness(1)" },
     ghost: { background: "transparent", color: C.purple, border: `1px solid ${C.purpleLight}`, transform: hov ? "scale(1.02)" : "scale(1)", filter: hov ? "brightness(1.05)" : "brightness(1)" },
