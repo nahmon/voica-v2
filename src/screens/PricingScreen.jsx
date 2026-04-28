@@ -103,7 +103,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
 
       // 토스 결제창 오픈
       const tossPayments = await loadTossPayments(VITE_TOSS_CLIENT_KEY);
-      const payment = tossPayments.payment({ customerKey: "ANONYMOUS" });
+      const payment = tossPayments.payment({ customerKey: user.id });
       await payment.requestPayment({
         method: "CARD",
         amount: { currency: "KRW", value: amount },

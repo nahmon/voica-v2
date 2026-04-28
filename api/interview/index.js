@@ -40,7 +40,7 @@ export default async function handler(req, res) {
 
   // ── PUT: update existing interview ──
   if (req.method === "PUT") {
-    const { id, title, incentive, reward_amount, questions = [] } = req.body;
+    const { id, title, incentive, reward_amount, slack_webhook_url, questions = [] } = req.body;
     if (!id || !title) return res.status(400).json({ error: "id and title required" });
 
     const { data: existing } = await supabase
@@ -48,7 +48,10 @@ export default async function handler(req, res) {
       .eq("id", id).eq("user_id", user.id).single();
     if (!existing) return res.status(403).json({ error: "Not found or access denied" });
 
-    await supabase.from("interviews").update({ title, incentive: incentive ?? null, expert_only: req.body.expert_only ?? false, status: "active" }).eq("id", id);
+    const interviewUpdate = { title, incentive: incentive ?? null, expert_only: req.body.expert_only ?? false, status: "active" };
+    if (slack_webhook_url !== undefined) interviewUpdate.slack_webhook_url = slack_webhook_url || null;
+    if (reward_amount !== undefined) interviewUpdate.reward_amount = reward_amount;
+    await supabase.from("interviews").update(interviewUpdate).eq("id", id);
 
     // Get current question IDs in DB
     const { data: currentQs } = await supabase

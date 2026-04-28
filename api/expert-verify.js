@@ -1,5 +1,6 @@
 import { supabase } from "./_supabase.js";
 import { rateLimit, getIp } from "./_rateLimit.js";
+import { sendSlack } from "./lib/slack.js";
 import OpenAI from "openai";
 
 // Max base64 file size: 5MB (base64 overhead ~33%, so raw limit ~3.75MB)
@@ -232,6 +233,14 @@ export default async function handler(req, res) {
       });
 
     if (upsertError) return res.status(500).json({ error: "Failed to save verification request" });
+
+    // Admin Slack notification
+    const domain = safeCareerInfo?.domain ?? "-";
+    const jobTitle = safeCareerInfo?.job_title ?? "-";
+    await sendSlack(
+      process.env.SLACK_ADMIN_WEBHOOK_URL,
+      `🔔 전문가 인증 신청\n👤 사용자 ID: ${user.id}\n💼 직군: ${domain} / ${jobTitle}\n📋 방식: ${method}`
+    );
 
     return res.status(200).json({ ok: true });
   }

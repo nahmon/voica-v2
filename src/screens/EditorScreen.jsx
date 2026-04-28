@@ -68,6 +68,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [editingId, setEditingId] = useState(interviewId ?? null);
   const [loadingExisting, setLoadingExisting] = useState(!!interviewId);
   const [copied, setCopied] = useState(false);
+  const [slackWebhookUrl, setSlackWebhookUrl] = useState("");
   const [addTypeOpen, setAddTypeOpen] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
@@ -122,7 +123,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     (async () => {
       try {
         const [{ data: iv }, { data: qs }] = await Promise.all([
-          supabase.from("interviews").select("id, title, incentive, share_code, expert_only").eq("id", interviewId).single(),
+          supabase.from("interviews").select("id, title, incentive, share_code, expert_only, slack_webhook_url").eq("id", interviewId).single(),
           supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
         ]);
         if (iv) {
@@ -134,6 +135,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           if (rwMatch) setRewardAmount(parseInt(rwMatch[1].replace(/,/g, "")));
           if (iv.share_code) setShareCode(iv.share_code);
           setExpertOnly(iv.expert_only ?? false);
+          setSlackWebhookUrl(iv.slack_webhook_url ?? "");
         }
         if (qs && qs.length > 0) {
           const loaded = qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options, stimulus: q.stimulus, followup_enabled: q.followup_enabled !== false }));
@@ -431,6 +433,22 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               <span style={{ marginLeft: "auto", fontSize: 13, fontWeight: 600, color: C.purple }}>₩{rewardAmount.toLocaleString("ko-KR")}</span>
             </div>
           )}
+        </div>
+
+        {/* Slack webhook */}
+        <div style={{ background: C.bg, borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", border: `1px solid ${C.border}` }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: C.label, marginBottom: 8, letterSpacing: 0.5 }}>Slack 알림 (선택)</div>
+          <div style={{ fontSize: 12, color: C.body, marginBottom: 8, lineHeight: 1.5 }}>응답 완료 시 Slack으로 알림을 받을 수 있어요.</div>
+          <input
+            type="url"
+            value={slackWebhookUrl}
+            onChange={e => setSlackWebhookUrl(e.target.value)}
+            onBlur={() => {
+              if (editingId) supabase.from("interviews").update({ slack_webhook_url: slackWebhookUrl || null }).eq("id", editingId);
+            }}
+            placeholder="https://hooks.slack.com/services/..."
+            style={{ width: "100%", boxSizing: "border-box", padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, color: C.navy, background: C.white, outline: "none" }}
+          />
         </div>
 
         <div style={{ background: C.bg, borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, marginBottom: 20, border: `1px solid ${C.border}` }}>

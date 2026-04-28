@@ -1,4 +1,5 @@
 import { supabase } from "./_supabase.js";
+import { sendSlack } from "./lib/slack.js";
 import { rateLimit, getIp } from "./_rateLimit.js";
 
 export default async function handler(req, res) {
@@ -56,7 +57,7 @@ export default async function handler(req, res) {
 
       const { data: session } = await supabase
         .from("sessions")
-        .select("id, status, interview_id, interviews(reward_amount)")
+        .select("id, status, interview_id, interviews(reward_amount, slack_webhook_url, title)")
         .eq("id", session_id)
         .single();
       if (!session) return res.status(404).json({ error: "Session not found" });
@@ -89,6 +90,11 @@ export default async function handler(req, res) {
           }, { onConflict: "session_id", ignoreDuplicates: true });
         }
       }
+
+      // Slack notification on session completion
+      const webhookUrl = session.interviews?.slack_webhook_url;
+      const interviewTitle = session.interviews?.title ?? "인터뷰";
+      await sendSlack(webhookUrl, `✅ 새 응답이 도착했어요!\n📋 인터뷰: ${interviewTitle}\n🔗 세션 ID: ${session_id}`);
 
       return res.status(200).json({ ok: true });
     }
