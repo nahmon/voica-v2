@@ -2,9 +2,11 @@ import { useState } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer } from "../components/shared.jsx";
 import { FAQ_DATA, FAQ_DATA_KO } from "../lib/mockData.js";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function FAQScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const [openIdx, setOpenIdx] = useState(null);
+  const isMobile = useIsMobile();
   const isKo = lang === "ko";
   const data = isKo ? FAQ_DATA_KO : FAQ_DATA;
 
@@ -14,7 +16,7 @@ export default function FAQScreen({ go, user, logout, lang = "ko", onLangChange 
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
       <GlobalNav go={go} activeTab="faq" variant={user ? "app" : "public"} user={user} logout={logout} lang={lang} />
 
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: isMobile ? "20px 16px 32px" : "32px 24px 48px" }}>
         <div style={{ width: "100%", maxWidth: 640 }}>
           <div style={{ marginBottom: 32 }}>
             <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, letterSpacing: "0.16px", marginBottom: 6 }}>

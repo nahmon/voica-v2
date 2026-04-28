@@ -305,13 +305,13 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                   {STAT_ICONS[stat.iconIdx]?.(stat.color)}
                 </div>
               </div>
-              <div style={{ fontSize: 36, fontWeight: 600, color: stat.color, lineHeight: 1.0, marginBottom: 6, fontFamily: F, letterSpacing: "-1px", fontFeatureSettings: '"tnum"' }}>{stat.value}</div>
+              <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 600, color: stat.color, lineHeight: 1.0, marginBottom: 6, fontFamily: F, letterSpacing: "-1px", fontFeatureSettings: '"tnum"' }}>{stat.value}</div>
               <div style={{ fontSize: 12, color: C.body, letterSpacing: "0.16px" }}>{stat.sub}</div>
             </div>
           ))}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12, marginBottom: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(200px,1fr))", gap: 12, marginBottom: 28 }}>
           {[
             { icon: "users", title: isKo ? "인터뷰 패널 모집" : "Panelist Recruiting", desc: isKo ? "지원자를 검토하고 승인해요" : "Review and approve applicants", screen: "recruiter_admin" },
             { icon: "search", title: isKo ? "모집 보드" : "Recruitment Board", desc: isKo ? "공개 모집 공고를 관리해요" : "Manage public recruitment listings", screen: "panel_board" },

@@ -174,7 +174,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
         });
         setSessions(sorted);
         setAllResponses(sorted.flatMap(s => s.responses ?? []));
-        if (sorted.length > 0 && window.innerWidth >= 768) setSelectedSession(sorted[0]);
+        if (sorted.length > 0 && !isMobile) setSelectedSession(sorted[0]);
       } catch (e) {
         showToast(isKo ? "응답 데이터를 불러오지 못했어요." : "Failed to load responses.", "error");
       } finally {
