@@ -75,7 +75,7 @@ export default function PaymentSuccessScreen({ go, user, logout, lang = "ko" }) 
             </p>
             <button
               onClick={() => go("dashboard")}
-              style={{ marginTop: 8, padding: "12px 28px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F }}>
+              style={{ marginTop: 8, padding: "12px 24px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F }}>
               {isKo ? "대시보드로 →" : "Go to dashboard →"}
             </button>
           </>
@@ -89,7 +89,7 @@ export default function PaymentSuccessScreen({ go, user, logout, lang = "ko" }) 
             <p style={{ color: C.body, fontSize: 14, margin: 0 }}>{error}</p>
             <button
               onClick={() => go("pricing")}
-              style={{ marginTop: 8, padding: "12px 28px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F }}>
+              style={{ marginTop: 8, padding: "12px 24px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F }}>
               {isKo ? "다시 시도" : "Try again"}
             </button>
           </>

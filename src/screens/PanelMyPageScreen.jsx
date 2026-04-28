@@ -85,7 +85,7 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
 
   // Load bank account, rewards, and expert status
   useEffect(() => {
-    if (!user) return;
+    if (!user) { setDataLoading(false); return; }
     setDataLoading(true);
     (async () => {
       try {
@@ -164,10 +164,10 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F }}>
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: F, overflowX: "hidden" }}>
       <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
 
-      <div style={{ maxWidth: 640, margin: "0 auto", padding: isMobile ? "20px 16px 48px" : "28px 24px 48px", flex: 1, width: "100%" }}>
+      <div style={{ maxWidth: 640, margin: "0 auto", padding: isMobile ? "20px 16px 48px" : "28px 24px 48px", flex: 1, width: "100%", boxSizing: "border-box", overflowX: "hidden" }}>
 
         {/* ── Rewards Card ── */}
         <div style={{ background: "linear-gradient(135deg, #0a1628 0%, #1a2a4a 100%)", borderRadius: 16, padding: "24px", marginBottom: 16, color: C.white, position: "relative", overflow: "hidden" }}>
@@ -179,7 +179,7 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
           <div style={{ fontSize: 36, fontWeight: 800, marginBottom: 2, letterSpacing: "-1px" }}>
             {dataLoading
               ? <Skeleton width={120} height={36} borderRadius={8} style={{ background: "rgba(255,255,255,0.15)", marginBottom: 2 }} />
-              : <>{withdrawable.toLocaleString()}<span style={{ fontSize: 20, fontWeight: 600, marginLeft: 4 }}>pts</span></>}
+              : <><span style={{ fontSize: 20, fontWeight: 600, marginRight: 2 }}>₩</span>{withdrawable.toLocaleString()}</>}
           </div>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 20 }}>
             {dataLoading
@@ -220,17 +220,17 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
                 <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{isKo ? "신청 금액" : "Amount"}</span>
                 <span style={{ fontSize: 14, fontWeight: 700, color: C.white }}>₩{withdrawable.toLocaleString()}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{isKo ? "입금 계좌" : "Account"}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{bankAccount?.bank_name} {bankAccount?.account_number}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14, gap: 8 }}>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", flexShrink: 0 }}>{isKo ? "입금 계좌" : "Account"}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: C.white, wordBreak: "break-all", textAlign: "right" }}>{bankAccount?.bank_name} {bankAccount?.account_number}</span>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => setWithdrawStep(null)}
-                  style={{ flex: 1, padding: "10px 0", borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: F, fontSize: 13, cursor: "pointer" }}>
+                  style={{ flex: 1, padding: "10px 0", minHeight: 44, borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: F, fontSize: 13, cursor: "pointer" }}>
                   {isKo ? "취소" : "Cancel"}
                 </button>
                 <button onClick={handleClaimAll} disabled={claimingAll}
-                  style={{ flex: 2, padding: "10px 0", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                  style={{ flex: 2, padding: "10px 0", minHeight: 44, borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                   {claimingAll ? (isKo ? "신청 중..." : "Submitting...") : (isKo ? "정산 신청" : "Submit Claim")}
                 </button>
               </div>
@@ -254,10 +254,11 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
               style={{
                 width: "100%", padding: "13px 0", borderRadius: 10,
                 border: "none", cursor: withdrawable > 0 ? "pointer" : "not-allowed",
-                fontFamily: F, fontWeight: 700, fontSize: 15,
+                fontFamily: F, fontWeight: 700, fontSize: isMobile ? 13 : 15,
                 background: withdrawable > 0 ? C.purple : "rgba(255,255,255,0.12)",
                 color: C.white, transition: "background 0.15s",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                wordBreak: "keep-all",
               }}>
               {withdrawable > 0
                 ? (bankAccount
@@ -291,17 +292,17 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
                   value={bankForm[key]}
                   onChange={e => setBankForm(prev => ({ ...prev, [key]: e.target.value }))}
                   placeholder={placeholder}
-                  style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 7, border: `1px solid ${bankForm[key] ? C.purple : C.border}`, fontSize: 14, fontFamily: F, color: C.navy, outline: "none", background: C.bg }}
+                  style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", minHeight: 44, borderRadius: 7, border: `1px solid ${bankForm[key] ? C.purple : C.border}`, fontSize: 14, fontFamily: F, color: C.navy, outline: "none", background: C.bg }}
                 />
               </div>
             ))}
             <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
               <button onClick={() => setShowBankSetup(false)}
-                style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontFamily: F, fontSize: 13, cursor: "pointer" }}>
+                style={{ flex: 1, padding: "11px 0", minHeight: 44, borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontFamily: F, fontSize: 13, cursor: "pointer" }}>
                 {isKo ? "나중에" : "Later"}
               </button>
               <button onClick={handleSaveBank} disabled={savingBank || !bankForm.bank_name || !bankForm.account_number || !bankForm.account_holder}
-                style={{ flex: 2, padding: "11px 0", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                style={{ flex: 2, padding: "11px 0", minHeight: 44, borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                 {savingBank ? (isKo ? "저장 중..." : "Saving...") : (isKo ? "등록하기" : "Register")}
               </button>
             </div>
@@ -409,8 +410,8 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
             {Ic.Warning({ s: 16, c: C.ruby })}
             <div style={{ fontSize: 12, color: C.ruby, lineHeight: 1.6 }}>
               {isKo
-                ? <><strong>경고 {warnings}회</strong> — 경고 3회 누적 시 패널 활동이 정지돼요. <span style={{ color: C.body }}>이의 신청은 <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 12, padding: 0, textDecoration: "underline" }}>고객 지원</button>으로 문의해 주세요.</span></>
-                : <><strong>{warnings} Warning{warnings > 1 ? "s" : ""}</strong> — Panelist access will be suspended at 3 warnings. <span style={{ color: C.body }}>To appeal, please contact <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 12, padding: 0, textDecoration: "underline" }}>Support</button>.</span></>
+                ? <><strong>경고 {warnings}회</strong> — 경고 3회 누적 시 패널 활동이 정지돼요. <span style={{ color: C.body }}>이의 신청은 <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 12, padding: "2px", textDecoration: "underline", display: "inline" }}>고객 지원</button>으로 문의해 주세요.</span></>
+                : <><strong>{warnings} Warning{warnings > 1 ? "s" : ""}</strong> — Panelist access will be suspended at 3 warnings. <span style={{ color: C.body }}>To appeal, please contact <button onClick={() => go("support")} style={{ color: C.purple, background: "none", border: "none", cursor: "pointer", fontFamily: F, fontSize: 12, padding: "2px", textDecoration: "underline", display: "inline" }}>Support</button>.</span></>
               }
             </div>
           </div>
@@ -430,14 +431,14 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
                 </div>
                 <div style={{ flex: 1, marginBottom: isLast ? 0 : 8 }}>
                   <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: "14px 16px", boxShadow: S.ambient, borderLeft: `3px solid ${st.dot}` }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 4 }}>{intv.title}</div>
-                        <div style={{ fontSize: 12, color: C.body }}>{intv.company} · {intv.date}</div>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8, gap: 8 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 4, wordBreak: "keep-all", overflowWrap: "break-word" }}>{intv.title}</div>
+                        <div style={{ fontSize: 12, color: C.body, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{intv.company} · {intv.date}</div>
                       </div>
-                      <span style={{ fontSize: 11, fontWeight: 500, color: st.color, background: st.bg, padding: "3px 10px", borderRadius: 20, whiteSpace: "nowrap" }}>{st.label}</span>
+                      <span style={{ fontSize: 11, fontWeight: 500, color: st.color, background: st.bg, padding: "3px 10px", borderRadius: 20, whiteSpace: "nowrap", flexShrink: 0 }}>{st.label}</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
                       <span style={{ fontSize: 13, fontWeight: 500, color: C.purple }}>{intv.reward}</span>
                       {intv.status === "in_progress" && (
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -476,13 +477,17 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
               },
             ].map(item => (
               <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                <div>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 500, color: C.navy }}>{item.label}</div>
                   <div style={{ fontSize: 11, color: C.body, marginTop: 2 }}>{item.desc}</div>
                 </div>
                 <button onClick={() => item.set(v => !v)}
-                  style={{ width: 42, height: 24, minHeight: "unset", borderRadius: 12, border: "none", background: item.value ? C.purple : C.border, cursor: "pointer", position: "relative", flexShrink: 0, transition: "background 0.2s", padding: 0 }}>
-                  <div style={{ position: "absolute", top: 3, left: item.value ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: C.white, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.18)" }} />
+                  aria-checked={item.value}
+                  role="switch"
+                  style={{ width: 42, height: 44, borderRadius: 12, border: "none", background: "transparent", cursor: "pointer", position: "relative", flexShrink: 0, padding: "10px 0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: 42, height: 24, borderRadius: 12, background: item.value ? C.purple : C.border, position: "relative", transition: "background 0.2s" }}>
+                    <div style={{ position: "absolute", top: 3, left: item.value ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: C.white, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.18)" }} />
+                  </div>
                 </button>
               </div>
             ))}

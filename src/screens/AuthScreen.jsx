@@ -36,6 +36,12 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
     if (error) {
       setAuthError(error.message === "Invalid login credentials" ? "이메일 또는 비밀번호가 올바르지 않아요" : error.message);
     } else {
+      const afterLogin = localStorage.getItem("voica_after_login");
+      if (afterLogin) {
+        localStorage.removeItem("voica_after_login");
+        go(afterLogin);
+        return;
+      }
       const userRole = data.user?.user_metadata?.role;
       go(userRole === "panel" ? "panel_board" : "dashboard");
     }
@@ -53,6 +59,12 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
     if (error) {
       setAuthError(error.message);
     } else {
+      const afterLogin = localStorage.getItem("voica_after_login");
+      if (afterLogin && role !== "panel") {
+        localStorage.removeItem("voica_after_login");
+        go(afterLogin);
+        return;
+      }
       go(role === "panel" ? "panel_entry" : "dashboard");
     }
   };
@@ -116,7 +128,7 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
           <div style={{ background: C.white, borderRadius: 12, padding: "28px 28px", boxShadow: S.card }}>
             <div style={{ display: "flex", background: C.bg, borderRadius: 6, padding: 3, marginBottom: 24 }}>
               {["login", "signup"].map(t => (
-                <button key={t} onClick={() => { setTab(t); setResetMode(false); setAuthError(""); }} style={{ flex: 1, padding: "10px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: 400, transition: "all 0.15s", background: tab === t ? C.white : "transparent", color: tab === t ? C.navy : C.body, boxShadow: tab === t ? S.ambient : "none" }}>
+                <button key={t} onClick={() => { setTab(t); setResetMode(false); setAuthError(""); }} style={{ flex: 1, padding: "8px 10px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: 400, transition: "all 0.15s", background: tab === t ? C.white : "transparent", color: tab === t ? C.navy : C.body, boxShadow: tab === t ? S.ambient : "none" }}>
                   {t === "login" ? "로그인" : "회원가입"}
                 </button>
               ))}

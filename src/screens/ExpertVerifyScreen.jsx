@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
 
 const MAX_FILE_BYTES = 2 * 1024 * 1024; // 2 MB
@@ -244,9 +245,51 @@ function StatusCard({ status, lang, note, onReApply, go }) {
   return null;
 }
 
+const EXPERT_DOMAINS = [
+  { value: "it_dev", label: "IT/개발" },
+  { value: "marketing", label: "마케팅/광고" },
+  { value: "design", label: "디자인/UX" },
+  { value: "finance", label: "금융/회계" },
+  { value: "medical", label: "의료/헬스케어" },
+  { value: "education", label: "교육" },
+  { value: "legal", label: "법률" },
+  { value: "manufacturing", label: "제조/엔지니어링" },
+  { value: "other", label: "기타" },
+];
+const EXPERT_INDUSTRIES = [
+  { value: "startup", label: "스타트업/중소기업" },
+  { value: "large_corp", label: "대기업/중견기업" },
+  { value: "public", label: "공공기관/비영리" },
+  { value: "freelance", label: "프리랜서/자영업" },
+];
+const EXPERT_YEARS = [
+  { value: "lt2", label: "~2년" },
+  { value: "3to5", label: "3~5년" },
+  { value: "6to10", label: "6~10년" },
+  { value: "gt10", label: "10년+" },
+];
+
+function EVPill({ children, active, onClick }) {
+  return (
+    <button onClick={onClick} style={{ padding: "6px 14px", borderRadius: 20, border: `1.5px solid ${active ? C.purple : C.border}`, background: active ? C.purpleBg : C.white, color: active ? C.purple : C.navy, fontSize: 13, fontFamily: F, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+      {children}
+    </button>
+  );
+}
+
+function EVStepSection({ title, children, style: sx }) {
+  return (
+    <div style={sx}>
+      <div style={{ fontSize: 13, fontWeight: 500, color: C.label, marginBottom: 10 }}>{title}</div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{children}</div>
+    </div>
+  );
+}
+
 export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange }) {
   const t = T[lang] ?? T.ko;
   const isKo = lang === "ko";
+  const isMobile = useIsMobile();
   const { showToast } = useToast();
 
   const [profileStatus, setProfileStatus] = useState(null); // null = loading
@@ -259,9 +302,14 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef(null);
+  const [step, setStep] = useState(1);
+  const [domain, setDomain] = useState(null);
+  const [industry, setIndustry] = useState(null);
+  const [yearsExp, setYearsExp] = useState(null);
+  const [jobTitle, setJobTitle] = useState("");
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) { setProfileStatus("none"); return; }
     (async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -338,7 +386,7 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ method: selectedMethod, data }),
+        body: JSON.stringify({ method: selectedMethod, data, career_info: { domain, industry, years_exp: yearsExp, job_title: jobTitle.trim() || null } }),
       });
 
       if (!res.ok) throw new Error("Request failed");
@@ -362,8 +410,8 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
       <GlobalNav go={go} activeTab="" variant="panel" user={user} lang={lang} />
 
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
-        <div style={{ width: "100%", maxWidth: 600 }}>
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: isMobile ? "24px 16px 48px" : "32px 24px 48px" }}>
+        <div style={{ width: "100%", maxWidth: 600, boxSizing: "border-box" }}>
 
           {/* Loading */}
           {profileStatus === null && (
@@ -379,7 +427,7 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
                 status={profileStatus}
                 lang={lang}
                 note={reviewerNote}
-                onReApply={() => { setProfileStatus("none"); setSelectedMethod(null); }}
+                onReApply={() => { setProfileStatus("none"); setSelectedMethod(null); setStep(1); setDomain(null); setIndustry(null); setYearsExp(null); setJobTitle(""); }}
                 go={go}
               />
             </div>
@@ -402,119 +450,127 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
           {/* Main form (none / re-apply) */}
           {profileStatus !== null && (profileStatus === "none") && !submitted && (
             <>
-              {/* Hero */}
-              <div style={{ marginBottom: 32 }}>
-                <div style={{ fontSize: 24, fontWeight: 700, color: C.navy, letterSpacing: "-0.01em", marginBottom: 8 }}>{t.title}</div>
-                <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 20 }}>{t.subtitle}</div>
-                <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
-                  {t.heroPoints.map((point, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 20, height: 20, borderRadius: "50%", background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        {Ic.Check({ s: 11, c: C.purple })}
+              {/* Hero - step 1 only */}
+              {step === 1 && (
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: C.navy, letterSpacing: "-0.01em", marginBottom: 8, wordBreak: "keep-all" }}>{t.title}</div>
+                  <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 20, wordBreak: "keep-all" }}>{t.subtitle}</div>
+                  <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
+                    {t.heroPoints.map((point, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 20, height: 20, borderRadius: "50%", background: C.purpleBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          {Ic.Check({ s: 11, c: C.purple })}
+                        </div>
+                        <span style={{ fontSize: 13, color: C.navy }}>{point}</span>
                       </div>
-                      <span style={{ fontSize: 13, color: C.navy }}>{point}</span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              {/* Step indicator */}
+              <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 28 }}>
+                {[1, 2, 3].map((n, i) => {
+                  const stepLabels = isKo ? ["전문 분야", "경력 정보", "서류 업로드"] : ["Domain", "Career", "Documents"];
+                  return (
+                    <div key={n} style={{ display: "flex", alignItems: "flex-start", flex: i < 2 ? "1 1 0" : "0 0 auto" }}>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: step >= n ? C.purple : "#f1f0ff", border: `2px solid ${step >= n ? C.purple : C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: step >= n ? "#fff" : C.body }}>
+                          {step > n ? "✓" : n}
+                        </div>
+                        <span style={{ fontSize: 10, color: step === n ? C.purple : C.body, fontWeight: step === n ? 600 : 400, whiteSpace: "nowrap" }}>{stepLabels[i]}</span>
+                      </div>
+                      {i < 2 && <div style={{ flex: 1, height: 2, background: step > n ? C.purple : C.border, alignSelf: "flex-start", marginTop: 13, margin: "13px 6px 0" }} />}
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Method selection */}
-              <div style={{ marginBottom: 24 }}>
-                <div style={{ fontSize: 13, fontWeight: 500, color: C.label, marginBottom: 12 }}>{t.selectMethod}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {["employment_certificate", "health_insurance"].map((method) => {
-                    const m = t.methods[method];
-                    const active = selectedMethod === method;
-                    return (
-                      <button
-                        key={method}
-                        onClick={() => handleSelectMethod(method)}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 14,
-                          padding: "16px 18px",
-                          background: C.white,
-                          border: `1.5px solid ${active ? C.purple : C.border}`,
-                          borderRadius: 10,
-                          cursor: "pointer",
-                          textAlign: "left",
-                          fontFamily: F,
-                          transition: "border-color 0.15s, box-shadow 0.15s",
-                          boxShadow: active ? `0 0 0 3px ${C.purpleBg}` : "none",
-                          outline: "none",
-                          width: "100%",
-                        }}
-                        onMouseEnter={e => { if (!active) e.currentTarget.style.borderColor = C.purpleLight; }}
-                        onMouseLeave={e => { if (!active) e.currentTarget.style.borderColor = C.border; }}
-                      >
-                        <span style={{ fontSize: 24, flexShrink: 0 }}>{m.icon}</span>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: active ? C.purple : C.navy, marginBottom: 2 }}>{m.title}</div>
-                          <div style={{ fontSize: 12, color: C.body }}>{m.desc}</div>
-                        </div>
-                        <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${active ? C.purple : C.border}`, background: active ? C.purple : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s" }}>
-                          {active && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
-                        </div>
-                      </button>
-                    );
-                  })}
+              {/* Step 1: Domain & Industry */}
+              {step === 1 && (
+                <div>
+                  <EVStepSection title={isKo ? "직군을 선택해 주세요" : "Select your field"}>
+                    {EXPERT_DOMAINS.map(d => <EVPill key={d.value} active={domain === d.value} onClick={() => setDomain(d.value)}>{d.label}</EVPill>)}
+                  </EVStepSection>
+                  <EVStepSection title={isKo ? "소속 산업군을 선택해 주세요" : "Select your industry"} style={{ marginTop: 20 }}>
+                    {EXPERT_INDUSTRIES.map(d => <EVPill key={d.value} active={industry === d.value} onClick={() => setIndustry(d.value)}>{d.label}</EVPill>)}
+                  </EVStepSection>
+                  <Btn full size="lg" disabled={!domain || !industry} onClick={() => setStep(2)} style={{ marginTop: 24 }}>
+                    {isKo ? "다음" : "Next"}
+                  </Btn>
                 </div>
-              </div>
+              )}
 
-              {/* Input area for selected method */}
-              {selectedMethod && (
-                <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "20px 20px", marginBottom: 20 }}>
-                  {selectedMethod === "email" ? (
-                    <div>
-                      <label htmlFor="expert-email" style={{ fontSize: 12, fontWeight: 500, color: C.label, display: "block", marginBottom: 6 }}>
-                        {t.methods.email.label} <span style={{ color: "#ea2261" }}>*</span>
-                      </label>
-                      <input
-                        id="expert-email"
-                        type="email"
-                        placeholder={t.methods.email.placeholder}
-                        value={emailValue}
-                        onChange={e => setEmailValue(e.target.value)}
-                        style={{
-                          width: "100%",
-                          padding: "10px 12px",
-                          borderRadius: 6,
-                          border: `1px solid ${C.border}`,
-                          fontSize: 13,
-                          fontFamily: F,
-                          color: C.navy,
-                          outline: "none",
-                          boxSizing: "border-box",
-                          transition: "border-color 0.15s",
-                        }}
-                        onFocus={e => e.target.style.borderColor = C.purple}
-                        onBlur={e => e.target.style.borderColor = C.border}
-                      />
+              {/* Step 2: Career info */}
+              {step === 2 && (
+                <div>
+                  <EVStepSection title={isKo ? "총 경력 연수를 선택해 주세요" : "Total experience"}>
+                    {EXPERT_YEARS.map(y => <EVPill key={y.value} active={yearsExp === y.value} onClick={() => setYearsExp(y.value)}>{y.label}</EVPill>)}
+                  </EVStepSection>
+                  <div style={{ marginTop: 20 }}>
+                    <label style={{ fontSize: 12, fontWeight: 500, color: C.label, display: "block", marginBottom: 6 }}>
+                      {isKo ? "현 직함/직위 (선택)" : "Job title (optional)"}
+                    </label>
+                    <input
+                      type="text"
+                      value={jobTitle}
+                      onChange={e => setJobTitle(e.target.value)}
+                      placeholder={isKo ? "예: 시니어 프로덕트 매니저" : "e.g. Senior Product Manager"}
+                      maxLength={80}
+                      style={{ width: "100%", padding: "10px 12px", minHeight: 44, borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => e.target.style.borderColor = C.purple}
+                      onBlur={e => e.target.style.borderColor = C.border}
+                    />
+                  </div>
+                  <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
+                    <Btn variant="ghost" size="lg" onClick={() => setStep(1)} style={{ flex: 1 }}>{isKo ? "이전" : "Back"}</Btn>
+                    <Btn size="lg" disabled={!yearsExp} onClick={() => setStep(3)} style={{ flex: 2 }}>{isKo ? "다음" : "Next"}</Btn>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Document upload */}
+              {step === 3 && (
+                <div>
+                  <div style={{ marginBottom: 24 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: C.label, marginBottom: 12 }}>{t.selectMethod}</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {["employment_certificate", "health_insurance"].map((method) => {
+                        const m = t.methods[method];
+                        const active = selectedMethod === method;
+                        return (
+                          <button key={method} onClick={() => handleSelectMethod(method)}
+                            style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", background: C.white, border: `1.5px solid ${active ? C.purple : C.border}`, borderRadius: 10, cursor: "pointer", textAlign: "left", fontFamily: F, transition: "border-color 0.15s, box-shadow 0.15s", boxShadow: active ? `0 0 0 3px ${C.purpleBg}` : "none", outline: "none", width: "100%" }}
+                            onMouseEnter={e => { if (!active) e.currentTarget.style.borderColor = C.purpleLight; }}
+                            onMouseLeave={e => { if (!active) e.currentTarget.style.borderColor = C.border; }}
+                          >
+                            <span style={{ fontSize: 24, flexShrink: 0 }}>{m.icon}</span>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 14, fontWeight: 600, color: active ? C.purple : C.navy, marginBottom: 2 }}>{m.title}</div>
+                              <div style={{ fontSize: 12, color: C.body, wordBreak: "keep-all" }}>{m.desc}</div>
+                            </div>
+                            <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${active ? C.purple : C.border}`, background: active ? C.purple : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s" }}>
+                              {active && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
-                  ) : (
-                    <div>
+                  </div>
+
+                  {selectedMethod && (
+                    <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "20px", marginBottom: 16 }}>
                       <label style={{ fontSize: 12, fontWeight: 500, color: C.label, display: "block", marginBottom: 6 }}>
                         {t.methods[selectedMethod].label} <span style={{ color: "#ea2261" }}>*</span>
                       </label>
                       {fileInfo ? (
                         <FilePreview fileInfo={fileInfo} onRemove={() => { setFileInfo(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} />
                       ) : (
-                        <div
-                          role="button"
-                          tabIndex={fileReading ? -1 : 0}
+                        <div role="button" tabIndex={fileReading ? -1 : 0}
                           aria-label={isKo ? "파일 업로드 영역, 클릭하여 파일 선택" : "File upload area, click to select file"}
                           onClick={() => !fileReading && fileInputRef.current?.click()}
                           onKeyDown={e => (e.key === "Enter" || e.key === " ") && !fileReading && fileInputRef.current?.click()}
-                          style={{
-                            border: `1.5px dashed ${fileError ? "#ea2261" : C.border}`,
-                            borderRadius: 8,
-                            padding: "28px 16px",
-                            textAlign: "center",
-                            cursor: fileReading ? "default" : "pointer",
-                            background: "#fafbfc",
-                            transition: "all 0.15s",
-                          }}
+                          style={{ border: `1.5px dashed ${fileError ? "#ea2261" : C.border}`, borderRadius: 8, padding: "28px 16px", textAlign: "center", cursor: fileReading ? "default" : "pointer", background: "#fafbfc", transition: "all 0.15s" }}
                           onMouseEnter={e => { if (!fileReading) e.currentTarget.style.borderColor = C.purpleLight; }}
                           onMouseLeave={e => { e.currentTarget.style.borderColor = fileError ? "#ea2261" : C.border; }}
                         >
@@ -525,9 +581,7 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
                             </div>
                           ) : (
                             <>
-                              <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }}>
-                                {Ic.Clip({ s: 20, c: C.body })}
-                              </div>
+                              <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }}>{Ic.Clip({ s: 20, c: C.body })}</div>
                               <div style={{ fontSize: 13, color: C.navy, fontWeight: 500, marginBottom: 4 }}>{t.methods[selectedMethod].uploadPrompt}</div>
                               <div style={{ fontSize: 11, color: C.body, opacity: 0.8 }}>PDF, JPG, PNG · {isKo ? "최대 2MB · 3개월 이내 발급본" : "Max 2 MB · Issued within 3 months"}</div>
                             </>
@@ -535,34 +589,24 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
                         </div>
                       )}
                       {fileError && <div style={{ fontSize: 11, color: "#ea2261", marginTop: 6 }}>{fileError}</div>}
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".jpg,.jpeg,.png,.pdf"
-                        style={{ display: "none" }}
-                        onChange={handleFileChange}
-                      />
+                      <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.pdf" style={{ display: "none" }} onChange={handleFileChange} />
                     </div>
                   )}
+
+                  {selectedMethod && (
+                    <div style={{ fontSize: 12, color: C.body, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
+                      <span>ℹ️</span><span>{t.reviewNote}</span>
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <Btn variant="ghost" size="lg" onClick={() => setStep(2)} style={{ flex: 1 }}>{isKo ? "이전" : "Back"}</Btn>
+                    <Btn size="lg" disabled={!isFormValid() || submitting} onClick={handleSubmit} style={{ flex: 2 }}>
+                      {submitting ? t.submitting : t.submitBtn}
+                    </Btn>
+                  </div>
                 </div>
               )}
-
-              {/* Review time note */}
-              {selectedMethod && (
-                <div style={{ fontSize: 12, color: C.body, marginBottom: 20, display: "flex", alignItems: "center", gap: 6 }}>
-                  <span>ℹ️</span>
-                  <span>{t.reviewNote}</span>
-                </div>
-              )}
-
-              <Btn
-                full
-                size="lg"
-                disabled={!isFormValid() || submitting}
-                onClick={handleSubmit}
-              >
-                {submitting ? t.submitting : t.submitBtn}
-              </Btn>
             </>
           )}
 

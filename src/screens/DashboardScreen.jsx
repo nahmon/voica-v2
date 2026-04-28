@@ -182,7 +182,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
   );
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
+    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column", overflowX: "hidden" }}>
       {membersModal && (
         <MembersModal
           interviewId={membersModal.id}
@@ -192,23 +192,23 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
       )}
       {showCancelModal && (
         <div onClick={() => setShowCancelModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title" onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: "36px 32px", maxWidth: 400, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.18)", textAlign: "center" }}>
+          <div role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title" onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: isMobile ? "24px 20px" : "36px 32px", maxWidth: 400, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.18)", textAlign: "center" }}>
             <div style={{ fontSize: 36, marginBottom: 12 }}>💳</div>
-            <div id="cancel-modal-title" style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>
+            <div id="cancel-modal-title" style={{ fontSize: isMobile ? 18 : 20, fontWeight: 700, color: C.navy, marginBottom: 8, wordBreak: "keep-all" }}>
               {isKo ? "구독을 해지할까요?" : "Cancel subscription?"}
             </div>
-            <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 24 }}>
+            <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 24, wordBreak: "keep-all" }}>
               {subscription?.current_period_end
                 ? (isKo
                     ? `${new Date(subscription.current_period_end).toLocaleDateString("ko-KR")}까지 Pro 기능을 계속 사용할 수 있어요. 이후에는 무료 플랜으로 전환됩니다.`
                     : `You'll keep Pro access until ${new Date(subscription.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. After that, you'll be on the free plan.`)
                 : (isKo ? "기간 종료 후 무료 플랜으로 전환됩니다." : "You'll be moved to the free plan at period end.")}
             </div>
-            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <button onClick={() => setShowCancelModal(false)} style={{ padding: "10px 20px", borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+              <button onClick={() => setShowCancelModal(false)} style={{ padding: "10px 20px", minHeight: 44, borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
                 {isKo ? "유지하기" : "Keep Pro"}
               </button>
-              <button onClick={handleCancelSubscription} disabled={canceling} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontSize: 13, fontWeight: 600, fontFamily: F, cursor: canceling ? "not-allowed" : "pointer", opacity: canceling ? 0.7 : 1 }}>
+              <button onClick={handleCancelSubscription} disabled={canceling} style={{ padding: "10px 24px", minHeight: 44, borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontSize: 13, fontWeight: 600, fontFamily: F, cursor: canceling ? "not-allowed" : "pointer", opacity: canceling ? 0.7 : 1 }}>
                 {canceling ? (isKo ? "처리 중..." : "Processing...") : (isKo ? "해지하기" : "Cancel subscription")}
               </button>
             </div>
@@ -217,21 +217,21 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
       )}
       {showUpgradeModal && (
         <div onClick={() => setShowUpgradeModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div role="dialog" aria-modal="true" aria-labelledby="upgrade-modal-title" onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: "36px 32px", maxWidth: 400, width: "100%", boxShadow: S.elevated, textAlign: "center" }}>
+          <div role="dialog" aria-modal="true" aria-labelledby="upgrade-modal-title" onClick={e => e.stopPropagation()} style={{ background: C.white, borderRadius: 20, padding: isMobile ? "24px 20px" : "36px 32px", maxWidth: 400, width: "100%", boxShadow: S.elevated, textAlign: "center" }}>
             <div style={{ fontSize: 36, marginBottom: 12 }}>🚀</div>
-            <div id="upgrade-modal-title" style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 8 }}>
+            <div id="upgrade-modal-title" style={{ fontSize: isMobile ? 18 : 20, fontWeight: 700, color: C.navy, marginBottom: 8, wordBreak: "keep-all" }}>
               {isKo ? "Pro 플랜으로 업그레이드하세요" : "Upgrade to Pro"}
             </div>
-            <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 24 }}>
+            <div style={{ fontSize: 13, color: C.body, lineHeight: 1.6, marginBottom: 24, wordBreak: "keep-all", whiteSpace: "pre-line" }}>
               {isKo
                 ? "무료 플랜은 인터뷰를 3개까지 만들 수 있어요.\nPro로 업그레이드하면 무제한으로 인터뷰를 만들 수 있어요."
                 : "Free plan allows up to 3 interviews.\nUpgrade to Pro for unlimited interviews."}
             </div>
-            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <button onClick={() => setShowUpgradeModal(false)} style={{ padding: "10px 20px", borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+              <button onClick={() => setShowUpgradeModal(false)} style={{ padding: "10px 20px", minHeight: 44, borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
                 {isKo ? "취소" : "Cancel"}
               </button>
-              <button onClick={() => { setShowUpgradeModal(false); go("pricing"); }} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 13, fontWeight: 600, fontFamily: F, cursor: "pointer" }}>
+              <button onClick={() => { setShowUpgradeModal(false); go("pricing"); }} style={{ padding: "10px 24px", minHeight: 44, borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 13, fontWeight: 600, fontFamily: F, cursor: "pointer" }}>
                 {isKo ? "Pro 시작하기 →" : "Start Pro →"}
               </button>
             </div>
@@ -252,20 +252,20 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
       `}</style>
       <GlobalNav go={go} activeTab="dashboard" variant="app" logout={logout} isMobile={isMobile} user={user} lang={lang} />
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px", flex: 1, width: "100%" }}>
+      <main style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "20px 16px 60px" : "32px 24px", flex: 1, width: "100%", boxSizing: "border-box", overflowX: "hidden" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 16 }}>
-          <div>
-            <div style={{ fontSize: 26, fontWeight: 500, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.12, marginBottom: 4, fontFeatureSettings: '"ss01"' }}>{isKo ? `안녕하세요, ${userName} 👋` : `Hello, ${userName} 👋`}</div>
-            <div style={{ fontSize: 14, color: C.body }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: isMobile ? 20 : 26, fontWeight: 500, color: C.navy, letterSpacing: "0.16px", lineHeight: 1.12, marginBottom: 4, fontFeatureSettings: '"ss01"', wordBreak: "keep-all" }}>{isKo ? `안녕하세요, ${userName} 👋` : `Hello, ${userName} 👋`}</div>
+            <div style={{ fontSize: 13, color: C.body }}>
               {isKo
                 ? <><strong style={{ fontWeight: 400, color: C.navy }}>{activeCount}</strong>개 진행 중인 인터뷰 · 전체 응답 <strong style={{ fontWeight: 400, color: C.navy }}>{totalSessions}</strong>개</>
                 : <><strong style={{ fontWeight: 400, color: C.navy }}>{activeCount}</strong> active interviews, <strong style={{ fontWeight: 400, color: C.navy }}>{totalSessions}</strong> total responses</>
               }
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
             {creditBalance !== null && creditBalance > 0 && (
-              <div role="button" tabIndex={0} onClick={() => go("pricing")} onKeyDown={e => (e.key === "Enter" || e.key === " ") && go("pricing")} aria-label={isKo ? "크레딧 충전하기" : "Add credits"} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, background: C.purpleBg, border: `1px solid rgba(83,58,253,0.15)`, cursor: "pointer" }}>
+              <div role="button" tabIndex={0} onClick={() => go("pricing")} onKeyDown={e => (e.key === "Enter" || e.key === " ") && go("pricing")} aria-label={isKo ? "크레딧 충전하기" : "Add credits"} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", minHeight: 44, borderRadius: 20, background: C.purpleBg, border: `1px solid rgba(83,58,253,0.15)`, cursor: "pointer" }}>
                 <span style={{ fontSize: 13 }}>🪙</span>
                 <span style={{ fontSize: 12, fontWeight: 600, color: C.purple }}>{isKo ? `${creditBalance.toLocaleString()}원` : `$${(creditBalance / 1300).toFixed(0)}`}</span>
               </div>
@@ -280,7 +280,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                     {isKo ? `${new Date(subscription.current_period_end).toLocaleDateString("ko-KR")} 종료` : `Ends ${new Date(subscription.current_period_end).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}
                   </div>
                 ) : (
-                  <button onClick={() => setShowCancelModal(true)} style={{ padding: "5px 10px", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 11, fontFamily: F, cursor: "pointer" }}>
+                  <button onClick={() => setShowCancelModal(true)} style={{ padding: "6px 12px", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 11, fontFamily: F, cursor: "pointer" }}>
                     {isKo ? "구독 관리" : "Manage"}
                   </button>
                 )}
@@ -333,8 +333,8 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
 
         {/* Search + filter bar */}
         {!loading && interviews.length > 0 && (
-          <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap", alignItems: "center" }}>
-            <div style={{ position: "relative", flex: 1, minWidth: 160 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+            <div style={{ position: "relative" }}>
               <div style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
                 {Ic.Search({ s: 14, c: C.body })}
               </div>
@@ -343,13 +343,13 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                 onChange={e => setSearchQuery(e.target.value)}
                 aria-label={isKo ? "프로젝트 검색" : "Search projects"}
                 placeholder={isKo ? "프로젝트 검색..." : "Search projects..."}
-                style={{ width: "100%", padding: "8px 10px 8px 32px", borderRadius: 10, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, background: C.white, outline: "none", boxSizing: "border-box" }}
+                style={{ width: "100%", padding: "8px 10px 8px 32px", borderRadius: 10, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, background: C.white, outline: "none", boxSizing: "border-box", minHeight: 44 }}
               />
             </div>
-            <div style={{ display: "flex", gap: 6 }}>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {STATUS_KEYS.map((key, idx) => (
                 <button key={key} onClick={() => setStatusFilter(key)}
-                  style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${statusFilter === key ? C.purple : C.border}`, background: statusFilter === key ? C.purple : C.white, color: statusFilter === key ? C.white : C.body, fontSize: 12, fontFamily: F, cursor: "pointer", fontWeight: statusFilter === key ? 500 : 400, transition: "all 0.08s ease-out" }}>
+                  style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${statusFilter === key ? C.purple : C.border}`, background: statusFilter === key ? C.purple : C.white, color: statusFilter === key ? C.white : C.body, fontSize: 12, fontFamily: F, cursor: "pointer", fontWeight: statusFilter === key ? 500 : 400, transition: "all 0.08s ease-out", minHeight: 36 }}>
                   {STATUS_LABELS[idx]}
                 </button>
               ))}
@@ -441,13 +441,13 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                   <span style={{ fontSize: 13, fontWeight: 600, color: sessionCount > 0 ? C.purple : C.body, fontFeatureSettings: '"tnum"' }}>{sessionCount}</span>
                 </div>
                 {/* Actions */}
-                <div style={{ display: "flex", gap: 8, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
+                <div style={{ display: "flex", gap: 8, paddingTop: 8, borderTop: `1px solid ${C.border}`, flexWrap: "wrap" }}>
                   {p.share_code && (
                     <Btn variant="ghost" size="sm" onClick={e => handleCopyLink(e, p.share_code)}>
                       {copiedId === p.share_code ? (isKo ? "복사됨 ✓" : "Copied ✓") : (isKo ? "링크 복사" : "Copy Link")}
                     </Btn>
                   )}
-                  {p.status === "draft" && <Btn size="sm" onClick={e => handleStatusChange(e, p.id, "active")}>{isKo ? "공개하기" : "Publish"}</Btn>}
+                  {p.status === "draft" && <Btn size="sm" onClick={e => { e.stopPropagation(); go("publish_interview", p.id); }}>{isKo ? "공개하기" : "Publish"}</Btn>}
                   {p.status !== "closed" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("editor", p.id); }}>{isKo ? "수정" : "Edit"}</Btn>}
                   {p.status === "active" && <Btn variant="ghost" size="sm" onClick={e => handleStatusChange(e, p.id, "closed")}>{isKo ? "마감" : "Close"}</Btn>}
                   {sessionCount > 0 && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("responses", p.id); }}>{isKo ? "응답 보기" : "View Responses"}</Btn>}

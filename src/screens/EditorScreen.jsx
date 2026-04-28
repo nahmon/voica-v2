@@ -199,27 +199,27 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const isEmpty = !title.trim() && questions.length === 1 && !questions[0].content.trim();
 
   const TemplateBanner = isEmpty && !editingId && (
-    <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "20px 24px 16px" }}>
+    <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: isMobile ? "16px 16px 12px" : "20px 24px 16px" }}>
       {/* AI section */}
-      <div style={{ background: "linear-gradient(135deg,rgba(83,58,253,0.06),rgba(249,107,238,0.06))", border: `1.5px solid rgba(83,58,253,0.18)`, borderRadius: 14, padding: "16px 18px", marginBottom: 18 }}>
+      <div style={{ background: "linear-gradient(135deg,rgba(83,58,253,0.06),rgba(249,107,238,0.06))", border: `1.5px solid rgba(83,58,253,0.18)`, borderRadius: 14, padding: isMobile ? "14px 14px" : "16px 18px", marginBottom: 18 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
           <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✦</div>
           <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>AI로 초안 만들기</div>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: isMobile ? "wrap" : "nowrap" }}>
           <input
             aria-label="AI 초안 프롬프트"
             value={aiPrompt}
             onChange={e => setAiPrompt(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") { setShowAiModal(true); } }}
             placeholder="인터뷰 목적을 설명하세요 — 예: 20대 앱 사용자의 불편함을 파악하고 싶어요"
-            style={{ flex: 1, padding: "9px 12px", borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, outline: "none", minWidth: 0 }}
+            style={{ flex: 1, minWidth: 0, padding: "9px 12px", borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, outline: "none" }}
             onFocus={e => e.target.style.borderColor = C.purple}
             onBlur={e => e.target.style.borderColor = C.border}
           />
           <button
             onClick={() => setShowAiModal(true)}
-            style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#533afd,#f96bee)", color: C.white, fontSize: 13, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap" }}
+            style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#533afd,#f96bee)", color: C.white, fontSize: 13, fontWeight: 600, fontFamily: F, cursor: "pointer", whiteSpace: "nowrap", minHeight: 44, width: isMobile ? "100%" : "auto" }}
           >
             초안 생성
           </button>
@@ -383,8 +383,8 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const shareUrl = shareCode ? `${window.location.origin}/i/${shareCode}` : null;
 
   const ShareOverlay = showShareOverlay && shareCode && (
-    <div role="presentation" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div role="dialog" aria-modal="true" aria-label="링크 공유" style={{ background: C.white, borderRadius: 20, padding: "40px 36px", maxWidth: 440, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px", animation: "fadeInUp 0.2s ease" }}>
+    <div role="presentation" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? 16 : 24, overflowY: "auto" }}>
+      <div role="dialog" aria-modal="true" aria-label="링크 공유" style={{ background: C.white, borderRadius: isMobile ? 16 : 20, padding: isMobile ? "28px 20px" : "40px 36px", maxWidth: 440, width: "100%", textAlign: "center", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px", animation: "fadeInUp 0.2s ease" }}>
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(21,190,83,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
           {Ic.CheckCircle({ s: 28, c: C.success })}
         </div>
@@ -402,7 +402,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
                 setRewardAmount(amt);
                 if (editingId) supabase.from("interviews").update({ incentive: amt > 0 ? `₩${amt.toLocaleString("ko-KR")}` : null, reward_amount: amt }).eq("id", editingId);
               }}
-                style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${rewardAmount === amt ? C.purple : C.border}`, background: rewardAmount === amt ? C.purpleBg : C.white, color: rewardAmount === amt ? C.purple : C.body, fontSize: 13, fontFamily: F, cursor: "pointer", fontWeight: rewardAmount === amt ? 600 : 400, transition: "all 0.15s" }}>
+                style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${rewardAmount === amt ? C.purple : C.border}`, background: rewardAmount === amt ? C.purpleBg : C.white, color: rewardAmount === amt ? C.purple : C.body, fontSize: 13, fontFamily: F, cursor: "pointer", fontWeight: rewardAmount === amt ? 600 : 400, transition: "all 0.15s" }}>
                 {amt === 0 ? "없음" : amt === 1000 ? "₩1,000" : amt === 3000 ? "₩3,000 ✦" : amt === 5000 ? "₩5,000" : "₩10,000"}
               </button>
             ))}
@@ -442,7 +442,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           <img
             src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`}
             alt="QR Code"
-            style={{ width: 180, height: 180, borderRadius: 12, border: `1px solid ${C.border}` }}
+            style={{ width: isMobile ? 140 : 180, height: isMobile ? 140 : 180, borderRadius: 12, border: `1px solid ${C.border}` }}
           />
           <div style={{ marginTop: 10 }}>
             <Btn size="sm" variant="ghost" onClick={() => window.open(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`, "_blank")}>QR 코드 저장</Btn>
@@ -458,9 +458,9 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
 
   const AiModal = showAiModal && (
-    <div role="presentation" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+    <div role="presentation" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? 16 : 24 }}
       onClick={e => { if (e.target === e.currentTarget) setShowAiModal(false); }}>
-      <div role="dialog" aria-modal="true" aria-label="AI 초안 생성" style={{ background: C.white, borderRadius: 20, padding: "36px 32px 28px", maxWidth: 480, width: "100%", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px" }}>
+      <div role="dialog" aria-modal="true" aria-label="AI 초안 생성" style={{ background: C.white, borderRadius: isMobile ? 16 : 20, padding: isMobile ? "24px 20px 20px" : "36px 32px 28px", maxWidth: 480, width: "100%", boxShadow: "rgba(50,50,93,0.2) 0px 40px 80px -16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#533afd,#f96bee)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M8 0 C8 0 8.8 3.5 10.5 5.5 C12.2 7.5 16 8 16 8 C16 8 12.2 8.5 10.5 10.5 C8.8 12.5 8 16 8 16 C8 16 7.2 12.5 5.5 10.5 C3.8 8.5 0 8 0 8 C0 8 3.8 7.5 5.5 5.5 C7.2 3.5 8 0 8 0Z"/></svg>
@@ -570,10 +570,10 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   );
 
   const ShareLinkBar = shareCode && editingId && (
-    <div style={{ background: "rgba(83,58,253,0.06)", borderBottom: `1px solid rgba(83,58,253,0.15)`, padding: "8px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-      <span style={{ fontSize: 12, color: C.purple, fontWeight: 500 }}>공유 링크</span>
-      <span style={{ flex: 1, fontSize: 12, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
-      <Btn size="sm" variant="ghost" onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px" }}>{copied ? "Copied ✓" : "Copy"}</Btn>
+    <div style={{ background: "rgba(83,58,253,0.06)", borderBottom: `1px solid rgba(83,58,253,0.15)`, padding: isMobile ? "8px 12px" : "8px 16px", display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+      <span style={{ fontSize: 12, color: C.purple, fontWeight: 500, flexShrink: 0 }}>공유 링크</span>
+      <span style={{ flex: 1, minWidth: 0, fontSize: 12, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
+      <Btn size="sm" variant="ghost" onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px", flexShrink: 0 }}>{copied ? "Copied ✓" : "Copy"}</Btn>
     </div>
   );
 
@@ -590,7 +590,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
   // ─── Mobile layout ───
   if (isMobile) return (
-    <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh" }}>
+    <div style={{ fontFamily: F, background: C.bg, minHeight: "100vh", overflowX: "hidden" }}>
       {ShareOverlay}
       {AiModal}
       {NavBar}
@@ -602,7 +602,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           value={title}
           onChange={e => setTitle(e.target.value)}
           placeholder="인터뷰 제목을 입력하세요"
-          style={{ width: "100%", border: "none", outline: "none", fontSize: 18, fontFamily: F, fontWeight: 600, color: C.navy, background: "transparent", boxSizing: "border-box" }}
+          style={{ width: "100%", border: "none", outline: "none", fontSize: 18, fontFamily: F, fontWeight: 600, color: C.navy, background: "transparent", boxSizing: "border-box", minHeight: 44, wordBreak: "break-word" }}
         />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10, padding: "10px 12px", borderRadius: 8, border: `1px solid ${expertOnly ? "rgba(110,75,255,0.3)" : C.border}`, background: expertOnly ? C.purpleBg : "transparent" }}>
           <div>
@@ -622,24 +622,27 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
       <div style={{ display: "flex", gap: 6, padding: "10px 16px", overflowX: "auto", background: C.white, borderBottom: `1px solid ${C.border}` }}>
         {questions.map((qq, i) => (
           <button key={qq.id} onClick={() => setSelectedIdx(i)}
-            style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: "none", background: selectedIdx === i ? C.purple : C.bg, color: selectedIdx === i ? C.white : C.body, whiteSpace: "nowrap", fontWeight: selectedIdx === i ? 500 : 400 }}>
+            style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: "none", background: selectedIdx === i ? C.purple : C.bg, color: selectedIdx === i ? C.white : C.body, whiteSpace: "nowrap", fontWeight: selectedIdx === i ? 500 : 400, minHeight: 44, display: "inline-flex", alignItems: "center" }}>
             Q{i + 1}
           </button>
         ))}
         <div style={{ position: "relative" }}>
           <button aria-label="질문 추가" aria-expanded={addTypeOpen} onClick={() => setAddTypeOpen(v => !v)}
-            style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: `1px dashed ${C.border}`, background: "transparent", color: C.body, whiteSpace: "nowrap" }}>
+            style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontFamily: F, cursor: "pointer", border: `1px dashed ${C.border}`, background: "transparent", color: C.body, whiteSpace: "nowrap", minHeight: 44, minWidth: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>
             +
           </button>
           {addTypeOpen && (
-            <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 100 }}>
-              {Q_TYPES.map(({ type, icon, label }) => (
-                <div key={type} onClick={() => addQuestion(type)}
-                  style={{ padding: "10px 16px", fontSize: 13, color: C.navy, cursor: "pointer", whiteSpace: "nowrap", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 7 }}>
-                  {icon}{label}
-                </div>
-              ))}
-            </div>
+            <>
+              <div onClick={() => setAddTypeOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 99 }} />
+              <div style={{ position: "absolute", top: "calc(100% + 4px)", right: 0, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0 4px 16px", zIndex: 100, minWidth: 160 }}>
+                {Q_TYPES.map(({ type, icon, label }) => (
+                  <div key={type} onClick={() => addQuestion(type)}
+                    style={{ padding: "12px 16px", fontSize: 14, color: C.navy, cursor: "pointer", whiteSpace: "nowrap", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 7 }}>
+                    {icon}{label}
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -820,8 +823,9 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
 
 function PreviewCard({ q, idx, total, updateQ }) {
   const editable = !!updateQ;
+  const isMobile = useIsMobile();
   return (
-    <div style={{ width: "100%", maxWidth: 600, background: C.interviewBg, borderRadius: 12, padding: "36px 32px", boxShadow: "rgba(50,50,93,0.25) 0px 30px 60px -20px", position: "relative", overflow: "hidden" }}>
+    <div style={{ width: "100%", maxWidth: 600, background: C.interviewBg, borderRadius: 12, padding: isMobile ? "24px 18px" : "36px 32px", boxShadow: "rgba(50,50,93,0.25) 0px 30px 60px -20px", position: "relative", overflow: "hidden", boxSizing: "border-box", minWidth: 0 }}>
       <div style={{ position: "absolute", top: -40, right: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(110,75,255,0.18),transparent)", filter: "blur(40px)", pointerEvents: "none" }} />
       <div style={{ position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
@@ -896,12 +900,12 @@ function PreviewCard({ q, idx, total, updateQ }) {
                 value={opt}
                 onChange={e => { const next = [...q.options]; next[i] = e.target.value; updateQ(idx, { options: next }); }}
                 placeholder={`보기 ${i + 1}`}
-                style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", fontSize: 13, color: "rgba(255,255,255,0.85)", fontFamily: F, outline: "none", width: "100%", boxSizing: "border-box", caretColor: "rgba(185,185,249,0.9)" }}
+                style={{ padding: isMobile ? "12px 12px" : "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", fontSize: isMobile ? 14 : 13, color: "rgba(255,255,255,0.85)", fontFamily: F, outline: "none", width: "100%", boxSizing: "border-box", caretColor: "rgba(185,185,249,0.9)", minHeight: 44 }}
                 onFocus={e => e.target.style.borderColor = "rgba(185,185,249,0.5)"}
                 onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.15)"}
               />
             ) : (
-              <div key={i} style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{opt || `보기 ${i + 1}`}</div>
+              <div key={i} style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", fontSize: 13, color: "rgba(255,255,255,0.7)", wordBreak: "break-word" }}>{opt || `보기 ${i + 1}`}</div>
             ))}
             {editable && (
               <button
@@ -917,9 +921,9 @@ function PreviewCard({ q, idx, total, updateQ }) {
         )}
 
         {q?.type === "likert" && (
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: isMobile ? 4 : 6, flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch", paddingBottom: 2 }}>
             {Array.from({ length: (q.options?.max ?? 5) - (q.options?.min ?? 1) + 1 }, (_, i) => i + (q.options?.min ?? 1)).map(n => (
-              <div key={n} style={{ flex: 1, aspectRatio: "1", borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "rgba(255,255,255,0.7)" }}>{n}</div>
+              <div key={n} style={{ flex: 1, minWidth: isMobile ? 30 : 36, minHeight: isMobile ? 30 : 36, aspectRatio: "1", borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isMobile ? 12 : 14, color: "rgba(255,255,255,0.7)", flexShrink: 0 }}>{n}</div>
             ))}
           </div>
         )}
@@ -930,11 +934,12 @@ function PreviewCard({ q, idx, total, updateQ }) {
 
 function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimuliDragId, stimuliUploading, setStimuliUploading, uploadStimulusImage }) {
   if (!q) return null;
+  const isMobile = useIsMobile();
 
   const currentTypeDef = Q_TYPES.find(t => t.type === q.type);
 
   return (
-    <div>
+    <div style={{ width: "100%", boxSizing: "border-box" }}>
       <div style={{ fontSize: 12, fontWeight: 600, color: C.label, marginBottom: 14 }}>질문 설정</div>
 
       {/* Type selector with icons and descriptions */}
@@ -962,7 +967,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
           onChange={e => updateQ(idx, { content: e.target.value })}
           rows={4}
           placeholder="질문을 입력하세요"
-          style={{ width: "100%", padding: "8px 10px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.5 }}
+          style={{ width: "100%", padding: isMobile ? "10px 12px" : "8px 10px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: isMobile ? 14 : 13, fontFamily: F, color: C.navy, resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.5 }}
         />
         <div style={{ fontSize: 10, color: (q.content?.length ?? 0) > 200 ? C.ruby : C.body, textAlign: "right", marginTop: 3 }}>
           {q.content?.length ?? 0}/200 chars
@@ -978,10 +983,10 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
                 value={opt}
                 onChange={e => { const next = [...q.options]; next[i] = e.target.value; updateQ(idx, { options: next }); }}
                 placeholder={`Option ${i + 1}`}
-                style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }}
+                style={{ flex: 1, minWidth: 0, padding: isMobile ? "10px 10px" : "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: isMobile ? 14 : 12, fontFamily: F, outline: "none", boxSizing: "border-box", minHeight: 44 }}
               />
               {q.options.length > 2 && (
-                <button aria-label={`보기 ${i + 1} 삭제`} onClick={() => updateQ(idx, { options: q.options.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14 }}>✕</button>
+                <button aria-label={`보기 ${i + 1} 삭제`} onClick={() => updateQ(idx, { options: q.options.filter((_, j) => j !== i) })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
               )}
             </div>
           ))}
@@ -996,11 +1001,11 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input type="number" aria-label="최솟값" value={q.options?.min ?? 1} min={1} max={4}
               onChange={e => updateQ(idx, { options: { ...q.options, min: Number(e.target.value) } })}
-              style={{ width: 48, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", textAlign: "center" }} />
+              style={{ width: 56, padding: "10px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: isMobile ? 14 : 12, fontFamily: F, outline: "none", textAlign: "center", minHeight: 44, boxSizing: "border-box" }} />
             <span style={{ fontSize: 12, color: C.body }}>~</span>
             <input type="number" aria-label="최댓값" value={q.options?.max ?? 5} min={2} max={10}
               onChange={e => updateQ(idx, { options: { ...q.options, max: Number(e.target.value) } })}
-              style={{ width: 48, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", textAlign: "center" }} />
+              style={{ width: 56, padding: "10px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: isMobile ? 14 : 12, fontFamily: F, outline: "none", textAlign: "center", minHeight: 44, boxSizing: "border-box" }} />
           </div>
         </div>
       )}
@@ -1022,7 +1027,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
               })()}
               <div style={{ display: "flex", gap: 6 }}>
                 <input value={q.stimulus.label ?? ""} onChange={e => updateQ(idx, { stimulus: { ...q.stimulus, label: e.target.value } })} placeholder="소재 설명 (선택)" style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }} />
-                <button aria-label="소재 제거" onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
+                <button aria-label="소재 제거" onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px", minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>✕</button>
               </div>
             </div>
           ) : (
@@ -1109,7 +1114,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
               )}
               <div style={{ display: "flex", gap: 6 }}>
                 <input value={q.stimulus.label ?? ""} onChange={e => updateQ(idx, { stimulus: { ...q.stimulus, label: e.target.value } })} placeholder="화면 설명 (예: 온보딩 1단계)" style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none" }} />
-                <button aria-label="소재 제거" onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
+                <button aria-label="소재 제거" onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px", minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>✕</button>
               </div>
             </div>
           ) : (
@@ -1169,7 +1174,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
                 placeholder="자료 설명 (선택)"
                 style={{ flex: 1, padding: "6px 8px", borderRadius: 4, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, outline: "none", boxSizing: "border-box" }}
               />
-              <button aria-label="소재 제거" onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>✕</button>
+              <button aria-label="소재 제거" onClick={() => updateQ(idx, { stimulus: null })} style={{ background: "none", border: "none", color: C.body, cursor: "pointer", fontSize: 14, padding: "0 4px", minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>✕</button>
             </div>
           </div>
         ) : (

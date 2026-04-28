@@ -269,12 +269,12 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
     return (
       <div style={{ fontFamily: F, minHeight: "100vh", background: C.bg }}>
         <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
-        <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 16px", height: 48, display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 16px", minHeight: 48, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", paddingTop: 6, paddingBottom: 6, boxSizing: "border-box" }}>
           <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>{isKo ? "← 대시보드" : "← Dashboard"}</Btn>
-          <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
             {interview?.title ?? "Interview"}
           </div>
-          <div style={{ fontSize: 12, color: C.body, whiteSpace: "nowrap" }}>{isKo ? `완료 ${completedCount}` : `${completedCount} completed`}</div>
+          <div style={{ fontSize: 12, color: C.body, whiteSpace: "nowrap", flexShrink: 0 }}>{isKo ? `완료 ${completedCount}` : `${completedCount} completed`}</div>
         </div>
         <div style={{ padding: "12px 16px" }}>
           <StatsBar sessions={sessions} allResponses={allResponses} lang={lang} />

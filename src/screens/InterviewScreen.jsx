@@ -628,7 +628,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Warmup ───
   if (introStep === "warmup") return (
-    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: 24 }}>
+    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, padding: isMobile ? "24px 16px" : 24, boxSizing: "border-box", overflowX: "hidden" }}>
       <div style={{ width: "100%", maxWidth: 420, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 28, fontWeight: 500 }}>단계 1 / 2 · 마이크 확인</div>
         <div style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: "#fff", marginBottom: 10, lineHeight: 1.2 }}>목소리가 잘 들리나요?</div>
@@ -692,7 +692,7 @@ export default function InterviewScreen({ go, shareCode }) {
 
   // ─── Intro / Info ───
   if (introStep === "info") return (
-    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", alignItems: "flex-start", justifyContent: "center", fontFamily: F, padding: "48px 24px 48px", overflowY: "auto" }}>
+    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", alignItems: "flex-start", justifyContent: "center", fontFamily: F, padding: isMobile ? "32px 16px 48px" : "48px 24px 48px", overflowY: "auto", boxSizing: "border-box", overflowX: "hidden" }}>
       <div style={{ width: "100%", maxWidth: 576 }}>
         {/* Logo row */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 36 }}>
@@ -788,7 +788,7 @@ export default function InterviewScreen({ go, shareCode }) {
   }));
 
   if (completed) return (
-    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, fontFamily: F, position: "relative", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: IV_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: isMobile ? "24px 16px" : 40, fontFamily: F, position: "relative", overflow: "hidden", boxSizing: "border-box" }}>
       <style>{INTERVIEW_STYLES}</style>
 
       {/* Confetti dots */}
@@ -1088,10 +1088,12 @@ export default function InterviewScreen({ go, shareCode }) {
                     <div style={{ textAlign: "center" }}>
                       <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>탭해서 답변 시작</div>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginTop: 2 }}>최소 {MIN_RECORD_SECS}초 이상 답변해 주세요</div>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 10 }}>
-                        <kbd style={{ fontSize: 11, fontFamily: "monospace", border: "1px solid rgba(110,75,255,0.35)", borderRadius: 4, padding: "1px 6px", background: "rgba(110,75,255,0.1)", color: C.purple }}>Space</kbd>
-                        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>녹음 시작/중지</span>
-                      </div>
+                      {!isMobile && (
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 10 }}>
+                          <kbd style={{ fontSize: 11, fontFamily: "monospace", border: "1px solid rgba(110,75,255,0.35)", borderRadius: 4, padding: "1px 6px", background: "rgba(110,75,255,0.1)", color: C.purple }}>Space</kbd>
+                          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>녹음 시작/중지</span>
+                        </div>
+                      )}
                     </div>
                   )}
                   {/* Skip */}
@@ -1129,7 +1131,7 @@ export default function InterviewScreen({ go, shareCode }) {
                   const count = (q.options?.max ?? 5) - (q.options?.min ?? 1) + 1;
                   return (
                     <button key={n} onClick={() => setSelectedValue(n)}
-                      style={{ width: `calc((100% - ${(count - 1) * 8}px) / ${count})`, minWidth: 36, maxWidth: 56, height: 48, borderRadius: 10, border: "none", background: selectedValue === n ? C.purple : "rgba(255,255,255,0.1)", color: selectedValue === n ? C.white : "rgba(255,255,255,0.6)", fontSize: 17, fontFamily: F, cursor: "pointer", transition: "all 0.15s" }}>
+                      style={{ width: `calc((100% - ${(count - 1) * 8}px) / ${count})`, minWidth: 44, maxWidth: 64, height: 48, borderRadius: 10, border: "none", background: selectedValue === n ? C.purple : "rgba(255,255,255,0.1)", color: selectedValue === n ? C.white : "rgba(255,255,255,0.6)", fontSize: 17, fontFamily: F, cursor: "pointer", transition: "all 0.15s" }}>
                       {n}
                     </button>
                   );

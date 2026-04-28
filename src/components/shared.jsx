@@ -76,7 +76,7 @@ export function Badge({ children, variant = "neutral", style: sx = {} }) {
 
 export function Btn({ children, variant = "primary", size = "md", onClick, disabled, full, style: sx = {} }) {
   const [hov, setHov] = useState(false);
-  const sz = { sm: { padding: "5px 14px", fontSize: 13 }, md: { padding: "9px 20px", fontSize: 15 }, lg: { padding: "13px 32px", fontSize: 16 } };
+  const sz = { sm: { padding: "5px 14px", fontSize: 13, minHeight: 44 }, md: { padding: "9px 20px", fontSize: 15, minHeight: 44 }, lg: { padding: "13px 32px", fontSize: 16, minHeight: 44 } };
   const vr = {
     primary: { background: disabled ? "#a09de8" : hov ? C.purpleHover : C.purple, color: C.white, border: "none", transform: !disabled && hov ? "scale(1.02)" : "scale(1)", filter: !disabled && hov ? "brightness(1.05)" : "brightness(1)" },
     ghost: { background: "transparent", color: C.purple, border: `1px solid ${C.purpleLight}`, transform: hov ? "scale(1.02)" : "scale(1)", filter: hov ? "brightness(1.05)" : "brightness(1)" },
@@ -217,9 +217,9 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             {variant === "app" && !isMobile && (
               <>
                 {hasInterviews !== null && (
-                  <Btn size="sm" onClick={() => go(hasInterviews ? "dashboard" : "editor")}>{hasInterviews ? (isKo ? "대시보드" : "Dashboard") : (isKo ? "+ 인터뷰 시작" : "+ Start Interview")}</Btn>
+                  <Btn size="sm" style={{ minHeight: 32, height: 32, padding: "0 14px" }} onClick={() => go(hasInterviews ? "dashboard" : "editor")}>{hasInterviews ? (isKo ? "대시보드" : "Dashboard") : (isKo ? "+ 인터뷰 시작" : "+ Start Interview")}</Btn>
                 )}
-                {logout && <Btn variant="ghost" size="sm" onClick={logout}>{isKo ? "로그아웃" : "Log Out"}</Btn>}
+                {logout && <Btn variant="ghost" size="sm" style={{ minHeight: 32, height: 32, padding: "0 14px" }} onClick={logout}>{isKo ? "로그아웃" : "Log Out"}</Btn>}
                 <div style={{ width: 1, height: 16, background: C.border }} />
                 {(() => {
                   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
@@ -236,13 +236,13 @@ export function GlobalNav({ go, activeTab, variant = "public", logout, isMobile:
             )}
             {variant === "panel" && !isMobile && (
               <>
-                {logout && <Btn variant="ghost" size="sm" onClick={logout}>{isKo ? "로그아웃" : "Log Out"}</Btn>}
+                {logout && <Btn variant="ghost" size="sm" style={{ minHeight: 32, height: 32, padding: "0 14px" }} onClick={logout}>{isKo ? "로그아웃" : "Log Out"}</Btn>}
               </>
             )}
             {(variant === "public" || variant === "sub") && !isMobile && (
               <>
-                <Btn variant="ghost" size="sm" style={{ border: "1px solid rgba(23,23,23,0.2)", borderRadius: 10 }} onClick={() => go("panel_entry")}>{isKo ? "인터뷰 참여" : "Join as Panelist"}</Btn>
-                <Btn size="sm" onClick={() => go("advertiser_login")}>{isKo ? "로그인" : "Log In"}</Btn>
+                <Btn variant="ghost" size="sm" style={{ minHeight: 32, height: 32, padding: "0 14px", border: "1px solid rgba(23,23,23,0.2)", borderRadius: 10 }} onClick={() => go("panel_entry")}>{isKo ? "인터뷰 참여" : "Join as Panelist"}</Btn>
+                <Btn size="sm" style={{ minHeight: 32, height: 32, padding: "0 14px" }} onClick={() => go("advertiser_login")}>{isKo ? "로그인" : "Log In"}</Btn>
               </>
             )}
             {isMobile && (

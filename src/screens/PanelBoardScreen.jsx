@@ -168,7 +168,7 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
   }
 
   return (
-    <div style={{ background: "#ffffff", minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
+    <div style={{ background: "#ffffff", minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column", overflowX: "hidden" }}>
       <GlobalNav go={go} activeTab="panel_board" variant={user?.user_metadata?.role === "researcher" ? "app" : "panel"} user={user} logout={logout} lang={lang} />
 
       {/* Hero */}
@@ -185,10 +185,10 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>{isKo ? `인터뷰 ${filtered.length}건 모집 중` : `${filtered.length} interviews open now`}</span>
           </div>
 
-          <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 700, color: "#fff", margin: "0 0 8px", lineHeight: 1.25 }}>
+          <h1 style={{ fontSize: isMobile ? 20 : 30, fontWeight: 700, color: "#fff", margin: "0 0 8px", lineHeight: 1.25, wordBreak: "keep-all" }}>
             {isKo ? "인터뷰에 참여하고, 리워드를 받아보세요" : "Share your voice. Earn rewards."}
           </h1>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", margin: "0 0 24px" }}>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", margin: "0 0 24px", wordBreak: "keep-all" }}>
             {isKo ? "내 프로필에 딱 맞는 AI 인터뷰에 참여해 보세요." : "Join AI-powered interviews matched to your profile."}
           </p>
 
@@ -228,7 +228,7 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: isMobile ? "20px 16px 80px" : "28px 24px 80px", flex: 1, minWidth: 0, width: "100%" }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: isMobile ? "20px 16px 80px" : "28px 24px 80px", flex: 1, minWidth: 0, width: "100%", boxSizing: "border-box", overflowX: "hidden" }}>
 
         {/* Filters + Sort row */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
@@ -237,7 +237,6 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
             <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto", scrollbarWidth: "none" }}>
               {CATEGORY_KEYS.map(c => {
                 const active = catFilter === c;
-                const emoji = CATEGORY_EMOJIS[c];
                 const isRecommendedCat = c === "Recommended";
                 return (
                   <button key={c} onClick={() => setCatFilter(c)} style={{
@@ -249,7 +248,6 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
                     transition: "all 0.12s",
                     display: "flex", alignItems: "center", gap: 4,
                   }}>
-                    <span style={{ fontSize: isRecommendedCat ? 10 : 13, lineHeight: 1 }}>{emoji}</span>
                     {isRecommendedCat
                       ? <>{isKo ? "추천" : "Matched"}<span style={{ fontSize: 11, fontWeight: 700, background: active ? "rgba(255,255,255,0.25)" : C.purpleBg, color: active ? "#fff" : C.purple, borderRadius: 10, padding: "1px 6px", marginLeft: 2 }}>{recommendedCount}</span></>
                       : catLabel(c)}
@@ -427,7 +425,7 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
                     <button
                       onClick={() => setSearch("")}
                       style={{
-                        padding: "9px 18px", borderRadius: 8, border: `1px solid ${C.border}`,
+                        padding: "7px 16px", borderRadius: 8, border: `1px solid ${C.border}`,
                         background: "#fff", fontSize: 13, fontFamily: F, color: C.navy,
                         cursor: "pointer", fontWeight: 500,
                       }}>
@@ -438,7 +436,7 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
                     <button
                       onClick={() => setCatFilter("All")}
                       style={{
-                        padding: "9px 18px", borderRadius: 8, border: "none",
+                        padding: "7px 16px", borderRadius: 8, border: "none",
                         background: C.purple, fontSize: 13, fontFamily: F, color: "#fff",
                         cursor: "pointer", fontWeight: 600,
                       }}>

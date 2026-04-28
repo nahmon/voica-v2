@@ -10,7 +10,11 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
   const isKo = lang === "ko";
 
   useEffect(() => {
-    if (!user) { go("auth"); return; }
+    if (!user) {
+      localStorage.setItem("voica_after_login", "payment_subscribe");
+      go("advertiser_login");
+      return;
+    }
     startBillingAuth();
   }, [user]);
 

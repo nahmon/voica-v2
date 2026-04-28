@@ -40,7 +40,7 @@ export default function FAQScreen({ go, user, logout, lang = "ko", onLangChange 
                       <div key={ii} style={{ background: C.white, borderBottom: ii < section.items.length - 1 ? `1px solid ${C.border}` : "none" }}>
                         <button
                           onClick={() => toggle(key)}
-                          style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", background: "none", border: "none", cursor: "pointer", fontFamily: F, textAlign: "left", gap: 12 }}>
+                          style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", background: "none", border: "none", cursor: "pointer", fontFamily: F, textAlign: "left", gap: 12 }}>
                           <span style={{ fontSize: 14, fontWeight: 500, color: open ? C.purple : C.navy, lineHeight: 1.5, flex: 1 }}>Q. {item.q}</span>
                           <span style={{ color: open ? C.purple : C.body, fontSize: 18, lineHeight: 1, flexShrink: 0, transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
                             {Ic.ChevronDown({s:18,c: open ? C.purple : C.body})}

@@ -1,20 +1,10 @@
 import { useState } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 
-// ─── Category accent colors ───
-const CATEGORY_COLORS = {
-  Tech:      { accent: "#2563eb", bg: "rgba(37,99,235,0.08)",  text: "#1d4ed8" },
-  Beauty:    { accent: "#db2777", bg: "rgba(219,39,119,0.08)", text: "#be185d" },
-  Finance:   { accent: "#16a34a", bg: "rgba(22,163,74,0.08)",  text: "#15803d" },
-  Media:     { accent: "#9333ea", bg: "rgba(147,51,234,0.08)", text: "#7e22ce" },
-  Food:      { accent: "#ea580c", bg: "rgba(234,88,12,0.08)",  text: "#c2410c" },
-  Education: { accent: "#0891b2", bg: "rgba(8,145,178,0.08)",  text: "#0e7490" },
-  Expert:    { accent: "#475569", bg: "rgba(71,85,105,0.08)",  text: "#334155" },
-  default:   { accent: C.purple, bg: C.purpleBg,               text: C.purple  },
-};
+const BRAND_COLOR = { accent: C.purple, bg: C.purpleBg, text: C.purple };
 
-function getCategoryColor(category) {
-  return CATEGORY_COLORS[category] || CATEGORY_COLORS.default;
+function getCategoryColor() {
+  return BRAND_COLOR;
 }
 
 // ─── Company avatar ───
@@ -39,15 +29,14 @@ function CompanyAvatar({ company, category }) {
 }
 
 // ─── Method / location meta chip ───
-function MetaChip({ icon, label }) {
+function MetaChip({ label }) {
   return (
     <span style={{
-      display: "inline-flex", alignItems: "center", gap: 3,
+      display: "inline-flex", alignItems: "center",
       fontSize: 11, padding: "2px 8px", borderRadius: 6,
       background: "rgba(0,0,0,0.04)", color: C.body,
       border: "1px solid rgba(0,0,0,0.06)", whiteSpace: "nowrap",
     }}>
-      <span style={{ fontSize: 11 }}>{icon}</span>
       {label}
     </span>
   );
@@ -74,11 +63,11 @@ export function MatchBadge({ score, isKo }) {
 function DetailSection({ job, isKo, catColor }) {
   const tp = job.targetProfile;
   const rows = tp ? [
-    { icon: "👤", label: isKo ? "연령" : "Age", value: tp.age },
-    { icon: "👥", label: isKo ? "성별" : "Gender", value: isKo ? (tp.gender === "Any" ? "무관" : tp.gender === "Female" ? "여성" : tp.gender === "Male" ? "남성" : tp.gender) : tp.gender },
-    { icon: "📍", label: isKo ? "지역" : "Region", value: tp.region },
-    { icon: "🎯", label: isKo ? "해당하는 분" : "Who fits", value: tp.lifestyle },
-    tp.exclude && { icon: "⛔", label: isKo ? "참여 불가" : "Excluded", value: tp.exclude },
+    { label: isKo ? "연령" : "Age", value: tp.age },
+    { label: isKo ? "성별" : "Gender", value: isKo ? (tp.gender === "Any" ? "무관" : tp.gender === "Female" ? "여성" : tp.gender === "Male" ? "남성" : tp.gender) : tp.gender },
+    { label: isKo ? "지역" : "Region", value: tp.region },
+    { label: isKo ? "해당하는 분" : "Who fits", value: tp.lifestyle },
+    tp.exclude && { label: isKo ? "참여 불가" : "Excluded", value: tp.exclude, isExclude: true },
   ].filter(Boolean) : [];
 
   return (
@@ -109,14 +98,9 @@ function DetailSection({ job, isKo, catColor }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
             {rows.map(r => (
               <div key={r.label} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <span style={{
-                  width: 26, height: 26, borderRadius: 6,
-                  background: catColor.bg, display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 13, flexShrink: 0,
-                }}>{r.icon}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: C.body, marginBottom: 1 }}>{r.label}</div>
-                  <div style={{ fontSize: 13, color: r.icon === "⛔" ? "#dc2626" : C.navy, lineHeight: 1.5 }}>{r.value}</div>
+                  <div style={{ fontSize: 13, color: r.isExclude ? "#dc2626" : C.navy, lineHeight: 1.5 }}>{r.value}</div>
                 </div>
               </div>
             ))}
@@ -148,15 +132,6 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
     return m;
   })();
 
-  const methodIcon = (() => {
-    const m = job.method;
-    if (!m) return "🎙";
-    if (m === "voice" || m === "audio") return "🎙";
-    if (m === "video") return "🎥";
-    if (m === "text") return "💬";
-    return "🎙";
-  })();
-
   const locationLabel = (() => {
     const l = job.location;
     if (!l || l === "online") return isKo ? "온라인" : "Online";
@@ -171,26 +146,17 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
       style={{
         background: "#fff",
         borderRadius: 14,
-        border: isUrgent
-          ? "1.5px solid rgba(220,38,38,0.4)"
-          : isRecommended
-            ? `1.5px solid ${catColor.accent}40`
-            : `1px solid ${C.border}`,
+        border: isRecommended
+          ? `1.5px solid ${catColor.accent}40`
+          : `1px solid ${C.border}`,
         overflow: "hidden",
         transition: "transform 0.18s ease-out, box-shadow 0.18s ease-out",
         transform: hovered ? "translateY(-2px)" : "translateY(0)",
         boxShadow: hovered
-          ? isUrgent
-            ? "0 8px 24px rgba(220,38,38,0.12), 0 2px 8px rgba(220,38,38,0.08)"
-            : `0 8px 24px rgba(6,27,49,0.1), 0 2px 8px rgba(6,27,49,0.06)`
-          : isUrgent
-            ? "0 0 0 3px rgba(220,38,38,0.08)"
-            : "none",
+          ? `0 8px 24px rgba(6,27,49,0.1), 0 2px 8px rgba(6,27,49,0.06)`
+          : "none",
       }}
     >
-      {/* Category stripe */}
-      <div style={{ height: 3, background: catColor.accent, opacity: isUrgent ? 1 : 0.85 }} />
-
       <div style={{ padding: isMobile ? "14px 16px" : "18px 22px" }}>
 
         {/* Header row: avatar + company + badges / reward */}
@@ -201,13 +167,13 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
               <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 12, fontWeight: 500, color: C.body, whiteSpace: "nowrap" }}>{job.company}</span>
                 {isUrgent && (
-                  <span style={{ fontSize: 11, fontWeight: 600, color: "#dc2626", background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 6, whiteSpace: "nowrap" }}>
-                    ⚡ {isKo ? "마감 임박" : "Closing soon"}
+                  <span style={{ fontSize: 11, fontWeight: 600, color: C.body, background: "rgba(0,0,0,0.06)", padding: "2px 7px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                    {isKo ? "마감 임박" : "Closing soon"}
                   </span>
                 )}
                 {isRecommended && !isUrgent && (
                   <span style={{ fontSize: 11, fontWeight: 600, color: catColor.text, background: catColor.bg, padding: "2px 7px", borderRadius: 6, whiteSpace: "nowrap" }}>
-                    ★ {isKo ? "추천" : "Matched"}
+                    {isKo ? "추천" : "Matched"}
                   </span>
                 )}
               </div>
@@ -221,7 +187,6 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
           {/* Reward */}
           <div style={{ textAlign: "right", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 4, justifyContent: "flex-end" }}>
-              {Ic.Coin({ s: 14, c: catColor.accent })}
               <span style={{ fontSize: isMobile ? 17 : 19, fontWeight: 800, color: catColor.accent, lineHeight: 1 }}>
                 {job.reward}
               </span>
@@ -252,14 +217,14 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
 
         {/* Meta row: method + location + duration */}
         <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 10 }}>
-          <MetaChip icon={methodIcon} label={methodLabel} />
-          <MetaChip icon="📍" label={locationLabel} />
-          {job.duration && <MetaChip icon="⏱" label={job.duration} />}
+          <MetaChip label={methodLabel} />
+          <MetaChip label={locationLabel} />
+          {job.duration && <MetaChip label={job.duration} />}
         </div>
 
         {/* Conditions + deadline chips */}
         <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 12 }}>
-          {job.conditions.map(c => (
+          {(job.conditions ?? []).map(c => (
             <span key={c} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(0,0,0,0.04)", color: C.navy, fontWeight: 500, border: "1px solid rgba(0,0,0,0.06)" }}>{c}</span>
           ))}
           <span style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(0,0,0,0.04)", color: C.body, border: "1px solid rgba(0,0,0,0.06)" }}>~{job.deadline}</span>
@@ -271,11 +236,11 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
           <div style={{ flex: 1, minWidth: 0, height: 5, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{
               height: "100%", borderRadius: 2, width: `${fillPct}%`,
-              background: fillPct >= 80 ? C.ruby : catColor.accent,
+              background: catColor.accent,
               transition: "width 0.3s",
             }} />
           </div>
-          <span style={{ fontSize: 11, color: isUrgent ? "#dc2626" : C.body, fontWeight: isUrgent ? 600 : 400, whiteSpace: "nowrap", flexShrink: 0 }}>
+          <span style={{ fontSize: 11, color: C.body, fontWeight: 400, whiteSpace: "nowrap", flexShrink: 0 }}>
             {isKo ? `${remaining}자리 남음` : `${remaining} left`}
           </span>
         </div>
@@ -287,7 +252,8 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
             display: "flex", alignItems: "center", gap: 4,
             background: "none", border: "none", cursor: "pointer",
             fontSize: 12, fontWeight: 600, color: catColor.text,
-            fontFamily: F, padding: "4px 0", marginBottom: 10,
+            fontFamily: F, padding: "10px 0", marginBottom: 2,
+            minHeight: 44,
           }}
         >
           <span style={{
@@ -313,7 +279,7 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
         ) : (
           <button
             onClick={e => { e.stopPropagation(); onApply(); }}
-            style={{ width: "100%", padding: "11px 14px", borderRadius: 8, border: "none", background: catColor.accent, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: F, transition: "opacity 0.12s" }}
+            style={{ width: "100%", padding: "11px 14px", minHeight: 44, borderRadius: 8, border: "none", background: catColor.accent, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: F, transition: "opacity 0.12s" }}
             onMouseEnter={e => { e.currentTarget.style.opacity = "0.88"; }}
             onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
           >
@@ -330,9 +296,9 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
 // ─── Confirmed CTA ───
 function ConfirmedCTA({ isKo, go, catColor }) {
   return (
-    <div style={{ display: "flex", gap: 8 }}>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
       <div style={{
-        flex: 1, padding: "10px 14px",
+        flex: 1, minWidth: 180, padding: "10px 14px",
         background: "rgba(22,163,74,0.07)", borderRadius: 8,
         border: "1px solid rgba(22,163,74,0.2)",
         display: "flex", alignItems: "center", gap: 8,
@@ -356,7 +322,7 @@ function ConfirmedCTA({ isKo, go, catColor }) {
       <button
         onClick={() => go("consent")}
         style={{
-          padding: "10px 20px", background: catColor.accent, color: "#fff",
+          padding: "10px 20px", minHeight: 44, background: catColor.accent, color: "#fff",
           border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600,
           cursor: "pointer", fontFamily: F, whiteSpace: "nowrap",
         }}

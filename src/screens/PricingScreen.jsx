@@ -70,13 +70,21 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
   ];
 
   const handleProStart = () => {
-    if (!user) { go("auth"); return; }
+    if (!user) {
+      localStorage.setItem("voica_after_login", "payment_subscribe");
+      go("advertiser_login");
+      return;
+    }
     sessionStorage.setItem("voica_billing", billing);
     go("payment_subscribe");
   };
 
   const handleCreditPurchase = async (pkg) => {
-    if (!user) { go("auth"); return; }
+    if (!user) {
+      localStorage.setItem("voica_after_login", "pricing");
+      go("advertiser_login");
+      return;
+    }
     if (!VITE_TOSS_CLIENT_KEY) { showToast("결제 설정이 준비 중이에요.", "error"); return; }
     setPaying(pkg.id);
     try {

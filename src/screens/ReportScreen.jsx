@@ -351,21 +351,6 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
     return Object.entries(buckets).filter(([, v]) => v > 0);
   }, [completedSessions, isKo]);
 
-  if (loading) return (
-    <div style={{ minHeight: "100vh", background: dk.bg, fontFamily: F, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <div style={{ width: 36, height: 36, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.1)", borderTopColor: "#7c6af7", animation: "spin 0.8s linear infinite" }} />
-      <div style={{ fontSize: 14, color: dk.muted }}>{isKo ? "리포트 불러오는 중..." : "Loading report..."}</div>
-    </div>
-  );
-
-  if (!interviewId) return (
-    <div style={{ minHeight: "100vh", background: dk.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F, gap: 16 }}>
-      <div style={{ fontSize: 16, color: dk.text }}>{isKo ? "인터뷰를 선택해주세요" : "Please select an interview"}</div>
-      <Btn onClick={() => go("dashboard")}>{isKo ? "대시보드로" : "Go to dashboard"}</Btn>
-    </div>
-  );
-
   const hasReport = report?.status === "completed" && report.content;
 
   const voiceClips = useMemo(() => {
@@ -403,8 +388,23 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
     };
   }, [hasReport, report, questions, allResponses, mcDists, ratingDists, questionInsights, voiceClips, sentimentDist, demographicInsights, genderDist, ageBuckets]);
 
+  if (loading) return (
+    <div style={{ minHeight: "100vh", background: dk.bg, fontFamily: F, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <div style={{ width: 36, height: 36, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.1)", borderTopColor: "#7c6af7", animation: "spin 0.8s linear infinite" }} />
+      <div style={{ fontSize: 14, color: dk.muted }}>{isKo ? "리포트 불러오는 중..." : "Loading report..."}</div>
+    </div>
+  );
+
+  if (!interviewId) return (
+    <div style={{ minHeight: "100vh", background: dk.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F, gap: 16 }}>
+      <div style={{ fontSize: 16, color: dk.text }}>{isKo ? "인터뷰를 선택해주세요" : "Please select an interview"}</div>
+      <Btn onClick={() => go("dashboard")}>{isKo ? "대시보드로" : "Go to dashboard"}</Btn>
+    </div>
+  );
+
   return (
-    <div style={{ background: dk.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column" }}>
+    <div style={{ background: dk.bg, minHeight: "100vh", fontFamily: F, display: "flex", flexDirection: "column", overflowX: "hidden" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse-step { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
@@ -418,25 +418,25 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       `}</style>
 
       {/* Top bar */}
-      <div className="no-print" style={{ background: dk.card, borderBottom: `1px solid ${dk.border}`, padding: isMobile ? "0 16px" : "0 32px", height: 52, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, overflow: "hidden" }}>
-          <div onClick={() => go("landing")} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
+      <div className="no-print" style={{ background: dk.card, borderBottom: `1px solid ${dk.border}`, padding: isMobile ? "8px 12px" : "0 32px", minHeight: 52, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexShrink: 0, flexWrap: "wrap", boxSizing: "border-box" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: 1, overflow: "hidden" }}>
+          <div onClick={() => go("landing")} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", flexShrink: 0 }}>
             <div style={{ width: 22, height: 22, borderRadius: 5, background: C.purple, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <div style={{ width: 9, height: 9, borderRadius: 2, background: "white" }} />
             </div>
             <span style={{ fontSize: 13, color: dk.muted }}>voicesurvey</span>
           </div>
-          <span style={{ color: dk.border }}>/</span>
-          <span style={{ fontSize: 13, color: dk.muted }}>{isKo ? "리포트" : "Reports"}</span>
+          <span style={{ color: dk.border, flexShrink: 0 }}>/</span>
+          <span style={{ fontSize: 13, color: dk.muted, flexShrink: 0 }}>{isKo ? "리포트" : "Reports"}</span>
           {interview?.title && !isMobile && (
             <>
-              <span style={{ color: dk.border }}>·</span>
-              <span style={{ fontSize: 13, color: dk.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 320 }}>{interview.title}</span>
+              <span style={{ color: dk.border, flexShrink: 0 }}>·</span>
+              <span style={{ fontSize: 13, color: dk.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{interview.title}</span>
             </>
           )}
         </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
-          <button aria-label={isKo ? "대시보드로 돌아가기" : "Back to dashboard"} onClick={() => go("dashboard")} style={{ background: "none", border: "none", padding: "6px 10px", color: dk.muted, fontSize: 13, cursor: "pointer", fontFamily: F }}>
+        <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0, flexWrap: "wrap" }}>
+          <button aria-label={isKo ? "대시보드로 돌아가기" : "Back to dashboard"} onClick={() => go("dashboard")} style={{ background: "none", border: "none", padding: "8px 10px", minHeight: 44, color: dk.muted, fontSize: 13, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center" }}>
             ← {isMobile ? "" : (isKo ? "대시보드" : "Dashboard")}
           </button>
           {hasReport && (
@@ -446,13 +446,13 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                   <button
                     onClick={handleCopyPublicLink}
                     title={`${location.origin}/report/public/${publicToken}`}
-                    style={{ padding: "5px 12px", borderRadius: 8, border: `1px solid rgba(110,75,255,0.4)`, background: "rgba(110,75,255,0.1)", color: "#a78bff", fontSize: 12, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center", gap: 5 }}>
+                    style={{ padding: "8px 12px", minHeight: 44, borderRadius: 8, border: `1px solid rgba(110,75,255,0.4)`, background: "rgba(110,75,255,0.1)", color: "#a78bff", fontSize: 12, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center", gap: 5 }}>
                     🔗 {isMobile ? "" : (isKo ? "링크 복사" : "Copy link")}
                   </button>
                   <button
                     onClick={handleRevokePublicLink}
                     disabled={sharingLoading}
-                    style={{ padding: "5px 10px", borderRadius: 8, border: `1px solid ${dk.border}`, background: "none", color: dk.muted, fontSize: 12, cursor: "pointer", fontFamily: F }}>
+                    style={{ padding: "8px 10px", minHeight: 44, borderRadius: 8, border: `1px solid ${dk.border}`, background: "none", color: dk.muted, fontSize: 12, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center" }}>
                     {isKo ? "초기화" : "Revoke"}
                   </button>
                 </div>
@@ -460,11 +460,11 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                 <button
                   onClick={handleCreatePublicLink}
                   disabled={sharingLoading}
-                  style={{ padding: "6px 14px", borderRadius: 8, border: `1px solid ${dk.border}`, background: "none", color: dk.text, fontSize: 13, cursor: sharingLoading ? "default" : "pointer", fontFamily: F, opacity: sharingLoading ? 0.6 : 1 }}>
+                  style={{ padding: "8px 14px", minHeight: 44, borderRadius: 8, border: `1px solid ${dk.border}`, background: "none", color: dk.text, fontSize: 13, cursor: sharingLoading ? "default" : "pointer", fontFamily: F, opacity: sharingLoading ? 0.6 : 1, display: "flex", alignItems: "center" }}>
                   {sharingLoading ? (isKo ? "생성 중..." : "Creating...") : (isKo ? "공개 링크 생성" : "Create public link")}
                 </button>
               )}
-              <button onClick={handlePrint} style={{ padding: "6px 16px", borderRadius: 8, border: "none", background: C.purple, color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F }}>
+              <button onClick={handlePrint} style={{ padding: "8px 16px", minHeight: 44, borderRadius: 8, border: "none", background: C.purple, color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center" }}>
                 {isKo ? "내보내기 →" : "Export →"}
               </button>
             </>
@@ -472,11 +472,11 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
         </div>
       </div>
 
-      <main style={{ maxWidth: 900, margin: "0 auto", padding: isMobile ? "16px" : "32px", flex: 1, width: "100%" }} className="print-content">
+      <main style={{ maxWidth: 900, margin: "0 auto", padding: isMobile ? "12px 16px 60px" : "32px", flex: 1, width: "100%", boxSizing: "border-box", overflowX: "hidden" }} className="print-content">
 
         {/* No report CTA */}
         {!report && (
-          <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: "40px 32px", textAlign: "center", marginTop: 24 }}>
+          <div style={{ background: dk.card, border: `1px solid ${dk.border}`, borderRadius: 12, padding: isMobile ? "28px 20px" : "40px 32px", textAlign: "center", marginTop: 24 }}>
             <div style={{ fontSize: 32, marginBottom: 16, color: C.purple }}>✦</div>
             <div style={{ fontSize: 18, fontWeight: 500, color: dk.text, marginBottom: 8 }}>{isKo ? "AI 리포트 생성" : "Generate AI Report"}</div>
             <div style={{ fontSize: 13, color: dk.muted, marginBottom: 24, lineHeight: 1.7 }}>
@@ -545,8 +545,8 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
             )}
 
             {/* 01 리서치 개요 */}
-            <Section number={sn.overview} title={isKo ? "리서치 개요" : "Research Overview"} dk={dk}>
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(5,1fr)", gap: 1, background: dk.border, borderRadius: 8, overflow: "hidden" }}>
+            <Section number={sn.overview} title={isKo ? "리서치 개요" : "Research Overview"} dk={dk} isMobile={isMobile}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(5,1fr)", gap: 1, background: dk.border, borderRadius: 8, overflow: "hidden" }}>
                 {[
                   { label: isKo ? "조사 방법" : "Method", value: isKo ? "AI 음성 인터뷰" : "AI Voice Interview", small: true },
                   { label: isKo ? "총 응답자" : "Total", value: String(totalSessions) },
@@ -564,7 +564,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
 
             {/* 02 핵심 결론 */}
             {report.content.themes?.length > 0 && (
-              <Section number={sn.findings} title={isKo ? "핵심 결론" : "Key Findings"} dk={dk}>
+              <Section number={sn.findings} title={isKo ? "핵심 결론" : "Key Findings"} dk={dk} isMobile={isMobile}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {report.content.themes.slice(0, 3).map((theme, i) => (
                     <div key={i} style={{
@@ -600,7 +600,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
 
             {/* 03 정량 결과 */}
             {(mcDists.length > 0 || ratingDists.length > 0) && (
-              <Section number={sn.quant} title={isKo ? "정량 결과" : "Quantitative Results"} dk={dk}>
+              <Section number={sn.quant} title={isKo ? "정량 결과" : "Quantitative Results"} dk={dk} isMobile={isMobile}>
                 {mcDists.length > 0 && (
                   <div style={{ marginBottom: ratingDists.length > 0 ? 28 : 0, display: "flex", flexDirection: "column", gap: 22 }}>
                     {mcDists.map(({ question: q, entries, maxCount, total }) => (
@@ -612,7 +612,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                             const isTop = i === 0 && count > 0;
                             return (
                               <div key={label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                <div style={{ width: isMobile ? 72 : 140, fontSize: 12, color: isTop ? dk.text : dk.muted, flexShrink: 0, textAlign: "right", wordBreak: "keep-all", lineHeight: 1.3 }}>{label}</div>
+                                <div style={{ width: isMobile ? 64 : 140, fontSize: isMobile ? 11 : 12, color: isTop ? dk.text : dk.muted, flexShrink: 0, textAlign: "right", wordBreak: "keep-all", lineHeight: 1.3, overflowWrap: "break-word" }}>{label}</div>
                                 <div style={{ flex: 1, height: 22, background: dk.card2, borderRadius: 4, overflow: "hidden" }}>
                                   <div style={{ height: "100%", width: `${maxCount > 0 ? (count / maxCount) * 100 : 0}%`, background: isTop ? `linear-gradient(90deg,${C.purple},#7c6af7)` : "rgba(110,75,255,0.28)", borderRadius: 4 }} />
                                 </div>
@@ -656,7 +656,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
 
             {/* 04 문항별 AI 인사이트 */}
             {questionInsights.length > 0 && (
-              <Section number={sn.qInsights} title={isKo ? "문항별 AI 인사이트" : "Per-Question AI Insights"} dk={dk}>
+              <Section number={sn.qInsights} title={isKo ? "문항별 AI 인사이트" : "Per-Question AI Insights"} dk={dk} isMobile={isMobile}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {questionInsights.map((qi, i) => {
                     const isLast = i === questionInsights.length - 1;
@@ -693,7 +693,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                 .filter(({ resps }) => resps.length > 0);
               if (questionsWithQuotes.length === 0) return null;
               return (
-                <Section number={sn.quotes} title={isKo ? "대표 발언" : "Representative Quotes"} dk={dk}>
+                <Section number={sn.quotes} title={isKo ? "대표 발언" : "Representative Quotes"} dk={dk} isMobile={isMobile}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                     {questionsWithQuotes.map(({ q, resps }, qi) => (
                       <div key={q.id}>
@@ -757,7 +757,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
 
             {/* 음성 클립 모음 */}
             {voiceClips.length > 0 && (
-              <Section number={sn.clips} title={isKo ? "음성 클립 모음" : "Audio Clips"} dk={dk}>
+              <Section number={sn.clips} title={isKo ? "음성 클립 모음" : "Audio Clips"} dk={dk} isMobile={isMobile}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   {voiceClips.map(({ q, resps }, qi) => (
                     <div key={q.id}>
@@ -806,7 +806,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
 
             {/* 06 테마 & 감정 분석 */}
             {(report.content.themes?.length > 0 || sentimentDist) && (
-              <Section number={sn.themes} title={isKo ? "테마 & 감정 분석" : "Themes & Sentiment"} dk={dk}>
+              <Section number={sn.themes} title={isKo ? "테마 & 감정 분석" : "Themes & Sentiment"} dk={dk} isMobile={isMobile}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   {sentimentDist && (
                     <div>
@@ -822,7 +822,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 600, color: dk.dim, letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 10 }}>{isKo ? "테마별 감정 분석" : "Theme × Sentiment"}</div>
                       {/* header */}
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 52px 52px 52px 40px", gap: 4, padding: "0 4px 6px", borderBottom: `1px solid ${dk.border}` }}>
+                      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 40px 40px 40px 32px" : "1fr 52px 52px 52px 40px", gap: 4, padding: "0 4px 6px", borderBottom: `1px solid ${dk.border}` }}>
                         {[isKo ? "테마" : "Theme", isKo ? "긍정" : "Pos", isKo ? "중립" : "Neu", isKo ? "부정" : "Neg", isKo ? "언급" : "N"].map((h, hi) => (
                           <div key={hi} style={{ fontSize: 10, fontWeight: 600, color: dk.dim, letterSpacing: "0.06em", textAlign: hi > 0 ? "center" : "left" }}>{h}</div>
                         ))}
@@ -840,7 +840,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                           { val: negP, color: "#f87171", bg: "rgba(239,68,68,0.12)", dom: theme.sentiment === "negative" },
                         ];
                         return (
-                          <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 52px 52px 52px 40px", gap: 4, padding: "10px 4px", borderBottom: isLast ? "none" : `1px solid ${dk.border}`, alignItems: "center" }}>
+                          <div key={i} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 40px 40px 40px 32px" : "1fr 52px 52px 52px 40px", gap: 4, padding: "10px 4px", borderBottom: isLast ? "none" : `1px solid ${dk.border}`, alignItems: "center" }}>
                             <div>
                               <div style={{ fontSize: 13, fontWeight: 500, color: dk.text }}>{theme.label}</div>
                               {(theme.key_quote || theme.quotes?.[0]) && (
@@ -868,7 +868,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
             )}
 
             {/* 07 응답자 프로파일 */}
-            <Section number={sn.profile} title={isKo ? "응답자 프로파일" : "Respondent Profile"} dk={dk}>
+            <Section number={sn.profile} title={isKo ? "응답자 프로파일" : "Respondent Profile"} dk={dk} isMobile={isMobile}>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 28 }}>
                 {/* Completion donut */}
                 <div>
@@ -956,7 +956,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
 
             {/* 08 인구통계 기반 AI 분석 */}
             {demographicInsights && (genderDist.length > 0 || ageBuckets.length > 0) && (
-              <Section number={sn.demoInsights} title={isKo ? "인구통계 기반 분석" : "Demographic Analysis"} dk={dk}>
+              <Section number={sn.demoInsights} title={isKo ? "인구통계 기반 분석" : "Demographic Analysis"} dk={dk} isMobile={isMobile}>
                 {demographicInsights.summary && (
                   <div style={{ background: dk.card2, borderLeft: "2px solid rgba(52,211,153,0.4)", borderRadius: "0 6px 6px 0", padding: "12px 14px", marginBottom: 16 }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: "#34d399", marginBottom: 6, letterSpacing: "0.06em" }}>OVERVIEW</div>
@@ -983,7 +983,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
 
             {/* 09 인사이트 & 액션 아이템 */}
             {report.content.recommendations?.length > 0 && (
-              <Section number={sn.actions} title={isKo ? "인사이트 & 액션 아이템" : "Insights & Action Items"} dk={dk}>
+              <Section number={sn.actions} title={isKo ? "인사이트 & 액션 아이템" : "Insights & Action Items"} dk={dk} isMobile={isMobile}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {report.content.recommendations.map((r, i) => {
                     const isObj = r && typeof r === "object";
@@ -1054,19 +1054,19 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                   </div>
                 </div>
               ))}
-              <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+              <div style={{ display: "flex", gap: 8, marginTop: 4, flexWrap: isMobile ? "wrap" : "nowrap" }}>
                 <input
                   aria-label={isKo ? "팀 메모 입력" : "Add team note"}
                   value={commentText}
                   onChange={e => setCommentText(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && !e.shiftKey && handleAddComment()}
                   placeholder={isKo ? "팀 메모 추가..." : "Add a note..."}
-                  style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: `1px solid ${dk.border}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: dk.text, fontFamily: F, outline: "none" }}
+                  style={{ flex: 1, minWidth: 0, background: "rgba(255,255,255,0.06)", border: `1px solid ${dk.border}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: dk.text, fontFamily: F, outline: "none", minHeight: 44, boxSizing: "border-box" }}
                 />
                 <button
                   onClick={handleAddComment}
                   disabled={!commentText.trim() || commentLoading}
-                  style={{ padding: "10px 18px", borderRadius: 10, border: "none", background: C.purple, color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F, opacity: commentLoading ? 0.6 : 1 }}>
+                  style={{ padding: "10px 18px", minHeight: 44, borderRadius: 10, border: "none", background: C.purple, color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F, opacity: commentLoading ? 0.6 : 1, flexShrink: 0, width: isMobile ? "100%" : "auto" }}>
                   {isKo ? "추가" : "Add"}
                 </button>
               </div>
@@ -1099,15 +1099,15 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   );
 }
 
-function Section({ number, title, children, dk }) {
+function Section({ number, title, children, dk, isMobile }) {
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, paddingTop: 22 }}>
         <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(110,75,255,0.5)", letterSpacing: "0.05em", flexShrink: 0 }}>{number}</span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#e2e8f0", flexShrink: 0 }}>{title}</span>
+        <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 600, color: "#e2e8f0", flexShrink: 0 }}>{title}</span>
         <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
       </div>
-      <div style={{ background: "#161b22", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "20px 22px" }}>
+      <div style={{ background: "#161b22", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: isMobile ? "16px 14px" : "20px 22px", overflowX: "hidden" }}>
         {children}
       </div>
     </div>
