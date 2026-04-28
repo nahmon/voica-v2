@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { PANEL_JOBS, PANEL_JOBS_KO, MOCK_PANEL_PROFILE, getMatchScore } from "../lib/mockData.js";
 import { GlobalNav, Footer, EmptyState } from "../components/shared.jsx";
+import PanelJobCard, { MatchBadge } from "../components/PanelJobCard.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
 
@@ -47,6 +48,8 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
   const [catFilter, setCatFilter] = useState("All");
   const [sortKey, setSortKey] = useState("recommended");
   const [mobileSortOpen, setMobileSortOpen] = useState(false);
+  const [desktopSortOpen, setDesktopSortOpen] = useState(false);
+  const desktopSortRef = useRef(null);
   const [applyState, setApplyState] = useState(loadApplyState);
   const [recentIds, setRecentIds] = useState(getRecentlyViewed);
   const [userProfile, setUserProfile] = useState(null);
@@ -73,7 +76,20 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
   const SORT_OPTIONS = isKo ? SORT_OPTIONS_KO : SORT_OPTIONS_EN;
   const CATEGORY_KEYS = ["All", "Recommended", "Expert", "Tech", "Beauty", "Media", "Food", "Finance", "Education"];
   const CATEGORY_LABELS_KO = { All: "전체", Recommended: "추천", Expert: "전문직", Tech: "테크", Beauty: "뷰티", Media: "미디어", Food: "식음료", Finance: "금융", Education: "교육" };
+  const CATEGORY_EMOJIS = { All: "🌐", Recommended: "✦", Expert: "💼", Tech: "💻", Beauty: "💄", Media: "📺", Food: "🍽", Finance: "💰", Education: "📚" };
   const catLabel = (key) => isKo ? (CATEGORY_LABELS_KO[key] ?? key) : key;
+
+  // Close desktop sort dropdown on outside click
+  useEffect(() => {
+    if (!desktopSortOpen) return;
+    function handleClickOutside(e) {
+      if (desktopSortRef.current && !desktopSortRef.current.contains(e.target)) {
+        setDesktopSortOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [desktopSortOpen]);
 
   // Map Korean profile values to English for getMatchScore compatibility
   const INTEREST_MAP = {
@@ -218,28 +234,33 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
           {/* Category pills */}
           <div style={{ position: "relative", flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto", scrollbarWidth: "none" }}>
-
-            {CATEGORY_KEYS.map(c => {
-              const active = catFilter === c;
-              return (
-                <button key={c} onClick={() => setCatFilter(c)} style={{
-                  padding: "6px 14px", borderRadius: 20, fontSize: 12, fontFamily: F, cursor: "pointer",
-                  border: `1px solid ${active ? C.purple : C.border}`,
-                  background: active ? C.purple : "#fff",
-                  color: active ? "#fff" : C.body,
-                  fontWeight: active ? 600 : 400, flexShrink: 0,
-                  transition: "all 0.12s",
-                }}>
-                  {c === "Recommended" ? `✦ ${isKo ? `추천 (${recommendedCount})` : `Matched (${recommendedCount})`}` : catLabel(c)}
-                </button>
-              );
-            })}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto", scrollbarWidth: "none" }}>
+              {CATEGORY_KEYS.map(c => {
+                const active = catFilter === c;
+                const emoji = CATEGORY_EMOJIS[c];
+                const isRecommendedCat = c === "Recommended";
+                return (
+                  <button key={c} onClick={() => setCatFilter(c)} style={{
+                    padding: "6px 12px", borderRadius: 20, fontSize: 12, fontFamily: F, cursor: "pointer",
+                    border: `1px solid ${active ? C.purple : C.border}`,
+                    background: active ? C.purple : "#fff",
+                    color: active ? "#fff" : C.body,
+                    fontWeight: active ? 600 : 400, flexShrink: 0,
+                    transition: "all 0.12s",
+                    display: "flex", alignItems: "center", gap: 4,
+                  }}>
+                    <span style={{ fontSize: isRecommendedCat ? 10 : 13, lineHeight: 1 }}>{emoji}</span>
+                    {isRecommendedCat
+                      ? <>{isKo ? "추천" : "Matched"}<span style={{ fontSize: 11, fontWeight: 700, background: active ? "rgba(255,255,255,0.25)" : C.purpleBg, color: active ? "#fff" : C.purple, borderRadius: 10, padding: "1px 6px", marginLeft: 2 }}>{recommendedCount}</span></>
+                      : catLabel(c)}
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 32, background: "linear-gradient(to right, transparent, #fff)", pointerEvents: "none" }} />
           </div>
-          <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 32, background: "linear-gradient(to right, transparent, #fff)", pointerEvents: "none" }} />
-          </div>
 
-          {/* Sort: desktop dropdown / mobile icon button */}
+          {/* Sort: desktop custom dropdown / mobile icon button */}
           {isMobile ? (
             <button
               onClick={() => setMobileSortOpen(v => !v)}
@@ -253,19 +274,50 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
               ⇅
             </button>
           ) : (
-            <select
-              aria-label={isKo ? "정렬 기준" : "Sort by"}
-              value={sortKey}
-              onChange={e => setSortKey(e.target.value)}
-              style={{
-                padding: "7px 12px", borderRadius: 8, border: `1px solid ${C.border}`,
-                background: "#fff", fontSize: 12, fontFamily: F, color: C.navy,
-                cursor: "pointer", flexShrink: 0, outline: "none",
-              }}>
-              {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
-            </select>
+            <div ref={desktopSortRef} style={{ position: "relative", flexShrink: 0 }}>
+              <button
+                onClick={() => setDesktopSortOpen(v => !v)}
+                aria-label={isKo ? "정렬 기준" : "Sort by"}
+                aria-expanded={desktopSortOpen}
+                style={{
+                  padding: "7px 10px 7px 12px", borderRadius: 8,
+                  border: `1px solid ${desktopSortOpen ? C.purple : C.border}`,
+                  background: desktopSortOpen ? C.purpleBg : "#fff",
+                  fontSize: 12, fontFamily: F, color: desktopSortOpen ? C.purple : C.navy,
+                  cursor: "pointer", display: "flex", alignItems: "center", gap: 6, outline: "none",
+                  transition: "all 0.12s",
+                }}>
+                {SORT_OPTIONS.find(o => o.key === sortKey)?.label}
+                <span style={{ fontSize: 10, opacity: 0.7, transform: desktopSortOpen ? "rotate(180deg)" : "none", transition: "transform 0.12s", display: "inline-block" }}>▾</span>
+              </button>
+              {desktopSortOpen && (
+                <div style={{
+                  position: "absolute", top: "calc(100% + 4px)", right: 0, zIndex: 50,
+                  background: "#fff", borderRadius: 10, border: `1px solid ${C.border}`,
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)", minWidth: 140, overflow: "hidden",
+                }}>
+                  {SORT_OPTIONS.map(o => {
+                    const active = sortKey === o.key;
+                    return (
+                      <button key={o.key} onClick={() => { setSortKey(o.key); setDesktopSortOpen(false); }} style={{
+                        display: "block", width: "100%", textAlign: "left",
+                        padding: "9px 14px", fontSize: 12, fontFamily: F, cursor: "pointer",
+                        border: "none", background: active ? C.purpleBg : "transparent",
+                        color: active ? C.purple : C.navy, fontWeight: active ? 600 : 400,
+                        transition: "background 0.08s",
+                      }}
+                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = "rgba(0,0,0,0.03)"; }}
+                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}>
+                        {o.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           )}
         </div>
+
         {/* Mobile sort options row */}
         {isMobile && mobileSortOpen && (
           <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
@@ -289,20 +341,28 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
         {/* Recently viewed — top */}
         {recentJobs.length > 0 && (
           <div style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              {isKo ? "최근 본 인터뷰" : "Recently viewed"}
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span>{isKo ? "최근 본 인터뷰" : "Recently viewed"}</span>
+              <button
+                onClick={() => { localStorage.removeItem(RECENTLY_VIEWED_KEY); setRecentIds([]); }}
+                style={{
+                  fontSize: 11, color: C.body, background: "none", border: "none", cursor: "pointer",
+                  fontFamily: F, padding: "2px 4px", opacity: 0.65,
+                }}>
+                {isKo ? "전체 지우기" : "Clear all"}
+              </button>
             </div>
-            <div style={{ display: "flex", gap: 10, overflowX: "auto", scrollbarWidth: "none", paddingBottom: 4 }}>
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", scrollbarWidth: "none", paddingBottom: 4 }}>
               {recentJobs.map(job => (
                 <div key={job.id} style={{
-                  background: "#fff", borderRadius: 12, padding: "12px 14px",
-                  border: `1px solid rgba(0,0,0,0.08)`, flexShrink: 0,
-                  minWidth: 200, maxWidth: 240,
+                  background: "#fff", borderRadius: 10, padding: "10px 12px",
+                  border: `1px solid rgba(0,0,0,0.07)`, flexShrink: 0,
+                  minWidth: 180, maxWidth: 220,
                 }}>
-                  <div style={{ fontSize: 12, color: C.body, marginBottom: 4 }}>{job.company}</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{job.title}</div>
+                  <div style={{ fontSize: 11, color: C.body, marginBottom: 3 }}>{job.company}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, marginBottom: 7, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{job.title}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: C.purple }}>{job.reward}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: C.purple }}>{job.reward}</span>
                     <MatchBadge score={job._matchScore} isKo={isKo} />
                   </div>
                 </div>
@@ -311,25 +371,85 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
           </div>
         )}
 
-        {/* Result count */}
-        <div style={{ fontSize: 12, color: C.body, marginBottom: 12 }}>
-          {isKo
-            ? `${catFilter !== "All" ? `${catLabel(catFilter)} ` : ""}인터뷰 ${filtered.length}건`
-            : `${filtered.length} interview${filtered.length !== 1 ? "s" : ""} ${catFilter !== "All" ? `in ${catFilter}` : "available"}`}
-        </div>
+        {/* Result count row */}
+        {(() => {
+          const hasSearch = debouncedSearch !== "";
+          const hasCatFilter = catFilter !== "All";
+          const isFiltered = hasSearch || hasCatFilter;
+          return (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 12, color: C.body }}>
+                {isKo
+                  ? `${hasCatFilter ? `${catLabel(catFilter)} ` : ""}인터뷰 ${filtered.length}건`
+                  : `${filtered.length} interview${filtered.length !== 1 ? "s" : ""} ${hasCatFilter ? `in ${catLabel(catFilter)}` : "available"}`}
+              </span>
+              {isFiltered && (
+                <span style={{
+                  fontSize: 11, fontWeight: 600, color: C.purple,
+                  background: C.purpleBg, borderRadius: 10, padding: "2px 8px",
+                  display: "flex", alignItems: "center", gap: 5,
+                }}>
+                  {isKo ? "필터 적용됨" : "Filtered"}
+                  <button
+                    onClick={() => { setSearch(""); setCatFilter("All"); }}
+                    style={{
+                      fontSize: 11, color: C.purple, background: "none", border: "none",
+                      cursor: "pointer", fontFamily: F, padding: 0, fontWeight: 600, lineHeight: 1,
+                    }}>
+                    ✕
+                  </button>
+                </span>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Job cards */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {filtered.length === 0 ? (
-            <EmptyState
-              icon="🔍"
-              title={isKo ? "인터뷰를 찾을 수 없어요" : "No interviews found"}
-              description={isKo ? "다른 검색어나 필터를 써보세요" : "Try a different search or filter"}
-              action={debouncedSearch ? (isKo ? "검색 초기화" : "Clear search") : undefined}
-              onAction={debouncedSearch ? () => setSearch("") : undefined}
-            />
-          ) : filtered.map(job => (
-            <JobCard
+          {filtered.length === 0 ? (() => {
+            const hasSearch = debouncedSearch !== "";
+            const hasCatFilter = catFilter !== "All";
+            return (
+              <div style={{ textAlign: "center", padding: "48px 16px" }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>🔍</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 8 }}>
+                  {isKo ? "인터뷰를 찾을 수 없어요" : "No interviews found"}
+                </div>
+                <div style={{ fontSize: 13, color: C.body, marginBottom: 20 }}>
+                  {hasSearch && hasCatFilter
+                    ? (isKo ? "검색어와 카테고리 필터를 모두 초기화해 보세요" : "Try clearing the search and category filter")
+                    : hasSearch
+                      ? (isKo ? "다른 검색어를 입력해 보세요" : "Try a different search term")
+                      : (isKo ? "다른 카테고리를 선택해 보세요" : "Try a different category")}
+                </div>
+                <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                  {hasSearch && (
+                    <button
+                      onClick={() => setSearch("")}
+                      style={{
+                        padding: "9px 18px", borderRadius: 8, border: `1px solid ${C.border}`,
+                        background: "#fff", fontSize: 13, fontFamily: F, color: C.navy,
+                        cursor: "pointer", fontWeight: 500,
+                      }}>
+                      {isKo ? "검색 초기화" : "Clear search"}
+                    </button>
+                  )}
+                  {hasCatFilter && (
+                    <button
+                      onClick={() => setCatFilter("All")}
+                      style={{
+                        padding: "9px 18px", borderRadius: 8, border: "none",
+                        background: C.purple, fontSize: 13, fontFamily: F, color: "#fff",
+                        cursor: "pointer", fontWeight: 600,
+                      }}>
+                      {isKo ? "전체 보기" : "View all"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })() : filtered.map(job => (
+            <PanelJobCard
               key={job.id}
               job={job}
               status={applyState[job.id] || "none"}
@@ -348,156 +468,3 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
   );
 }
 
-function MatchBadge({ score, isKo }) {
-  const pct = Math.min(100, Math.round((score / 8) * 100));
-  let color, bg;
-  if (pct >= 70) { color = C.successText; bg = C.successBg; }
-  else if (pct >= 40) { color = "#92650a"; bg = "rgba(251,191,36,0.12)"; }
-  else { color = C.body; bg = "rgba(0,0,0,0.05)"; }
-  return (
-    <span style={{ fontSize: 11, fontWeight: 600, color, background: bg, padding: "2px 8px", borderRadius: 6, flexShrink: 0 }}>
-      {isKo ? `${pct}% 일치` : `${pct}% match`}
-    </span>
-  );
-}
-
-function JobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, go }) {
-  const remaining = job.total - job.filled;
-  const fillPct = Math.round((job.filled / job.total) * 100);
-  const isConfirmed = status === "confirmed";
-  const isApplied = status !== "none";
-  const isUrgent = job.urgent || remaining <= 10;
-
-  return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 12,
-        border: isRecommended ? `1.5px solid ${C.purpleLight}` : `1px solid ${C.border}`,
-        overflow: "hidden",
-        transition: "transform 0.12s ease-out, filter 0.12s ease-out",
-      }}
-      onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.01)"; e.currentTarget.style.filter = "brightness(1.02)"; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.filter = "brightness(1)"; }}
-    >
-      <div style={{ padding: isMobile ? "14px 16px" : "18px 22px" }}>
-
-        {/* Header row: company + badges / reward */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", flex: 1, minWidth: 0, paddingRight: 10 }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: C.body, whiteSpace: "nowrap" }}>{job.company}</span>
-            {isUrgent && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#dc2626", background: "rgba(220,38,38,0.07)", padding: "2px 7px", borderRadius: 6, whiteSpace: "nowrap" }}>
-                {isKo ? "⚡ 마감 임박" : "⚡ Closing"}
-              </span>
-            )}
-            {isRecommended && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: C.purple, background: C.purpleBg, padding: "2px 7px", borderRadius: 6, whiteSpace: "nowrap" }}>
-                {isKo ? "★ 추천" : "★ Matched"}
-              </span>
-            )}
-          </div>
-          <div style={{ textAlign: "right", flexShrink: 0 }}>
-            <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: C.purple, lineHeight: 1 }}>{job.reward}</div>
-            <div style={{ fontSize: 11, color: C.body, marginTop: 3, display: "flex", alignItems: "center", gap: 3, justifyContent: "flex-end" }}>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={C.body} strokeWidth="1.4" strokeLinecap="round"><circle cx="5" cy="5" r="4"/><path d="M5 3v2l1.5 1.5"/></svg>
-              {job.duration}
-            </div>
-          </div>
-        </div>
-
-        {/* Title */}
-        <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 700, color: C.navy, lineHeight: 1.4, marginBottom: 8, wordBreak: "keep-all", overflowWrap: "break-word" }}>
-          {job.title}
-        </div>
-
-        {/* Description — always visible, 2-line clamp */}
-        {job.description && (
-          <p style={{
-            fontSize: 13, color: C.body, lineHeight: 1.65, margin: "0 0 10px",
-            display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
-          }}>
-            {job.description}
-          </p>
-        )}
-
-        {/* Conditions + deadline chips */}
-        <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 12 }}>
-          {job.conditions.map(c => (
-            <span key={c} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(0,0,0,0.04)", color: C.navy, fontWeight: 500, border: "1px solid rgba(0,0,0,0.06)" }}>{c}</span>
-          ))}
-          <span style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(0,0,0,0.04)", color: C.body, border: "1px solid rgba(0,0,0,0.06)" }}>~{job.deadline}</span>
-        </div>
-
-        {/* Match + fill row */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, minWidth: 0 }}>
-          <MatchBadge score={job._matchScore} isKo={isKo} />
-          <div style={{ flex: 1, minWidth: 0, height: 5, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" }}>
-            <div style={{ height: "100%", borderRadius: 2, width: `${fillPct}%`, background: fillPct >= 80 ? C.ruby : C.purple, transition: "width 0.3s" }} />
-          </div>
-          <span style={{ fontSize: 11, color: isUrgent ? "#dc2626" : C.body, fontWeight: isUrgent ? 600 : 400, whiteSpace: "nowrap", flexShrink: 0 }}>
-            {isKo ? `${remaining}자리 남음` : `${remaining} left`}
-          </span>
-        </div>
-
-        {/* CTA */}
-        {isConfirmed ? (
-          <div style={{ display: "flex", gap: 8 }}>
-            <div style={{ flex: 1, padding: "10px 14px", background: "rgba(22,163,74,0.07)", borderRadius: 8, border: "1px solid rgba(22,163,74,0.2)", display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#15803d" }}>{isKo ? "참여 확정됐어요!" : "Confirmed — you're in!"}</span>
-            </div>
-            <button onClick={() => go("consent")} style={{ padding: "10px 20px", background: C.purple, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: F, whiteSpace: "nowrap" }}>
-              {isKo ? "시작하기 " : "Start "}<span className="ba">→</span>
-            </button>
-          </div>
-        ) : isApplied ? (
-          <div style={{ padding: "10px 14px", background: C.purpleBg, borderRadius: 8, border: `1px solid ${C.purple}20` }}>
-            {(() => {
-              const steps = isKo
-                ? ["지원 완료", "AI 심사중", "확정 대기"]
-                : ["Applied", "AI Review", "Confirming"];
-              const stepIdx = status === "applied" ? 1 : 2;
-              return (
-                <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
-                  {steps.map((label, i) => {
-                    const done = i < stepIdx;
-                    const active = i === stepIdx;
-                    return (
-                      <div key={i} style={{ display: "flex", alignItems: "center", flex: i < steps.length - 1 ? 1 : "none" }}>
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                          <div style={{
-                            width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
-                            background: done ? C.purple : active ? C.purple : "rgba(0,0,0,0.08)",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            fontSize: 10, color: "#fff", fontWeight: 700,
-                          }}>
-                            {done ? "✓" : i + 1}
-                          </div>
-                          <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? C.purple : done ? C.purple : C.body, whiteSpace: "nowrap" }}>{label}</span>
-                        </div>
-                        {i < steps.length - 1 && (
-                          <div style={{ flex: 1, height: 2, background: done ? C.purple : "rgba(0,0,0,0.08)", margin: "0 4px", marginBottom: 14, borderRadius: 1 }} />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
-          </div>
-        ) : (
-          <button
-            onClick={e => { e.stopPropagation(); onApply(); }}
-            style={{ width: "100%", padding: "11px 14px", borderRadius: 8, border: "none", background: C.purple, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: F, transition: "background 0.12s" }}
-            onMouseEnter={e => e.currentTarget.style.background = C.purpleHover}
-            onMouseLeave={e => e.currentTarget.style.background = C.purple}
-          >
-            {isKo ? "지원하기 " : "Apply Now "}<span className="ba">→</span>
-          </button>
-        )}
-
-      </div>
-    </div>
-  );
-}
