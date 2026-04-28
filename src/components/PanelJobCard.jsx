@@ -252,8 +252,7 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
             display: "flex", alignItems: "center", gap: 4,
             background: "none", border: "none", cursor: "pointer",
             fontSize: 12, fontWeight: 600, color: catColor.text,
-            fontFamily: F, padding: "10px 0", marginBottom: 2,
-            minHeight: 44,
+            fontFamily: F, padding: "6px 0", marginBottom: 2,
           }}
         >
           <span style={{

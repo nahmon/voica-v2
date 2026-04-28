@@ -149,7 +149,17 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
       <GlobalNav go={go} variant="app" user={user} logout={logout} lang={lang} />
       <div style={{ padding: "10px 24px", background: C.white, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Btn variant="ghost" size="sm" onClick={() => go("dashboard")}>← {isKo ? "대시보드" : "Dashboard"}</Btn>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {onLangChange && (
+            <div style={{ display: "flex", gap: 2, marginRight: 4 }}>
+              {[["ko", "KO"], ["en", "EN"]].map(([code, label]) => (
+                <button key={code} onClick={() => onLangChange(code)}
+                  style={{ fontSize: 11, fontWeight: lang === code ? 600 : 400, color: lang === code ? C.purple : C.body, background: lang === code ? C.purpleBg : "transparent", border: `1px solid ${lang === code ? C.purpleLight : C.border}`, borderRadius: 5, padding: "3px 8px", cursor: "pointer", fontFamily: F, transition: "all 0.12s" }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
           <Btn variant="ghost" size="sm" onClick={() => go("editor")}>{isKo ? "인터뷰 편집" : "Edit interview"}</Btn>
           <Btn size="sm" onClick={() => go("report")}>{isKo ? "리포트 보기" : "View report"}</Btn>
         </div>

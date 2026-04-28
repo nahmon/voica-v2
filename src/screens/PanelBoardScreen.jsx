@@ -240,7 +240,7 @@ export default function PanelBoardScreen({ go, user, logout, lang = "ko", onLang
                 const isRecommendedCat = c === "Recommended";
                 return (
                   <button key={c} onClick={() => setCatFilter(c)} style={{
-                    padding: "6px 12px", borderRadius: 20, fontSize: 12, fontFamily: F, cursor: "pointer",
+                    padding: "5px 10px", borderRadius: 20, fontSize: 12, fontFamily: F, cursor: "pointer",
                     border: `1px solid ${active ? C.purple : C.border}`,
                     background: active ? C.purple : "#fff",
                     color: active ? "#fff" : C.body,
