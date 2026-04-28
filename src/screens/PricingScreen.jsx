@@ -29,19 +29,43 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
       .then(({ data }) => setIsPro(data?.status === "active"));
   }, [user]);
 
-  const proKrwMonthly = 199000;
-  const proKrwYearlyMonthly = 159000;
-  const proKrwYearlyTotal = proKrwYearlyMonthly * 12;
-  const proMonthly = 149;
-  const proYearlyMonthly = Math.round(proMonthly * 0.8);
-  const proYearlyTotal = proYearlyMonthly * 12;
+  // Starter
+  const starterKrwMonthly = 59000;
+  const starterKrwYearlyMonthly = 44000;
+  const starterKrwYearlyTotal = starterKrwYearlyMonthly * 12;
+  const starterDisplayPrice = isKo
+    ? (billing === "yearly" ? `₩${starterKrwYearlyMonthly.toLocaleString("ko-KR")}/월` : `₩${starterKrwMonthly.toLocaleString("ko-KR")}/월`)
+    : (billing === "yearly" ? "$34/mo" : "$44/mo");
+  const starterDisplaySub = billing === "yearly"
+    ? (isKo ? `연 ₩${starterKrwYearlyTotal.toLocaleString("ko-KR")} 결제 · 25% 절약` : `$408 billed annually · save 25%`)
+    : (isKo ? "월간 결제 · 언제든 취소" : "Billed monthly · cancel anytime");
+  const starterPlanId = billing === "yearly" ? "starter_yearly" : "starter_monthly";
 
+  // Pro
+  const proKrwMonthly = 149000;
+  const proKrwYearlyMonthly = 89000;
+  const proKrwYearlyTotal = proKrwYearlyMonthly * 12;
   const proDisplayPrice = isKo
     ? (billing === "yearly" ? `₩${proKrwYearlyMonthly.toLocaleString("ko-KR")}/월` : `₩${proKrwMonthly.toLocaleString("ko-KR")}/월`)
-    : (billing === "yearly" ? `$${proYearlyMonthly}/mo` : `$${proMonthly}/mo`);
+    : (billing === "yearly" ? "$66/mo" : "$110/mo");
   const proDisplaySub = billing === "yearly"
-    ? (isKo ? `연 ₩${proKrwYearlyTotal.toLocaleString("ko-KR")} 결제 · 20% 절약` : `$${proYearlyTotal} billed annually · save 20%`)
+    ? (isKo ? `연 ₩${proKrwYearlyTotal.toLocaleString("ko-KR")} 결제 · 40% 절약` : `$792 billed annually · save 40%`)
     : (isKo ? "월간 결제 · 언제든 자유롭게 취소" : "Billed monthly · cancel anytime");
+  const proPlanId = billing === "yearly" ? "pro_yearly" : "pro_monthly";
+
+  const starterFeatures = isKo ? [
+    "월 100개 응답 포함",
+    "AI 기본 분석 · 키워드 추출",
+    "인터뷰 5개",
+    "데이터 6개월 보관",
+    "이메일 지원",
+  ] : [
+    "100 responses/mo included",
+    "AI basic analysis · keyword extraction",
+    "Up to 5 interviews",
+    "6 months data retention",
+    "Email support",
+  ];
 
   const proFeatures = isKo ? [
     "월 500개 응답 포함 (초과 시 응답당 ₩660)",
@@ -69,15 +93,18 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
     "99.9% SLA", "Auto-generated PPT slides", "Slack & Notion integration",
   ];
 
-  const handleProStart = () => {
+  const handlePlanStart = (planId) => {
     if (!user) {
       localStorage.setItem("voica_after_login", "payment_subscribe");
       go("advertiser_login");
       return;
     }
     sessionStorage.setItem("voica_billing", billing);
+    sessionStorage.setItem("voica_plan_id", planId);
     go("payment_subscribe");
   };
+
+  const handleProStart = () => handlePlanStart(proPlanId);
 
   const handleCreditPurchase = async (pkg) => {
     if (!user) {
@@ -146,23 +173,42 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
               <button key={val} onClick={() => setBilling(val)}
                 style={{ padding: "6px 20px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: billing === val ? 600 : 400, background: billing === val ? C.white : "transparent", color: billing === val ? C.navy : C.body, boxShadow: billing === val ? S.ambient : "none", transition: "all 0.15s" }}>
                 {label}
-                {val === "yearly" && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: C.success }}>{isKo ? "20% 할인" : "20% off"}</span>}
+                {val === "yearly" && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: C.success }}>{isKo ? "최대 40% 할인" : "up to 40% off"}</span>}
               </button>
             ))}
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2,1fr)", gap: 20, alignItems: "stretch", maxWidth: 780, margin: "0 auto 60px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16, alignItems: "stretch", maxWidth: 1000, margin: "0 auto 60px" }}>
+          {/* Starter */}
+          <div onMouseEnter={() => setHoveredCard("starter")} onMouseLeave={() => setHoveredCard(null)}
+            style={{ background: C.white, border: `1.5px solid ${hoveredCard === "starter" ? C.purple : C.border}`, borderRadius: 20, padding: "28px 24px", display: "flex", flexDirection: "column", transform: hoveredCard === "starter" ? "scale(1.015)" : "scale(1)", transition: "transform 0.15s ease-out, border-color 0.15s ease-out" }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 8, letterSpacing: 0.5 }}>Starter</div>
+            <div style={{ fontSize: 30, fontWeight: 800, color: C.navy, lineHeight: 1, marginBottom: 4 }}>{starterDisplayPrice}</div>
+            <div style={{ fontSize: 11, color: C.body, marginBottom: 24 }}>{starterDisplaySub}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24, flex: 1 }}>
+              {starterFeatures.map(f => (
+                <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <span style={{ color: C.success, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ fontSize: 13, color: C.body, lineHeight: 1.45 }}>{f}</span>
+                </div>
+              ))}
+            </div>
+            <Btn full variant="ghost" onClick={() => handlePlanStart(starterPlanId)}>
+              {isKo ? "Starter 시작하기 →" : "Start Starter →"}
+            </Btn>
+          </div>
+
           {/* Pro */}
           <div onMouseEnter={() => setHoveredCard("pro")} onMouseLeave={() => setHoveredCard(null)}
-            style={{ background: C.white, border: `2px solid ${C.purple}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.elevated, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "pro" ? "scale(1.015)" : "scale(1)", filter: hoveredCard === "pro" ? "brightness(1.03)" : "brightness(1)", transition: "transform 0.15s ease-out, filter 0.15s ease-out" }}>
+            style={{ background: C.white, border: `2px solid ${C.purple}`, borderRadius: 20, padding: "28px 24px", position: "relative", display: "flex", flexDirection: "column", transform: hoveredCard === "pro" ? "scale(1.02)" : "scale(1.01)", transition: "transform 0.15s ease-out" }}>
             <div style={{ position: "absolute", top: 14, right: 14 }}>
               <span style={{ fontSize: 10, fontWeight: 700, background: C.purpleBg, color: C.purple, padding: "3px 8px", borderRadius: 4 }}>{isKo ? "인기" : "Most popular"}</span>
             </div>
             <div style={{ fontSize: 12, fontWeight: 600, color: C.purple, marginBottom: 8, letterSpacing: 0.5 }}>Pro</div>
-            <div style={{ fontSize: 36, fontWeight: 800, color: C.navy, lineHeight: 1, marginBottom: 4 }}>{proDisplayPrice}</div>
-            <div style={{ fontSize: 12, color: C.body, marginBottom: 28 }}>{proDisplaySub}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, flex: 1 }}>
+            <div style={{ fontSize: 30, fontWeight: 800, color: C.navy, lineHeight: 1, marginBottom: 4 }}>{proDisplayPrice}</div>
+            <div style={{ fontSize: 11, color: C.body, marginBottom: 24 }}>{proDisplaySub}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24, flex: 1 }}>
               {proFeatures.map(f => (
                 <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                   <span style={{ color: C.success, flexShrink: 0, marginTop: 1 }}>✓</span>
@@ -170,31 +216,26 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
                 </div>
               ))}
             </div>
-            <Btn full
-              onClick={isPro ? undefined : handleProStart}
-              disabled={isPro || paying === "pro"}
-              style={isPro ? { background: C.success, cursor: "default" } : {}}>
-              {isPro
-                ? (isKo ? "✓ Pro 구독 중" : "✓ Subscribed")
-                : paying === "pro" ? (isKo ? "연결 중..." : "Loading...") : (isKo ? "Pro 구독 시작하기 →" : "Start Pro →")}
+            <Btn full onClick={isPro ? undefined : handleProStart} disabled={isPro} style={isPro ? { background: C.success, cursor: "default" } : {}}>
+              {isPro ? (isKo ? "✓ Pro 구독 중" : "✓ Subscribed") : (isKo ? "Pro 구독 시작하기 →" : "Start Pro →")}
             </Btn>
           </div>
 
           {/* Enterprise */}
           <div onMouseEnter={() => setHoveredCard("enterprise")} onMouseLeave={() => setHoveredCard(null)}
-            style={{ background: C.white, border: `1.5px solid ${hoveredCard === "enterprise" ? C.purple : C.border}`, borderRadius: 20, padding: "32px 28px", boxShadow: S.standard, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", transform: hoveredCard === "enterprise" ? "scale(1.015)" : "scale(1)", filter: hoveredCard === "enterprise" ? "brightness(1.03)" : "brightness(1)", transition: "transform 0.15s ease-out, filter 0.15s ease-out, border-color 0.15s ease-out" }}>
+            style={{ background: C.white, border: `1.5px solid ${hoveredCard === "enterprise" ? C.purple : C.border}`, borderRadius: 20, padding: "28px 24px", display: "flex", flexDirection: "column", transform: hoveredCard === "enterprise" ? "scale(1.015)" : "scale(1)", transition: "transform 0.15s ease-out, border-color 0.15s ease-out" }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: C.body, marginBottom: 8, letterSpacing: 0.5 }}>Enterprise</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: C.navy, lineHeight: 1.2, marginBottom: 4 }}>{isKo ? "맞춤 요금" : "Custom pricing"}</div>
-            <div style={{ fontSize: 12, color: C.body, marginBottom: 28 }}>{isKo ? "연간 계약 · 대량 할인 가능" : "Annual contract · volume discounts available"}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, flex: 1 }}>
+            <div style={{ fontSize: 11, color: C.body, marginBottom: 24 }}>{isKo ? "연간 계약 · 대량 할인" : "Annual contract · volume discounts"}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24, flex: 1 }}>
               {enterpriseFeatures.map(f => (
                 <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                   <span style={{ color: C.success, flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: 13, color: C.navy, lineHeight: 1.45 }}>{f}</span>
+                  <span style={{ fontSize: 13, color: C.body, lineHeight: 1.45 }}>{f}</span>
                 </div>
               ))}
             </div>
-            <Btn full onClick={() => go("support")}>{isKo ? "영업팀 문의 →" : "Contact sales →"}</Btn>
+            <Btn full variant="ghost" onClick={() => go("support")}>{isKo ? "영업팀 문의 →" : "Contact sales →"}</Btn>
           </div>
         </div>
 

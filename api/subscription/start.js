@@ -2,7 +2,7 @@
 import { supabase } from "../_supabase.js";
 import { rateLimit, getIp } from "../_rateLimit.js";
 import { issueBillingKey, chargeBillingKey } from "../lib/toss.js";
-import { PRO_PLAN, PRO_PLAN_YEARLY } from "../lib/plans.js";
+import { getPlanById, PRO_PLAN } from "../lib/plans.js";
 import { nanoid } from "../lib/nanoid.js";
 
 export default async function handler(req, res) {
@@ -18,9 +18,16 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: "Unauthorized" });
 
-  const { authKey, customerKey, billing } = req.body ?? {};
+  const { authKey, customerKey, billing, planId } = req.body ?? {};
   if (!authKey || !customerKey) return res.status(400).json({ error: "authKey, customerKey 필요" });
-  const plan = billing === "yearly" ? PRO_PLAN_YEARLY : PRO_PLAN;
+  // planId explicitly sent → look it up; fallback to billing toggle for legacy
+  let plan;
+  if (planId) {
+    plan = getPlanById(planId);
+    if (!plan) return res.status(400).json({ error: "Invalid planId" });
+  } else {
+    plan = billing === "yearly" ? { ...PRO_PLAN, id: "pro_yearly", name: "Voica Pro 연간 구독", amount: 1068000 } : PRO_PLAN;
+  }
 
   // customerKey는 반드시 user.id여야 함
   if (customerKey !== user.id) return res.status(400).json({ error: "Invalid customerKey" });

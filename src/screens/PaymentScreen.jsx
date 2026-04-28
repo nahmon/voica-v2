@@ -24,10 +24,15 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
       const tossPayments = await loadTossPayments(VITE_TOSS_CLIENT_KEY);
       // customerKey = user.id (UUID) — 서버에서 검증
       const billing = sessionStorage.getItem("voica_billing") || "monthly";
+      const planId = sessionStorage.getItem("voica_plan_id") || null;
       const payment = tossPayments.payment({ customerKey: user.id });
+      const successUrl = new URL(`${window.location.origin}/payment/success`);
+      successUrl.searchParams.set("type", "subscription");
+      successUrl.searchParams.set("billing", billing);
+      if (planId) successUrl.searchParams.set("planId", planId);
       await payment.requestBillingAuth({
         method: "CARD",
-        successUrl: `${window.location.origin}/payment/success?type=subscription&billing=${billing}`,
+        successUrl: successUrl.toString(),
         failUrl: `${window.location.origin}/pricing`,
         customerEmail: user.email ?? "",
       });
