@@ -16,7 +16,7 @@ const ALLOWED_MIME_TYPES = new Set([
 // Allowed fields in verifyData to prevent unexpected field injection
 const ALLOWED_VERIFY_FIELDS = new Set(["file_data", "mime_type", "file_name"]);
 
-const ALLOWED_CAREER_FIELDS = new Set(["domain", "industry", "years_exp", "job_title"]);
+const ALLOWED_CAREER_FIELDS = new Set(["domain", "industry", "years_exp", "job_title", "company_name", "company_size", "degree"]);
 
 async function getAuthUser(req) {
   const token = req.headers.authorization?.replace("Bearer ", "");

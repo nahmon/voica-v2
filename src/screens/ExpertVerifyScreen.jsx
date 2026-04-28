@@ -268,6 +268,22 @@ const EXPERT_YEARS = [
   { value: "6to10", label: "6~10년" },
   { value: "gt10", label: "10년+" },
 ];
+const EXPERT_COMPANY_SIZES = [
+  { value: "startup", label: "스타트업 (1~50인)" },
+  { value: "sme", label: "중소기업 (51~300인)" },
+  { value: "mid", label: "중견기업 (301~1000인)" },
+  { value: "large", label: "대기업 (1000인+)" },
+  { value: "public", label: "공공기관/비영리" },
+  { value: "freelance", label: "프리랜서/자영업" },
+];
+const EXPERT_DEGREES = [
+  { value: "high_school", label: "고졸" },
+  { value: "associate", label: "전문학사" },
+  { value: "bachelor", label: "학사" },
+  { value: "master", label: "석사" },
+  { value: "phd", label: "박사" },
+  { value: "none", label: "해당 없음" },
+];
 
 function EVPill({ children, active, onClick }) {
   return (
@@ -307,6 +323,9 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
   const [industry, setIndustry] = useState(null);
   const [yearsExp, setYearsExp] = useState(null);
   const [jobTitle, setJobTitle] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companySize, setCompanySize] = useState(null);
+  const [degree, setDegree] = useState(null);
 
   useEffect(() => {
     if (!user) { setProfileStatus("none"); return; }
@@ -386,7 +405,7 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ method: selectedMethod, data, career_info: { domain, industry, years_exp: yearsExp, job_title: jobTitle.trim() || null } }),
+        body: JSON.stringify({ method: selectedMethod, data, career_info: { domain, industry, years_exp: yearsExp, job_title: jobTitle.trim() || null, company_name: companyName.trim() || null, company_size: companySize, degree } }),
       });
 
       if (!res.ok) throw new Error("Request failed");
@@ -427,7 +446,7 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
                 status={profileStatus}
                 lang={lang}
                 note={reviewerNote}
-                onReApply={() => { setProfileStatus("none"); setSelectedMethod(null); setStep(1); setDomain(null); setIndustry(null); setYearsExp(null); setJobTitle(""); }}
+                onReApply={() => { setProfileStatus("none"); setSelectedMethod(null); setStep(1); setDomain(null); setIndustry(null); setYearsExp(null); setJobTitle(""); setCompanyName(""); setCompanySize(null); setDegree(null); }}
                 go={go}
               />
             </div>
@@ -522,6 +541,27 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
                       onBlur={e => e.target.style.borderColor = C.border}
                     />
                   </div>
+                  <div style={{ marginTop: 20 }}>
+                    <label style={{ fontSize: 12, fontWeight: 500, color: C.label, display: "block", marginBottom: 6 }}>
+                      {isKo ? "재직/재직 중인 회사명 (선택)" : "Company name (optional)"}
+                    </label>
+                    <input
+                      type="text"
+                      value={companyName}
+                      onChange={e => setCompanyName(e.target.value)}
+                      placeholder={isKo ? "예: 삼성전자, 카카오" : "e.g. Kakao, Samsung"}
+                      maxLength={100}
+                      style={{ width: "100%", padding: "10px 12px", minHeight: 44, borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => e.target.style.borderColor = C.purple}
+                      onBlur={e => e.target.style.borderColor = C.border}
+                    />
+                  </div>
+                  <EVStepSection title={isKo ? "회사 규모 (선택)" : "Company size (optional)"} style={{ marginTop: 20 }}>
+                    {EXPERT_COMPANY_SIZES.map(s => <EVPill key={s.value} active={companySize === s.value} onClick={() => setCompanySize(prev => prev === s.value ? null : s.value)}>{s.label}</EVPill>)}
+                  </EVStepSection>
+                  <EVStepSection title={isKo ? "최종 학력 (선택)" : "Education (optional)"} style={{ marginTop: 20 }}>
+                    {EXPERT_DEGREES.map(d => <EVPill key={d.value} active={degree === d.value} onClick={() => setDegree(prev => prev === d.value ? null : d.value)}>{d.label}</EVPill>)}
+                  </EVStepSection>
                   <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
                     <Btn variant="ghost" size="lg" onClick={() => setStep(1)} style={{ flex: 1 }}>{isKo ? "이전" : "Back"}</Btn>
                     <Btn size="lg" disabled={!yearsExp} onClick={() => setStep(3)} style={{ flex: 2 }}>{isKo ? "다음" : "Next"}</Btn>
