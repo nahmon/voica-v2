@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     const orderId = `voica_sub_${nanoid(12)}_${Date.now()}`;
     const newStart = new Date(sub.current_period_end);
     const newEnd = new Date(newStart);
-    if (sub.plan_id === "pro_yearly") {
+    if (sub.plan_id.endsWith("_yearly")) {
       newEnd.setFullYear(newEnd.getFullYear() + 1);
     } else {
       newEnd.setMonth(newEnd.getMonth() + 1);
