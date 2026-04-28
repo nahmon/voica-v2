@@ -52,9 +52,10 @@ const TermsScreen          = lazy(() => import("./screens/TermsScreen.jsx"));
 const PrivacyScreen        = lazy(() => import("./screens/PrivacyScreen.jsx"));
 const AboutScreen          = lazy(() => import("./screens/AboutScreen.jsx"));
 const BillingSuccessScreen = lazy(() => import("./screens/BillingSuccessScreen.jsx"));
-const ExpertVerifyScreen   = lazy(() => import("./screens/ExpertVerifyScreen.jsx"));
-const PaymentScreen        = lazy(() => import("./screens/PaymentScreen.jsx"));
-const PaymentSuccessScreen = lazy(() => import("./screens/PaymentSuccessScreen.jsx"));
+const ExpertVerifyScreen      = lazy(() => import("./screens/ExpertVerifyScreen.jsx"));
+const PaymentScreen           = lazy(() => import("./screens/PaymentScreen.jsx"));
+const PaymentSuccessScreen    = lazy(() => import("./screens/PaymentSuccessScreen.jsx"));
+const InterviewPublishScreen  = lazy(() => import("./screens/InterviewPublishScreen.jsx"));
 
 function OAuthErrorHandler() {
   const { showToast } = useToast();
@@ -93,6 +94,10 @@ function ResponsesRoute(props) {
   const { id } = useParams();
   return <ResponsesScreen {...props} interviewId={id} />;
 }
+function PublishRoute(props) {
+  const { id } = useParams();
+  return <InterviewPublishScreen {...props} interviewId={id} />;
+}
 
 function AppRoutes() {
   const [user, setUser] = useState(null);
@@ -108,6 +113,7 @@ function AppRoutes() {
     window.scrollTo(0, 0);
     if (code !== undefined) setShareCode(code);
     if (screen === "editor")           { navigate(id ? `/editor/${id}` : "/editor"); return; }
+    if (screen === "publish_interview") { navigate(`/publish/${id}`); return; }
     if (screen === "interview")        { navigate(`/i/${code ?? id}`); return; }
     if (screen === "consent")          { navigate("/consent", { state: { shareCode: code ?? shareCode } }); return; }
     if (screen === "report")           { navigate(`/report/${id}`); return; }
@@ -126,7 +132,7 @@ function AppRoutes() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      const _exempt = /^\/(i|report|responses)\/|^\/editor|^\/panel/;
+      const _exempt = /^\/(i|report|responses)\/|^\/editor|^\/panel|^\/publish/;
       if (session?.user && !_exempt.test(window.location.pathname)) {
         const role = session.user.user_metadata?.role;
         if (!role) navigate("/role-select");
@@ -142,7 +148,7 @@ function AppRoutes() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       if (event !== "SIGNED_IN") return;
-      const _exempt2 = /^\/(i|report|responses)\/|^\/editor|^\/panel/;
+      const _exempt2 = /^\/(i|report|responses)\/|^\/editor|^\/panel|^\/publish/;
       if (session?.user && !_exempt2.test(window.location.pathname)) {
         const role = session.user.user_metadata?.role;
         if (!role) navigate("/role-select");
@@ -195,6 +201,7 @@ function AppRoutes() {
         <Route path="/payment/subscribe" element={<PaymentScreen {...common} />} />
         <Route path="/payment/success"   element={<PaymentSuccessScreen {...common} />} />
         <Route path="/panel/expert-verify" element={<ExpertVerifyScreen {...common} />} />
+        <Route path="/publish/:id"   element={<PublishRoute {...common} />} />
         <Route path="*"              element={<LandingScreen {...common} />} />
       </Routes>
     </Suspense>
