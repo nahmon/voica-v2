@@ -71,8 +71,65 @@ export function MatchBadge({ score, isKo }) {
 }
 
 // ─── PanelJobCard ───
+function DetailSection({ job, isKo, catColor }) {
+  const tp = job.targetProfile;
+  const rows = tp ? [
+    { icon: "👤", label: isKo ? "연령" : "Age", value: tp.age },
+    { icon: "👥", label: isKo ? "성별" : "Gender", value: isKo ? (tp.gender === "Any" ? "무관" : tp.gender === "Female" ? "여성" : tp.gender === "Male" ? "남성" : tp.gender) : tp.gender },
+    { icon: "📍", label: isKo ? "지역" : "Region", value: tp.region },
+    { icon: "🎯", label: isKo ? "해당하는 분" : "Who fits", value: tp.lifestyle },
+    tp.exclude && { icon: "⛔", label: isKo ? "참여 불가" : "Excluded", value: tp.exclude },
+  ].filter(Boolean) : [];
+
+  return (
+    <div style={{
+      borderTop: `1px solid ${C.border}`,
+      marginTop: 14,
+      paddingTop: 16,
+      display: "flex", flexDirection: "column", gap: 14,
+    }}>
+      {/* Full description */}
+      {job.description && (
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: catColor.text, marginBottom: 7, letterSpacing: 0.3, textTransform: "uppercase" }}>
+            {isKo ? "인터뷰 개요" : "About this interview"}
+          </div>
+          <p style={{ fontSize: 13, color: C.navy, lineHeight: 1.72, margin: 0 }}>
+            {job.description}
+          </p>
+        </div>
+      )}
+
+      {/* Target profile */}
+      {rows.length > 0 && (
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: catColor.text, marginBottom: 9, letterSpacing: 0.3, textTransform: "uppercase" }}>
+            {isKo ? "모집 대상" : "Who we're looking for"}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {rows.map(r => (
+              <div key={r.label} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                <span style={{
+                  width: 26, height: 26, borderRadius: 6,
+                  background: catColor.bg, display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 13, flexShrink: 0,
+                }}>{r.icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: C.body, marginBottom: 1 }}>{r.label}</div>
+                  <div style={{ fontSize: 13, color: r.icon === "⛔" ? "#dc2626" : C.navy, lineHeight: 1.5 }}>{r.value}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApply, onView, go }) {
   const [hovered, setHovered] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const remaining = job.total - job.filled;
   const fillPct = Math.round((job.filled / job.total) * 100);
@@ -209,7 +266,7 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
         </div>
 
         {/* Match + fill row */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, minWidth: 0 }}>
           <MatchBadge score={job._matchScore} isKo={isKo} />
           <div style={{ flex: 1, minWidth: 0, height: 5, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{
@@ -223,7 +280,32 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
           </span>
         </div>
 
+        {/* Expand / collapse toggle */}
+        <button
+          onClick={e => { e.stopPropagation(); setExpanded(v => !v); }}
+          style={{
+            display: "flex", alignItems: "center", gap: 4,
+            background: "none", border: "none", cursor: "pointer",
+            fontSize: 12, fontWeight: 600, color: catColor.text,
+            fontFamily: F, padding: "4px 0", marginBottom: 10,
+          }}
+        >
+          <span style={{
+            display: "inline-block",
+            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s",
+            fontSize: 10,
+          }}>▼</span>
+          {expanded
+            ? (isKo ? "접기" : "Hide details")
+            : (isKo ? "상세 모집 내용 보기" : "View details")}
+        </button>
+
+        {/* Expanded detail section */}
+        {expanded && <DetailSection job={job} isKo={isKo} catColor={catColor} />}
+
         {/* CTA */}
+        <div style={{ marginTop: expanded ? 16 : 0 }}>
         {isConfirmed ? (
           <ConfirmedCTA isKo={isKo} go={go} catColor={catColor} />
         ) : isApplied ? (
@@ -238,6 +320,7 @@ export function PanelJobCard({ job, status, isRecommended, isMobile, isKo, onApp
             {isKo ? "지원하기 " : "Apply Now "}<span>→</span>
           </button>
         )}
+        </div>
 
       </div>
     </div>
