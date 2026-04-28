@@ -1,5 +1,6 @@
 import { supabase } from "./_supabase.js";
 import { rateLimit, getIp } from "./_rateLimit.js";
+import OpenAI from "openai";
 
 // Max base64 file size: 5MB (base64 overhead ~33%, so raw limit ~3.75MB)
 const MAX_FILE_DATA_B64_LEN = 5 * 1024 * 1024;
@@ -14,6 +15,8 @@ const ALLOWED_MIME_TYPES = new Set([
 
 // Allowed fields in verifyData to prevent unexpected field injection
 const ALLOWED_VERIFY_FIELDS = new Set(["file_data", "mime_type", "file_name"]);
+
+const ALLOWED_CAREER_FIELDS = new Set(["domain", "industry", "years_exp", "job_title"]);
 
 async function getAuthUser(req) {
   const token = req.headers.authorization?.replace("Bearer ", "");
@@ -79,10 +82,79 @@ export default async function handler(req, res) {
     });
   }
 
-  // ── POST: submit verification request ───────────────────────────────────
+  // ── POST: submit verification OR admin AI check ─────────────────────────
   if (req.method === "POST") {
     const user = await getAuthUser(req);
     if (!user) return res.status(401).json({ error: "Unauthorized" });
+
+    // Admin AI check action
+    if (req.body?.action === "ai_check") {
+      if (!(await isAdminUser(supabase, user.id))) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      const { user_id } = req.body;
+      if (!user_id) return res.status(400).json({ error: "user_id required" });
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("expert_verify_method, expert_verify_data")
+        .eq("id", user_id)
+        .maybeSingle();
+
+      if (!profile) return res.status(404).json({ error: "Profile not found" });
+
+      const vd = profile.expert_verify_data ?? {};
+      const careerInfo = vd.career_info ?? null;
+      const filePath = vd.file_path ?? null;
+      const mimeType = vd.mime_type ?? "";
+
+      if (!filePath) return res.status(400).json({ error: "No document on file" });
+      if (mimeType === "application/pdf") {
+        return res.status(200).json({
+          ok: true,
+          result: { match: null, notes: "PDF 파일은 자동 분석이 지원되지 않아요. 직접 확인해 주세요.", extracted: null },
+        });
+      }
+
+      // Get short-lived signed URL from Storage (never expose raw base64)
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from("expert-docs")
+        .createSignedUrl(filePath, 120);
+      if (signedError || !signedData?.signedUrl) {
+        return res.status(500).json({ error: "Failed to access document" });
+      }
+
+      try {
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const careerSummary = careerInfo
+          ? `직군: ${careerInfo.domain ?? "—"}, 산업: ${careerInfo.industry ?? "—"}, 경력: ${careerInfo.years_exp ?? "—"}, 직함: ${careerInfo.job_title ?? "—"}`
+          : "경력 정보 없음";
+
+        const chat = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          max_tokens: 400,
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `다음은 전문가 인증 서류 이미지입니다. 이미지에서 회사명, 직위/직함, 발급일을 추출하고, 아래 신청자가 제출한 경력 정보와 일치하는지 판단해 주세요.\n\n신청자 경력 정보: ${careerSummary}\n\nJSON으로만 응답: { "company": "회사명 또는 null", "title": "직위 또는 null", "issued_date": "발급일 또는 null", "match": true/false/null, "confidence": "high/medium/low", "notes": "한 줄 코멘트" }`,
+                },
+                { type: "image_url", image_url: { url: signedData.signedUrl, detail: "low" } },
+              ],
+            },
+          ],
+        });
+
+        const raw = chat.choices[0]?.message?.content ?? "";
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+        return res.status(200).json({ ok: true, result: parsed ?? { match: null, notes: raw, extracted: null } });
+      } catch (e) {
+        return res.status(500).json({ error: "AI 분석 실패: " + e.message });
+      }
+    }
 
     const { method, data: verifyData } = req.body ?? {};
 
@@ -109,18 +181,38 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid file type. Allowed: JPEG, PNG, WebP, PDF" });
     }
 
-    // [Medium] Whitelist allowed fields — strip unexpected keys before storing
-    const safeVerifyData = {};
-    for (const key of ALLOWED_VERIFY_FIELDS) {
-      if (verifyData[key] !== undefined) safeVerifyData[key] = verifyData[key];
-    }
+    // Sanitize file_name
+    let safeFileName = verifyData.file_name !== undefined
+      ? String(verifyData.file_name).replace(/\0/g, "").slice(0, 255)
+      : undefined;
 
-    // [Medium] Enforce mime_type from data URI header (prevent client-supplied mismatch)
-    safeVerifyData.mime_type = mimeMatch[1];
+    const mimeType = mimeMatch[1];
+    const ext = mimeType === "application/pdf" ? "pdf"
+      : mimeType === "image/png" ? "png"
+      : mimeType === "image/webp" ? "webp"
+      : "jpg";
 
-    // [Low] Sanitize file_name: strip null bytes, limit length
-    if (safeVerifyData.file_name !== undefined) {
-      safeVerifyData.file_name = String(safeVerifyData.file_name).replace(/\0/g, "").slice(0, 255);
+    // Upload document to Supabase Storage (never store raw base64 in DB)
+    const base64Raw = verifyData.file_data.replace(/^data:[^;]+;base64,/, "");
+    const fileBuffer = Buffer.from(base64Raw, "base64");
+    const filePath = `${user.id}/${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("expert-docs")
+      .upload(filePath, fileBuffer, { contentType: mimeType, upsert: true });
+    if (uploadError) return res.status(500).json({ error: "Failed to upload document" });
+
+    // Sanitize career_info
+    const rawCareerInfo = req.body?.career_info;
+    let safeCareerInfo = null;
+    if (rawCareerInfo && typeof rawCareerInfo === "object") {
+      safeCareerInfo = {};
+      for (const key of ALLOWED_CAREER_FIELDS) {
+        if (rawCareerInfo[key] !== undefined) {
+          safeCareerInfo[key] = typeof rawCareerInfo[key] === "string"
+            ? rawCareerInfo[key].replace(/\0/g, "").slice(0, 200)
+            : rawCareerInfo[key];
+        }
+      }
     }
 
     const { error: upsertError } = await supabase
@@ -130,7 +222,10 @@ export default async function handler(req, res) {
         expert_status: "pending",
         expert_verify_method: method,
         expert_verify_data: {
-          ...safeVerifyData,
+          file_path: filePath,
+          mime_type: mimeType,
+          ...(safeFileName ? { file_name: safeFileName } : {}),
+          ...(safeCareerInfo ? { career_info: safeCareerInfo } : {}),
           submitted_at: new Date().toISOString(),
         },
         updated_at: new Date().toISOString(),

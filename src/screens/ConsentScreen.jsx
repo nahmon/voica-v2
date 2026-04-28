@@ -28,7 +28,7 @@ function StepIndicator({ current }) {
               <span style={{ fontSize: 10, color: active ? C.purple : done ? C.success : C.body, fontWeight: active ? 600 : 400 }}>{label}</span>
             </div>
             {i < STEPS.length - 1 && (
-              <div style={{ width: 48, height: 2, background: done ? C.success : C.border, margin: "0 4px", marginBottom: 18, transition: "background 0.2s" }} />
+              <div style={{ width: "clamp(20px, 8vw, 48px)", height: 2, background: done ? C.success : C.border, margin: "0 4px", marginBottom: 18, transition: "background 0.2s" }} />
             )}
           </div>
         );
@@ -89,7 +89,7 @@ function WelcomeIllustration({ isMobile }) {
 const FAQ_ITEMS = [
   {
     q: { ko: "내 음성 데이터는 어떻게 사용되나요?", en: "How will my voice data be used?" },
-    a: { ko: "음성은 텍스트로 전환(STT)되어 리서치 분석에만 사용됩니다. 인터뷰 완료 후 1년이 지나면 자동 삭제되며, 제3자에게 판매되지 않습니다.", en: "Your voice is transcribed to text (STT) and used solely for research analysis. It is automatically deleted one year after the interview is completed and will never be sold to third parties." },
+    a: { ko: "음성은 텍스트로 전환(STT)되며, 리포트 생성을 위해 AI(OpenAI)가 익명화된 텍스트를 분석합니다. 음성 및 텍스트 원본은 리서치 분석에만 사용되고, 인터뷰 완료 후 1년이 지나면 자동 삭제되며, 제3자에게 판매되지 않습니다.", en: "Your voice is transcribed to text (STT). To generate the report, anonymized transcripts are analyzed by AI (OpenAI). The original voice and text are used solely for research analysis, automatically deleted one year after completion, and never sold to third parties." },
   },
   {
     q: { ko: "내 개인정보는 누가 받아보나요?", en: "Who receives my personal information?" },
@@ -338,9 +338,9 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
   // Step 0: Overview (welcome + info)
   if (step === 0) {
     return (
-      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
+      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F, overflowX: "hidden" }}>
         <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
-        <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
+        <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: isMobile ? "24px 16px 48px" : "32px 24px 48px", boxSizing: "border-box" }}>
           <div style={{ width: "100%", maxWidth: 540 }}>
             <StepIndicator current={0} />
             <WelcomeIllustration isMobile={isMobile} />
@@ -395,9 +395,9 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
   // Step 1: Consent
   if (step === 1) {
     return (
-      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
+      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F, overflowX: "hidden" }}>
         <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
-        <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
+        <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: isMobile ? "24px 16px 48px" : "32px 24px 48px", boxSizing: "border-box" }}>
           <div style={{ width: "100%", maxWidth: 540 }}>
             <StepIndicator current={1} />
 
@@ -466,7 +466,7 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
             </div>
 
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setStep(0)} style={{ padding: "13px 18px", borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, fontSize: 14, color: C.body, cursor: "pointer", fontFamily: F }}>Back</button>
+              <button onClick={() => setStep(0)} style={{ padding: "13px 18px", minHeight: 44, borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, fontSize: 14, color: C.body, cursor: "pointer", fontFamily: F }}>Back</button>
               <Btn full size="lg" disabled={!allRequired} onClick={() => setStep(2)}>
                 Confirm and Continue
               </Btn>
@@ -480,9 +480,9 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
 
   // Step 2: Start
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F }}>
+    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", fontFamily: F, overflowX: "hidden" }}>
       <GlobalNav go={go} variant="panel" user={user} logout={logout} lang={lang} />
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "32px 24px 48px" }}>
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: isMobile ? "24px 16px 48px" : "32px 24px 48px", boxSizing: "border-box" }}>
         <div style={{ width: "100%", maxWidth: 540 }}>
           <StepIndicator current={2} />
 
@@ -502,13 +502,13 @@ export default function ConsentScreen({ go, user, logout, shareCode, lang = "ko"
 
             {/* Summary pills */}
             <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 32, flexWrap: "wrap" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 5, background: C.white, borderRadius: 20, padding: "7px 16px", border: `1px solid ${C.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, background: C.white, borderRadius: 20, padding: "6px 14px", border: `1px solid ${C.border}` }}>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke={C.purple} strokeWidth="1.4" strokeLinecap="round">
                   <circle cx="6" cy="6" r="5" /><path d="M6 3.5v2.5l1.5 1.5" />
                 </svg>
                 <span style={{ fontSize: 12, fontWeight: 600, color: C.navy }}>~10 minutes</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 5, background: C.white, borderRadius: 20, padding: "7px 16px", border: `1px solid ${C.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, background: C.white, borderRadius: 20, padding: "6px 14px", border: `1px solid ${C.border}` }}>
                 {Ic.Coin({ s: 12, c: "#15803d" })}
                 <span style={{ fontSize: 12, fontWeight: 600, color: "#15803d" }}>Reward paid on completion</span>
               </div>

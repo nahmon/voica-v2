@@ -35,11 +35,11 @@ export default async function handler(req, res) {
   if (!interview) return res.status(404).json({ error: "Not found" });
   if (interview.user_id !== user.id) return res.status(403).json({ error: "Forbidden" });
 
-  // Fetch sessions + responses
+  // Fetch sessions + responses (no PII — per consent FAQ, identifying info is never shared)
   const { data: sessions } = await supabase
     .from("sessions")
     .select(`
-      id, created_at, status, panelist_name, panelist_email,
+      id, created_at, status,
       responses(question_id, transcript, value, created_at)
     `)
     .eq("interview_id", id)
@@ -61,9 +61,9 @@ export default async function handler(req, res) {
   const qMap = Object.fromEntries((questions ?? []).map(q => [q.id, q]));
   const sortedQIds = (questions ?? []).map(q => q.id);
 
-  // Header row
+  // Header row — no PII fields (name/email never shared per consent)
   const headers = [
-    "session_id", "panelist_name", "panelist_email", "completed_at",
+    "session_id", "completed_at",
     ...sortedQIds.map(qid => {
       const q = qMap[qid];
       return `Q${q?.order_num ?? "?"}: ${(q?.content ?? "").slice(0, 40)}`;
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
       (s.responses ?? []).map(r => [r.question_id, r.transcript ?? r.value ?? ""])
     );
     return [
-      s.id, s.panelist_name ?? "", s.panelist_email ?? "",
+      s.id,
       s.created_at ? new Date(s.created_at).toISOString() : "",
       ...sortedQIds.map(qid => respByQ[qid] ?? ""),
     ];

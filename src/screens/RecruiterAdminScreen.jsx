@@ -41,7 +41,10 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
   const [payingRewards, setPayingRewards] = useState(false);
   const [expertVerifications, setExpertVerifications] = useState([]);
   const [expertLoading, setExpertLoading] = useState(false);
-  const [expertActioning, setExpertActioning] = useState(null); // user_id being actioned
+  const [expertActioning, setExpertActioning] = useState(null);
+  const [aiChecking, setAiChecking] = useState(null);
+  const [aiResults, setAiResults] = useState({});
+  const [aiConsentPending, setAiConsentPending] = useState(null);
   const { showToast } = useToast();
   const isMobile = useIsMobile();
   const filters = ["All", "Applied", "Qualified", "Unqualified", "Completed"];
@@ -67,6 +70,25 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
       } finally { setExpertLoading(false); }
     })();
   }, [activeTab, user]);
+
+  const handleAiCheckConfirmed = async (userId) => {
+    setAiConsentPending(null);
+    setAiChecking(userId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/expert-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({ action: "ai_check", user_id: userId }),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        setAiResults(prev => ({ ...prev, [userId]: d.result }));
+      } else {
+        showToast(d.error ?? "AI 분석 실패", "error");
+      }
+    } finally { setAiChecking(null); }
+  };
 
   const handleExpertAction = async (userId, status) => {
     setExpertActioning(userId);
@@ -161,41 +183,66 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
               <div style={{ textAlign: "center", padding: "60px 0", color: C.body, fontSize: 14 }}>{isKo ? "심사 대기 중인 신청이 없어요" : "No pending verifications"}</div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {expertVerifications.map(v => (
-                  <div key={v.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 16 }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: C.navy, marginBottom: 4 }}>{v.id}</div>
-                      <div style={{ fontSize: 12, color: C.body, marginBottom: 4 }}>
-                        {isKo ? "방법" : "Method"}: <span style={{ fontWeight: 500, color: C.navy }}>{v.expert_verify_method ?? "—"}</span>
+                {expertVerifications.map(v => {
+                  const ci = v.expert_verify_data?.career_info;
+                  const aiResult = aiResults[v.id];
+                  const domainLabels = { it_dev: "IT/개발", marketing: "마케팅/광고", design: "디자인/UX", finance: "금융/회계", medical: "의료/헬스케어", education: "교육", legal: "법률", manufacturing: "제조/엔지니어링", other: "기타" };
+                  const industryLabels = { startup: "스타트업/중소기업", large_corp: "대기업/중견기업", public: "공공기관/비영리", freelance: "프리랜서/자영업" };
+                  const yearsLabels = { lt2: "~2년", "3to5": "3~5년", "6to10": "6~10년", gt10: "10년+" };
+                  return (
+                    <div key={v.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "16px 20px" }}>
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 11, color: C.body, fontFamily: "monospace", marginBottom: 6, wordBreak: "break-all" }}>{v.id}</div>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+                            {ci?.domain && <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 12, background: C.purpleBg, color: C.purple, fontWeight: 500 }}>{domainLabels[ci.domain] ?? ci.domain}</span>}
+                            {ci?.industry && <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 12, background: "#f0f9ff", color: "#0369a1", fontWeight: 500 }}>{industryLabels[ci.industry] ?? ci.industry}</span>}
+                            {ci?.years_exp && <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 12, background: C.bg, color: C.body, border: `1px solid ${C.border}` }}>{yearsLabels[ci.years_exp] ?? ci.years_exp}</span>}
+                          </div>
+                          {ci?.job_title && <div style={{ fontSize: 12, color: C.navy, fontWeight: 500, marginBottom: 4 }}>{ci.job_title}</div>}
+                          <div style={{ fontSize: 12, color: C.body }}>
+                            {isKo ? "서류" : "Method"}: <span style={{ fontWeight: 500, color: C.navy }}>{v.expert_verify_method === "employment_certificate" ? "재직증명서" : v.expert_verify_method === "health_insurance" ? "건강보험료 납부확인서" : v.expert_verify_method ?? "—"}</span>
+                            {v.expert_verify_data?.file_name && <span style={{ color: C.body }}> · {v.expert_verify_data.file_name}</span>}
+                          </div>
+                          {v.expert_verify_data?.submitted_at && (
+                            <div style={{ fontSize: 11, color: C.body, marginTop: 3 }}>
+                              신청: {new Date(v.expert_verify_data.submitted_at).toLocaleDateString("ko-KR")}
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0 }}>
+                          <div style={{ display: "flex", gap: 6 }}>
+                            <button disabled={expertActioning === v.id} onClick={() => handleExpertAction(v.id, "verified")}
+                              style={{ padding: "6px 12px", fontSize: 12, borderRadius: 6, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F, fontWeight: 500, opacity: expertActioning === v.id ? 0.6 : 1 }}>
+                              승인
+                            </button>
+                            <button disabled={expertActioning === v.id} onClick={() => handleExpertAction(v.id, "rejected")}
+                              style={{ padding: "6px 12px", fontSize: 12, borderRadius: 6, border: "1px solid rgba(217,48,37,0.25)", background: "rgba(217,48,37,0.06)", color: C.ruby, cursor: "pointer", fontFamily: F, fontWeight: 500, opacity: expertActioning === v.id ? 0.6 : 1 }}>
+                              반려
+                            </button>
+                          </div>
+                          <button disabled={aiChecking === v.id} onClick={() => setAiConsentPending(v.id)}
+                            style={{ padding: "5px 12px", fontSize: 11, borderRadius: 6, border: `1px solid ${C.purpleLight}`, background: C.purpleBg, color: C.purple, cursor: "pointer", fontFamily: F, fontWeight: 500, opacity: aiChecking === v.id ? 0.6 : 1 }}>
+                            {aiChecking === v.id ? "분석 중…" : "AI 검수"}
+                          </button>
+                        </div>
                       </div>
-                      {v.expert_verify_data?.submitted_at && (
-                        <div style={{ fontSize: 11, color: C.body }}>
-                          {isKo ? "신청일" : "Submitted"}: {new Date(v.expert_verify_data.submitted_at).toLocaleDateString("ko-KR")}
+                      {aiResult && (
+                        <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 8, background: aiResult.match === true ? C.successBg : aiResult.match === false ? "rgba(217,48,37,0.06)" : C.bg, border: `1px solid ${aiResult.match === true ? C.successBorder : aiResult.match === false ? "rgba(217,48,37,0.2)" : C.border}` }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: aiResult.notes ? 6 : 0 }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: aiResult.match === true ? C.successText : aiResult.match === false ? C.ruby : C.body }}>
+                              {aiResult.match === true ? "✓ 정보 일치" : aiResult.match === false ? "✗ 불일치 감지" : "분석 결과"}
+                            </span>
+                            {aiResult.confidence && <span style={{ fontSize: 10, color: C.body, background: C.bg, border: `1px solid ${C.border}`, padding: "1px 6px", borderRadius: 10 }}>{aiResult.confidence}</span>}
+                            {aiResult.company && <span style={{ fontSize: 11, color: C.navy, fontWeight: 500 }}>{aiResult.company}</span>}
+                            {aiResult.title && <span style={{ fontSize: 11, color: C.body }}>{aiResult.title}</span>}
+                          </div>
+                          {aiResult.notes && <div style={{ fontSize: 12, color: C.body }}>{aiResult.notes}</div>}
                         </div>
                       )}
-                      {v.expert_verify_data?.email && (
-                        <div style={{ fontSize: 12, color: C.body, marginTop: 4 }}>Email: {v.expert_verify_data.email}</div>
-                      )}
-                      {v.expert_verify_data?.file_name && (
-                        <div style={{ fontSize: 12, color: C.body, marginTop: 4 }}>{isKo ? "파일" : "File"}: {v.expert_verify_data.file_name}</div>
-                      )}
                     </div>
-                    <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                      <button
-                        disabled={expertActioning === v.id}
-                        onClick={() => handleExpertAction(v.id, "verified")}
-                        style={{ padding: "6px 14px", fontSize: 12, borderRadius: 6, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F, fontWeight: 500, opacity: expertActioning === v.id ? 0.6 : 1 }}>
-                        {isKo ? "승인" : "Approve"}
-                      </button>
-                      <button
-                        disabled={expertActioning === v.id}
-                        onClick={() => handleExpertAction(v.id, "rejected")}
-                        style={{ padding: "6px 14px", fontSize: 12, borderRadius: 6, border: "1px solid rgba(217,48,37,0.25)", background: "rgba(217,48,37,0.06)", color: C.ruby, cursor: "pointer", fontFamily: F, fontWeight: 500, opacity: expertActioning === v.id ? 0.6 : 1 }}>
-                        {isKo ? "반려" : "Reject"}
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -298,8 +345,8 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
                   <div style={{ display: "flex", gap: 8 }}>
                     {p.status === "Applied" && (
                       <>
-                        <button style={{ flex: 1, padding: "8px", fontSize: 13, borderRadius: 8, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>Approve</button>
-                        <button style={{ flex: 1, padding: "8px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(217,48,37,0.25)", background: "rgba(217,48,37,0.06)", color: C.ruby, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>Reject</button>
+                        <button style={{ flex: 1, padding: "6px 14px", fontSize: 13, borderRadius: 8, border: `1px solid ${C.successBorder}`, background: C.successBg, color: C.successText, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>Approve</button>
+                        <button style={{ flex: 1, padding: "6px 14px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(217,48,37,0.25)", background: "rgba(217,48,37,0.06)", color: C.ruby, cursor: "pointer", fontFamily: F, fontWeight: 500 }}>Reject</button>
                       </>
                     )}
                     {p.status === "Qualified" && <Btn size="sm" onClick={() => go("interview")}>Start interview</Btn>}
@@ -371,6 +418,23 @@ export default function RecruiterAdminScreen({ go, user, logout, lang = "ko", on
         )}</>)}
       </main>
       <Footer go={go} lang={lang} onLangChange={onLangChange} />
+
+      {/* AI consent modal */}
+      {aiConsentPending && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 9000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div style={{ background: C.white, borderRadius: 14, padding: "28px 24px", maxWidth: 380, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 10 }}>AI 검수 전 안내</div>
+            <div style={{ fontSize: 13, color: C.body, lineHeight: 1.7, marginBottom: 20 }}>
+              이 서류 이미지는 내용 검토를 위해 <strong>OpenAI API</strong>로 전송됩니다. 전송된 이미지는 분석 후 즉시 삭제되며 모델 학습에 사용되지 않습니다.
+              <br /><br />계속 진행하시겠습니까?
+            </div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button onClick={() => setAiConsentPending(null)} style={{ padding: "8px 18px", fontSize: 13, borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, color: C.body, cursor: "pointer", fontFamily: F }}>취소</button>
+              <button onClick={() => handleAiCheckConfirmed(aiConsentPending)} style={{ padding: "8px 18px", fontSize: 13, borderRadius: 8, border: "none", background: C.purple, color: "#fff", cursor: "pointer", fontFamily: F, fontWeight: 600 }}>AI 검수 진행</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
