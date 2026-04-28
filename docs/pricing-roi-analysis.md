@@ -124,6 +124,52 @@
 
 ---
 
+## 미국 경쟁사 벤치마킹 분석
+
+> 상세 데이터: `docs/competitor-pricing.md` 참조
+
+### 경쟁 포지셔닝 지도
+
+| 축 | Voica | VoicePanel | HeyMarvin | Dovetail | Respondent.io |
+|---|---|---|---|---|---|
+| **AI 인터뷰 직접 수행** | ✅ | ✅ | ✅ | ❌ | ❌ |
+| **분석/인사이트 저장소** | 부분 | 부분 | ✅ | ✅ | ❌ |
+| **패널 리크루팅 마켓** | ❌ | 애드온 | ❌ | ❌ | ✅ |
+| **한국어 지원** | ✅ | 29개국어 | ❌ | 제한적 | ❌ |
+| **한국 시장 특화** | ✅ | ❌ | ❌ | ❌ | ❌ |
+
+**Voica의 실제 직접 경쟁자: VoicePanel, HeyMarvin.** 나머지는 리크루팅 또는 분석 특화 도구로 용도가 다름.
+
+### 경쟁사 가격 비교 (USD 기준)
+
+| 플랜 | Voica (KRW/₩환산) | VoicePanel | HeyMarvin | Dovetail |
+|---|---|---|---|---|
+| Entry 월간 | ₩59,000 (~$43) | $99/mo | $250/mo (5인 최소) | $15/user/mo |
+| Mid 월간 | ₩149,000 (~$108) | 없음 (Custom) | $500/mo (5인 최소) | - |
+| Enterprise | 문의 | Custom | Custom | Custom |
+
+**핵심 인사이트:**
+- **Voica는 VoicePanel 대비 56% 저렴.** AI 음성 인터뷰 동급 기능에 $43 vs $99.
+- **HeyMarvin은 최소 $250/mo** — 5인 미만 팀은 진입 불가. Voica는 1인도 ₩59,000.
+- **한국 시장에서 달러 결제 장벽** 없음 — 원화 청구가 실제 전환율에서 20–30% 유리.
+
+### 가격 포지셔닝 전략 권장
+
+1. **"VoicePanel의 절반 가격"** 메시지 활용 가능 — 실제 기능 비교 시 방어 가능한 클레임
+2. **한국 리서처에게 달러 결제 없는 유일한 AI 인터뷰 플랫폼** 포지셔닝
+3. **HeyMarvin vs Voica:** HeyMarvin은 팀 최소 5인 강제 + 연간 약정. Voica는 개인도 월간 결제 가능 → 스타트업/프리랜서 리서처에게 명확한 우위
+
+### 경쟁사에서 배울 수 있는 모델
+
+| 항목 | 참고 경쟁사 | Voica 적용 방안 |
+|---|---|---|
+| 크레딧+구독 분리 | VoicePanel (recruiting credits 별도) | 현재 구조 유지, 초과 응답을 크레딧으로 처리 |
+| Free Forever 티어 | Dovetail, VoicePanel, HeyMarvin | 현재 Free 유지 (PLG 핵심) |
+| 연간 약정 할인 | HeyMarvin (연간 필수), Dovetail (20–30%) | 연간 40% 할인으로 가장 공격적인 락인 |
+| 사용량 기반 스케일 | Ethnio (pageview 기반), Respondent (session 기반) | 응답수 기반 티어 — 현재 구조 유효 |
+
+---
+
 ## 주의: Toss 결제 키 환경변수
 
 Vercel 프로덕션 배포에 아래 환경변수가 설정되어 있어야 합니다:
