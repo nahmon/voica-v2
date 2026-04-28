@@ -226,11 +226,11 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => setWithdrawStep(null)}
-                  style={{ flex: 1, padding: "10px 0", minHeight: 44, borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: F, fontSize: 13, cursor: "pointer" }}>
+                  style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: F, fontSize: 13, cursor: "pointer" }}>
                   {isKo ? "취소" : "Cancel"}
                 </button>
                 <button onClick={handleClaimAll} disabled={claimingAll}
-                  style={{ flex: 2, padding: "10px 0", minHeight: 44, borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                  style={{ flex: 2, padding: "8px 0", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                   {claimingAll ? (isKo ? "신청 중..." : "Submitting...") : (isKo ? "정산 신청" : "Submit Claim")}
                 </button>
               </div>
@@ -298,11 +298,11 @@ export default function PanelMyPageScreen({ go, user, logout, lang = "ko", onLan
             ))}
             <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
               <button onClick={() => setShowBankSetup(false)}
-                style={{ flex: 1, padding: "11px 0", minHeight: 44, borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontFamily: F, fontSize: 13, cursor: "pointer" }}>
+                style={{ flex: 1, padding: "9px 0", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontFamily: F, fontSize: 13, cursor: "pointer" }}>
                 {isKo ? "나중에" : "Later"}
               </button>
               <button onClick={handleSaveBank} disabled={savingBank || !bankForm.bank_name || !bankForm.account_number || !bankForm.account_holder}
-                style={{ flex: 2, padding: "11px 0", minHeight: 44, borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                style={{ flex: 2, padding: "9px 0", borderRadius: 8, border: "none", background: C.purple, color: C.white, fontFamily: F, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                 {savingBank ? (isKo ? "저장 중..." : "Saving...") : (isKo ? "등록하기" : "Register")}
               </button>
             </div>
