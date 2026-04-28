@@ -8,9 +8,10 @@ import { supabase } from "../supabase.js";
 const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
 
 const CREDIT_PACKAGES = [
-  { id: "credit_100k",  label: "100,000원", labelEn: "$75",  amount: 100000,  credits: "100,000크레딧", creditsEn: "100,000 credits" },
-  { id: "credit_300k",  label: "300,000원", labelEn: "$220", amount: 300000,  credits: "300,000크레딧", creditsEn: "300,000 credits", badge: "인기", badgeEn: "Popular" },
-  { id: "credit_1m",    label: "1,000,000원", labelEn: "$750", amount: 1000000, credits: "1,000,000크레딧", creditsEn: "1,000,000 credits", badge: "대용량", badgeEn: "Bulk" },
+  { id: "interview_1",  label: "₩280,000",   labelEn: "$203",  amount: 280000,  credits: "인터뷰 1건",  creditsEn: "1 interview" },
+  { id: "interview_3",  label: "₩795,000",   labelEn: "$576",  amount: 795000,  credits: "인터뷰 3건",  creditsEn: "3 interviews", badge: "인기", badgeEn: "Popular" },
+  { id: "interview_5",  label: "₩1,275,000", labelEn: "$924",  amount: 1275000, credits: "인터뷰 5건",  creditsEn: "5 interviews" },
+  { id: "interview_10", label: "₩2,380,000", labelEn: "$1,725", amount: 2380000, credits: "인터뷰 10건", creditsEn: "10 interviews", badge: "대용량", badgeEn: "Bulk" },
 ];
 
 export default function PricingScreen({ go, user, logout, lang = "ko", onLangChange }) {
@@ -29,46 +30,44 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
       .then(({ data }) => setIsPro(data?.status === "active"));
   }, [user]);
 
-  // Starter
-  const starterKrwMonthly = 59000;
-  const starterKrwYearlyMonthly = 44000;
+  // Starter (3건/mo 포함, 연간 10% 할인)
+  const starterKrwMonthly = 690000;
+  const starterKrwYearlyMonthly = 621000;
   const starterKrwYearlyTotal = starterKrwYearlyMonthly * 12;
   const starterDisplayPrice = isKo
     ? (billing === "yearly" ? `₩${starterKrwYearlyMonthly.toLocaleString("ko-KR")}/월` : `₩${starterKrwMonthly.toLocaleString("ko-KR")}/월`)
-    : (billing === "yearly" ? "$34/mo" : "$44/mo");
+    : (billing === "yearly" ? "$453/mo" : "$500/mo");
   const starterDisplaySub = billing === "yearly"
-    ? (isKo ? `연 ₩${starterKrwYearlyTotal.toLocaleString("ko-KR")} 결제 · 25% 절약` : `$408 billed annually · save 25%`)
+    ? (isKo ? `연 ₩${starterKrwYearlyTotal.toLocaleString("ko-KR")} 결제 · 10% 절약` : `$5,436 billed annually · save 10%`)
     : (isKo ? "월간 결제 · 언제든 취소" : "Billed monthly · cancel anytime");
   const starterPlanId = billing === "yearly" ? "starter_yearly" : "starter_monthly";
 
-  // Pro
-  const proKrwMonthly = 149000;
-  const proKrwYearlyMonthly = 89000;
+  // Pro (8건/mo 포함, 연간 10% 할인)
+  const proKrwMonthly = 1690000;
+  const proKrwYearlyMonthly = 1521000;
   const proKrwYearlyTotal = proKrwYearlyMonthly * 12;
   const proDisplayPrice = isKo
     ? (billing === "yearly" ? `₩${proKrwYearlyMonthly.toLocaleString("ko-KR")}/월` : `₩${proKrwMonthly.toLocaleString("ko-KR")}/월`)
-    : (billing === "yearly" ? "$66/mo" : "$110/mo");
+    : (billing === "yearly" ? "$1,102/mo" : "$1,225/mo");
   const proDisplaySub = billing === "yearly"
-    ? (isKo ? `연 ₩${proKrwYearlyTotal.toLocaleString("ko-KR")} 결제 · 40% 절약` : `$792 billed annually · save 40%`)
+    ? (isKo ? `연 ₩${proKrwYearlyTotal.toLocaleString("ko-KR")} 결제 · 10% 절약` : `$13,224 billed annually · save 10%`)
     : (isKo ? "월간 결제 · 언제든 자유롭게 취소" : "Billed monthly · cancel anytime");
   const proPlanId = billing === "yearly" ? "pro_yearly" : "pro_monthly";
 
   const starterFeatures = isKo ? [
-    "월 100개 응답 포함",
+    "인터뷰 3건/월 포함",
     "AI 기본 분석 · 키워드 추출",
-    "인터뷰 5개",
     "데이터 6개월 보관",
     "이메일 지원",
   ] : [
-    "100 responses/mo included",
+    "3 interviews/mo included",
     "AI basic analysis · keyword extraction",
-    "Up to 5 interviews",
     "6 months data retention",
     "Email support",
   ];
 
   const proFeatures = isKo ? [
-    "월 500개 응답 포함 (초과 시 응답당 ₩660)",
+    "인터뷰 8건/월 포함",
     "AI 심층 분석 · 주제 드릴다운",
     "대표 인용문 자동 추출",
     "크로스탭 분석 · 세그먼트 비교",
@@ -76,7 +75,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
     "팀원 최대 5명",
     "데이터 1년 보관",
   ] : [
-    "500 responses/mo included (then $0.49 per response)",
+    "8 interviews/mo included",
     "AI deep analysis + theme drill-down",
     "Auto-extracted representative quotes",
     "Cross-tab analysis & segment comparison",
@@ -173,7 +172,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
               <button key={val} onClick={() => setBilling(val)}
                 style={{ padding: "6px 20px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F, fontWeight: billing === val ? 600 : 400, background: billing === val ? C.white : "transparent", color: billing === val ? C.navy : C.body, boxShadow: billing === val ? S.ambient : "none", transition: "all 0.15s" }}>
                 {label}
-                {val === "yearly" && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: C.success }}>{isKo ? "최대 40% 할인" : "up to 40% off"}</span>}
+                {val === "yearly" && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: C.success }}>{isKo ? "10% 할인" : "10% off"}</span>}
               </button>
             ))}
           </div>
