@@ -106,11 +106,18 @@ export default function SupportScreen({ go, user, logout, lang = "ko", onLangCha
 
             <Btn full size="lg" style={{ marginTop: 24 }}
               disabled={!category || !email || !subject || !body}
-              onClick={() => {
-                const mailSubject = encodeURIComponent(`[${category}] ${subject}`);
-                const mailBody = encodeURIComponent(`문의 유형: ${category}\n답장 이메일: ${email}\n\n${body}`);
-                window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${mailSubject}&body=${mailBody}`;
-                setSent(true);
+              onClick={async () => {
+                try {
+                  const res = await fetch("/api/support", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ category, email, subject, body }),
+                  });
+                  if (!res.ok) throw new Error("Failed");
+                  setSent(true);
+                } catch {
+                  alert(isKo ? "전송에 실패했어요. 직접 이메일로 문의해 주세요." : "Send failed. Please email us directly.");
+                }
               }}>
               {isKo ? "메시지 보내기" : "Send message"}
             </Btn>
