@@ -43,8 +43,10 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
         go("pricing");
       } else {
         console.error("[payment] billingAuth error:", e?.code, e?.message, e);
+        try { console.error("[payment] full error JSON:", JSON.stringify(e, Object.getOwnPropertyNames(e))); } catch (_) {}
         const code = e?.code ? ` (${e.code})` : "";
-        setError((e?.message || (isKo ? "결제창을 열 수 없습니다." : "Could not open payment.")) + code);
+        const detail = e?.data ? ` | ${JSON.stringify(e.data)}` : "";
+        setError((e?.message || (isKo ? "결제창을 열 수 없습니다." : "Could not open payment.")) + code + detail);
       }
     }
   };
