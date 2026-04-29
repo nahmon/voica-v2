@@ -497,7 +497,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
                         return (
                           <div key={r.id} style={{ borderBottom: idx < clips.length - 1 ? `1px solid ${C.border}` : "none", paddingBottom: idx < clips.length - 1 ? 16 : 0 }}>
                             <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>{sess?.respondent?.name || sess?.panelist_name || (isKo ? `참여자 ${sessNum}` : `Respondent ${sessNum}`)}</div>
-                            <VoicePlayer audioUrl={r.audio_url} transcript={r.transcript} />
+                            <VoicePlayer audioUrl={r.audio_url} responseId={r.id} transcript={r.transcript} />
                           </div>
                         );
                       })}
@@ -622,7 +622,7 @@ function QuestionAnswer({ question, response, index, lang = "ko" }) {
 }
 
 function VoiceAnswer({ response }) {
-  return <VoicePlayer audioUrl={response.audio_url} transcript={response.transcript} />;
+  return <VoicePlayer audioUrl={response.audio_url} responseId={response.id} transcript={response.transcript} />;
 }
 
 function MCAnswer({ response, question }) {

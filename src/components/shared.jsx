@@ -607,11 +607,13 @@ export function Footer({ go, lang = "en", onLangChange, tagline }) {
 }
 
 // ─── VoicePlayer — shared audio player (used in ResponsesScreen and ReportScreen) ───
-export function VoicePlayer({ audioUrl, transcript, dark = false }) {
+export function VoicePlayer({ audioUrl, responseId, transcript, dark = false }) {
   const audioRef = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [resolvedUrl, setResolvedUrl] = useState(audioUrl);
+  const [loadError, setLoadError] = useState(false);
 
   const fmt = s => {
     if (!isFinite(s) || s < 0) return "0:00";
@@ -620,16 +622,36 @@ export function VoicePlayer({ audioUrl, transcript, dark = false }) {
     return `${m}:${String(sec).padStart(2, "0")}`;
   };
 
-  const toggle = () => {
+  const fetchFreshUrl = async () => {
+    if (!responseId) return null;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return null;
+      const res = await fetch(`/api/storage?response_id=${responseId}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (!res.ok) return null;
+      const { audio_url } = await res.json();
+      return audio_url ?? null;
+    } catch { return null; }
+  };
+
+  const toggle = async () => {
     const a = audioRef.current;
     if (!a) return;
-    if (playing) { a.pause(); setPlaying(false); }
-    else { a.play().catch(() => {}); setPlaying(true); }
+    if (playing) { a.pause(); setPlaying(false); return; }
+    // If we had an error or no URL yet, try fetching a fresh signed URL
+    if ((loadError || !resolvedUrl) && responseId) {
+      const fresh = await fetchFreshUrl();
+      if (fresh) { setResolvedUrl(fresh); setLoadError(false); }
+    }
+    a.play().catch(() => {});
+    setPlaying(true);
   };
 
   const download = () => {
     const a = document.createElement("a");
-    a.href = audioUrl;
+    a.href = resolvedUrl ?? audioUrl;
     a.download = "voice-clip.webm";
     a.target = "_blank";
     document.body.appendChild(a);
@@ -651,18 +673,19 @@ export function VoicePlayer({ audioUrl, transcript, dark = false }) {
   const textMuted = dark ? "rgba(255,255,255,0.35)" : C.body;
   const textMain = dark ? "#e2e8f0" : C.navy;
 
-  if (!audioUrl && !transcript) return <div style={{ fontSize: 13, color: textMuted, fontStyle: "italic" }}>No recording</div>;
+  if (!audioUrl && !responseId && !transcript) return <div style={{ fontSize: 13, color: textMuted, fontStyle: "italic" }}>No recording</div>;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      {audioUrl && (
+      {(resolvedUrl || responseId) && (
         <>
           <audio
             ref={audioRef}
-            src={audioUrl}
+            src={resolvedUrl ?? undefined}
             onTimeUpdate={e => setCurrent(e.target.currentTime)}
-            onLoadedMetadata={e => setDuration(e.target.duration)}
+            onLoadedMetadata={e => { setDuration(e.target.duration); setLoadError(false); }}
             onEnded={() => { setPlaying(false); setCurrent(0); }}
+            onError={() => setLoadError(true)}
           />
           <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: bg, borderRadius: 10, border: `1px solid ${border}` }}>
             <button
