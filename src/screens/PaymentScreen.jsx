@@ -32,17 +32,21 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
       successUrl.searchParams.set("type", "subscription");
       successUrl.searchParams.set("billing", billing);
       if (planId) successUrl.searchParams.set("planId", planId);
+      const customerName = user.user_metadata?.full_name || user.email?.split("@")[0] || "고객";
       await payment.requestBillingAuth({
         method: "CARD",
         successUrl: successUrl.toString(),
         failUrl: `${window.location.origin}/pricing`,
         customerEmail: user.email ?? "",
+        customerName,
       });
     } catch (e) {
-      if (e?.code !== "USER_CANCEL") {
-        setError(e?.message || (isKo ? "결제창을 열 수 없습니다." : "Could not open payment."));
-      } else {
+      if (e?.code === "USER_CANCEL") {
         go("pricing");
+      } else {
+        console.error("[payment] billingAuth error:", e?.code, e?.message, e);
+        const code = e?.code ? ` (${e.code})` : "";
+        setError((e?.message || (isKo ? "결제창을 열 수 없습니다." : "Could not open payment.")) + code);
       }
     }
   };
