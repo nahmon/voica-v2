@@ -411,6 +411,7 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
       if (!res.ok) throw new Error("Request failed");
       setSubmitted(true);
       setProfileStatus("pending");
+      setTimeout(() => go("panel_board"), 2500);
     } catch {
       showToast(isKo ? "제출 중 오류가 발생했어요. 다시 시도해주세요." : "Submission failed. Please try again.", "error");
     } finally {
@@ -461,6 +462,9 @@ export default function ExpertVerifyScreen({ go, user, lang = "ko", onLangChange
                 </div>
                 <div style={{ fontSize: 22, fontWeight: 600, color: C.navy, marginBottom: 10 }}>{t.successTitle}</div>
                 <div style={{ fontSize: 14, color: C.body, lineHeight: 1.7, marginBottom: 28 }}>{t.successDesc}</div>
+                <div style={{ fontSize: 12, color: C.body, marginTop: -20, marginBottom: 28, opacity: 0.7 }}>
+                  {isKo ? "잠시 후 패널 보드로 이동합니다…" : "Redirecting to panel board…"}
+                </div>
                 <Btn onClick={() => go("panel_board")}>{t.backToPanel}</Btn>
               </div>
             </div>
