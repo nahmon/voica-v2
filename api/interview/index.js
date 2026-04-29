@@ -53,6 +53,7 @@ export default async function handler(req, res) {
     const interviewUpdate = { title, incentive: incentive ?? null, expert_only: req.body.expert_only ?? false, status: "active" };
     if (slack_webhook_url !== undefined) interviewUpdate.slack_webhook_url = slack_webhook_url || null;
     if (reward_amount !== undefined) interviewUpdate.reward_amount = reward_amount;
+    if (req.body.ends_at !== undefined) interviewUpdate.ends_at = req.body.ends_at || null;
     await supabase.from("interviews").update(interviewUpdate).eq("id", id);
 
     // Get current question IDs in DB

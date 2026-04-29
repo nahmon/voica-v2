@@ -69,6 +69,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   const [loadingExisting, setLoadingExisting] = useState(!!interviewId);
   const [copied, setCopied] = useState(false);
   const [slackWebhookUrl, setSlackWebhookUrl] = useState("");
+  const [endsAt, setEndsAt] = useState("");
   const [addTypeOpen, setAddTypeOpen] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
@@ -123,7 +124,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
     (async () => {
       try {
         const [{ data: iv }, { data: qs }] = await Promise.all([
-          supabase.from("interviews").select("id, title, incentive, share_code, expert_only, slack_webhook_url").eq("id", interviewId).single(),
+          supabase.from("interviews").select("id, title, incentive, share_code, expert_only, slack_webhook_url, ends_at").eq("id", interviewId).single(),
           supabase.from("questions").select("*").eq("interview_id", interviewId).order("order_num"),
         ]);
         if (iv) {
@@ -136,6 +137,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           if (iv.share_code) setShareCode(iv.share_code);
           setExpertOnly(iv.expert_only ?? false);
           setSlackWebhookUrl(iv.slack_webhook_url ?? "");
+          if (iv.ends_at) setEndsAt(iv.ends_at.slice(0, 10));
         }
         if (qs && qs.length > 0) {
           const loaded = qs.map(q => ({ id: q.id, type: q.type, content: q.content, options: q.options, stimulus: q.stimulus, followup_enabled: q.followup_enabled !== false }));
@@ -317,6 +319,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         expert_only: expertOnly,
         incentive: rewardAmount > 0 ? `₩${rewardAmount.toLocaleString("ko-KR")}` : null,
         reward_amount: rewardAmount,
+        ends_at: endsAt || null,
         questions: questions.map((q, i) => ({
           id: q.id,
           order_num: i + 1,
@@ -638,6 +641,13 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
             <span style={{ position: "absolute", top: 2, left: expertOnly ? 18 : 2, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s", display: "block" }} />
           </button>
         </div>
+        <div style={{ marginTop: 8, padding: "10px 12px", borderRadius: 8, border: `1px solid ${C.border}` }}>
+          <div style={{ fontSize: 10, fontWeight: 500, color: C.label, marginBottom: 6 }}>마감일 (선택)</div>
+          <input type="date" value={endsAt} min={new Date().toISOString().slice(0, 10)}
+            onChange={e => { setEndsAt(e.target.value); if (editingId) supabase.from("interviews").update({ ends_at: e.target.value || null }).eq("id", editingId); }}
+            style={{ width: "100%", boxSizing: "border-box", padding: "6px 8px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 12, fontFamily: F, color: C.navy, background: C.white, outline: "none" }} />
+          {endsAt && <div style={{ fontSize: 10, color: C.body, marginTop: 4 }}>{new Date(endsAt).toLocaleDateString("ko-KR")} 자정에 자동 마감</div>}
+        </div>
       </div>
       {/* Question tabs */}
       <div style={{ display: "flex", gap: 6, padding: "10px 16px", overflowX: "auto", background: C.white, borderBottom: `1px solid ${C.border}` }}>
@@ -803,6 +813,14 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               >
                 <span style={{ position: "absolute", top: 2, left: expertOnly ? 20 : 2, width: 18, height: 18, borderRadius: "50%", background: "white", transition: "left 0.2s", display: "block" }} />
               </button>
+            </div>
+            {/* Ends-at date picker */}
+            <div style={{ marginTop: 10, padding: "12px 14px", borderRadius: 8, border: `1px solid ${C.border}` }}>
+              <div style={{ fontSize: 11, fontWeight: 500, color: C.label, marginBottom: 8 }}>마감일 (선택)</div>
+              <input type="date" value={endsAt} min={new Date().toISOString().slice(0, 10)}
+                onChange={e => { setEndsAt(e.target.value); if (editingId) supabase.from("interviews").update({ ends_at: e.target.value || null }).eq("id", editingId); }}
+                style={{ width: "100%", boxSizing: "border-box", padding: "8px 10px", borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: F, color: C.navy, background: C.white, outline: "none" }} />
+              {endsAt && <div style={{ fontSize: 11, color: C.body, marginTop: 6 }}>{new Date(endsAt).toLocaleDateString("ko-KR")} 자정에 자동 마감</div>}
             </div>
           </div>
 
