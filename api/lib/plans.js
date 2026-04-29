@@ -1,25 +1,25 @@
 export const STARTER_PLAN = {
   id: "starter_monthly",
   name: "Voica Starter 월간 구독",
-  amount: 690000,
+  amount: 750000,
 };
 
 export const STARTER_PLAN_YEARLY = {
   id: "starter_yearly",
   name: "Voica Starter 연간 구독",
-  amount: 7452000, // 621,000 × 12 (10% off)
+  amount: 8100000, // 675,000 × 12 (10% off)
 };
 
 export const PRO_PLAN = {
   id: "pro_monthly",
   name: "Voica Pro 월간 구독",
-  amount: 1690000,
+  amount: 1990000,
 };
 
 export const PRO_PLAN_YEARLY = {
   id: "pro_yearly",
   name: "Voica Pro 연간 구독",
-  amount: 18252000, // 1,521,000 × 12 (10% off)
+  amount: 21492000, // 1,791,000 × 12 (10% off)
 };
 
 // 인터뷰 건 단위 단건 결제
