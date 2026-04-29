@@ -89,7 +89,15 @@ export default function PaymentSuccessScreen({ go, user, logout, lang = "ko" }) 
             <h2 style={{ fontSize: 20, fontWeight: 700, color: C.navy, margin: 0 }}>
               {isKo ? "결제 확인 중 오류가 발생했어요" : "Payment confirmation failed"}
             </h2>
-            <p style={{ color: C.body, fontSize: 14, margin: 0 }}>{error}</p>
+            <p style={{ color: C.body, fontSize: 14, margin: 0 }}>
+              {isKo
+                ? "결제 중 오류가 발생했어요. 잠시 후 다시 시도하거나 고객지원에 문의해주세요."
+                : "An error occurred during payment. Please try again or contact support."}
+            </p>
+            <details style={{ fontSize: 12, color: C.body, maxWidth: 400, textAlign: "left" }}>
+              <summary style={{ cursor: "pointer", userSelect: "none" }}>{isKo ? "오류 상세 보기" : "Error details"}</summary>
+              <p style={{ marginTop: 6, wordBreak: "break-all" }}>{error}</p>
+            </details>
             <button
               onClick={() => go("pricing")}
               style={{ marginTop: 8, padding: "12px 24px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: F }}>

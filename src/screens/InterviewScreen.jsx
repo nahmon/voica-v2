@@ -812,11 +812,12 @@ export default function InterviewScreen({ go, shareCode }) {
         <div style={{ fontSize: isMobile ? 26 : 32, fontWeight: 700, color: C.white, marginBottom: 10 }}>인터뷰 완료!</div>
         <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: interview.incentive ? 12 : 20 }}>{isMobile ? "감사합니다! 답변이 저장됐어요." : <>소중한 의견 감사드려요.<br />답변이 안전하게 저장됐어요.</>}</div>
         {interview.incentive && (
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.3)", marginBottom: 20, textAlign: "left" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 16px", borderRadius: 10, background: "rgba(21,190,83,0.1)", border: "1px solid rgba(21,190,83,0.3)", marginBottom: 20, textAlign: "left" }}>
             <span style={{ fontSize: 20, flexShrink: 0 }}>🎁</span>
             <div>
               <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(21,190,83,0.9)", marginBottom: 2 }}>참여 리워드</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.8)" }}>{interview.incentive}</div>
+              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", marginBottom: 6 }}>{interview.incentive}</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>리워드 수령 방법은 인터뷰 주최자가 별도로 안내드립니다.</div>
             </div>
           </div>
         )}
@@ -843,10 +844,10 @@ export default function InterviewScreen({ go, shareCode }) {
           {shareCopied ? "✓ 복사됨!" : "🔗 완료 공유하기"}
         </button>
 
-        {/* Primary CTA — go back */}
-        <button onClick={() => go("landing")}
+        {/* Primary CTA — close window */}
+        <button onClick={() => { if (window.opener || window.history.length <= 1) { window.close(); } else { go("landing"); } }}
           style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "13px 20px", borderRadius: 10, border: "none", background: C.purple, color: C.white, fontSize: 15, fontWeight: 600, fontFamily: F, cursor: "pointer", marginBottom: 24, width: "100%" }}>
-          홈으로 →
+          창 닫기
         </button>
 
         {/* Powered by Voice Survey footer */}

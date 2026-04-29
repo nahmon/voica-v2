@@ -44,7 +44,7 @@ const TRANSLATIONS = {
       ],
       rows: [
         { label: "Timeline", before: "~2 weeks", after: "10 minutes to launch" },
-        { label: "Cost", before: "$2,000+/project", after: "$149~/mo" },
+        { label: "Cost", before: "$2,000+/project", after: "$544~/mo" },
         { label: "Sample", before: "10 participants", after: "500 parallel" },
         { label: "Analysis", before: "Manual transcription", after: "Automated, by-theme" },
         { label: "Recruiting", before: "Agency dependent", after: "Matched in-platform" },
@@ -74,7 +74,7 @@ const TRANSLATIONS = {
     },
     cta: {
       title: "Start your first interview\ntoday.",
-      subtitle: "100 voice interviews free. No credit card required.",
+      subtitle: "Free plan available. No credit card required.",
       cta1: "Start free →",
       cta2: "Contact sales",
     },
@@ -115,7 +115,7 @@ const TRANSLATIONS = {
       ],
       rows: [
         { label: "기간", before: "약 2주", after: "10분 안에 시작" },
-        { label: "비용", before: "₩2,600,000+/프로젝트", after: "₩199,000~/월" },
+        { label: "비용", before: "₩2,600,000+/프로젝트", after: "₩750,000~/월" },
         { label: "표본", before: "10명", after: "500명 동시" },
         { label: "분석", before: "직접 전사", after: "자동화, 주제별" },
         { label: "모집", before: "대행사 의존", after: "플랫폼 내 매칭" },
@@ -145,7 +145,7 @@ const TRANSLATIONS = {
     },
     cta: {
       title: "오늘 오후에 첫 인터뷰를\n돌려보세요.",
-      subtitle: "음성 인터뷰 100건 무료. 카드 등록 불필요.",
+      subtitle: "무료 플랜 제공. 카드 등록 불필요.",
       cta1: "무료로 시작 →",
       cta2: "영업팀 문의",
     },

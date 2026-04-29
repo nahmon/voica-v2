@@ -3,6 +3,8 @@ import { C, S, F, Ic } from "../lib/constants.jsx";
 import { Btn, Input, GlobalNav, Footer } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
+const SUPPORT_EMAIL = "voica.support@gmail.com";
+
 export default function SupportScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
   const [category, setCategory] = useState("");
@@ -104,7 +106,12 @@ export default function SupportScreen({ go, user, logout, lang = "ko", onLangCha
 
             <Btn full size="lg" style={{ marginTop: 24 }}
               disabled={!category || !email || !subject || !body}
-              onClick={() => setSent(true)}>
+              onClick={() => {
+                const mailSubject = encodeURIComponent(`[${category}] ${subject}`);
+                const mailBody = encodeURIComponent(`문의 유형: ${category}\n답장 이메일: ${email}\n\n${body}`);
+                window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${mailSubject}&body=${mailBody}`;
+                setSent(true);
+              }}>
               {isKo ? "메시지 보내기" : "Send message"}
             </Btn>
 
