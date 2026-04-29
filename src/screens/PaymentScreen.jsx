@@ -28,17 +28,15 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
       localStorage.removeItem("voica_billing");
       localStorage.removeItem("voica_plan_id");
       const payment = tossPayments.payment({ customerKey: user.id });
-      const successUrl = new URL(`${window.location.origin}/payment/success`);
+      const successUrl = new URL(`https://voicesurvey.app/payment/success`);
       successUrl.searchParams.set("type", "subscription");
       successUrl.searchParams.set("billing", billing);
       if (planId) successUrl.searchParams.set("planId", planId);
-      const customerName = user.user_metadata?.full_name || user.email?.split("@")[0] || "고객";
       await payment.requestBillingAuth({
         method: "CARD",
         successUrl: successUrl.toString(),
-        failUrl: `${window.location.origin}/pricing`,
+        failUrl: `https://voicesurvey.app/pricing`,
         customerEmail: user.email ?? "",
-        customerName,
       });
     } catch (e) {
       if (e?.code === "USER_CANCEL") {
