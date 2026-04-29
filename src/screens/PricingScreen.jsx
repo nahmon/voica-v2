@@ -145,7 +145,7 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
               ))}
             </div>
             <Btn full variant="ghost" onClick={() => handlePlanStart(starterPlanId)}>
-              {isKo ? "Starter 시작하기 →" : "Start Starter →"}
+              {isKo ? "Starter 시작하기 →" : "Get Started →"}
             </Btn>
           </div>
 

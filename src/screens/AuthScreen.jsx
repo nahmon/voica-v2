@@ -16,6 +16,7 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
   const [loading, setLoading] = useState(false);
   const [resetMode, setResetMode] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [signupSent, setSignupSent] = useState(false);
   const [socialMsg, setSocialMsg] = useState("");
 
   const handleResetPassword = async (e) => {
@@ -59,13 +60,7 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
     if (error) {
       setAuthError(error.message);
     } else {
-      const afterLogin = localStorage.getItem("voica_after_login");
-      if (afterLogin && role !== "panel") {
-        localStorage.removeItem("voica_after_login");
-        go(afterLogin);
-        return;
-      }
-      go(role === "panel" ? "panel_entry" : "dashboard");
+      setSignupSent(true);
     }
   };
 
@@ -182,7 +177,22 @@ export default function AdvertiserLoginScreen({ go, lang = "ko" }) {
               </>
             )}
 
-            {tab === "signup" && (
+            {tab === "signup" && signupSent && (
+              <div style={{ textAlign: "center", padding: "24px 8px" }}>
+                <div style={{ fontSize: 36, marginBottom: 16 }}>📧</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: C.navy, marginBottom: 8 }}>이메일을 확인해주세요</div>
+                <div style={{ fontSize: 13, color: C.body, lineHeight: 1.7 }}>
+                  <strong>{email}</strong>로 가입 확인 링크를 발송했어요.<br />
+                  받은 편지함을 확인하고 링크를 클릭해 주세요.
+                </div>
+                <div style={{ marginTop: 20 }}>
+                  <span onClick={() => { setSignupSent(false); setTab("login"); }} style={{ fontSize: 12, color: C.purple, cursor: "pointer" }}>
+                    로그인으로 돌아가기
+                  </span>
+                </div>
+              </div>
+            )}
+            {tab === "signup" && !signupSent && (
               <>
                 <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
                   <Input label="이름" placeholder="홍길동" value={name} onChange={e => setName(e.target.value)} />

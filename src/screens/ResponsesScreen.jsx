@@ -247,7 +247,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
           <button aria-label={isKo ? "응답 목록으로 돌아가기" : "Back to responses"} onClick={() => setSelectedSession(null)}
             style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: C.navy, padding: "0 4px", lineHeight: 1 }}>←</button>
           <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {selectedSession.panelist_name || (isKo ? `참여자 ${sessionIdx}` : `Respondent ${sessionIdx}`)}
+            {selectedSession.respondent?.name || selectedSession.panelist_name || (isKo ? `참여자 ${sessionIdx}` : `Respondent ${sessionIdx}`)}
           </div>
           <Btn size="sm" onClick={() => go("report", interviewId)}>{isKo ? "리포트" : "Report"}</Btn>
         </div>
@@ -319,7 +319,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
                   {originalIdx + 1}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>{s.panelist_name || (isKo ? `참여자 ${originalIdx + 1}` : `Respondent ${originalIdx + 1}`)}</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: C.navy, marginBottom: 2 }}>{s.respondent?.name || s.panelist_name || (isKo ? `참여자 ${originalIdx + 1}` : `Respondent ${originalIdx + 1}`)}</div>
                   <div style={{ fontSize: 12, color: C.body }}>{dt} · {isKo ? `${respCount}개 응답` : `${respCount} responses`}</div>
                 </div>
                 <div style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 10, whiteSpace: "nowrap", background: isCompleted ? "rgba(21,190,83,0.12)" : "#fef3c7", color: isCompleted ? C.successText : "#92400e" }}>
@@ -417,7 +417,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
                     <div style={{ width: 20, height: 20, borderRadius: "50%", background: isCompleted ? "rgba(21,190,83,0.12)" : "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600, color: isCompleted ? C.successText : "#92650a", flexShrink: 0 }}>
                       {originalIdx + 1}
                     </div>
-                    <span style={{ flex: 1, fontSize: 12, color: isSelected ? C.purple : C.navy }}>{s.panelist_name || (isKo ? `참여자 ${originalIdx + 1}` : `Respondent ${originalIdx + 1}`)}</span>
+                    <span style={{ flex: 1, fontSize: 12, color: isSelected ? C.purple : C.navy }}>{s.respondent?.name || s.panelist_name || (isKo ? `참여자 ${originalIdx + 1}` : `Respondent ${originalIdx + 1}`)}</span>
                     <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 8, background: isCompleted ? "rgba(21,190,83,0.12)" : "#fef3c7", color: isCompleted ? C.successText : "#92400e" }}>{isCompleted ? (isKo ? "완료" : "Done") : (isKo ? "진행중" : "Active")}</span>
                   </div>
                 );
@@ -431,7 +431,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
                       {originalIdx + 1}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, color: isSelected ? C.purple : C.navy, fontWeight: isSelected ? 500 : 400 }}>{s.panelist_name || (isKo ? `참여자 ${originalIdx + 1}` : `Respondent ${originalIdx + 1}`)}</div>
+                      <div style={{ fontSize: 13, color: isSelected ? C.purple : C.navy, fontWeight: isSelected ? 500 : 400 }}>{s.respondent?.name || s.panelist_name || (isKo ? `참여자 ${originalIdx + 1}` : `Respondent ${originalIdx + 1}`)}</div>
                       <div style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 8, display: "inline-block", background: isCompleted ? "rgba(21,190,83,0.12)" : "#fef3c7", color: isCompleted ? C.successText : "#92400e" }}>{isCompleted ? (isKo ? "완료" : "Completed") : (isKo ? "진행 중" : "In progress")}</div>
                     </div>
                     <div style={{ fontSize: 10, color: C.body, textAlign: "right", flexShrink: 0 }}>
@@ -470,7 +470,7 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
                         const sessNum = sessions.indexOf(sess) + 1;
                         return (
                           <div key={r.id} style={{ borderBottom: idx < clips.length - 1 ? `1px solid ${C.border}` : "none", paddingBottom: idx < clips.length - 1 ? 16 : 0 }}>
-                            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>{sess?.panelist_name || (isKo ? `참여자 ${sessNum}` : `Respondent ${sessNum}`)}</div>
+                            <div style={{ fontSize: 11, color: C.body, marginBottom: 8 }}>{sess?.respondent?.name || sess?.panelist_name || (isKo ? `참여자 ${sessNum}` : `Respondent ${sessNum}`)}</div>
                             <VoicePlayer audioUrl={r.audio_url} transcript={r.transcript} />
                           </div>
                         );

@@ -1087,7 +1087,7 @@ export default function InterviewScreen({ go, shareCode }) {
                     </div>
                   ) : (
                     <div style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>탭해서 답변 시작</div>
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>{isMobile ? "탭해서 시작" : "클릭 또는 Space로 시작"}</div>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginTop: 2 }}>최소 {MIN_RECORD_SECS}초 이상 답변해 주세요</div>
                       {!isMobile && (
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 10 }}>

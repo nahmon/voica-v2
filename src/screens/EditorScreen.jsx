@@ -520,7 +520,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <Btn size="sm" onClick={handleSave} disabled={saving}>
-            {saving ? "저장 중…" : editingId ? "저장" : "링크 생성"}
+            {saving ? "저장 중…" : "저장하기"}
           </Btn>
           <button aria-label="추가 메뉴" aria-expanded={showMobileMenu} onClick={() => setShowMobileMenu(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", fontSize: 20, color: C.navy, lineHeight: 1, minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>⋯</button>
         </div>
@@ -575,7 +575,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           onMouseEnter={() => setShowSaveTooltip(true)}
           onMouseLeave={() => setShowSaveTooltip(false)}>
           <Btn size="sm" onClick={handleSave} disabled={saving}>
-            {saving ? "저장 중…" : editingId ? "저장하기" : "링크 생성 →"}
+            {saving ? "저장 중…" : "저장하기"}
           </Btn>
           {showSaveTooltip && (
             <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: C.navy, color: C.white, fontSize: 11, padding: "4px 8px", borderRadius: 6, whiteSpace: "nowrap", zIndex: 200, pointerEvents: "none" }}>
@@ -588,10 +588,13 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   );
 
   const ShareLinkBar = shareCode && editingId && (
-    <div style={{ background: "rgba(83,58,253,0.06)", borderBottom: `1px solid rgba(83,58,253,0.15)`, padding: isMobile ? "8px 12px" : "8px 16px", display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+    <div style={{ background: "rgba(83,58,253,0.06)", borderBottom: `1px solid rgba(83,58,253,0.15)`, padding: isMobile ? "8px 12px" : "8px 16px", display: "flex", alignItems: "center", gap: 8, minWidth: 0, flexWrap: "wrap" }}>
       <span style={{ fontSize: 12, color: C.purple, fontWeight: 500, flexShrink: 0 }}>공유 링크</span>
       <span style={{ flex: 1, minWidth: 0, fontSize: 12, color: C.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFeatureSettings: '"tnum"' }}>{shareUrl}</span>
-      <Btn size="sm" variant="ghost" onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px", flexShrink: 0 }}>{copied ? "Copied ✓" : "Copy"}</Btn>
+      <Btn size="sm" variant="ghost" onClick={handleCopy} style={{ fontSize: 11, padding: "3px 10px", flexShrink: 0 }}>{copied ? "복사됨 ✓" : "링크 복사"}</Btn>
+      <span style={{ fontSize: 11, color: "rgba(140,90,0,0.9)", background: "rgba(180,120,0,0.08)", padding: "2px 8px", borderRadius: 10, flexShrink: 0, whiteSpace: "nowrap" }}>
+        💡 AI 리포트는 응답 10개 이상 시 생성 가능
+      </span>
     </div>
   );
 

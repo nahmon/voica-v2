@@ -202,11 +202,11 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                 : (isKo ? "기간 종료 후 무료 플랜으로 전환됩니다." : "You'll be moved to the free plan at period end.")}
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-              <button onClick={() => setShowCancelModal(false)} style={{ padding: "10px 20px", minHeight: 44, borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
-                {isKo ? "유지하기" : "Keep Pro"}
-              </button>
               <button onClick={handleCancelSubscription} disabled={canceling} style={{ padding: "10px 24px", minHeight: 44, borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontSize: 13, fontWeight: 600, fontFamily: F, cursor: canceling ? "not-allowed" : "pointer", opacity: canceling ? 0.7 : 1 }}>
                 {canceling ? (isKo ? "처리 중..." : "Processing...") : (isKo ? "해지하기" : "Cancel subscription")}
+              </button>
+              <button onClick={() => setShowCancelModal(false)} style={{ padding: "10px 20px", minHeight: 44, borderRadius: 10, border: `1px solid ${C.border}`, background: "transparent", color: C.body, fontSize: 13, fontFamily: F, cursor: "pointer" }}>
+                {isKo ? "유지하기" : "Keep Pro"}
               </button>
             </div>
           </div>
@@ -449,7 +449,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
                   )}
                   {p.status === "draft" && <Btn size="sm" onClick={e => { e.stopPropagation(); go("publish_interview", p.id); }}>{isKo ? "공개하기" : "Publish"}</Btn>}
                   {p.status !== "closed" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("editor", p.id); }}>{isKo ? "수정" : "Edit"}</Btn>}
-                  {p.status === "active" && <Btn variant="ghost" size="sm" onClick={e => handleStatusChange(e, p.id, "closed")}>{isKo ? "마감" : "Close"}</Btn>}
+                  {p.status === "active" && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); if (!window.confirm(isKo ? "마감하면 더 이상 응답을 받을 수 없어요. 계속할까요?" : "Closing will stop accepting responses. Continue?")) return; handleStatusChange(e, p.id, "closed"); }}>{isKo ? "마감" : "Close"}</Btn>}
                   {sessionCount > 0 && <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); go("responses", p.id); }}>{isKo ? "응답 보기" : "View Responses"}</Btn>}
                   {p.status === "closed" && <Btn size="sm" onClick={e => { e.stopPropagation(); go("report", p.id); }}>{isKo ? "리포트" : "Report"}</Btn>}
                 </div>
