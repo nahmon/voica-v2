@@ -17,7 +17,9 @@ async function prewarmTts(supabase, questions) {
         const { data: { publicUrl } } = supabase.storage.from("tts-cache").getPublicUrl(`${q.id}.mp3`);
         await supabase.from("questions").update({ tts_url: publicUrl }).eq("id", q.id);
       }
-    } catch {}
+    } catch (e) {
+      console.error("[prewarmTts] failed for q=", q.id, e.message);
+    }
   }));
 }
 
@@ -102,13 +104,13 @@ export default async function handler(req, res) {
   if (!title) return res.status(400).json({ error: "title required" });
 
   // Generate unique share_code
-  let share_code, attempts = 0;
-  do {
-    share_code = nanoid(8);
-    const { data } = await supabase.from("interviews").select("id").eq("share_code", share_code).maybeSingle();
-    if (!data) break;
-    attempts++;
-  } while (attempts < 5);
+  let share_code;
+  for (let attempts = 0; attempts < 5; attempts++) {
+    const candidate = nanoid(8);
+    const { data } = await supabase.from("interviews").select("id").eq("share_code", candidate).maybeSingle();
+    if (!data) { share_code = candidate; break; }
+  }
+  if (!share_code) return res.status(500).json({ error: "Failed to generate unique share code. Please try again." });
 
   // Create interview
   const { data: interview, error: ivError } = await supabase

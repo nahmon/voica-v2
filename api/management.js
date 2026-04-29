@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { supabase } from "./_supabase.js";
 import { rateLimit, getIp } from "./_rateLimit.js";
+import { PRO_PLAN, PRO_PLAN_YEARLY } from "./lib/plans.js";
 
 const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY;
 const ADMIN_IDS = (process.env.ADMIN_USER_IDS ?? "").split(",").map(s => s.trim()).filter(Boolean);
@@ -27,7 +28,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "paymentKey, orderId, amount required" });
     }
 
-    const VALID_AMOUNTS = { monthly: 199000, yearly: 1908000 };
+    const VALID_AMOUNTS = { monthly: PRO_PLAN.amount, yearly: PRO_PLAN_YEARLY.amount };
     const expectedAmount = VALID_AMOUNTS[billingCycle];
     if (!expectedAmount || Number(amount) !== expectedAmount) {
       return res.status(400).json({ error: "Invalid payment amount" });

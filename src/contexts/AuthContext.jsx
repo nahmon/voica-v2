@@ -1,3 +1,5 @@
+// NOTE: This file is not currently used — App.jsx manages auth state directly.
+// Keeping for potential future use. If removing, also update any imports.
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../supabase.js";

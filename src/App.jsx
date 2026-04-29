@@ -6,9 +6,10 @@ import { ToastProvider, useToast } from "./components/shared.jsx";
 import OnboardingModal from "./components/OnboardingModal.jsx";
 
 class ErrorBoundary extends Component {
-  constructor(props) { super(props); this.state = { error: null }; }
+  constructor(props) { super(props); this.state = { error: null, errorInfo: null }; }
   static getDerivedStateFromError(error) { return { error }; }
-  componentDidCatch(error) {
+  componentDidCatch(error, errorInfo) {
+    this.setState({ errorInfo });
     // Stale chunk after new deploy — reload to get fresh assets
     if (error?.message?.includes("Failed to fetch dynamically imported module") ||
         error?.message?.includes("Importing a module script failed") ||
@@ -22,9 +23,15 @@ class ErrorBoundary extends Component {
         this.state.error?.message?.includes("Importing a module script failed");
       if (isChunkError) return null; // reloading
       return (
-        <div style={{ padding: 32, fontFamily: "monospace", color: "#c00" }}>
-          <strong>Render error:</strong> {this.state.error?.message}<br />
-          <pre style={{ fontSize: 11, marginTop: 8, whiteSpace: "pre-wrap" }}>{this.state.error?.stack}</pre>
+        <div style={{ padding: 40, textAlign: "center", fontFamily: "sans-serif" }}>
+          <h2>오류가 발생했습니다</h2>
+          <p style={{ color: "#666" }}>페이지를 새로고침하거나 잠시 후 다시 시도해주세요.</p>
+          {import.meta.env.DEV && (
+            <pre style={{ textAlign: "left", fontSize: 12, color: "#c00", marginTop: 20 }}>
+              {this.state.error?.toString()}
+              {this.state.errorInfo?.componentStack}
+            </pre>
+          )}
         </div>
       );
     }

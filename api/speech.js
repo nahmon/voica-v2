@@ -29,7 +29,7 @@ export default async function handler(req, res) {
       return res.status(429).json({ error: "Too many requests. Please try again later." });
     }
 
-    const form = formidable({ maxFileSize: 25 * 1024 * 1024 });
+    const form = formidable({ maxFileSize: 10 * 1024 * 1024 });
     const [fields, files] = await form.parse(req);
 
     const sessionId = fields.session_id?.[0];
@@ -37,11 +37,16 @@ export default async function handler(req, res) {
 
     const { data: session } = await supabase
       .from("sessions")
-      .select("id, status")
+      .select("id, status, stt_count")
       .eq("id", sessionId)
       .single();
     if (!session || session.status !== "in_progress") {
       return res.status(403).json({ error: "Invalid or completed session" });
+    }
+
+    const MAX_STT_PER_SESSION = 50;
+    if ((session.stt_count ?? 0) >= MAX_STT_PER_SESSION) {
+      return res.status(429).json({ error: "STT limit reached for this session" });
     }
 
     const audioFile = files.audio?.[0];
@@ -54,6 +59,13 @@ export default async function handler(req, res) {
         file: await toFile(fileStream, "audio.webm", { type: "audio/webm" }),
         language: "ko",
       });
+
+      supabase.from("sessions")
+        .update({ stt_count: (session.stt_count ?? 0) + 1 })
+        .eq("id", sessionId)
+        .then(() => {})
+        .catch(e => console.error("[speech/stt] count update failed:", e.message));
+
       return res.status(200).json({ transcript: transcription.text });
     } catch (e) {
       console.error("[speech/stt]", e.message);

@@ -17,11 +17,16 @@ export default async function handler(req, res) {
   if (!session_id) return res.status(403).json({ error: "session_id required" });
   const { data: session } = await supabase
     .from("sessions")
-    .select("id, status")
+    .select("id, status, followup_count")
     .eq("id", session_id)
     .single();
   if (!session || session.status !== "in_progress") {
     return res.status(403).json({ error: "Invalid or completed session" });
+  }
+
+  const MAX_FOLLOWUPS_PER_SESSION = 20;
+  if ((session.followup_count ?? 0) >= MAX_FOLLOWUPS_PER_SESSION) {
+    return res.status(429).json({ error: "Follow-up limit reached for this session" });
   }
 
   if (!question_content?.trim()) return res.status(400).json({ error: "question_content required" });
@@ -52,6 +57,12 @@ export default async function handler(req, res) {
     const text = completion.choices[0].message.content?.trim() ?? "";
 
     if (text === "NO_FOLLOWUP") return res.status(200).json({ followup: null });
+
+    supabase.from("sessions")
+      .update({ followup_count: (session.followup_count ?? 0) + 1 })
+      .eq("id", session_id)
+      .then(() => {})
+      .catch(e => console.error("[followup] count update failed:", e.message));
 
     return res.status(200).json({ followup: text });
   } catch (e) {

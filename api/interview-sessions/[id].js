@@ -26,12 +26,16 @@ export default async function handler(req, res) {
     .single();
   if (ivError || !interview) return res.status(403).json({ error: "Interview not found or access denied" });
 
-  // Fetch all sessions (service role bypasses RLS)
+  const limit = Math.min(parseInt(req.query.limit ?? "50"), 100);
+  const offset = parseInt(req.query.offset ?? "0");
+
+  // Fetch sessions with pagination
   const { data: sessions, error: sessError } = await supabase
     .from("sessions")
     .select("id, respondent, status, completed_at, started_at")
     .eq("interview_id", interviewId)
-    .order("started_at", { ascending: false });
+    .order("started_at", { ascending: false })
+    .range(offset, offset + limit - 1);
   if (sessError) return res.status(500).json({ error: sessError.message });
 
   // Fetch all responses for all sessions in one query
@@ -45,5 +49,5 @@ export default async function handler(req, res) {
     responses = resp ?? [];
   }
 
-  return res.status(200).json({ interview, sessions: sessions ?? [], responses });
+  return res.status(200).json({ interview, sessions: sessions ?? [], responses, limit, offset });
 }

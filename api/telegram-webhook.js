@@ -24,5 +24,13 @@ export default async function handler(req, res) {
     status: 'pending',
   })
 
-  if (error) console.error('[webhook] insert failed:', error)
+  if (error) {
+    console.error('[webhook] insert failed:', error)
+    if (process.env.SLACK_WEBHOOK_URL) {
+      const { sendSlack } = await import('./lib/slack.js');
+      sendSlack(process.env.SLACK_WEBHOOK_URL,
+        `⚠️ Telegram 태스크 유실: ${message.text.slice(0, 100)} | err: ${error.message}`
+      ).catch(() => {});
+    }
+  }
 }

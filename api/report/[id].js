@@ -275,7 +275,7 @@ ${transcriptBlock}
 
     // Generate a 12-char URL-safe token using Node built-in crypto
     const { randomBytes } = await import("crypto");
-    const publicToken = randomBytes(9).toString("base64url").slice(0, 12);
+    const publicToken = randomBytes(16).toString("base64url").slice(0, 16);
 
     const { error: updateErr } = await supabase
       .from("interviews")

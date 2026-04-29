@@ -69,17 +69,6 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: "Invalid or completed session" });
     }
 
-    // If a token is present (authenticated user), verify ownership to prevent
-    // one user from generating upload URLs for another user's session.
-    // Anonymous respondents (no token) are allowed through — session in_progress is sufficient.
-    const token = req.headers.authorization?.replace("Bearer ", "");
-    if (token) {
-      const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
-      if (!authErr && user && session.interviews?.user_id !== user.id) {
-        return res.status(403).json({ error: "Forbidden: you do not own this session's interview" });
-      }
-    }
-
     const path = `${sessionId}/${questionId}.${ext.toLowerCase()}`;
     const { data, error } = await supabase.storage
       .from("audio-responses")

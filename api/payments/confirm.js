@@ -38,9 +38,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: e.message });
   }
 
-  await supabase.from("orders")
+  const { data: updatedOrder } = await supabase
+    .from("orders")
     .update({ status: "PAID", toss_payment_key: paymentKey, updated_at: new Date().toISOString() })
-    .eq("id", orderId);
+    .eq("id", orderId)
+    .eq("status", "PENDING")
+    .select("id")
+    .single();
+
+  // 다른 요청이 이미 처리한 경우 멱등 처리
+  if (!updatedOrder) return res.status(200).json({ ok: true });
 
   await supabase.rpc("add_credits", {
     p_user_id: user.id,

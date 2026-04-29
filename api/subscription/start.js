@@ -53,6 +53,21 @@ export default async function handler(req, res) {
     periodEnd.setMonth(periodEnd.getMonth() + 1);
   }
 
+  // 청구 전에 pending 상태로 먼저 저장 (결제 후 DB 저장 실패 방지)
+  await supabase.from("subscriptions").upsert({
+    user_id: user.id,
+    plan_id: plan.id,
+    billing_key: billingResult.billingKey,
+    customer_key: customerKey,
+    status: "pending",
+    amount: plan.amount,
+    current_period_start: now.toISOString(),
+    current_period_end: periodEnd.toISOString(),
+    cancel_at_period_end: false,
+    retry_count: 0,
+    updated_at: now.toISOString(),
+  }, { onConflict: "user_id" });
+
   let charge;
   try {
     charge = await chargeBillingKey({
@@ -64,22 +79,17 @@ export default async function handler(req, res) {
       customerEmail: user.email ?? "",
     });
   } catch (e) {
+    // 결제 실패 시 pending → failed로 표시
+    await supabase.from("subscriptions")
+      .update({ status: "failed", updated_at: now.toISOString() })
+      .eq("user_id", user.id);
     return res.status(400).json({ error: `첫 결제 실패: ${e.message}` });
   }
 
-  await supabase.from("subscriptions").upsert({
-    user_id: user.id,
-    plan_id: plan.id,
-    billing_key: billingResult.billingKey,
-    customer_key: customerKey,
-    status: "active",
-    amount: plan.amount,
-    current_period_start: now.toISOString(),
-    current_period_end: periodEnd.toISOString(),
-    cancel_at_period_end: false,
-    retry_count: 0,
-    updated_at: now.toISOString(),
-  }, { onConflict: "user_id" });
+  // 결제 성공 시 active로 업데이트
+  await supabase.from("subscriptions")
+    .update({ status: "active", updated_at: now.toISOString() })
+    .eq("user_id", user.id);
 
   await supabase.from("payment_attempts").insert({
     user_id: user.id,

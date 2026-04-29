@@ -47,6 +47,24 @@ export default async function handler(req, res) {
     const { data: { user: authUser } } = await supabase.auth.admin.getUserById(sub.user_id);
     const customerEmail = authUser?.email ?? "";
 
+    // 낙관적 잠금: 청구 전에 period 먼저 업데이트 (동시 실행 방지)
+    const { data: locked } = await supabase
+      .from("subscriptions")
+      .update({
+        current_period_start: newStart.toISOString(),
+        current_period_end: newEnd.toISOString(),
+        updated_at: now.toISOString(),
+      })
+      .eq("id", sub.id)
+      .eq("current_period_end", sub.current_period_end)
+      .select("id")
+      .single();
+
+    if (!locked) {
+      console.warn(`[cron] sub ${sub.id} already processed by another instance, skipping`);
+      continue;
+    }
+
     try {
       const charge = await chargeBillingKey({
         billingKey: sub.billing_key,
@@ -57,10 +75,9 @@ export default async function handler(req, res) {
         customerEmail,
       });
 
+      // period는 이미 업데이트됨, status만 업데이트
       await supabase.from("subscriptions").update({
         status: "active",
-        current_period_start: newStart.toISOString(),
-        current_period_end: newEnd.toISOString(),
         retry_count: 0,
         updated_at: now.toISOString(),
       }).eq("id", sub.id);
@@ -80,7 +97,10 @@ export default async function handler(req, res) {
       // 2번 실패 → unpaid (서비스 차단), 1번 실패 → past_due (3일 그레이스)
       const nextStatus = retryCount >= 2 ? "unpaid" : "past_due";
 
+      // 실패 시 period 롤백
       await supabase.from("subscriptions").update({
+        current_period_start: sub.current_period_start,
+        current_period_end: sub.current_period_end,
         status: nextStatus,
         retry_count: retryCount,
         updated_at: now.toISOString(),

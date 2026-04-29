@@ -82,7 +82,8 @@ export default async function handler(req, res) {
   });
 
   const csv = [headers, ...rows].map(row => row.map(escapeCsv).join(",")).join("\n");
-  const filename = `${interview.title.replace(/[^a-zA-Z0-9가-힣]/g, "_")}_responses.csv`;
+  const safeName = interview.title.replace(/[^a-zA-Z0-9가-힣]/g, "_").slice(0, 100);
+  const filename = `${safeName}_responses.csv`;
 
   res.setHeader("Content-Type", "text/csv; charset=utf-8");
   res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
