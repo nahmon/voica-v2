@@ -809,6 +809,24 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
             {(report.content.themes?.length > 0 || sentimentDist) && (
               <Section number={sn.themes} title={isKo ? "테마 & 감정 분석" : "Themes & Sentiment"} dk={dk} isMobile={isMobile}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                  {report.content.sentiment_analysis?.overall_score && (
+                    <div style={{ marginBottom: 16 }}>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: dk.dim, letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 8 }}>
+                        {isKo ? "전체 감성 점수" : "Overall Sentiment Score"}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ flex: 1, height: 8, background: dk.card2, borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ width: `${report.content.sentiment_analysis.overall_score * 10}%`, height: "100%", background: report.content.sentiment_analysis.overall_score >= 7 ? "#22c55e" : report.content.sentiment_analysis.overall_score >= 4 ? "#eab308" : "#ef4444", borderRadius: 4, transition: "width 0.5s" }} />
+                        </div>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: dk.text, minWidth: 32 }}>{report.content.sentiment_analysis.overall_score}<span style={{ fontSize: 11, color: dk.muted }}>/10</span></span>
+                      </div>
+                      {report.content.sentiment_analysis?.summary && (
+                        <div style={{ fontSize: 12, color: dk.muted, marginTop: 8, fontStyle: "italic", lineHeight: 1.5 }}>
+                          {report.content.sentiment_analysis.summary}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {sentimentDist && (
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 600, color: dk.dim, letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 10 }}>{isKo ? "감정 분포" : "Sentiment Distribution"}</div>
@@ -847,6 +865,18 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                               {(theme.key_quote || theme.quotes?.[0]) && (
                                 <div style={{ fontSize: 11, color: dk.muted, marginTop: 2, fontStyle: "italic", lineHeight: 1.4 }}>
                                   "{(theme.key_quote || theme.quotes[0]).slice(0, 72)}{(theme.key_quote || theme.quotes[0]).length > 72 ? "…" : ""}"
+                                </div>
+                              )}
+                              {theme.emotion_keywords?.length > 0 && (
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
+                                  {theme.emotion_keywords.map((kw, ki) => (
+                                    <span key={ki} style={{
+                                      fontSize: 10, padding: "1px 6px", borderRadius: 10,
+                                      background: theme.sentiment === "positive" ? "rgba(34,197,94,0.12)" : theme.sentiment === "negative" ? "rgba(239,68,68,0.12)" : "rgba(148,163,184,0.1)",
+                                      color: theme.sentiment === "positive" ? "#4ade80" : theme.sentiment === "negative" ? "#f87171" : "#94a3b8",
+                                      border: `1px solid ${theme.sentiment === "positive" ? "rgba(34,197,94,0.2)" : theme.sentiment === "negative" ? "rgba(239,68,68,0.2)" : "rgba(148,163,184,0.15)"}`,
+                                    }}>{kw}</span>
+                                  ))}
                                 </div>
                               )}
                             </div>

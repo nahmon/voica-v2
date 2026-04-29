@@ -150,6 +150,7 @@ ${transcriptBlock}
         "negative": 부정적으로 언급한 응답자 수,
         "neutral": 중립적으로 언급한 응답자 수
       },
+      "emotion_keywords": ["감정단어1", "감정단어2", "감정단어3"],
       "key_quote": "이 테마를 가장 잘 대표하는 응답자의 실제 발언 (원문 그대로)",
       "quotes": ["두 번째 대표 발언", "세 번째 대표 발언 (있는 경우)"]
     }
@@ -158,6 +159,11 @@ ${transcriptBlock}
   "stats": {
     "total_responses": ${sessions.length},
     "avg_completion_time": "세션 시작~완료 시간 기반 추정값 (예: 약 8분)"
+  },
+
+  "sentiment_analysis": {
+    "overall_score": 1-10 사이 정수 (1=매우 부정적, 10=매우 긍정적),
+    "summary": "전체 감성을 데이터 기반으로 요약한 1문장 (50자 내외)"
   },
 
   "recommendations": [
@@ -198,7 +204,9 @@ ${transcriptBlock}
 - recommendations.detail에는 반드시 실제 응답자 수치(X명 중 Y명, Z%)를 포함하세요.
 - summary는 반드시 세 개의 불렛(•)으로 구성하세요.
 - themes.key_quote는 응답자의 원문 발언을 그대로 인용하세요 (요약 금지).
-- 모든 수치는 실제 데이터에서 계산한 값이어야 합니다.`;
+- 모든 수치는 실제 데이터에서 계산한 값이어야 합니다.
+- emotion_keywords는 응답자 발화에서 추출한 실제 감정 표현이어야 합니다 (3개 이내).
+- sentiment_analysis.summary는 데이터 기반 1문장으로 작성하세요.`;
 
 
     try {
