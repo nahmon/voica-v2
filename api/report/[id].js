@@ -55,7 +55,7 @@ export default async function handler(req, res) {
     // Verify ownership
     const { data: interview } = await supabase
       .from("interviews")
-      .select("id, title, user_id")
+      .select("id, title, user_id, slack_webhook_url")
       .eq("id", id)
       .eq("user_id", user.id)
       .single();
@@ -224,6 +224,20 @@ ${transcriptBlock}
       }
 
       await supabase.from("reports").update({ status: "completed", content }).eq("id", report.id);
+
+      // Fire-and-forget Slack notification
+      if (interview.slack_webhook_url) {
+        const completedCount = sessions.filter(s => s.completed_at).length;
+        const reportUrl = `https://voicesurvey.app/report/${report.id}`;
+        fetch(interview.slack_webhook_url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: `📊 새 리포트 준비됨\n*인터뷰:* ${interview.title ?? "제목 없음"}\n*완료 응답자:* ${completedCount}명\n<${reportUrl}|리포트 보기 →>`,
+          }),
+        }).catch(e => console.error("[report] slack notify failed:", e.message));
+      }
+
       return res.status(200).json({ report_id: report.id, status: "completed", content });
     } catch (e) {
       console.error("[report] GPT error:", e.message);
