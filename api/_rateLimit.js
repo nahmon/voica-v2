@@ -1,5 +1,8 @@
-// Simple in-memory rate limiter (per Vercel function instance)
-// Resets on cold start — good enough for burst protection without external deps.
+// In-memory rate limiter (per Vercel function instance).
+// Resets on cold start — intentional: provides burst protection without external deps.
+// Secondary defense layer: all AI endpoints (followup, speech/stt, speech/tts) also
+// require a valid in_progress session_id verified against DB, which limits abuse
+// even if this rate limiter is bypassed via multi-instance spread.
 const store = new Map();
 const WINDOW_MS = 60_000;
 
