@@ -363,7 +363,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   handleSaveRef.current = handleSave;
 
   const handleCopy = async () => {
-    const url = `${window.location.origin}/i/${shareCode}`;
+    const url = `https://voicesurvey.app/i/${shareCode}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch {

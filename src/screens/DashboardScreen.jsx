@@ -111,7 +111,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
 
   const handleCopyLink = async (e, shareCode) => {
     e.stopPropagation();
-    const url = `${window.location.origin}/i/${shareCode}`;
+    const url = `https://voicesurvey.app/i/${shareCode}`;
     await copyToClipboard(url);
     setCopiedId(shareCode);
     setTimeout(() => setCopiedId(null), 2000);
