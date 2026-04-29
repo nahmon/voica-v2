@@ -2,6 +2,39 @@ import { supabase } from "./_supabase.js";
 import { sendSlack } from "./lib/slack.js";
 import { rateLimit, getIp } from "./_rateLimit.js";
 
+function calcQualityScore(session, responses) {
+  if (!responses.length) return 0;
+
+  let score = 100;
+  const voiceResponses = responses.filter(r => r.type === "voice");
+
+  // 1. Response length penalty (short transcripts)
+  const avgLen = voiceResponses.length > 0
+    ? voiceResponses.reduce((sum, r) => sum + (r.transcript?.trim().length ?? 0), 0) / voiceResponses.length
+    : 0;
+  if (avgLen < 10) score -= 40;
+  else if (avgLen < 30) score -= 20;
+  else if (avgLen < 60) score -= 10;
+
+  // 2. Completion time penalty (too fast = suspicious)
+  if (session.started_at && session.completed_at) {
+    const durationMs = new Date(session.completed_at) - new Date(session.started_at);
+    const durationMin = durationMs / 60000;
+    if (durationMin < 1) score -= 30;
+    else if (durationMin < 2) score -= 15;
+  }
+
+  // 3. Meaningless response detection
+  const junkPatterns = /^[ㄱ-ㅎㅏ-ㅣ\s.]{1,5}$|^(모름|없음|없어요|네|아니요|ㅇ|ㄴ)$/;
+  const junkCount = voiceResponses.filter(r => junkPatterns.test(r.transcript?.trim() ?? "")).length;
+  if (junkCount > 0) score -= junkCount * 15;
+
+  // 4. Completion bonus
+  if (responses.length >= 3) score += 5;
+
+  return Math.max(0, Math.min(100, score));
+}
+
 export default async function handler(req, res) {
   const resource = req.query.resource;
   const ip = getIp(req);
@@ -57,7 +90,7 @@ export default async function handler(req, res) {
 
       const { data: session } = await supabase
         .from("sessions")
-        .select("id, status, interview_id, interviews(reward_amount, slack_webhook_url, title)")
+        .select("id, status, interview_id, started_at, completed_at, interviews(reward_amount, slack_webhook_url, title)")
         .eq("id", session_id)
         .single();
       if (!session) return res.status(404).json({ error: "Session not found" });
@@ -68,7 +101,22 @@ export default async function handler(req, res) {
       }
 
       const patch = { status };
-      if (status === "completed") patch.completed_at = new Date().toISOString();
+      if (status === "completed") {
+        patch.completed_at = new Date().toISOString();
+
+        // Calculate quality score (0-100)
+        try {
+          const { data: sessionResponses } = await supabase
+            .from("responses")
+            .select("type, transcript, value")
+            .eq("session_id", session_id);
+
+          const sessionWithCompletion = { ...session, completed_at: patch.completed_at };
+          patch.quality_score = calcQualityScore(sessionWithCompletion, sessionResponses ?? []);
+        } catch (_) {
+          // quality_score 계산 실패해도 세션 완료는 정상 처리
+        }
+      }
 
       const { error } = await supabase
         .from("sessions")
