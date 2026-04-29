@@ -75,6 +75,17 @@ export default async function handler(req, res) {
 
     // No question_id = bridge phrase, skip cache
     if (!question_id) {
+      const session_id = body.session_id ?? req.query.session_id;
+      if (session_id) {
+        const { data: bridgeSession } = await supabase
+          .from("sessions")
+          .select("id, status")
+          .eq("id", session_id)
+          .single();
+        if (!bridgeSession || bridgeSession.status !== "in_progress") {
+          return res.status(403).json({ error: "Invalid or completed session" });
+        }
+      }
       const mp3 = await openai.audio.speech.create({ model: "tts-1-hd", voice: "shimmer", input: text });
       const buffer = Buffer.from(await mp3.arrayBuffer());
       return res.status(200).json({ url: `data:audio/mpeg;base64,${buffer.toString("base64")}` });

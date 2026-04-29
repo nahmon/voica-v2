@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { rateLimit, getIp } from "./_rateLimit.js";
+import { supabase } from "./_supabase.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -12,6 +13,16 @@ export default async function handler(req, res) {
   }
 
   const { question_content, transcript, interview_title, session_id } = req.body;
+
+  if (!session_id) return res.status(403).json({ error: "session_id required" });
+  const { data: session } = await supabase
+    .from("sessions")
+    .select("id, status")
+    .eq("id", session_id)
+    .single();
+  if (!session || session.status !== "in_progress") {
+    return res.status(403).json({ error: "Invalid or completed session" });
+  }
 
   if (!question_content?.trim()) return res.status(400).json({ error: "question_content required" });
   if (question_content.length > 500) return res.status(400).json({ error: "question_content too long" });

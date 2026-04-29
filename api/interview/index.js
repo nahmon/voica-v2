@@ -66,12 +66,15 @@ export default async function handler(req, res) {
     if (toDelete.length > 0) {
       await supabase.from("questions").delete().in("id", toDelete);
     }
-    for (const q of incomingWithDbId) {
-      const upd = { order_num: questions.indexOf(q) + 1, type: q.type, content: q.content };
-      if (q.options != null) upd.options = q.options;
-      if (q.stimulus != null) upd.stimulus = q.stimulus;
-      if (q.followup_enabled === false) upd.followup_enabled = false;
-      await supabase.from("questions").update(upd).eq("id", q.id);
+    if (incomingWithDbId.length > 0) {
+      const upsertData = incomingWithDbId.map(q => {
+        const upd = { id: q.id, order_num: questions.indexOf(q) + 1, type: q.type, content: q.content };
+        if (q.options != null) upd.options = q.options;
+        if (q.stimulus != null) upd.stimulus = q.stimulus;
+        if (q.followup_enabled === false) upd.followup_enabled = false;
+        return upd;
+      });
+      await supabase.from("questions").upsert(upsertData);
     }
     if (incomingNew.length > 0) {
       const { data: newQs } = await supabase.from("questions").insert(
@@ -134,7 +137,12 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: qError.message });
     }
     // Pre-generate TTS for all voice questions so participants hear audio immediately
-    if (insertedQs?.length) await prewarmTts(supabase, insertedQs);
+    if (insertedQs?.length) {
+      Promise.race([
+        prewarmTts(supabase, insertedQs),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 10000))
+      ]).catch((e) => console.warn("[prewarmTts]", e.message));
+    }
   }
 
   return res.status(201).json({ interview, share_code });

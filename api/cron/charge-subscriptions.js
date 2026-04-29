@@ -4,6 +4,7 @@ import { supabase } from "../_supabase.js";
 import { chargeBillingKey } from "../lib/toss.js";
 import { PRO_PLAN, getPlanById } from "../lib/plans.js";
 import { nanoid } from "../lib/nanoid.js";
+import { sendSlack } from "../lib/slack.js";
 
 export default async function handler(req, res) {
   // Cron 보호: CRON_SECRET 검증
@@ -96,10 +97,14 @@ export default async function handler(req, res) {
       });
 
       console.error(`[cron] charge failed uid=${sub.user_id} status→${nextStatus}:`, e.code, e.message);
+      await sendSlack(process.env.SLACK_WEBHOOK_URL, `💳 청구 실패: uid=${sub.user_id} plan=${sub.plan_id} status→${nextStatus} err=${e.message}`).catch(() => {});
       failed++;
     }
   }
 
   console.log(`[cron] charged=${charged} failed=${failed}`);
+  if (failed > 0) {
+    await sendSlack(process.env.SLACK_WEBHOOK_URL, `💳 구독 청구 완료: 성공 ${charged}건, 실패 ${failed}건`).catch(() => {});
+  }
   return res.status(200).json({ charged, failed });
 }

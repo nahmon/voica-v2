@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { supabase } from "./_supabase.js";
 import { rateLimit, getIp } from "./_rateLimit.js";
 
@@ -135,7 +136,10 @@ export default async function handler(req, res) {
     const webhookSecret = process.env.TOSS_WEBHOOK_SECRET;
     if (!webhookSecret) return res.status(503).json({ error: "Webhook not configured" });
     const sig = req.headers["toss-payments-signature"];
-    if (!sig || sig !== webhookSecret) return res.status(401).json({ error: "Invalid signature" });
+    const expected = crypto.createHmac("sha256", webhookSecret)
+      .update(JSON.stringify(req.body)).digest("base64");
+    if (!sig || !crypto.timingSafeEqual(Buffer.from(sig, "utf8"), Buffer.from(expected, "utf8")))
+      return res.status(401).json({ error: "Invalid signature" });
 
     const { eventType, data } = req.body ?? {};
     if (!eventType || !data) return res.status(400).json({ error: "Invalid webhook payload" });
