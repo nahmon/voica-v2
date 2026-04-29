@@ -640,10 +640,15 @@ export function VoicePlayer({ audioUrl, responseId, transcript, dark = false }) 
     const a = audioRef.current;
     if (!a) return;
     if (playing) { a.pause(); setPlaying(false); return; }
-    // If we had an error or no URL yet, try fetching a fresh signed URL
+    // If we had an error or no URL yet, fetch a fresh signed URL and set it directly
     if ((loadError || !resolvedUrl) && responseId) {
       const fresh = await fetchFreshUrl();
-      if (fresh) { setResolvedUrl(fresh); setLoadError(false); }
+      if (fresh) {
+        setResolvedUrl(fresh);
+        setLoadError(false);
+        a.src = fresh; // set directly — React state update is async, audio element needs src now
+        a.load();
+      }
     }
     a.play().catch(() => {});
     setPlaying(true);

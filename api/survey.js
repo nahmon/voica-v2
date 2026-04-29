@@ -8,13 +8,13 @@ function calcQualityScore(session, responses) {
   let score = 100;
   const voiceResponses = responses.filter(r => r.type === "voice");
 
-  // 1. Response length penalty (short transcripts)
-  const avgLen = voiceResponses.length > 0
-    ? voiceResponses.reduce((sum, r) => sum + (r.transcript?.trim().length ?? 0), 0) / voiceResponses.length
-    : 0;
-  if (avgLen < 10) score -= 40;
-  else if (avgLen < 30) score -= 20;
-  else if (avgLen < 60) score -= 10;
+  // 1. Response length penalty (skip if no voice questions in this interview)
+  if (voiceResponses.length > 0) {
+    const avgLen = voiceResponses.reduce((sum, r) => sum + (r.transcript?.trim().length ?? 0), 0) / voiceResponses.length;
+    if (avgLen < 10) score -= 40;
+    else if (avgLen < 30) score -= 20;
+    else if (avgLen < 60) score -= 10;
+  }
 
   // 2. Completion time penalty (too fast = suspicious)
   if (session.started_at && session.completed_at) {
