@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  if (!rateLimit(`interview-write:${getIp(req)}`, 30)) {
+  if (!await rateLimit(`interview-write:${getIp(req)}`, 30)) {
     return res.status(429).json({ error: "Too many requests" });
   }
 

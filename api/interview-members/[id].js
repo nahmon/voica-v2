@@ -35,7 +35,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
-    if (!rateLimit(`invite:${user.id}`, 10)) {
+    if (!await rateLimit(`invite:${user.id}`, 10)) {
       return res.status(429).json({ error: "Too many requests" });
     }
     const { email } = req.body ?? {};

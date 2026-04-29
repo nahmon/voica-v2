@@ -39,7 +39,7 @@ export default async function handler(req, res) {
   const resource = req.query.resource;
   const ip = getIp(req);
 
-  if (!rateLimit(`survey:${ip}`, 60)) {
+  if (!await rateLimit(`survey:${ip}`, 60)) {
     return res.status(429).json({ error: "Too many requests. Please try again later." });
   }
 

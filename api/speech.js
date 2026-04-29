@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   const ip = getIp(req);
 
   if (type === "stt") {
-    if (!rateLimit(`stt:${ip}`, 20)) {
+    if (!await rateLimit(`stt:${ip}`, 20)) {
       return res.status(429).json({ error: "Too many requests. Please try again later." });
     }
 
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
   }
 
   if (type === "tts") {
-    if (!rateLimit(`tts:${ip}`, 30)) {
+    if (!await rateLimit(`tts:${ip}`, 30)) {
       return res.status(429).json({ error: "Too many requests. Please try again later." });
     }
 

@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   // Rate limit: 30 follow-up generations per minute per IP
-  if (!rateLimit(`followup:${getIp(req)}`, 30)) {
+  if (!await rateLimit(`followup:${getIp(req)}`, 30)) {
     return res.status(429).json({ followup: null });
   }
 

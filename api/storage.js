@@ -41,7 +41,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
-    if (!rateLimit(`upload:${getIp(req)}`, 30)) {
+    if (!await rateLimit(`upload:${getIp(req)}`, 30)) {
       return res.status(429).json({ error: "Too many requests. Please try again later." });
     }
 

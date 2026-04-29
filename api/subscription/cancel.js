@@ -5,7 +5,7 @@ import { rateLimit, getIp } from "../_rateLimit.js";
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  if (!rateLimit(`subscription-cancel:${getIp(req)}`, 5)) {
+  if (!await rateLimit(`subscription-cancel:${getIp(req)}`, 5)) {
     return res.status(429).json({ error: "Too many requests" });
   }
 

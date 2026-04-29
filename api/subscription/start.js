@@ -8,7 +8,7 @@ import { nanoid } from "../lib/nanoid.js";
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  if (!rateLimit(`subscription-start:${getIp(req)}`, 5)) {
+  if (!await rateLimit(`subscription-start:${getIp(req)}`, 5)) {
     return res.status(429).json({ error: "Too many requests" });
   }
 

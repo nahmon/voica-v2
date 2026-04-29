@@ -42,7 +42,7 @@ export default async function handler(req, res) {
   // ── POST: trigger generation ──
   if (req.method === "POST") {
     // [Medium] Rate limit report generation to prevent GPT API cost abuse
-    if (!rateLimit(`report-generate:${getIp(req)}`, 5)) {
+    if (!await rateLimit(`report-generate:${getIp(req)}`, 5)) {
       return res.status(429).json({ error: "Too many requests. Please try again later." });
     }
 

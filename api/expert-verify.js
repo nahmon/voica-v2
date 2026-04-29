@@ -46,7 +46,7 @@ async function isAdminUser(supabase, userId) {
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  if (!rateLimit(`expert-verify:${getIp(req)}`, 10)) {
+  if (!await rateLimit(`expert-verify:${getIp(req)}`, 10)) {
     return res.status(429).json({ error: "Too many requests" });
   }
 

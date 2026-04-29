@@ -9,7 +9,7 @@ const ADMIN_IDS = (process.env.ADMIN_USER_IDS ?? "").split(",").map(s => s.trim(
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  if (!rateLimit(`management:${getIp(req)}`, 15)) {
+  if (!await rateLimit(`management:${getIp(req)}`, 15)) {
     return res.status(429).json({ error: "Too many requests" });
   }
 

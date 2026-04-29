@@ -11,7 +11,7 @@ async function getUser(req) {
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  if (!rateLimit(`participant:${getIp(req)}`, 20)) {
+  if (!await rateLimit(`participant:${getIp(req)}`, 20)) {
     return res.status(429).json({ error: "Too many requests" });
   }
 

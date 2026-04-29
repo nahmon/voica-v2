@@ -1,25 +1,37 @@
-// In-memory rate limiter (per Vercel function instance).
-// Resets on cold start — intentional: provides burst protection without external deps.
-// Secondary defense layer: all AI endpoints (followup, speech/stt, speech/tts) also
-// require a valid in_progress session_id verified against DB, which limits abuse
-// even if this rate limiter is bypassed via multi-instance spread.
-const store = new Map();
+import { supabase } from "./_supabase.js";
+
+// Fallback in-memory store for when DB is unavailable
+const fallback = new Map();
 const WINDOW_MS = 60_000;
 
-/**
- * Returns true if the request is allowed, false if rate-limited.
- * @param {string} key  — e.g. IP address or "ip:endpoint"
- * @param {number} max  — max requests per WINDOW_MS (default 30)
- */
-export function rateLimit(key, max = 30) {
+function fallbackRateLimit(key, max) {
   const now = Date.now();
-  let entry = store.get(key);
+  let entry = fallback.get(key);
   if (!entry || now > entry.resetAt) {
     entry = { count: 0, resetAt: now + WINDOW_MS };
   }
   entry.count++;
-  store.set(key, entry);
+  fallback.set(key, entry);
   return entry.count <= max;
+}
+
+/**
+ * Supabase-backed rate limiter (global across Vercel instances).
+ * Falls back to in-memory if DB call fails (fail open — availability > strict limiting).
+ * Returns true if request is allowed, false if rate-limited.
+ */
+export async function rateLimit(key, max = 30) {
+  try {
+    const { data, error } = await supabase.rpc("check_rate_limit", {
+      p_key: key,
+      p_max: max,
+      p_window_ms: WINDOW_MS,
+    });
+    if (error) throw error;
+    return data === true;
+  } catch {
+    return fallbackRateLimit(key, max);
+  }
 }
 
 /** Extract best-effort IP from Vercel request headers */

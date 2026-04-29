@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
   // Rate limit: 60 req/min per token (using token as key suffix to isolate per-report)
   const ip = getIp(req);
-  if (!rateLimit(`public-report:${token}:${ip}`, 60)) {
+  if (!await rateLimit(`public-report:${token}:${ip}`, 60)) {
     return res.status(429).json({ error: "Too many requests" });
   }
 

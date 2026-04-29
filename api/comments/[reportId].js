@@ -41,7 +41,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
-    if (!rateLimit(`comment:${user.id}`, 20)) {
+    if (!await rateLimit(`comment:${user.id}`, 20)) {
       return res.status(429).json({ error: "Too many requests" });
     }
     const { content } = req.body ?? {};
