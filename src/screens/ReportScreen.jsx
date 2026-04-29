@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
+import { copyToClipboard } from "../lib/clipboard.js";
 import { Badge, Btn, GlobalNav, VoicePlayer, Footer, Skeleton, useToast } from "../components/shared.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
@@ -150,7 +151,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
       if (!res.ok) throw new Error(data.error || "Failed to create link");
       setPublicToken(data.public_report_token);
       const url = `${location.origin}/report/public/${data.public_report_token}`;
-      navigator.clipboard.writeText(url).catch(() => { const el = document.createElement("textarea"); el.value = url; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); });
+      copyToClipboard(url);
       showToast(isKo ? "공개 링크가 생성되어 클립보드에 복사됐어요" : "Public link created and copied", "success");
     } catch (e) {
       showToast(e.message, "error");
@@ -162,7 +163,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   const handleCopyPublicLink = async () => {
     if (!publicToken) return;
     const url = `${location.origin}/report/public/${publicToken}`;
-    navigator.clipboard.writeText(url).catch(() => { const el = document.createElement("textarea"); el.value = url; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); });
+    copyToClipboard(url);
     showToast(isKo ? "공개 링크가 복사됐어요" : "Link copied", "success");
   };
 
@@ -219,8 +220,8 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   const handlePrint = () => window.print();
   const handleShare = () => {
     const url = `${location.origin}/report/${interviewId}`;
-    navigator.clipboard.writeText(url).catch(() => { const el = document.createElement("textarea"); el.value = url; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); });
-    showToast(isKo ? "리포트 링크가 복사됐어요" : "Report link copied", "success");
+    copyToClipboard(url);
+    showToast(isKo ? "리포트 링크가 복사됐어요 (팀원 공유용)" : "Report link copied (team access required)", "success");
   };
 
   const completedSessions = useMemo(() => sessions.filter(s => s.status === "completed"), [sessions]);
@@ -465,7 +466,7 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
                 </button>
               )}
               <button onClick={handlePrint} style={{ padding: "8px 16px", minHeight: 44, borderRadius: 8, border: "none", background: C.purple, color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center" }}>
-                {isKo ? "내보내기 →" : "Export →"}
+                {isKo ? "인쇄 / PDF 저장" : "Print / Save PDF"}
               </button>
             </>
           )}

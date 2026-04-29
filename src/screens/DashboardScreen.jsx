@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabase.js";
 import { C, S, F, Ic } from "../lib/constants.jsx";
+import { copyToClipboard } from "../lib/clipboard.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
 import MembersModal from "../components/MembersModal.jsx";
@@ -111,11 +112,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
   const handleCopyLink = async (e, shareCode) => {
     e.stopPropagation();
     const url = `${window.location.origin}/i/${shareCode}`;
-    try { await navigator.clipboard.writeText(url); } catch {
-      const el = document.createElement("textarea");
-      el.value = url; document.body.appendChild(el); el.select();
-      document.execCommand("copy"); document.body.removeChild(el);
-    }
+    await copyToClipboard(url);
     setCopiedId(shareCode);
     setTimeout(() => setCopiedId(null), 2000);
   };
@@ -264,10 +261,13 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            {creditBalance !== null && creditBalance > 0 && (
+            {creditBalance !== null && (
               <div role="button" tabIndex={0} onClick={() => go("pricing")} onKeyDown={e => (e.key === "Enter" || e.key === " ") && go("pricing")} aria-label={isKo ? "크레딧 충전하기" : "Add credits"} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", minHeight: 44, borderRadius: 20, background: C.purpleBg, border: `1px solid rgba(83,58,253,0.15)`, cursor: "pointer" }}>
                 <span style={{ fontSize: 13 }}>🪙</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: C.purple }}>{isKo ? `${creditBalance.toLocaleString()}원` : `$${(creditBalance / 1300).toFixed(0)}`}</span>
+                {creditBalance > 0
+                  ? <span style={{ fontSize: 12, fontWeight: 600, color: C.purple }}>{isKo ? `${creditBalance.toLocaleString()}원` : `$${(creditBalance / 1300).toFixed(0)}`}</span>
+                  : <span style={{ fontSize: 12, fontWeight: 600, color: C.purple }}>{isKo ? "크레딧 0 · 충전" : "0 credits · Add"}</span>
+                }
               </div>
             )}
             {isPro && (
