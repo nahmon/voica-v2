@@ -84,13 +84,13 @@ export default function PricingScreen({ go, user, logout, lang = "ko", onLangCha
   ];
 
   const handlePlanStart = (planId) => {
+    localStorage.setItem("voica_billing", billing);
+    localStorage.setItem("voica_plan_id", planId);
     if (!user) {
       localStorage.setItem("voica_after_login", "payment_subscribe");
       go("advertiser_login");
       return;
     }
-    sessionStorage.setItem("voica_billing", billing);
-    sessionStorage.setItem("voica_plan_id", planId);
     go("payment_subscribe");
   };
 

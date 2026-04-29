@@ -158,9 +158,14 @@ function AppRoutes() {
       const _exempt2 = /^\/(i|report|responses)\/|^\/editor|^\/panel|^\/publish/;
       if (session?.user && !_exempt2.test(window.location.pathname)) {
         const role = session.user.user_metadata?.role;
+        const afterLogin = localStorage.getItem("voica_after_login");
         if (!role) navigate("/role-select");
         else if (role === "panel") navigate("/panel");
-        else {
+        else if (afterLogin) {
+          localStorage.removeItem("voica_after_login");
+          const paths = { payment_subscribe: "/payment/subscribe", pricing: "/pricing", dashboard: "/dashboard" };
+          navigate(paths[afterLogin] ?? "/dashboard");
+        } else {
           navigate("/dashboard");
           supabase.from("profiles").select("onboarding_completed_at").eq("id", session.user.id).maybeSingle()
             .then(({ data: profile }) => { if (!profile?.onboarding_completed_at) setShowOnboarding(true); });

@@ -23,8 +23,10 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
     try {
       const tossPayments = await loadTossPayments(VITE_TOSS_CLIENT_KEY);
       // customerKey = user.id (UUID) — 서버에서 검증
-      const billing = sessionStorage.getItem("voica_billing") || "monthly";
-      const planId = sessionStorage.getItem("voica_plan_id") || null;
+      const billing = localStorage.getItem("voica_billing") || sessionStorage.getItem("voica_billing") || "monthly";
+      const planId = localStorage.getItem("voica_plan_id") || sessionStorage.getItem("voica_plan_id") || null;
+      localStorage.removeItem("voica_billing");
+      localStorage.removeItem("voica_plan_id");
       const payment = tossPayments.payment({ customerKey: user.id });
       const successUrl = new URL(`${window.location.origin}/payment/success`);
       successUrl.searchParams.set("type", "subscription");
