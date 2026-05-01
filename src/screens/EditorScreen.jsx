@@ -636,7 +636,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
           <button
             role="switch" aria-checked={expertOnly} aria-label="전문가 패널 전용 토글"
             onClick={() => setExpertOnly(v => !v)}
-            style={{ width: 38, height: 20, borderRadius: 10, border: "none", cursor: "pointer", background: expertOnly ? C.purple : C.border, position: "relative", flexShrink: 0, transition: "background 0.2s" }}
+            style={{ width: 38, height: 20, borderRadius: 10, border: "none", cursor: "pointer", background: expertOnly ? C.purple : C.border, position: "relative", flexShrink: 0, transition: "background 0.2s", WebkitAppearance: "none", appearance: "none" }}
           >
             <span style={{ position: "absolute", top: 2, left: expertOnly ? 18 : 2, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s", display: "block" }} />
           </button>
@@ -809,7 +809,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
               <button
                 role="switch" aria-checked={expertOnly} aria-label="전문가 패널 전용 토글"
                 onClick={() => setExpertOnly(v => !v)}
-                style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: expertOnly ? C.purple : C.border, position: "relative", flexShrink: 0, transition: "background 0.2s" }}
+                style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: expertOnly ? C.purple : C.border, position: "relative", flexShrink: 0, transition: "background 0.2s", WebkitAppearance: "none", appearance: "none" }}
               >
                 <span style={{ position: "absolute", top: 2, left: expertOnly ? 20 : 2, width: 18, height: 18, borderRadius: "50%", background: "white", transition: "left 0.2s", display: "block" }} />
               </button>
@@ -1176,7 +1176,7 @@ function QuestionSettings({ q, idx, updateQ, typeLabel, stimuliDragId, setStimul
           </div>
           <button
             onClick={() => updateQ(idx, { followup_enabled: q.followup_enabled === false ? true : false })}
-            style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: q.followup_enabled === false ? C.border : C.purple, position: "relative", flexShrink: 0, transition: "background 0.2s" }}>
+            style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: q.followup_enabled === false ? C.border : C.purple, position: "relative", flexShrink: 0, transition: "background 0.2s", WebkitAppearance: "none", appearance: "none" }}>
             <span style={{ position: "absolute", top: 2, left: q.followup_enabled === false ? 2 : 20, width: 18, height: 18, borderRadius: "50%", background: "white", transition: "left 0.2s", display: "block" }} />
           </button>
         </div>
