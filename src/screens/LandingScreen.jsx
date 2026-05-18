@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { C, F, Ic } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, GlobalNav, VoCCarousel, HowItWorksCarousel, Footer } from "../components/shared.jsx";
@@ -506,13 +506,13 @@ function FinalCtaSection({ go, isMobile, t }) {
 export default function LandingScreen({ go, user, logout, lang = "ko", onLangChange }) {
   const isMobile = useIsMobile();
   const [liveCount, setLiveCount] = useState(247);
-  const refParam = new URLSearchParams(window.location.search).get("ref");
+  const refParam = useMemo(() => new URLSearchParams(window.location.search).get("ref"), []);
   const fromInterview = refParam === "interview";
   const t = TRANSLATIONS[lang];
 
   useEffect(() => {
     if (fromInterview) track("referral_from_interview", { ref: refParam });
-  }, []);
+  }, [fromInterview, refParam]);
   useEffect(() => {
     const tick = () => {
       setLiveCount(prev => {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
-import { C, F, Ic } from "../lib/constants.jsx";
+import { C, F, Ic, APP_URL } from "../lib/constants.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, Btn, useToast } from "../components/shared.jsx";
 import { track } from "../lib/analytics.js";
@@ -366,7 +366,7 @@ export default function EditorScreen({ go, user, logout, interviewId }) {
   handleSaveRef.current = handleSave;
 
   const handleCopy = async () => {
-    const url = `https://voicesurvey.app/i/${shareCode}`;
+    const url = `${APP_URL}/i/${shareCode}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch {

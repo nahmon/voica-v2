@@ -8,8 +8,8 @@ export default async function handler(req, res) {
   const { token } = req.query;
   if (!token) return res.status(404).json({ error: "Not found" });
 
-  // Validate token format: base64url chars, exactly 12 characters
-  if (typeof token !== "string" || !/^[A-Za-z0-9_-]{12}$/.test(token)) {
+  // Validate token format: base64url chars, exactly 16 characters
+  if (typeof token !== "string" || !/^[A-Za-z0-9_-]{16}$/.test(token)) {
     return res.status(404).json({ error: "Not found" });
   }
 

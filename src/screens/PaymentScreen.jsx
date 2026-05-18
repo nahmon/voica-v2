@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
-import { C, F } from "../lib/constants.jsx";
+import { C, F, APP_URL } from "../lib/constants.jsx";
 import { GlobalNav } from "../components/shared.jsx";
 
 const VITE_TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
@@ -28,14 +28,14 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
       localStorage.removeItem("voica_billing");
       localStorage.removeItem("voica_plan_id");
       const payment = tossPayments.payment({ customerKey: user.id });
-      const successUrl = new URL(`https://voicesurvey.app/payment/success`);
+      const successUrl = new URL(`${APP_URL}/payment/success`);
       successUrl.searchParams.set("type", "subscription");
       successUrl.searchParams.set("billing", billing);
       if (planId) successUrl.searchParams.set("planId", planId);
       await payment.requestBillingAuth({
         method: "CARD",
         successUrl: successUrl.toString(),
-        failUrl: `https://voicesurvey.app/pricing`,
+        failUrl: `${APP_URL}/pricing`,
         customerEmail: user.email ?? "",
       });
     } catch (e) {
@@ -44,9 +44,7 @@ export default function PaymentScreen({ go, user, logout, lang = "ko" }) {
       } else {
         console.error("[payment] billingAuth error:", e?.code, e?.message, e);
         try { console.error("[payment] full error JSON:", JSON.stringify(e, Object.getOwnPropertyNames(e))); } catch (_) {}
-        const code = e?.code ? ` (${e.code})` : "";
-        const detail = e?.data ? ` | ${JSON.stringify(e.data)}` : "";
-        setError((e?.message || (isKo ? "결제창을 열 수 없습니다." : "Could not open payment.")) + code + detail);
+        setError(e?.message || (isKo ? "결제창을 열 수 없습니다." : "Could not open payment."));
       }
     }
   };

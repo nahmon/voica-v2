@@ -23,6 +23,7 @@ export const S = {
   lift:     "0 4px 16px rgba(6,27,49,0.1)",
 };
 export const F = `'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif`;
+export const APP_URL = "https://voicesurvey.app";
 
 // ─── Icon System — Stripe-style line icons ───
 export const Ic = {

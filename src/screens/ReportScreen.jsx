@@ -36,11 +36,13 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   }, []);
 
   const loadComments = async (reportId) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch(`/api/comments/${reportId}`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` },
-    });
-    if (res.ok) setComments(await res.json());
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`/api/comments/${reportId}`, {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (res.ok) setComments(await res.json());
+    } catch {}
   };
 
   useEffect(() => {
@@ -209,12 +211,17 @@ export default function ReportScreen({ go, user, logout, interviewId, lang = "ko
   };
 
   const handleDeleteComment = async (commentId) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch(`/api/comments/${report?.id}?commentId=${commentId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${session?.access_token}` },
-    });
-    if (res.ok) setComments(prev => prev.filter(c => c.id !== commentId));
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`/api/comments/${report?.id}?commentId=${commentId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (res.ok) setComments(prev => prev.filter(c => c.id !== commentId));
+      else showToast(isKo ? "댓글 삭제에 실패했어요" : "Failed to delete comment", "error");
+    } catch {
+      showToast(isKo ? "댓글 삭제에 실패했어요" : "Failed to delete comment", "error");
+    }
   };
 
   const handlePrint = () => window.print();

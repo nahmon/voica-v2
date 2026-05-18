@@ -695,6 +695,7 @@ export function VoicePlayer({ audioUrl, responseId, transcript, dark = false }) 
           <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: bg, borderRadius: 10, border: `1px solid ${border}` }}>
             <button
               onClick={toggle}
+              aria-label={playing ? "Pause" : "Play"}
               style={{ width: 36, height: 36, borderRadius: "50%", background: C.purple, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.12s" }}
               onMouseEnter={e => e.currentTarget.style.background = "#4434d4"}
               onMouseLeave={e => e.currentTarget.style.background = C.purple}
@@ -721,6 +722,7 @@ export function VoicePlayer({ audioUrl, responseId, transcript, dark = false }) 
             <button
               onClick={download}
               title="Download"
+              aria-label="Download audio"
               style={{ width: 30, height: 30, borderRadius: "50%", background: "transparent", border: `1px solid ${border}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: textMuted, transition: "all 0.12s" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = C.purple; e.currentTarget.style.color = C.purple; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = border; e.currentTarget.style.color = textMuted; }}

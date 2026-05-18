@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabase.js";
-import { C, S, F, Ic } from "../lib/constants.jsx";
+import { C, S, F, Ic, APP_URL } from "../lib/constants.jsx";
 import { copyToClipboard } from "../lib/clipboard.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { Badge, Btn, GlobalNav, Footer, useToast } from "../components/shared.jsx";
@@ -53,9 +53,9 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
   useEffect(() => {
     if (!user) return;
     supabase.from("credits").select("balance").eq("user_id", user.id).maybeSingle()
-      .then(({ data }) => setCreditBalance(data?.balance ?? 0));
+      .then(({ data, error }) => { if (!error) setCreditBalance(data?.balance ?? 0); });
     supabase.from("subscriptions").select("status, cancel_at_period_end, current_period_end").eq("user_id", user.id).maybeSingle()
-      .then(({ data }) => { setIsPro(data?.status === "active"); setSubscription(data); });
+      .then(({ data, error }) => { if (!error) { setIsPro(data?.status === "active"); setSubscription(data); } });
   }, [user]);
 
   const handleCancelSubscription = async () => {
@@ -111,7 +111,7 @@ export default function DashboardScreen({ go, user, logout, lang = "ko", onLangC
 
   const handleCopyLink = async (e, shareCode) => {
     e.stopPropagation();
-    const url = `https://voicesurvey.app/i/${shareCode}`;
+    const url = `${APP_URL}/i/${shareCode}`;
     await copyToClipboard(url);
     setCopiedId(shareCode);
     setTimeout(() => setCopiedId(null), 2000);

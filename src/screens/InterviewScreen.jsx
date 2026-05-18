@@ -139,22 +139,27 @@ export default function InterviewScreen({ go, shareCode }) {
   useEffect(() => {
     if (!shareCode) { setLoadError("유효하지 않은 인터뷰 링크예요."); setLoading(false); return; }
     (async () => {
-      const res = await fetch(`/api/interview/${shareCode}`);
-      if (!res.ok) {
-        let msg = "인터뷰를 찾을 수 없어요. 링크를 확인해 주세요.";
-        try {
-          const errData = await res.json();
-          if (errData.status === "draft") msg = "아직 공개되지 않은 인터뷰예요. 공개 후 공유해 주세요.";
-          else if (errData.detail === "Missing Supabase credentials") msg = "서버 설정 오류예요. 관리자에게 문의해 주세요.";
-        } catch {}
-        setLoadError(msg);
+      try {
+        const res = await fetch(`/api/interview/${shareCode}`);
+        if (!res.ok) {
+          let msg = "인터뷰를 찾을 수 없어요. 링크를 확인해 주세요.";
+          try {
+            const errData = await res.json();
+            if (errData.status === "draft") msg = "아직 공개되지 않은 인터뷰예요. 공개 후 공유해 주세요.";
+            else if (errData.detail === "Missing Supabase credentials") msg = "서버 설정 오류예요. 관리자에게 문의해 주세요.";
+          } catch {}
+          setLoadError(msg);
+          setLoading(false);
+          return;
+        }
+        const data = await res.json();
+        setInterview(data);
         setLoading(false);
-        return;
+        track("interview_link_opened", { shareCode });
+      } catch {
+        setLoadError("네트워크 오류가 발생했어요. 연결 상태를 확인해 주세요.");
+        setLoading(false);
       }
-      const data = await res.json();
-      setInterview(data);
-      setLoading(false);
-      track("interview_link_opened", { shareCode });
     })();
   }, [shareCode]);
 
@@ -295,7 +300,7 @@ export default function InterviewScreen({ go, shareCode }) {
   useEffect(() => {
     if (introStep !== "started" || !sessionId || !interview) return;
     track("interview_q_started", { shareCode, sessionId, qIndex, total: interview.questions.length });
-  }, [qIndex, introStep, sessionId]);
+  }, [qIndex, introStep, sessionId, interview, shareCode]);
 
   // Auto-scroll chat history to bottom when new Q&A is archived
   useEffect(() => {
