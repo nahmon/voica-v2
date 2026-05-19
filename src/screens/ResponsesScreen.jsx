@@ -328,10 +328,10 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
                   </div>
                   {s.quality_score !== null && s.quality_score !== undefined && (
                     <span style={{
-                      fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 10,
-                      background: s.quality_score >= 80 ? "rgba(34,197,94,0.12)" : s.quality_score >= 50 ? "rgba(234,179,8,0.12)" : "rgba(239,68,68,0.12)",
-                      color: s.quality_score >= 80 ? "#16a34a" : s.quality_score >= 50 ? "#a16207" : "#dc2626",
-                      border: `1px solid ${s.quality_score >= 80 ? "rgba(34,197,94,0.3)" : s.quality_score >= 50 ? "rgba(234,179,8,0.3)" : "rgba(239,68,68,0.3)"}`,
+                      fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 10,
+                      background: s.quality_score >= 80 ? "rgba(34,197,94,0.22)" : s.quality_score >= 50 ? "rgba(234,179,8,0.22)" : "rgba(239,68,68,0.25)",
+                      color: s.quality_score >= 80 ? "#166534" : s.quality_score >= 50 ? "#78350f" : "#991b1b",
+                      border: `1.5px solid ${s.quality_score >= 80 ? "rgba(34,197,94,0.5)" : s.quality_score >= 50 ? "rgba(234,179,8,0.5)" : "rgba(239,68,68,0.55)"}`,
                       whiteSpace: "nowrap",
                     }}>
                       {s.quality_score >= 80 ? (isKo ? "✓ 양호" : "✓ Good") : s.quality_score >= 50 ? (isKo ? "△ 보통" : "△ Fair") : (isKo ? "⚠ 주의" : "⚠ Flag")}
@@ -449,10 +449,10 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
                         <div style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 8, display: "inline-block", background: isCompleted ? "rgba(21,190,83,0.12)" : "#fef3c7", color: isCompleted ? C.successText : "#92400e" }}>{isCompleted ? (isKo ? "완료" : "Completed") : (isKo ? "진행 중" : "In progress")}</div>
                         {s.quality_score !== null && s.quality_score !== undefined && (
                           <span style={{
-                            fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 10,
-                            background: s.quality_score >= 80 ? "rgba(34,197,94,0.12)" : s.quality_score >= 50 ? "rgba(234,179,8,0.12)" : "rgba(239,68,68,0.12)",
-                            color: s.quality_score >= 80 ? "#16a34a" : s.quality_score >= 50 ? "#a16207" : "#dc2626",
-                            border: `1px solid ${s.quality_score >= 80 ? "rgba(34,197,94,0.3)" : s.quality_score >= 50 ? "rgba(234,179,8,0.3)" : "rgba(239,68,68,0.3)"}`,
+                            fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 10,
+                            background: s.quality_score >= 80 ? "rgba(34,197,94,0.2)" : s.quality_score >= 50 ? "rgba(234,179,8,0.2)" : "rgba(239,68,68,0.22)",
+                            color: s.quality_score >= 80 ? "#166534" : s.quality_score >= 50 ? "#78350f" : "#991b1b",
+                            border: `1.5px solid ${s.quality_score >= 80 ? "rgba(34,197,94,0.45)" : s.quality_score >= 50 ? "rgba(234,179,8,0.45)" : "rgba(239,68,68,0.5)"}`,
                             flexShrink: 0,
                           }}>
                             {s.quality_score >= 80 ? (isKo ? "✓ 양호" : "✓ Good") : s.quality_score >= 50 ? (isKo ? "△ 보통" : "△ Fair") : (isKo ? "⚠ 주의" : "⚠ Flag")}
