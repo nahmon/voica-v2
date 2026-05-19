@@ -328,10 +328,10 @@ export default function ResponsesScreen({ go, user, logout, interviewId, lang = 
                   </div>
                   {s.quality_score !== null && s.quality_score !== undefined && (
                     <span style={{
-                      fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 10,
-                      background: s.quality_score >= 80 ? "rgba(34,197,94,0.12)" : s.quality_score >= 50 ? "rgba(234,179,8,0.12)" : "rgba(239,68,68,0.12)",
-                      color: s.quality_score >= 80 ? "#16a34a" : s.quality_score >= 50 ? "#a16207" : "#dc2626",
-                      border: `1px solid ${s.quality_score >= 80 ? "rgba(34,197,94,0.3)" : s.quality_score >= 50 ? "rgba(234,179,8,0.3)" : "rgba(239,68,68,0.3)"}`,
+                      fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 10,
+                      background: s.quality_score >= 80 ? "rgba(34,197,94,0.15)" : s.quality_score >= 50 ? "rgba(234,179,8,0.15)" : "rgba(239,68,68,0.18)",
+                      color: s.quality_score >= 80 ? "#15803d" : s.quality_score >= 50 ? "#92400e" : "#b91c1c",
+                      border: `1px solid ${s.quality_score >= 80 ? "rgba(34,197,94,0.4)" : s.quality_score >= 50 ? "rgba(234,179,8,0.4)" : "rgba(239,68,68,0.45)"}`,
                       whiteSpace: "nowrap",
                     }}>
                       {s.quality_score >= 80 ? (isKo ? "✓ 양호" : "✓ Good") : s.quality_score >= 50 ? (isKo ? "△ 보통" : "△ Fair") : (isKo ? "⚠ 주의" : "⚠ Flag")}
